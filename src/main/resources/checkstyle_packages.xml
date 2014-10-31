@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+    Checkstyle-Addons - Additional checks for the Checkstyle static code analysis tool
+    Copyright (C) 2014 Thomas Jensen
+
+    This program is free software: you can redistribute it and/or modify it under the
+    terms of the GNU General Public License, version 3, as published by the Free
+    Software Foundation.
+
+    This program is distributed in the hope that it will be useful, but WITHOUT ANY
+    WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A
+    PARTICULAR PURPOSE. See the GNU General Public License for more details.
+
+    You should have received a copy of the GNU General Public License along with this
+    program.  If not, see http://www.gnu.org/licenses/.
+-->
+<!DOCTYPE checkstyle-packages PUBLIC "-//Puppy Crawl//DTD Package Names 1.0//EN"
+        "http://www.puppycrawl.com/dtds/packages_1_0.dtd">
+
+<checkstyle-packages>
+    <!--
+        Defines the Java packages where our custom Checkstyle module classes (checks, filters) reside.
+        See http://checkstyle.sourceforge.net/config.html#Packages for more info.
+    -->
+    <package name="com.thomasjensen.checkstyle.addons.checks">
+        <package name="regexp" />
+    </package>
+</checkstyle-packages>

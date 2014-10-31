@@ -1,0 +1,107 @@
+apply plugin: 'java';
+apply plugin: 'jacoco';
+apply plugin: 'idea';
+
+project.description = 'Additional checks for Checkstyle'
+version = '0.1-SNAPSHOT'
+
+buildscript {
+    repositories {
+        mavenLocal()
+        mavenCentral()
+    }
+}
+
+idea.project {
+    languageLevel = '1.6'
+}
+
+idea.module.excludeDirs += file(".idea")
+idea.module.excludeDirs += file("luna_workspace")
+
+repositories {
+    mavenLocal()
+    mavenCentral()
+}
+
+task hello << { task -> println "I'm $task.project.name" }
+
+group = 'com.thomasjensen.checkstyle.addons'
+version = rootProject.version
+project.ext {
+    buildTimestamp = new Date(System.currentTimeMillis()).toString();
+}
+
+tasks.idea.dependsOn(cleanIdea)
+
+afterEvaluate {
+    for (def task in it.tasks)
+        if (task != rootProject.tasks.hello)
+            task.dependsOn rootProject.tasks.hello
+}
+
+/*
+ * Java source options
+ */
+tasks.withType(JavaCompile) {
+    sourceCompatibility = '1.6'
+    targetCompatibility = '1.6'
+    options.encoding = 'UTF-8'
+}
+
+/*
+ * 'Provided' configuration for JARs which need not be packaged
+ */
+configurations {
+    provided
+    provided.extendsFrom(compile)
+}
+idea.module {
+    downloadSources = true
+    downloadJavadoc = true
+    scopes.PROVIDED.plus += [configurations.provided]
+}
+sourceSets.main.compileClasspath += configurations.provided;
+sourceSets.main.runtimeClasspath += configurations.provided
+sourceSets.test.compileClasspath += configurations.provided
+sourceSets.test.runtimeClasspath += configurations.provided
+
+/*
+ * Dependencies
+ */
+dependencies {
+    provided group: 'com.google.code.findbugs', name: 'annotations', version: '3.0.0'
+    provided group: 'com.google.code.findbugs', name: 'jsr305', version: '3.0.0'
+    compile group: 'com.puppycrawl.tools', name: 'checkstyle', version: '5.9'
+    testCompile group: 'junit', name: 'junit', version: '4.11'
+}
+
+/*
+ * Manifest contents
+ */
+jar {
+    manifest {
+        attributes("Specification-Title": "Checkstyle-Addons",
+                "Specification-Vendor": "Thomas Jensen",
+                "Specification-Vendor-Id": "com.thomasjensen",
+                "Specification-Version": version,
+                "Implementation-Title": "Checkstyle-Addons",
+                "Implementation-Vendor": "Thomas Jensen",
+                "Implementation-Vendor-Id": "com.thomasjensen",
+                "Implementation-Version": version,
+                "Created-By": GradleVersion.current().toString(),
+                "Built-By": System.properties['user.name'],
+                "Build-Jdk": org.gradle.internal.jvm.Jvm.current(),
+                "Build-Timestamp": buildTimestamp)
+    }
+}
+
+
+/*
+ * JaCoCo test coverage configuration
+ */
+tasks.withType(Test) { task ->
+    jacoco {
+        append = false
+    }
+}
