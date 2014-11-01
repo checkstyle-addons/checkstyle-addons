@@ -1,0 +1,49 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE checkstyle-metadata PUBLIC "-//eclipse-cs//DTD Check Metadata 1.1//EN"
+    "http://eclipse-cs.sourceforge.net/dtds/checkstyle-metadata_1_1.dtd">
+<!--
+    Checkstyle-Addons - Additional checks for the Checkstyle static code analysis tool
+    Copyright (C) 2014 Thomas Jensen
+
+    This program is free software: you can redistribute it and/or modify it under the
+    terms of the GNU General Public License, version 3, as published by the Free
+    Software Foundation.
+
+    This program is distributed in the hope that it will be useful, but WITHOUT ANY
+    WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A
+    PARTICULAR PURPOSE. See the GNU General Public License for more details.
+
+    You should have received a copy of the GNU General Public License along with this
+    program.  If not, see http://www.gnu.org/licenses/.
+-->
+<checkstyle-metadata>
+<rule-group-metadata name="Checkstyle Addons" priority="1600">
+
+    <rule-metadata name="%RegexpOnFilename.name" internal-name="RegexpOnFilename" parent="Checker">
+        <alternative-name
+            internal-name="com.thomasjensen.checkstyle.addons.checks.regexp.RegexpOnFilenameCheck"/>
+        <description>%RegexpOnFilename.desc</description>
+
+        <property-metadata name="selection" datatype="Regex">
+            <description>%RegexpOnFilename.selection</description>
+        </property-metadata>
+        <property-metadata name="regexp" datatype="Regex" default-value="^(?:\s+.*|.*?\s+)$">
+            <description>%RegexpOnFilename.regexp</description>
+        </property-metadata>
+        <property-metadata name="mode" datatype="SingleSelect" default-value="illegal">
+            <description>%RegexpOnFilename.mode</description>
+            <enumeration>
+                <property-value-option value="illegal"/>
+                <property-value-option value="required"/>
+            </enumeration>
+        </property-metadata>
+        <property-metadata name="simple" datatype="Boolean" default-value="true">
+            <description>%RegexpOnFilename.simple</description>
+        </property-metadata>
+
+        <message-key key="regexp.filepath.illegal"/>
+        <message-key key="regexp.filepath.required"/>
+    </rule-metadata>
+
+</rule-group-metadata>
+</checkstyle-metadata>
