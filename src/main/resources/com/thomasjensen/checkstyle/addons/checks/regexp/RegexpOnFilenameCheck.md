@@ -25,6 +25,7 @@ The check works like this:
      name it is applied to, and how the result is interpreted is governed by the check
      properties.
 
+
 ### Properties
 
 <table border="1">
@@ -32,45 +33,43 @@ The check works like this:
     <th>name</th><th>description</th><th>type</th><th>default value</th>
 </tr>
 <tr>
-<td>fileExtensions</td>
-<td>Comma-separated list of file extensions. Leading dots are optional.
-    Spaces after the commas are allowed. Only files with one of these
-    extensions are checked against the regular expression.</td>
-<td><a href="http://addons.sourceforge.net/property_types.html#stringSet">StringSet</a></td>
-<td>unrestricted</td>
+    <td>fileExtensions</td>
+    <td>Comma-separated list of file extensions. Leading dots are optional.
+        Spaces after the commas are allowed. Only files with one of these
+        extensions are checked against the regular expression.</td>
+    <td>[StringSet](http://checkstyle.sourceforge.net/property_types.html#stringSet)</td>
+    <td>unrestricted</td>
 </tr>
-<tr valign="top">
-<td>selection</td>
-<td>Limits the check to files whose canonical path name contains the given
-    pattern. The canonical path is the simplest possible absolute path,
-    including the file name (no '<tt>..</tt>' elements etc.).</td>
-<td><a href="http://addons.sourceforge.net/property_types.html#regexp">regular
-    expression</a></td>
-<td>unrestricted</td>
+<tr>
+    <td>selection</td>
+    <td>Limits the check to files whose canonical path name contains the given
+        pattern. The canonical path is the simplest possible absolute path,
+        including the file name (no `..` elements etc.).</td>
+    <td>[regular expression](http://checkstyle.sourceforge.net/property_types.html#regexp)</td>
+    <td>unrestricted</td>
 </tr>
-<tr valign="top">
-<td>regexp</td>
-<td>The regular expression applied to the file name.</td>
-<td><a href="http://addons.sourceforge.net/property_types.html#regexp">regular
-    expression</a></td>
-<td><tt>^(?:\s+.*|.*?\s+)$</tt></td>
+<tr>
+    <td>regexp</td>
+    <td>The regular expression applied to the file name.</td>
+    <td>[regular expression](http://checkstyle.sourceforge.net/property_types.html#regexp)</td>
+    <td>`^(?:\s+.*|.*?\s+)$`</td>
 </tr>
-<tr valign="top">
-<td>mode</td>
-<td>whether <tt>regexp</tt> finds required or illegal matches</td>
-<td>{@link RegexpOnFilenameOption Mode}</td>
-<td><code>illegal</code></td>
+<tr>
+    <td>mode</td>
+    <td>whether `regexp` finds required or illegal matches</td>
+    <td>{@link RegexpOnFilenameOption Mode}</td>
+    <td>`illegal`</td>
 </tr>
-<tr valign="top">
-<td>simple</td>
-<td>If <code>true</code>, only the simple name of the file will be checked
-    against the pattern specified by <tt>regexp</tt>;
-    if <code>false</code>, the entire canonical path will be checked.<br/>
-    Note that this option applies only to the pattern specified by
-<tt>regexp</tt>; the <tt>selection</tt> property is <i>always</i> treated
-    as if <tt>simple=false</tt>.</td>
-<td><a href="http://addons.sourceforge.net/property_types.html#boolean">Boolean</a></td>
-<td><code>true</code></td>
+<tr>
+    <td>simple</td>
+    <td>If `true`, only the simple name of the file will be checked
+        against the pattern specified by `regexp`;
+        if `false`, the entire canonical path will be checked.<br/>
+        Note that this option applies only to the pattern specified by
+        `regexp`; the `selection` property is *always* treated
+        as if `simple=false`.</td>
+    <td>[Boolean](http://checkstyle.sourceforge.net/property_types.html#boolean)</td>
+    <td>`true`</td>
 </tr>
 </table>
 
@@ -83,33 +82,38 @@ by the matcher).
 
 ### Examples
 
-<script src="https://google-code-prettify.googlecode.com/svn/loader/run_prettify.js?lang=xml"></script>
-
 To configure the check to detect leading and trailing spaces in file names:
 
-<pre class="prettyprint">&lt;module name=&quot;RegexpOnFilename&quot;&gt;
- &lt;message key=&quot;regexp.filepath.illegal&quot; value=&quot;Filename ''{0}'' contains leading or trailing spaces.&quot;/&gt;
-;/module&gt;</pre>
+```xml
+<module name="RegexpOnFilename">
+  <message key="regexp.filepath.illegal" value="Filename ''{0}'' contains leading or trailing spaces."/>
+</module>
+```
 
 To configure the check to ensure that Java files reside in java folders, not resource folders:
 
-<pre class="prettyprint">&lt;module name=&quot;RegexpOnFilename&quot;&gt;
- &lt;property name=&quot;fileExtensions&quot; value=&quot;java&quot;/&gt;
- &lt;property name=&quot;regexp&quot; value=&quot;[\\/]src[\\/](?:test|main)[\\/]java[\\/]&quot;/&gt;
- &lt;property name=&quot;mode&quot; value=&quot;required&quot;/&gt;
- &lt;property name=&quot;simple&quot; value=&quot;false&quot;/&gt;
- &lt;message key=&quot;regexp.filepath.required&quot; value=&quot;The Java file ''{0}'' must reside in a Java source folder.&quot;/&gt;
-&lt;/module&gt;</pre>
+```xml
+<module name="RegexpOnFilename">
+  <property name="fileExtensions" value="java"/>
+  <property name="regexp" value="[\\/]src[\\/](?:test|main)[\\/]java[\\/]"/>
+  <property name="mode" value="required"/>
+  <property name="simple" value="false"/>
+  <message key="regexp.filepath.required"
+      value="The Java file ''{0}'' must reside in a Java source folder."/>
+</module>
+```
 
 To configure the check to enforce an HTML file naming convention on files in a certain folder:
 
-<pre class="prettyprint">&lt;module name=&quot;RegexpOnFilename&quot;&gt;
- &lt;property name=&quot;fileExtensions&quot; value=&quot;html&quot;/&gt;
- &lt;property name=&quot;selection&quot; value=&quot;[\\/]src[\\/]main[\\/]resources[\\/]html[\\/]views[\\/]&quot;/&gt;
- &lt;property name=&quot;regexp&quot; value=&quot;^view_.*&quot;/&gt;
- &lt;property name=&quot;mode&quot; value=&quot;required&quot;/&gt;
- &lt;message key=&quot;regexp.filepath.required&quot; value=&quot;Name of ''{0}'' must start with ''view_''.&quot;/&gt;
-&lt;/module&gt;</pre>
+```xml
+<module name="RegexpOnFilename">
+  <property name="fileExtensions" value="html"/>
+  <property name="selection" value="[\\/]src[\\/]main[\\/]resources[\\/]html[\\/]views[\\/]"/>
+  <property name="regexp" value="^view_.*"/>
+  <property name="mode" value="required"/>
+  <message key="regexp.filepath.required" value="Name of ''{0}'' must start with ''view_''."/>
+</module>
+```
 
 To configure the check to ban GIF files in favor of PNG:
 
