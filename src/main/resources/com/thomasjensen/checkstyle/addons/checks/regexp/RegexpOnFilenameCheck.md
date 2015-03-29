@@ -113,11 +113,13 @@ To configure the check to enforce an HTML file naming convention on files in a c
 
 To configure the check to ban GIF files in favor of PNG:
 
- <pre class="prettyprint">&lt;module name=&quot;RegexpOnFilename&quot;&gt;
-  &lt;property name=&quot;fileExtensions&quot; value=&quot;gif&quot;/&gt;
-  &lt;property name=&quot;regexp&quot; value=&quot;.&quot;/&gt;
-  &lt;message key=&quot;regexp.filepath.illegal&quot; value=&quot;''{0}'' must be in PNG format, not GIF.&quot;/&gt;
-&lt;/module&gt;</pre>
+```xml
+<module name="RegexpOnFilename">
+  <property name="fileExtensions" value="gif"/>
+  <property name="regexp" value="."/>
+  <message key="regexp.filepath.illegal" value="''{0}'' must be in PNG format, not GIF."/>
+</module>
+```
 
 ### Parent Module
 
