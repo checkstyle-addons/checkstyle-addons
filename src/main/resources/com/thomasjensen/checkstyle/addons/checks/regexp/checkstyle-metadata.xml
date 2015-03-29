@@ -2,8 +2,8 @@
 <!DOCTYPE checkstyle-metadata PUBLIC "-//eclipse-cs//DTD Check Metadata 1.1//EN"
     "http://eclipse-cs.sourceforge.net/dtds/checkstyle-metadata_1_1.dtd">
 <!--
-    Checkstyle-Addons - Additional checks for the Checkstyle static code analysis tool
-    Copyright (C) 2014 Thomas Jensen
+    Checkstyle-Addons - Additional Checkstyle checks
+    Copyright (C) 2015 Thomas Jensen, All rights reserved.
 
     This program is free software: you can redistribute it and/or modify it under the
     terms of the GNU General Public License, version 3, as published by the Free
@@ -19,26 +19,26 @@
 <checkstyle-metadata>
 <rule-group-metadata name="Checkstyle Addons" priority="1600">
 
-    <rule-metadata name="%RegexpOnFilename.name" internal-name="RegexpOnFilename" parent="Checker">
+    <rule-metadata name="RegexpOnFilename" internal-name="RegexpOnFilename" parent="Checker">
         <alternative-name
             internal-name="com.thomasjensen.checkstyle.addons.checks.regexp.RegexpOnFilenameCheck"/>
-        <description>%RegexpOnFilename.desc</description>
+        <description>Checks the names of files (Java and non-Java) against a regular expression.</description>
 
         <property-metadata name="selection" datatype="Regex">
-            <description>%RegexpOnFilename.selection</description>
+            <description>Only files which match this expression in addition to the file extensions will be checked. Leave blank for unrestricted.</description>
         </property-metadata>
         <property-metadata name="regexp" datatype="Regex" default-value="^(?:\s+.*|.*?\s+)$">
-            <description>%RegexpOnFilename.regexp</description>
+            <description>The regular expression to apply to the selected file names.</description>
         </property-metadata>
         <property-metadata name="mode" datatype="SingleSelect" default-value="illegal">
-            <description>%RegexpOnFilename.mode</description>
+            <description>Determines if the regular expression must or must not match.</description>
             <enumeration>
                 <property-value-option value="illegal"/>
                 <property-value-option value="required"/>
             </enumeration>
         </property-metadata>
         <property-metadata name="simple" datatype="Boolean" default-value="true">
-            <description>%RegexpOnFilename.simple</description>
+            <description>Check the simple file name only (checked), or the entire path (unchecked).</description>
         </property-metadata>
 
         <message-key key="regexp.filepath.illegal"/>

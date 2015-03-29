@@ -1,11 +1,30 @@
-.idea/
+# Gradle build directory
 .gradle/
-.settings/
-bin/
 build/
-out/
-target/
-luna_workspace/
-*~
+
+# IntelliJ IDEA control files
+*.iws
 *.iml
+*.ipr
+.idea/
+
+# Netbeans control files
+nbactions.xml
+nb-configuration.xml
+
+# Eclipse control files
+.classpath
+.project
+.settings/
+
+# Windows specific control files
+Thumbs.db
+Desktop.ini
+
+# Others
+bin/
+delme/
+out/
+gradleshell_*.bat
+*~
 *.zip

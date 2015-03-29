@@ -1,6 +1,6 @@
 /*
- * Checkstyle-Addons - Additional checks for the Checkstyle static code analysis tool
- * Copyright (C) 2014 Thomas Jensen
+ * Checkstyle-Addons - Additional Checkstyle checks
+ * Copyright (C) 2015 Thomas Jensen, All rights reserved.
  *
  * This program is free software: you can redistribute it and/or modify it under the
  * terms of the GNU General Public License, version 3, as published by the Free
@@ -15,9 +15,6 @@
  */
 package com.thomasjensen.checkstyle.addons.checks.regexp;
 
-import java.io.File;
-import java.io.IOException;
-
 import com.puppycrawl.tools.checkstyle.DefaultConfiguration;
 import com.puppycrawl.tools.checkstyle.api.CheckstyleException;
 import com.thomasjensen.checkstyle.addons.BaseCheckTestSupport;
@@ -25,6 +22,9 @@ import com.thomasjensen.checkstyle.addons.BaseFileSetCheckTestSupport;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
+
+import java.io.File;
+import java.io.IOException;
 
 
 /**

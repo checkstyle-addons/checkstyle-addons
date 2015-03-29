@@ -13,3 +13,24 @@
  * You should have received a copy of the GNU General Public License along with this
  * program.  If not, see <http://www.gnu.org/licenses/>.
  */
+package com.thomasjensen.checkstyle.addons.sonarqube;
+
+import java.util.Collections;
+import java.util.List;
+
+import org.sonar.api.SonarPlugin;
+
+
+/**
+ * The Checkstyle Addons SonarQube plugin main class.
+ */
+public final class CheckstyleExtensionPlugin
+    extends SonarPlugin
+{
+    @Override
+    @SuppressWarnings("unchecked")
+    public List<?> getExtensions()
+    {
+        return Collections.singletonList(CheckstyleExtensionRepository.class);
+    }
+}

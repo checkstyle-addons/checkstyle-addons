@@ -1,6 +1,6 @@
 /*
- * Checkstyle-Addons - Additional checks for the Checkstyle static code analysis tool
- * Copyright (C) 2014 Thomas Jensen
+ * Checkstyle-Addons - Additional Checkstyle checks
+ * Copyright (C) 2015 Thomas Jensen, All rights reserved.
  *
  * This program is free software: you can redistribute it and/or modify it under the
  * terms of the GNU General Public License, version 3, as published by the Free
