@@ -25,7 +25,6 @@ The check works like this:
      name it is applied to, and how the result is interpreted is governed by the check
      properties.
 
-
 ### Properties
 
 <table border="1">
@@ -37,39 +36,41 @@ The check works like this:
     <td>Comma-separated list of file extensions. Leading dots are optional.
         Spaces after the commas are allowed. Only files with one of these
         extensions are checked against the regular expression.</td>
-    <td>[StringSet](http://checkstyle.sourceforge.net/property_types.html#stringSet)</td>
+    <td><a href="http://checkstyle.sourceforge.net/property_types.html#stringSet">StringSet</a></td>
     <td>unrestricted</td>
 </tr>
 <tr>
     <td>selection</td>
     <td>Limits the check to files whose canonical path name contains the given
         pattern. The canonical path is the simplest possible absolute path,
-        including the file name (no `..` elements etc.).</td>
-    <td>[regular expression](http://checkstyle.sourceforge.net/property_types.html#regexp)</td>
+        including the file name (no <code>..</code> elements etc.).</td>
+    <td><a href="http://checkstyle.sourceforge.net/property_types.html#regexp">regular
+        expression</a></td>
     <td>unrestricted</td>
 </tr>
 <tr>
     <td>regexp</td>
     <td>The regular expression applied to the file name.</td>
-    <td>[regular expression](http://checkstyle.sourceforge.net/property_types.html#regexp)</td>
-    <td>`^(?:\s+.*|.*?\s+)$`</td>
+    <td><a href="http://checkstyle.sourceforge.net/property_types.html#regexp">regular
+        expression</a></td>
+    <td><tt>^(?:\s+.*|.*?\s+)$</tt></td>
 </tr>
 <tr>
     <td>mode</td>
-    <td>whether `regexp` finds required or illegal matches</td>
+    <td>whether <tt>regexp</tt> finds required or illegal matches</td>
     <td>{@link RegexpOnFilenameOption Mode}</td>
-    <td>`illegal`</td>
+    <td><code>illegal</code></td>
 </tr>
 <tr>
     <td>simple</td>
-    <td>If `true`, only the simple name of the file will be checked
-        against the pattern specified by `regexp`;
-        if `false`, the entire canonical path will be checked.<br/>
+    <td>If <code>true</code>, only the simple name of the file will be checked
+        against the pattern specified by <tt>regexp</tt>;
+        if <code>false</code>, the entire canonical path will be checked.<br/>
         Note that this option applies only to the pattern specified by
-        `regexp`; the `selection` property is *always* treated
-        as if `simple=false`.</td>
-    <td>[Boolean](http://checkstyle.sourceforge.net/property_types.html#boolean)</td>
-    <td>`true`</td>
+        <tt>regexp</tt>; the <tt>selection</tt> property is <i>always</i> treated
+        as if <tt>simple=false</tt>.</td>
+    <td><a href="http://checkstyle.sourceforge.net/property_types.html#boolean">Boolean</a></td>
+    <td><code>true</code></td>
 </tr>
 </table>
 
