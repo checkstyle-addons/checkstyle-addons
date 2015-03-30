@@ -1,0 +1,40 @@
+<!DOCTYPE suppressions PUBLIC "-//Puppy Crawl//DTD Suppressions 1.1//EN"
+    "http://www.puppycrawl.com/dtds/suppressions_1_1.dtd">
+<!--
+    Checkstyle-Addons - Additional Checkstyle checks
+    Copyright (C) 2015 Thomas Jensen, All rights reserved.
+
+    This library is free software; you can redistribute it and/or modify it under the
+    terms of the GNU Lesser General Public License, version 3, as published by the
+    Free Software Foundation.
+
+    This library is distributed in the hope that it will be useful, but WITHOUT ANY
+    WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A
+    PARTICULAR PURPOSE. See the GNU Lesser General Public License for more details.
+
+    You should have received a copy of the GNU Lesser General Public License along
+    with this library. If not, see <http://www.gnu.org/licenses/>.
+ -->
+<suppressions>
+
+    <!-- Test classes are subject to a relaxed ruleset only. -->
+    <suppress files="[\\/]src[\\/]test[\\/].*" id="TypeNameMain" />
+    <suppress files="[\\/]src[\\/]test[\\/].*" id="MethodNameMain" />
+    <suppress files="[\\/]src[\\/]test[\\/].*" checks="FileLength" />
+    <suppress files="[\\/]src[\\/]test[\\/]java[\\/].*"
+        checks="JavadocMethod|JavadocVariable|JavadocPackage" />
+    <suppress files="[\\/]src[\\/]test[\\/]java[\\/].*"
+        checks="MagicNumber|ClassDataAbstractionCoupling|ExecutableStatementCount|ThrowsCount|IllegalCatch" />
+    <suppress files="[\\/]src[\\/]test[\\/]java[\\/].*"
+        checks="EqualsAvoidNull|VisibilityModifier" />
+
+    <!-- Suppress the naming convention for test classes on production code (only one is active at a time) -->
+    <suppress files="[\\/]src[\\/]main[\\/].*" id="TypeNameTest" />
+    <suppress files="[\\/]src[\\/]main[\\/].*" id="MethodNameTest" />
+
+    <suppress files="[\\/]Base(?:FileSet)?CheckTestSupport\.java" checks="Header" />
+    <suppress files="[\\/]BaseCheckTestSupport\.java" checks="AbstractClassName" />
+    <suppress files="[\\/]BaseCheckTestSupport\.java" checks="LineLength" lines="25-30"/>
+
+</suppressions>
+
