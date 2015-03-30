@@ -16,6 +16,8 @@
 plugins {
     id 'java';
     id 'jacoco';
+    id 'com.github.kt3k.coveralls' version '2.3.1';
+    id 'checkstyle';
     id 'idea';
     //id 'com.github.johnrengelman.shadow' version '1.2.1';
 }
@@ -59,8 +61,10 @@ idea.module {
 /*
  * Compile with Java 6 for now
  */
-if (project.property('checkstyleaddons.jdk6.javac') == null) {
-    throw new GradleException('Property \'checkstyleaddons.jdk6.javac\' not defined in gradle.properties. ' +
+final String jdk6PropName = 'checkstyleaddons_jdk6_javac';
+def javac6 = project.hasProperty(jdk6PropName) ? project.property(jdk6PropName) : System.getenv(jdk6PropName);
+if (javac6 == null) {
+    throw new GradleException('Property \'' + jdk6PropName + '\' not defined in gradle.properties. ' +
         'It must point to a Java 6 compiler executable.');
 }
 tasks.withType(JavaCompile) {
@@ -68,7 +72,7 @@ tasks.withType(JavaCompile) {
     targetCompatibility = javaVersion;
     options.encoding = 'UTF-8';
     options.fork = true;
-    options.forkOptions.executable = project.property('checkstyleaddons.jdk6.javac');
+    options.forkOptions.executable = javac6;
 }
 
 
@@ -121,8 +125,25 @@ javadoc {
 
 
 /*
+ * Checkstyle configuration
+ */
+checkstyle {
+    configFile file('project/checkstyle.xml');
+    configProperties 'projectDir': project.projectDir;
+    toolVersion checkstyleVersion;
+    showViolations = true;
+    ignoreFailures = false;
+}
+
+
+/*
  * JaCoCo test coverage configuration
  */
+jacocoTestReport {
+    reports {
+        xml.enabled = true;   // coveralls plugin depends on xml format report
+    }
+}
 tasks.withType(Test) { task ->
     jacoco {
         append = false

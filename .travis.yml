@@ -5,4 +5,10 @@ jdk:
   - oraclejdk7
 
 after_success:
-  - gradle jacocoTestReport
+  - ./gradlew jacocoTestReport coveralls
+
+env:
+  global:
+    - secure: hMXc4ZWKt7j5vx26nRxKwjeeoK6/rhjGf2itRjNXFylzTKrjjLsK8G7dxNGPkYD8Ojn9B4mNOQkFTk3I+Wd2rtIcSes5vh0ozKB+R37/6+954FEAgH/EmyQO0j8mU04XX5qg5JZHbDEzmK3pgI5CsEl7dHBYjgWQElGNGLzTO6g=
+  matrix:
+    - checkstyleaddons_jdk6_javac=/usr/lib/jvm/java-6-openjdk-amd64/bin/javac
