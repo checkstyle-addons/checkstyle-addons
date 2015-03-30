@@ -1,6 +1,7 @@
+package com.thomasjensen.checkstyle.addons.checks.regexp;
 /*
  * Checkstyle-Addons - Additional Checkstyle checks
- * Copyright (C) 2015 Thomas Jensen, All rights reserved.
+ * Copyright (C) 2015 Thomas Jensen
  *
  * This program is free software: you can redistribute it and/or modify it under the
  * terms of the GNU General Public License, version 3, as published by the Free
@@ -13,7 +14,9 @@
  * You should have received a copy of the GNU General Public License along with this
  * program.  If not, see <http://www.gnu.org/licenses/>.
  */
-package com.thomasjensen.checkstyle.addons.checks.regexp;
+
+import java.io.File;
+import java.io.IOException;
 
 import com.puppycrawl.tools.checkstyle.DefaultConfiguration;
 import com.puppycrawl.tools.checkstyle.api.CheckstyleException;
@@ -22,9 +25,6 @@ import com.thomasjensen.checkstyle.addons.BaseFileSetCheckTestSupport;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
-
-import java.io.File;
-import java.io.IOException;
 
 
 /**
@@ -69,7 +69,7 @@ public class RegexpOnFilenameCheckTest
         mCheckConfig.addAttribute("regexp", regexp);
         mCheckConfig.addAttribute("mode", "required");
         final String[] expected =
-            {"0: Filename '" + SIMPLE_FILENAME + "' does not contain required pattern '" + regexp + "'.",};
+            {"0: Filename '" + SIMPLE_FILENAME + "' does not contain required pattern '" + regexp + "'."};
         verify(mCheckConfig, filepath, expected);
     }
 
@@ -85,7 +85,7 @@ public class RegexpOnFilenameCheckTest
         mCheckConfig.addAttribute("regexp", regexp);
         mCheckConfig.addAttribute("mode", "required");
         final String[] expected =
-            {"0: Filename '" + SIMPLE_FILENAME + "' does not contain required pattern '" + regexp + "'.",};
+            {"0: Filename '" + SIMPLE_FILENAME + "' does not contain required pattern '" + regexp + "'."};
         verify(mCheckConfig, filepath, expected);
     }
 
@@ -117,7 +117,7 @@ public class RegexpOnFilenameCheckTest
         mCheckConfig.addAttribute("regexp", regexp);
         mCheckConfig.addAttribute("mode", "required");
         final String[] expected =
-            {"0: Filename '" + SIMPLE_FILENAME + "' does not contain required pattern '" + regexp + "'.",};
+            {"0: Filename '" + SIMPLE_FILENAME + "' does not contain required pattern '" + regexp + "'."};
         verify(mCheckConfig, filepath, expected);
     }
 
@@ -133,7 +133,7 @@ public class RegexpOnFilenameCheckTest
         mCheckConfig.addAttribute("selection", SIMPLE_FILENAME + "$");
         mCheckConfig.addAttribute("mode", "required");
         final String[] expected =
-            {"0: Filename '" + SIMPLE_FILENAME + "' does not contain required pattern '" + regexp + "'.",};
+            {"0: Filename '" + SIMPLE_FILENAME + "' does not contain required pattern '" + regexp + "'."};
         verify(mCheckConfig, filepath, expected);
     }
 
@@ -175,7 +175,7 @@ public class RegexpOnFilenameCheckTest
         mCheckConfig.addAttribute("regexp", regexp);
         mCheckConfig.addAttribute("simple", "false");
         mCheckConfig.addAttribute("mode", "illegal");
-        final String[] expected = {"0: Filename '" + filepath + "' contains illegal pattern '" + regexp + "'.",};
+        final String[] expected = {"0: Filename '" + filepath + "' contains illegal pattern '" + regexp + "'."};
         verify(mCheckConfig, filepath, expected);
     }
 
@@ -222,7 +222,7 @@ public class RegexpOnFilenameCheckTest
         mCheckConfig.addAttribute("simple", "false");
         mCheckConfig.addAttribute("mode", "required");
         final String[] expected =
-            {"0: Filename '" + filepath + "' does not contain required pattern '" + regexp + "'.",};
+            {"0: Filename '" + filepath + "' does not contain required pattern '" + regexp + "'."};
         verify(mCheckConfig, filepath, expected);
     }
 
@@ -235,7 +235,7 @@ public class RegexpOnFilenameCheckTest
         final String filepath = getPath(SIMPLE_FILENAME);
         final String regexp = "^" + SIMPLE_FILENAME + "$";
         mCheckConfig.addAttribute("regexp", regexp);
-        final String[] expected = {"0: Filename '" + SIMPLE_FILENAME + "' contains illegal pattern '" + regexp + "'.",};
+        final String[] expected = {"0: Filename '" + SIMPLE_FILENAME + "' contains illegal pattern '" + regexp + "'."};
         verify(mCheckConfig, filepath, expected);
     }
 
@@ -300,7 +300,7 @@ public class RegexpOnFilenameCheckTest
             tempFile = File.createTempFile("addons-test-", "txt ");
             final String[] expected =
                 {"0: Filename '" + tempFile.getName() + "' contains illegal pattern '" + "^(?:\\s+.*|.*?\\s+)$"
-                    + "'.",};
+                    + "'."};
             verify(mCheckConfig, tempFile.getAbsolutePath(), expected);
         }
         finally {
@@ -321,7 +321,7 @@ public class RegexpOnFilenameCheckTest
             tempFile = File.createTempFile(" addons-test-", "txt");
             final String[] expected =
                 {"0: Filename '" + tempFile.getName() + "' contains illegal pattern '" + "^(?:\\s+.*|.*?\\s+)$"
-                    + "'.",};
+                    + "'."};
             verify(mCheckConfig, tempFile.getAbsolutePath(), expected);
         }
         finally {

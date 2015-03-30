@@ -20,8 +20,7 @@ import com.puppycrawl.tools.checkstyle.DefaultLogger;
 import com.puppycrawl.tools.checkstyle.TreeWalker;
 import com.puppycrawl.tools.checkstyle.api.AuditEvent;
 import com.puppycrawl.tools.checkstyle.api.Configuration;
-import static org.junit.Assert.assertEquals;
-
+import org.junit.Assert;
 
 // @formatter:off
 /**
@@ -30,31 +29,25 @@ import static org.junit.Assert.assertEquals;
  * target="_blank">on GitHub</a>. <p/>Credit goes to Oliver Burn, Ivan Sopov, et al.
  * <p/>
  * Used under the terms of the GNU LESSER GENERAL PUBLIC LICENSE, Version 2.1.
+ *
+ * @author Oliver Burn, Ivan Sopov, et al.
  */
 // @formatter:on
 public abstract class BaseCheckTestSupport
 {
-    /** a brief logger that only display info about errors */
+    /** A brief logger that only display info about errors. */
     protected static class BriefLogger
         extends DefaultLogger
     {
-        public BriefLogger(OutputStream out)
+        public BriefLogger(final OutputStream pOut)
         {
-            super(out, true);
+            super(pOut, true);
         }
 
 
 
         @Override
-        public void auditStarted(AuditEvent evt)
-        {
-            // empty
-        }
-
-
-
-        @Override
-        public void fileFinished(AuditEvent evt)
+        public void auditStarted(final AuditEvent pEvent)
         {
             // empty
         }
@@ -62,7 +55,15 @@ public abstract class BaseCheckTestSupport
 
 
         @Override
-        public void fileStarted(AuditEvent evt)
+        public void fileFinished(final AuditEvent pEvent)
+        {
+            // empty
+        }
+
+
+
+        @Override
+        public void fileStarted(final AuditEvent pEvent)
         {
             // empty
         }
@@ -78,18 +79,17 @@ public abstract class BaseCheckTestSupport
 
 
 
-    public static DefaultConfiguration createCheckConfig(Class<?> aClazz)
+    public static DefaultConfiguration createCheckConfig(final Class<?> pClazz)
     {
-        final DefaultConfiguration checkConfig = new DefaultConfiguration(aClazz.getName());
-        return checkConfig;
+        return new DefaultConfiguration(pClazz.getName());
     }
 
 
 
-    protected Checker createChecker(Configuration aCheckConfig)
+    protected Checker createChecker(final Configuration pCheckConfig)
         throws Exception
     {
-        final DefaultConfiguration dc = createCheckerConfig(aCheckConfig);
+        final DefaultConfiguration dc = createCheckerConfig(pCheckConfig);
         final Checker c = new Checker();
         // make sure the tests always run with english error messages
         // so the tests don't fail in supported locales like german
@@ -104,80 +104,82 @@ public abstract class BaseCheckTestSupport
 
 
 
-    protected DefaultConfiguration createCheckerConfig(Configuration aConfig)
+    protected DefaultConfiguration createCheckerConfig(final Configuration pConfig)
     {
         final DefaultConfiguration dc = new DefaultConfiguration("configuration");
         final DefaultConfiguration twConf = createCheckConfig(TreeWalker.class);
         // make sure that the tests always run with this charset
         dc.addAttribute("charset", "iso-8859-1");
         dc.addChild(twConf);
-        twConf.addChild(aConfig);
+        twConf.addChild(pConfig);
         return dc;
     }
 
 
 
-    protected static String getPath(String aFilename)
+    protected static String getPath(final String pFilename)
         throws IOException
     {
-        return new File("src/test/resources/com/thomasjensen/checkstyle/addons/checks/" + aFilename).getCanonicalPath();
+        return new File("src/test/resources/com/thomasjensen/checkstyle/addons/checks/" + pFilename).getCanonicalPath();
     }
 
 
 
-    protected static String getSrcPath(String aFilename)
+    protected static String getSrcPath(final String pFilename)
         throws IOException
     {
 
-        return new File("src/test/resources/com/thomasjensen/checkstyle/addons/checks/" + aFilename).getCanonicalPath();
+        return new File("src/test/resources/com/thomasjensen/checkstyle/addons/checks/" + pFilename).getCanonicalPath();
     }
 
 
 
-    protected void verify(Configuration aConfig, String aFileName, String[] aExpected)
+    protected void verify(final Configuration pConfig, final String pFileName, final String[] pExpected)
         throws Exception
     {
-        verify(createChecker(aConfig), aFileName, aFileName, aExpected);
+        verify(createChecker(pConfig), pFileName, pFileName, pExpected);
     }
 
 
 
-    protected void verify(Checker aC, String aFileName, String[] aExpected)
+    protected void verify(final Checker pChecker, final String pFileName, final String[] pExpected)
         throws Exception
     {
-        verify(aC, aFileName, aFileName, aExpected);
+        verify(pChecker, pFileName, pFileName, pExpected);
     }
 
 
 
-    protected void verify(Checker aC, String aProcessedFilename, String aMessageFileName, String[] aExpected)
+    protected void verify(final Checker pChecker, final String pProcessedFilename, final String pMessageFileName,
+        final String[] pExpected)
         throws Exception
     {
-        verify(aC, new File[]{new File(aProcessedFilename)}, aMessageFileName, aExpected);
+        verify(pChecker, new File[]{new File(pProcessedFilename)}, pMessageFileName, pExpected);
     }
 
 
 
-    protected void verify(Checker aC, File[] aProcessedFiles, String aMessageFileName, String[] aExpected)
+    protected void verify(final Checker pChecker, final File[] pProcessedFiles, final String pMessageFileName,
+        final String[] pExpected)
         throws Exception
     {
         mStream.flush();
         final List<File> theFiles = Lists.newArrayList();
-        Collections.addAll(theFiles, aProcessedFiles);
-        final int errs = aC.process(theFiles);
+        Collections.addAll(theFiles, pProcessedFiles);
+        final int errs = pChecker.process(theFiles);
 
         // process each of the lines
         final ByteArrayInputStream bais = new ByteArrayInputStream(mBAOS.toByteArray());
         final LineNumberReader lnr = new LineNumberReader(new InputStreamReader(bais));
 
-        for (int i = 0; i < aExpected.length; i++) {
-            final String expected = aMessageFileName + ":" + aExpected[i];
+        for (int i = 0; i < pExpected.length; i++) {
+            final String expected = pMessageFileName + ":" + pExpected[i];
             final String actual = lnr.readLine();
-            assertEquals("error message " + i, expected, actual);
+            Assert.assertEquals("error message " + i, expected, actual);
         }
 
-        assertEquals("unexpected output: " + lnr.readLine(), aExpected.length, errs);
-        aC.destroy();
+        Assert.assertEquals("unexpected output: " + lnr.readLine(), pExpected.length, errs);
+        pChecker.destroy();
     }
 
 
@@ -185,9 +187,9 @@ public abstract class BaseCheckTestSupport
     /**
      * Gets the check message 'as is' from appropriate 'messages.properties' file.
      *
-     * @param messageKey the key of message in 'messages.properties' file.
+     * @param pMessageKey the key of message in 'messages.properties' file.
      */
-    public String getCheckMessage(String messageKey)
+    public String getCheckMessage(final String pMessageKey)
     {
         Properties pr = new Properties();
         try {
@@ -196,6 +198,6 @@ public abstract class BaseCheckTestSupport
         catch (IOException e) {
             return null;
         }
-        return pr.getProperty(messageKey);
+        return pr.getProperty(pMessageKey);
     }
 }

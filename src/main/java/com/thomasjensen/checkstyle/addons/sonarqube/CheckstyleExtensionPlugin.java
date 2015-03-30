@@ -1,3 +1,4 @@
+package com.thomasjensen.checkstyle.addons.sonarqube;
 /*
  * Checkstyle-Addons - Additional Checkstyle checks
  * Copyright (C) 2015 Thomas Jensen
@@ -13,7 +14,6 @@
  * You should have received a copy of the GNU General Public License along with this
  * program.  If not, see <http://www.gnu.org/licenses/>.
  */
-package com.thomasjensen.checkstyle.addons.sonarqube;
 
 import java.util.Collections;
 import java.util.List;
@@ -23,6 +23,8 @@ import org.sonar.api.SonarPlugin;
 
 /**
  * The Checkstyle Addons SonarQube plugin main class.
+ *
+ * @author Thomas Jensen
  */
 public final class CheckstyleExtensionPlugin
     extends SonarPlugin

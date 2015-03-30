@@ -1,6 +1,7 @@
+package com.thomasjensen.checkstyle.addons.sonarqube;
 /*
  * Checkstyle-Addons - Additional Checkstyle checks
- * Copyright (C) 2015 Thomas Jensen, All rights reserved.
+ * Copyright (C) 2015 Thomas Jensen
  *
  * This program is free software: you can redistribute it and/or modify it under the
  * terms of the GNU General Public License, version 3, as published by the Free
@@ -13,7 +14,6 @@
  * You should have received a copy of the GNU General Public License along with this
  * program.  If not, see <http://www.gnu.org/licenses/>.
  */
-package com.thomasjensen.checkstyle.addons.sonarqube;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -38,14 +38,17 @@ public final class CheckstyleExtensionRepository
 
     private static final String REPOSITORY_LANGUAGE = "java";
 
-    private static final String RULES_RELATIVE_FILE_PATH = "/" +
-        CheckstyleExtensionRepository.class.getPackage().getName().replace('.', '/') +
-        "/sonarqube.xml";
+    private static final String RULES_RELATIVE_FILE_PATH =
+        "/" + CheckstyleExtensionRepository.class.getPackage().getName().replace('.', '/') + "/sonarqube.xml";
 
     private final XMLRuleParser xmlRuleParser;
 
 
 
+    /**
+     * Constructor.
+     * @param pXmlRuleParser the XML rule parser
+     */
     public CheckstyleExtensionRepository(final XMLRuleParser pXmlRuleParser)
     {
         super(REPOSITORY_KEY, REPOSITORY_LANGUAGE);

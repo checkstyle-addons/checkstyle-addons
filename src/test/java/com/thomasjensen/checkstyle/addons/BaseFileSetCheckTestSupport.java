@@ -11,15 +11,17 @@ import com.puppycrawl.tools.checkstyle.api.Configuration;
  * target="_blank">on GitHub</a>. <p/>Credit goes to Oliver Burn, Ivan Sopov, et al.
  * <p/>
  * Used under the terms of the GNU LESSER GENERAL PUBLIC LICENSE, Version 2.1.
+ *
+ * @author Oliver Burn, Ivan Sopov, et al.
  */
 public class BaseFileSetCheckTestSupport
     extends BaseCheckTestSupport
 {
     @Override
-    protected DefaultConfiguration createCheckerConfig(Configuration aCheckConfig)
+    protected DefaultConfiguration createCheckerConfig(final Configuration pCheckConfig)
     {
         final DefaultConfiguration dc = new DefaultConfiguration("root");
-        dc.addChild(aCheckConfig);
+        dc.addChild(pCheckConfig);
         return dc;
     }
 }
