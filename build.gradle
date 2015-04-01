@@ -142,6 +142,7 @@ checkstyle {
 jacocoTestReport {
     reports {
         xml.enabled = true;   // coveralls plugin depends on xml format report
+        html.enabled = true;
     }
 }
 tasks.withType(Test) { task ->
