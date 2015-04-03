@@ -39,6 +39,16 @@ public class CheckstyleExtensionRepositoryTest
 
 
 
+    @Test(expected = IllegalStateException.class)
+    public void testNonexistentFile()
+    {
+        CheckstyleExtensionRepository testee = new CheckstyleExtensionRepository(new XMLRuleParser(),
+            "nonexistent.xml");
+        testee.createRules();
+    }
+
+
+
     @Test
     public void testCreateRules()
     {
