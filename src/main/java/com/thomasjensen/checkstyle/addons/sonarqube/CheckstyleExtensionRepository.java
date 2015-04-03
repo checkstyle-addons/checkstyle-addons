@@ -38,8 +38,7 @@ public final class CheckstyleExtensionRepository
 
     private static final String REPOSITORY_LANGUAGE = "java";
 
-    private static final String RULES_RELATIVE_FILE_PATH =
-        "/" + CheckstyleExtensionRepository.class.getPackage().getName().replace('.', '/') + "/sonarqube.xml";
+    private final String rulesRelativeFilePath;
 
     private final XMLRuleParser xmlRuleParser;
 
@@ -47,13 +46,29 @@ public final class CheckstyleExtensionRepository
 
     /**
      * Constructor.
+     *
      * @param pXmlRuleParser the XML rule parser
      */
     public CheckstyleExtensionRepository(final XMLRuleParser pXmlRuleParser)
     {
+        this(pXmlRuleParser, "/" + CheckstyleExtensionRepository.class.getPackage().getName().replace('.', '/')
+            + "/sonarqube.xml");
+    }
+
+
+
+    /**
+     * Constructor for tests.
+     *
+     * @param pXmlRuleParser the XML rule parser
+     * @param pFilePath the path by which to find the rules description file
+     */
+    CheckstyleExtensionRepository(final XMLRuleParser pXmlRuleParser, final String pFilePath)
+    {
         super(REPOSITORY_KEY, REPOSITORY_LANGUAGE);
         setName(REPOSITORY_NAME);
         xmlRuleParser = pXmlRuleParser;
+        rulesRelativeFilePath = pFilePath;
     }
 
 
@@ -61,7 +76,10 @@ public final class CheckstyleExtensionRepository
     @Override
     public List<Rule> createRules()
     {
-        InputStream input = getClass().getResourceAsStream(RULES_RELATIVE_FILE_PATH);
+        InputStream input = getClass().getResourceAsStream(rulesRelativeFilePath);
+        if (input == null) {
+            throw new IllegalStateException("File not found: " + rulesRelativeFilePath);
+        }
         try {
             return xmlRuleParser.parse(input);
         }

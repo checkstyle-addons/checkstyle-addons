@@ -2,7 +2,7 @@ language: java
 
 jdk:
   - openjdk7
-#  - oraclejdk7
+  - oraclejdk7
 
 env:
   global:
@@ -23,4 +23,4 @@ before_install:
 #  - sudo update-alternatives --config java
 
 after_success:
-  - ./gradlew jacocoTestReport coveralls --info
+  - ./gradlew jacocoTestReport coveralls
