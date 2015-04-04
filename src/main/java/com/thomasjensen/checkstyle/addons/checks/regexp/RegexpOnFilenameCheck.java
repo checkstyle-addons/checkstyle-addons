@@ -26,8 +26,8 @@ import com.puppycrawl.tools.checkstyle.api.AbstractFileSetCheck;
 
 /**
  * This check applies a given regular expression to the names of files.
- * <p/>
- * <a href="http://checkstyle-addons.thomasjensen.com/latest/checks/RegexpOnFilename.html">Documentation</a>
+ *
+ * <p><a href="http://checkstyle-addons.thomasjensen.com/latest/checks/RegexpOnFilename.html">Documentation</a></p>
  *
  * @author Thomas Jensen
  */

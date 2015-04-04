@@ -23,6 +23,7 @@
         See http://checkstyle.sourceforge.net/config.html#Packages for more info.
     -->
     <package name="com.thomasjensen.checkstyle.addons.checks">
+        <package name="coding" />
         <package name="regexp" />
     </package>
 </checkstyle-packages>
