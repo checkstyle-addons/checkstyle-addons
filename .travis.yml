@@ -6,7 +6,6 @@ jdk:
 
 env:
   global:
-#    - secure: "ICmLwvUqwbs+r2P5Yk3sQRJonpHtcRv9QE7MmpYnKQgxu0VCi11wTq+NJpWgA3z4mmXmwlmg9xKr+D507km7XW2UrF08CsN8qJEGSIckXerKUYOHTx0Hmi7VT62aGnSsOz1QIWfhFc45jnET3PLrelIMT2E1tcWwuKOhcSbpMj4="
     - checkstyleaddons_jdk6_javac=/usr/lib/jvm/java-6-openjdk-amd64/bin/javac
 # TODO: compile with oracle jdk6 when build jdk is oraclejdk7
 
