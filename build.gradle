@@ -107,7 +107,7 @@ dependencies {
  * Javadoc generation
  */
 javadoc {
-    title = project.ext.longName + ' ' + project.version;
+    title = project.ext.longName + ' v' + project.version;
     classpath = project.sourceSets.main.compileClasspath;
     options.encoding = 'UTF-8';
     options.docEncoding = 'UTF-8';
