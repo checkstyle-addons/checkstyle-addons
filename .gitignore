@@ -21,10 +21,14 @@ nb-configuration.xml
 Thumbs.db
 Desktop.ini
 
+# Jekyll stuff
+_site/
+_cache/
+_support/
+
 # Others
 bin/
 delme/
 out/
-gradleshell_*.bat
 *~
 *.zip
