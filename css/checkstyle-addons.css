@@ -1,0 +1,107 @@
+/* top right bottom left;    vert horz */
+
+@import url(http://fonts.googleapis.com/css?family=Open+Sans);
+
+* {
+    margin: 0;
+    padding: 0;
+}
+
+body {
+    font-size: 16px;
+    padding: 50px 16px;
+}
+.jumbotron {
+    margin: 0 -16px 16px -16px;
+    padding: 16px 16px;
+}
+.jumbotron .btn {
+    padding-left: 24px;
+    padding-right: 24px;
+}
+.footer {
+    padding: 0.3em 16px;
+    text-align: left;
+}
+@media (max-width: 512px) {
+    body {
+        padding: 50px 2px;
+    }
+    .jumbotron {
+        padding: 16px 2px;
+        margin-left: -2px;
+        margin-right: -2px;
+    }
+    .footer {
+        padding: 0.3em 2px;
+        text-align: center;
+    }
+}
+
+.navbar {
+    position: fixed;
+    width: 100%;
+    top: 0;
+    left: 0;
+    z-index: 100;
+}
+a.navbar-brand {
+    font-weight: bold;
+    padding-top: 17px;
+}
+
+
+h2 {
+    margin-top: 32px;
+    margin-bottom: 16px;
+}
+
+.jumbotron h1 {
+    font-size: 48px;
+    font-weight: bold;
+}
+
+
+.whatsnewposts .container-fluid .row {
+    margin: 0 -16px 0 -16px;
+}
+.whatsnewposts .container-fluid .col-sm-5 {
+    padding-left: 0;
+}
+.whatsnewposts  .panel {
+    margin-bottom: 8px;
+}
+
+
+a.csa-offset-anchor { /* used to prevent anchors from being obscured by the fixed header */
+    display: block;
+    position: relative;
+    top: -60px;
+    visibility: hidden;
+}
+
+
+img.csa-tablogo {
+    height: 40px;
+}
+
+.footer {
+    width: 100%;
+    height: 50px;
+    background-color: #eeeeee;
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    background-image: linear-gradient(#e4e4e4, #eee 50%, #fff);
+    background-repeat: no-repeat;
+    border-top: 1px solid #d5d5d5;
+    filter: none;
+    text-shadow: 0 1px 0 rgba(255, 255, 255, 0.3);
+    font-size: 14px;
+}
+.footer .colored a {
+    color: #3399f3;
+}
+.footer a {
+    color: inherit;
+}

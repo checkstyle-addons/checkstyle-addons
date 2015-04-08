@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    {% comment %}
+    <!-- The above 3 meta tags *must* come first in the head; any other head content must come *after* these tags -->
+    {% endcomment %}
+    <title>{{ site.name }} - {% if page.title | size > 0 %}{{ page.title }}{% else %}{{ site.description }}{% endif %}</title>
+    <meta name="author" content="Thomas Jensen" />
+	{% if page.sedesc %}
+	<!-- start page -->
+	<meta name="description" content="{{ site.description }}" />
+    <meta name="keywords" content="checkstyle, {{ site.name }}, checkstyle addons, addons, add-ons, code style,
+        code analysis, coding standards, java, software quality, static code analysis, static analysis" />
+	<link rel="canonical" href="http://{{ page.sitehost }}/" />
+	{% else %}
+	<!-- regular page -->
+	<link rel="canonical" href="http://{{ page.sitehost }}{{ page.url }}" />
+	{% endif %}
+    <link href="{{ site.baseurl}}/css/bootstrap-spacelab.min.css" rel="stylesheet" data-semver="3.3.4" data-require="bootstrap-css" />
+    <link href="{{ site.baseurl}}/css/checkstyle-addons.css" rel="stylesheet" />
+</head>
+
+<body>
+    <nav class="navbar navbar-default">
+      <div class="container-fluid">
+        <div class="navbar-header">
+          <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#bs-example-navbar-collapse-1">
+            <span class="sr-only">Toggle navigation</span>
+            <span class="icon-bar"></span>
+            <span class="icon-bar"></span>
+            <span class="icon-bar"></span>
+          </button>
+          <a class="navbar-brand" href="{{ site.baseurl}}/">{{ site.name }}</a>
+        </div>
+
+        <div class="collapse navbar-collapse" id="bs-example-navbar-collapse-1">
+          <ul class="nav navbar-nav">
+            <li><a href="#">What's New</a></li>
+            <li class="dropdown">
+              <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-expanded="false">Checks <span class="caret"></span></a>
+              <ul class="dropdown-menu" role="menu">
+                <li><a href="#">All Checks</a></li>
+                <li class="divider"></li>
+                <li><a href="#">Coding</a></li>
+                <li><a href="#">Regexp</a></li>
+              </ul>
+            </li>
+            <li><a href="{{ site.baseurl }}/index.html#usage">Usage</a></li>
+            <li><a href="#">Contributing</a></li>
+          </ul>
+          <ul class="nav navbar-nav navbar-right">
+            <li><a target="_blank" href="https://github.com/{{ site.github }}">GitHub</a></li>
+          </ul>
+        </div>
+      </div>
+    </nav>

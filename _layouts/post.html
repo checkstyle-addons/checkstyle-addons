@@ -1,0 +1,15 @@
+{% include header.html %}
+
+<div class="article">
+    <h1>{{ page.date | date: "%b %-d, %Y" }} - {{ page.title }}</h1>
+    <div class="post-content">
+    {{ content }}
+    </div>
+</div>
+
+<ul class="pager">
+  {% if page.previous %}<li class="previous"><a href="{{ site.baseurl}}{{ page.previous.url }}">&larr; Older</a></li>{% endif %}
+  {% if page.next %}<li class="next"><a href="{{ site.baseurl}}{{ page.next.url }}">Newer &rarr;</a></li>{% endif %}
+</ul>
+
+{% include footer.html %}
