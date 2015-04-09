@@ -33,7 +33,7 @@ sedesc: Additional Checkstyle Checks
   <div class="panel-heading"><h3 class="panel-title">{% if post.content contains '<!--break-->' %}<a href="{{ post.url }}">{{ post.date | date: "%b %-d, %Y" }} - {{ post.title }}</a>{% else %}{{ post.date | date: "%b %-d, %Y" }} - {{ post.title }}{% endif %}</h3></div>
   <div class="panel-body">
     {{ post.content | split:'<!--break-->' | first }}{% if post.content contains '<!--break-->' %}
-    <a href="{{ post.url }}"><br/>... read more</a> {% endif %}</p>
+    <a href="{{ post.url }}"><br/>... read more</a> {% endif %}{% if post.content contains '<!--break-->' %}</p>{% endif %}
   </div>
 </div>
 </div>
@@ -58,9 +58,9 @@ sedesc: Additional Checkstyle Checks
 
 <ul class="nav nav-tabs">
   <li class="active"><a aria-expanded="true" href="#gradle" data-toggle="tab"><img src="images/gradle-logo-text.png"
-      class="csa-tablogo" /></a></li>
+      alt="Gradle" class="csa-tablogo" /></a></li>
   <li><a aria-expanded="false" href="#maven" data-toggle="tab"><img src="images/maven-logo.png"
-      class="csa-tablogo" /></a></li>
+      alt="Maven" class="csa-tablogo" /></a></li>
   <li><a aria-expanded="false" href="#ant" data-toggle="tab">Ant</a></li>
   <li><a aria-expanded="false" href="#eclipse" data-toggle="tab">Eclipse</a></li>
   <li><a aria-expanded="false" href="#intellij" data-toggle="tab">IntelliJ</a></li>
