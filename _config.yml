@@ -20,11 +20,11 @@ baseurl: ''
 github: 'checkstyle-addons/checkstyle-addons'
 
 # Set this to your UA-# value, or '' to disable the block completely
-gaaccount: ''
+gaaccount: 'UA-23698164-6'
 
 
 permalink: /:year/:month/:title
-paginate: 10
+#paginate: 10
 
 highlighter: pygments
 markdown: kramdown
