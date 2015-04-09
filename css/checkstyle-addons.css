@@ -25,15 +25,15 @@ body {
 }
 @media (max-width: 512px) {
     body {
-        padding: 50px 2px;
+        padding: 50px 5px;
     }
     .jumbotron {
-        padding: 16px 2px;
-        margin-left: -2px;
-        margin-right: -2px;
+        padding: 16px 5px;
+        margin-left: -5px;
+        margin-right: -5px;
     }
     .footer {
-        padding: 0.3em 2px;
+        padding: 0.3em 0px;
         text-align: center;
     }
 }
@@ -61,11 +61,17 @@ h2 {
     font-weight: bold;
 }
 
+.table .post-title {
+    font-weight: bold;
+}
+.table .post-title a {
+    color: inherit;
+}
 
 .whatsnewposts .container-fluid .row {
     margin: 0 -16px 0 -16px;
 }
-.whatsnewposts .container-fluid .col-sm-5 {
+.whatsnewposts .container-fluid .col-sm-5, .whatsnewposts .container-fluid .col-sm-2 {
     padding-left: 0;
 }
 .whatsnewposts  .panel {

@@ -7,9 +7,11 @@
     </div>
 </div>
 
+<p/><br/>
 <ul class="pager">
-  {% if page.previous %}<li class="previous"><a href="{{ site.baseurl}}{{ page.previous.url }}">&larr; Older</a></li>{% endif %}
-  {% if page.next %}<li class="next"><a href="{{ site.baseurl}}{{ page.next.url }}">Newer &rarr;</a></li>{% endif %}
+  <li class="previous{% if page.previous %} {% else %} disabled{% endif %}"><a href="{{ site.baseurl}}{{ page.previous.url }}">&larr; Older</a></li>
+  <li><a href="{{ site.baseurl}}/whatsnew.html">All Posts</a></li>
+  <li class="next{% if page.next %} {% else %} disabled{% endif %}"><a href="{{ site.baseurl}}{{ page.next.url }}">Newer &rarr;</a></li>
 </ul>
 
 {% include footer.html %}

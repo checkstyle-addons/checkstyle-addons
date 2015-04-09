@@ -1,0 +1,22 @@
+---
+layout: default
+title: What's New
+---
+
+<h1>What's New</h1>
+
+<p>Behold the chronicles of {{ site.name }}!</p><br/>
+
+<table class="table table-striped">
+<tr>
+    <th>Date</th><th>Post</th>
+</tr>
+{% for post in site.posts %}
+<tr {% if post.release == true %}class="info"{% endif %}>
+    <td><b>{{ post.date | date: "%b&nbsp;%-d, %Y" }}</b></td>
+    <td><span class="post-title">{% if post.content contains '<!--break-->' %}<a href="{{ post.url }}">{{ post.title }}</a>{% else %}{{ post.title }}{% endif %}</span><br/>
+    {{ post.content | split:'<!--break-->' | first }}{% if post.content contains '<!--break-->' %} <a href="{{ post.url }}"> &nbsp; ... read more</a> {% endif %}
+    </td>
+</tr>
+{% endfor %}
+</table>

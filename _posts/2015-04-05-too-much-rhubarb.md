@@ -2,8 +2,9 @@
 layout: post
 title: "Too much rhubarb"
 date: 2015-04-05 22:55:00 +0100
-comments: false
+release: false
 ---
 
-The {{ site.name }} project was officially started! We already have two checks, and a very nice framework for integrating
-with all kinds of standard software.
+This is just a test post to see what would happen to the site's HTML if there was more than one post.
+You never know.<!--break-->
+Lorem ipsum dolor sit amet non sectitur adipiscing elit.
