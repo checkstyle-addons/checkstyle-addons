@@ -153,6 +153,12 @@ tasks.withType(Test) { task ->
 
 
 /*
+ * Packaging of documentation for publication on the website
+ */
+apply from: 'site.gradle';
+
+
+/*
  * Creation of the individual JARs produced by this project
  */
 apply from: 'artifacts.gradle';
