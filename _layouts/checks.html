@@ -1,0 +1,11 @@
+{% include header.html %}
+
+<h1>Lots of page-related code.</h1>
+
+{% for checkfile in page.check_list %}
+{% capture includedMarkdown %}{% include {{ checkfile }} %}{% endcapture %}
+{{ includedMarkdown | markdownify }}
+{% endfor %}
+
+
+{% include footer.html %}
