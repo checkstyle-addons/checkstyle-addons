@@ -27,9 +27,9 @@ The check works like this:
 
 ### Properties
 
-<table border="1">
+<table class="table table-striped">
 <tr>
-    <th>name</th><th>description</th><th>type</th><th>default value</th>
+    <th>Name</th><th>Description</th><th>Type</th><th>Default</th>
 </tr>
 <tr>
     <td>fileExtensions</td>
@@ -59,7 +59,7 @@ The check works like this:
     <td>mode</td>
     <td>whether <tt>regexp</tt> finds required or illegal matches</td>
     <td>{@link RegexpOnFilenameOption Mode}</td>
-    <td><code>illegal</code></td>
+    <td><tt>illegal</tt></td>
 </tr>
 <tr>
     <td>simple</td>
@@ -70,7 +70,7 @@ The check works like this:
         <tt>regexp</tt>; the <tt>selection</tt> property is <i>always</i> treated
         as if <tt>simple=false</tt>.</td>
     <td><a href="http://checkstyle.sourceforge.net/property_types.html#boolean">Boolean</a></td>
-    <td><code>true</code></td>
+    <td><tt>true</tt></td>
 </tr>
 </table>
 
