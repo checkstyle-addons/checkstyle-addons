@@ -27,9 +27,9 @@ permalink: /:year/:month/:title
 #paginate: 10
 
 highlighter: pygments
-markdown: kramdown
-kramdown:
-  input: GFM
+#markdown: kramdown
+#kramdown:
+#  input: GFM
 
 exclude: ['README.md', 'LICENSE']
 
