@@ -43,13 +43,13 @@ task site (dependsOn: [processResources, siteCopyJavadoc]) {
     outputs.dir(siteDir);
 
     doLast {
-        File checksDocDir = new File(siteDir, '_includes/' + project.version);
-        checksDocDir.mkdirs();
+        File includesVersionDir = new File(siteDir, '_includes/' + project.version);
+        includesVersionDir.mkdirs();
 
-        File checksCatsDir = new File(siteDir, project.version + '/checks');
-        checksCatsDir.mkdirs();
-        File latestChecksCatsDir = new File(siteDir, 'latest/checks');
-        latestChecksCatsDir.mkdirs();
+        File versionChecksDir = new File(siteDir, project.version + '/checks');
+        versionChecksDir.mkdirs();
+        File latestChecksDir = new File(siteDir, 'latest/checks');
+        latestChecksDir.mkdirs();
 
         Map<String, List<File>> rawDocs = new HashMap<>();
         tree.files.each {File f ->
@@ -63,7 +63,7 @@ task site (dependsOn: [processResources, siteCopyJavadoc]) {
         }
 
         for (Map.Entry<String, List<File>> cat : rawDocs) {
-            File mdDir = new File(checksDocDir, cat.key);
+            File mdDir = "checks".equals(cat.key) ? includesVersionDir : new File(includesVersionDir, cat.key);
             mdDir.mkdir();
 
             SortedSet<String> frontMatterFileSet = new TreeSet<>(String.CASE_INSENSITIVE_ORDER);
@@ -73,21 +73,26 @@ task site (dependsOn: [processResources, siteCopyJavadoc]) {
                 frontMatterFileSet.add(project.version + '/' + cat.key + '/' + f.name);
             }
 
-            File catPage = new File(checksCatsDir, cat.key + '.html');
-            StringBuilder sb = new StringBuilder();
-            sb.append("---\n");
-            sb.append("layout: checks\n");
-            sb.append("check_list:\n");
-            for (String s : frontMatterFileSet) {
-                sb.append("  - ");
-                sb.append(s);
+            if (!"checks".equals(cat.key)) {
+                File catPage = new File(versionChecksDir, cat.key + '.html');
+                StringBuilder sb = new StringBuilder();
+                sb.append("---\n");
+                sb.append("layout: checks\n");
+                sb.append("check_category: ");
+                sb.append(cat.key);
                 sb.append("\n");
-            }
-            sb.append("---\n\n");
-            catPage.withWriter { it << sb.toString() }
+                sb.append("check_list:\n");
+                for (String s : frontMatterFileSet) {
+                    sb.append("  - ");
+                    sb.append(s);
+                    sb.append("\n");
+                }
+                sb.append("---\n\n");
+                catPage.withWriter {it << sb.toString()}
 
-            Files.copy(Paths.get(catPage.toURI()), Paths.get(new File(latestChecksCatsDir, catPage.name).toURI()),
-                StandardCopyOption.REPLACE_EXISTING, StandardCopyOption.COPY_ATTRIBUTES);
+                Files.copy(Paths.get(catPage.toURI()), Paths.get(new File(latestChecksDir, catPage.name).toURI()),
+                    StandardCopyOption.REPLACE_EXISTING, StandardCopyOption.COPY_ATTRIBUTES);
+            }
         }
     }
 }
