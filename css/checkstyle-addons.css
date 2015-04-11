@@ -6,6 +6,10 @@
     margin: 0;
     padding: 0;
 }
+ul, ol {
+    margin-top: 0.5em;
+    margin-left: 2em;
+}
 
 body {
     font-size: 16px;
@@ -19,6 +23,9 @@ body {
     padding-left: 24px;
     padding-right: 24px;
 }
+.checkpage dd {
+    padding-left: 5rem;
+}
 .footer {
     padding: 0.3em 16px;
     text-align: left;
@@ -31,6 +38,9 @@ body {
         padding: 16px 5px;
         margin-left: -5px;
         margin-right: -5px;
+    }
+    .checkpage dd {
+        padding-left: 2.5rem;
     }
     .footer {
         padding: 0.3em 0px;
@@ -86,6 +96,51 @@ a.csa-offset-anchor { /* used to prevent anchors from being obscured by the fixe
     visibility: hidden;
 }
 
+.checkpage h2 {
+    border-top: 1px solid #dddddd;
+    padding-top: 5px;
+    padding-bottom: 5px;
+    background-color: #f9f9f9;
+}
+.checkpage h3 {
+    margin-top: 3rem;
+}
+.checkpage dl {
+    margin: 2rem 0;
+}
+.checkpage > dl > dt:nth-of-type(2n), .checkpage > dl > dd:nth-of-type(2n) {
+    background-color: #f9f9f9;
+}
+.checkpage dt {
+    float: left;
+    display: inline;
+    padding: 5px 5px 0 5px;
+    font-weight: bold;
+}
+.checkpage dd {
+    border-bottom: 1px solid #dddddd;
+    padding-top: 5px;
+    padding-bottom: 6px;
+}
+.checkpage .proptype:before{
+    content: "[";
+}
+.checkpage .proptype {
+    font-weight: normal;
+}
+.checkpage .proptype:after {
+    content: "] – ";
+}
+.checkpage .propdefault:before{
+    content: "Default: ";
+    font-style: italic;
+}
+.checkpage .propdefault{
+    display: block;
+}
+.checkpage pre .line-numbers {
+    display: none;
+}
 
 img.csa-tablogo {
     height: 40px;
