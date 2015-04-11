@@ -1,5 +1,6 @@
 {% include header.html %}
 
+<div class="checkpage">
 {% capture headerName %}{{ page.check_version }}/{{ page.check_category }}.md{% endcapture %}
 {% capture headerMarkdown %}{% include {{ headerName }} %}{% endcapture %}
 {{ headerMarkdown | markdownify }}
@@ -8,5 +9,6 @@
 {% capture includedMarkdown %}{% include {{ checkfile }} %}{% endcapture %}
 {{ includedMarkdown | markdownify }}
 {% endfor %}
+</div>
 
 {% include footer.html %}
