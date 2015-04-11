@@ -22,7 +22,7 @@ task siteCopyJavadoc(type: Copy, dependsOn: javadoc) {
     description = 'Checkstyle-Addons: Copy Javadoc to site directory';
 
     destinationDir = new File(project.buildDir, 'site');
-    into(project.version + '/apidocs') {
+    into('v' + project.version + '/apidocs') {
         from fileTree(dir: javadoc.destinationDir);
     }
     into('latest/apidocs') {
@@ -43,10 +43,10 @@ task site (dependsOn: [processResources, siteCopyJavadoc]) {
     outputs.dir(siteDir);
 
     doLast {
-        File includesVersionDir = new File(siteDir, '_includes/' + project.version);
+        File includesVersionDir = new File(siteDir, '_includes/v' + project.version);
         includesVersionDir.mkdirs();
 
-        File versionChecksDir = new File(siteDir, project.version + '/checks');
+        File versionChecksDir = new File(siteDir, 'v' + project.version + '/checks');
         versionChecksDir.mkdirs();
         File latestChecksDir = new File(siteDir, 'latest/checks');
         latestChecksDir.mkdirs();
@@ -70,7 +70,7 @@ task site (dependsOn: [processResources, siteCopyJavadoc]) {
             for (File f : cat.value) {
                 Files.copy(Paths.get(f.toURI()), Paths.get(new File(mdDir, f.name).toURI()),
                     StandardCopyOption.REPLACE_EXISTING, StandardCopyOption.COPY_ATTRIBUTES);
-                frontMatterFileSet.add(project.version + '/' + cat.key + '/' + f.name);
+                frontMatterFileSet.add('v' + project.version + '/' + cat.key + '/' + f.name);
             }
 
             if (!"checks".equals(cat.key)) {
@@ -78,9 +78,15 @@ task site (dependsOn: [processResources, siteCopyJavadoc]) {
                 StringBuilder sb = new StringBuilder();
                 sb.append("---\n");
                 sb.append("layout: checks\n");
+
+                sb.append("check_version: v");
+                sb.append(project.version);
+                sb.append("\n");
+
                 sb.append("check_category: ");
                 sb.append(cat.key);
                 sb.append("\n");
+
                 sb.append("check_list:\n");
                 for (String s : frontMatterFileSet) {
                     sb.append("  - ");
