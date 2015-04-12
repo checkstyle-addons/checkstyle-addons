@@ -1,19 +1,16 @@
 {% include header.html %}
 
-<ul class="pagination" style="margin-bottom:0;">
-    <li class="reset"><a>More checks:</a></li>
-{% for cat in page.check_categories %}
-    <li{% if cat == page.check_category %} class="active"{% endif %}><a href="{{ cat }}.html">{{ cat }}</a></li>
-{% endfor %}
-</ul>
-
 <div class="checkpage">
+
+<h1>{{ page.check_category | capitalize }} <span class="version">{{ page.check_version }}</span></h1>
+
 {% capture headerName %}pages/checks/{{ page.check_category }}.md{% endcapture %}
 {% capture headerMarkdown %}{% include {{ headerName }} %}{% endcapture %}
 {{ headerMarkdown | markdownify }}
 
 {% for checkfile in page.check_list %}
 {% capture includedMarkdown %}{% include {{ checkfile }} %}{% endcapture %}
+<a name="{{ checkfile | split:"/" | last | split:"." | first | replace:'Check','' }}" class="csa-offset-anchor"></a>
 {{ includedMarkdown | markdownify }}
 {% endfor %}
 </div>

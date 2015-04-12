@@ -1,0 +1,21 @@
+<h1>Available Checks <span class="version">{{ page.check_version }}</span></h1>
+
+<p>These are the checks provided by {{ site.name }}, in alphabetical order. The navigation bar above provides a reference by category.</p>
+<p>Currently, there are {{ page.check_list | size }} checks.</p>
+
+<div class="checkpage">
+<dl>
+<dt class="title">Check [since version] – Description</dt><dd class="title">&nbsp;</dd>
+
+{% for check in page.check_list %}
+<dt><a href="{{ site.baseurl }}/{{ page.check_version }}/checks/{{ check.category }}.html#{{ check.check }}">{{ check.check }}</a>
+    <span class="proptype">since&nbsp;{{ check.since }}</span></dt>
+{% capture descMarkdown %}{{ check.desc }}{% endcapture %}
+<dd>{{ descMarkdown | markdownify }}</dd>
+{% endfor %}
+</dl>
+
+<p>For other versions of {{ site.name }}, please refer to the <a href="{{ site.baseurl }}/releases.html">release history</a>,
+which also includes version-specific check documentation.</p>
+
+</div>

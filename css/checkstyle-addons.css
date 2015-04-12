@@ -78,6 +78,10 @@ h2 {
     color: inherit;
 }
 
+h1 .version {
+    color: #bbb;
+}
+
 .whatsnewposts .container-fluid .row {
     margin: 0 -16px 0 -16px;
 }
@@ -133,6 +137,12 @@ a.csa-offset-anchor { /* used to prevent anchors from being obscured by the fixe
     border-bottom: 1px solid #dddddd;
     padding-top: 5px;
     padding-bottom: 6px;
+}
+.checkpage dd p {
+    margin-bottom: 0;
+}
+.checkpage dd.title {
+    border-bottom: 2px solid #DDD;
 }
 .checkpage .proptype:before{
     content: "[";
