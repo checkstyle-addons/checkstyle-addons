@@ -1,5 +1,12 @@
 {% include header.html %}
 
+<ul class="pagination" style="margin-bottom:0;">
+    <li class="reset"><a>More checks:</a></li>
+{% for cat in page.check_categories %}
+    <li{% if cat == page.check_category %} class="active"{% endif %}><a href="{{ cat }}.html">{{ cat }}</a></li>
+{% endfor %}
+</ul>
+
 <div class="checkpage">
 {% capture headerName %}pages/checks/{{ page.check_category }}.md{% endcapture %}
 {% capture headerMarkdown %}{% include {{ headerName }} %}{% endcapture %}

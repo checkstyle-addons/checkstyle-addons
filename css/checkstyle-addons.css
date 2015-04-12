@@ -96,6 +96,18 @@ a.csa-offset-anchor { /* used to prevent anchors from being obscured by the fixe
     visibility: hidden;
 }
 
+.pagination .reset a {
+    border: 0;
+    padding-left: 0;
+    color: inherit;
+    font-size: 16px;
+}
+.pagination .reset a:hover {
+    color: inherit;
+    background-color: inherit;
+    cursor: default; 
+}
+
 .checkpage h2 {
     border-top: 1px solid #dddddd;
     padding-top: 5px;
