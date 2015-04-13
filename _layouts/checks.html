@@ -10,7 +10,7 @@
 
 {% for checkfile in page.check_list %}
 {% capture includedMarkdown %}{% include {{ checkfile }} %}{% endcapture %}
-<a name="{{ checkfile | split:"/" | last | split:"." | first | replace:'Check','' }}" class="csa-offset-anchor"></a>
+<a name="{{ checkfile | split:"/" | last | split:"." | first }}" class="csa-offset-anchor"></a>
 {{ includedMarkdown | markdownify }}
 {% endfor %}
 </div>
