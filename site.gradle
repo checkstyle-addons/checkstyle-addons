@@ -37,7 +37,6 @@ task siteCopyAllChecks(type: Copy) {
     destinationDir = new File(project.buildDir, 'site');
     final File originalFile = new File(sourceSets.main.resources.srcDirs.iterator().next(),
         '/' + project.ext.checksPackage + '/all_checks.html');
-    println (originalFile);
     into('v' + project.version + '/checks') {
         from originalFile;
         rename { String fileName -> fileName.replace(originalFile.name, 'index.html'); }

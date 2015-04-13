@@ -89,6 +89,7 @@ jar {
     exclude 'eclipsecs-plugin.xml';
     exclude '**/checkstyle-metadata.*';
     exclude '**/*.md';
+    exclude '**/checks/all_checks.html';
     exclude '**/sonarqube/**';
     from 'LICENSE';
     manifest {
@@ -122,6 +123,7 @@ task jarEclipse(type: Jar, dependsOn: classes) {
     from(sourceSets.main.output) {
         exclude '**/sonarqube/**';
         exclude '**/*.md';
+        exclude '**/checks/all_checks.html';
         exclude 'sonarqube.xml';
         rename { String fileName -> fileName.replace('eclipsecs-plugin.xml', 'plugin.xml'); }
     }
@@ -197,14 +199,16 @@ task jarSonarQube(type: Jar, dependsOn: jar) {
             'Plugin-Version': project.version,
             'Plugin-Organization': project.ext.authorName,
             'Plugin-OrganizationUrl': 'https://github.com/checkstyle-addons',
+            'Plugin-SourcesUrl': 'https://github.com/checkstyle-addons/checkstyle-addons',
             'Plugin-IssueTrackerUrl': 'https://github.com/checkstyle-addons/checkstyle-addons/issues',
             'Plugin-Class': 'com.thomasjensen.checkstyle.addons.sonarqube.CheckstyleExtensionPlugin',
+            'Plugin-RequirePlugins': 'java:1.5',
             'Plugin-Dependencies': 'META-INF/lib/' + mainCheckJar.getName() + ' ' +
                 flattenPrefixLibs('META-INF/lib/', pubLibs, ' '.toCharacter()),
             'Plugin-License': 'GPLv3',
             'Plugin-Homepage': project.ext.website,
             //'Plugin-TermsConditionsUrl': config.sonarQubeConfig.pluginTermsConditionsUrl,
-            'Sonar-Version': '3.0'
+            'Sonar-Version': '3.6'   // earliest version with a working Java plugin (before, Java was built-in)
         ];
         attributes.putAll(mfAttrStd());
         attributes.remove('Website');
@@ -312,6 +316,7 @@ task jarMaven(type: Jar, dependsOn: classes) {
     from(sourceSets.main.output) {
         exclude '**/sonarqube/**';
         exclude '**/*.md';
+        exclude '**/checks/all_checks.html';
         exclude 'sonarqube.xml';
         exclude 'eclipsecs-plugin.xml';
         exclude '**/checkstyle-metadata.*';
