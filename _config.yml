@@ -31,7 +31,7 @@ markdown: kramdown
 kramdown:
   input: GFM
 
-exclude: ['README.md', 'LICENSE']
+exclude: ['README.md', 'LICENSE', '*.iml', 'build']
 
 # checkstyle-addons custom variables
 defaults:
