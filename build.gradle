@@ -40,6 +40,7 @@ ext {
     longName = 'Checkstyle Addons';
     buildTimestamp = new Date();
     sqPackage = 'com/thomasjensen/checkstyle/addons/sonarqube';
+    checksPackage = 'com/thomasjensen/checkstyle/addons/checks';
     website = 'http://checkstyle-addons.thomasjensen.com/';
 }
 
