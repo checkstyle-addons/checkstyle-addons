@@ -1,6 +1,9 @@
 package com.thomasjensen.checkstyle.addons.checks.coding;
 // @formatter:off
 
+import java.io.Serializable;
+
+
 public class InputLostInstance
 {
     private static final Object CONSTANT = new IllegalArgumentException();
@@ -68,11 +71,34 @@ public class InputLostInstance
         throw new IllegalArgumentException();
     }
 
+
+
     public void bar(Object arg)
     {
         do new IllegalArgumentException(); // report this
         while (System.currentTimeMillis() % 2 == 0);
 
         while (System.currentTimeMillis() % 2 == 0) new IllegalArgumentException(); // report this
+
+        if (System.currentTimeMillis() % 2 == 0) {
+            return new IllegalArgumentException();
+        }
+
+        String s = "foo " + new IllegalArgumentException();
+        String t = new Integer(20042) + new String() + new IllegalArgumentException();
+        int i = 43 - new Integer(1);
+
+        return new IllegalArgumentException();
+    }
+
+
+
+    public Serializable baz()
+    {
+        return new Serializable() {
+            public void foo() {
+                new IllegalArgumentException(); // report this
+            }
+        };
     }
 }

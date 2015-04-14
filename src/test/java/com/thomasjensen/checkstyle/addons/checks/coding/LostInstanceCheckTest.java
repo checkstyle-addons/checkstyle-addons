@@ -36,21 +36,22 @@ public class LostInstanceCheckTest
         final DefaultConfiguration checkConfig =
             createCheckConfig(LostInstanceCheck.class);
         final String[] expected = {
-            "10:9: Instance created here is not used for anything.",
-            "36:22: Instance created here is not used for anything.",
-            "37:35: Instance created here is not used for anything.",
-            "41:13: Instance created here is not used for anything.",
-            "43:13: Instance created here is not used for anything.",
+            "13:9: Instance created here is not used for anything.",
+            "39:22: Instance created here is not used for anything.",
+            "40:35: Instance created here is not used for anything.",
+            "44:13: Instance created here is not used for anything.",
             "46:13: Instance created here is not used for anything.",
-            "50:13: Instance created here is not used for anything.",
-            "52:13: Instance created here is not used for anything.",
+            "49:13: Instance created here is not used for anything.",
+            "53:13: Instance created here is not used for anything.",
             "55:13: Instance created here is not used for anything.",
-            "57:13: Instance created here is not used for anything.",
-            "60:30: Instance created here is not used for anything.",
-            "63:14: Instance created here is not used for anything.",
-            "66:35: Instance created here is not used for anything.",
-            "73:12: Instance created here is not used for anything.",
-            "76:53: Instance created here is not used for anything.",
+            "58:13: Instance created here is not used for anything.",
+            "60:13: Instance created here is not used for anything.",
+            "63:30: Instance created here is not used for anything.",
+            "66:14: Instance created here is not used for anything.",
+            "69:35: Instance created here is not used for anything.",
+            "78:12: Instance created here is not used for anything.",
+            "81:53: Instance created here is not used for anything.",
+            "100:17: Instance created here is not used for anything.",
         };
         verify(checkConfig, getPath("coding/InputLostInstance.java"), expected);
     }

@@ -26,7 +26,7 @@ import com.puppycrawl.tools.checkstyle.api.TokenTypes;
  * Checks that object instances created explicitly with <code>new</code> are actually used for something. Just being
  * assigned to a variable or passed as a parameter is enough. A full data flow analysis is not performed.
  *
- * <p><a href="http://checkstyle-addons.thomasjensen.com/latest/checks/LostInstance.html">Documentation</a></p>
+ * <p><a href="http://checkstyle-addons.thomasjensen.com/latest/checks/coding.html#LostInstance">Documentation</a></p>
  *
  * @author Thomas Jensen
  */
@@ -39,7 +39,7 @@ public class LostInstanceCheck
      */
     private static final int[] GOOD_PARENTS =
         new int[]{TokenTypes.ASSIGN, TokenTypes.ANNOTATION_MEMBER_VALUE_PAIR, TokenTypes.ARRAY_INIT, TokenTypes.ELIST,
-            TokenTypes.LITERAL_THROW};
+            TokenTypes.LITERAL_RETURN, TokenTypes.LITERAL_THROW};
 
     /**
      * List of tokens that, when occurring as a parent token of LITERAL_NEW, indicate that LITERAL_NEW stands alone.
