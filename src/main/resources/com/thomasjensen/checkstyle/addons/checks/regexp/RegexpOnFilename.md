@@ -15,7 +15,7 @@ By default, this check flags leading and trailing spaces in file names.
 
 The check works like this:
 
-  1. Select the files to check. Only files which match the regular expression given in `selection` are checked. The `selection` regexp is applied to the canonical file name, which included the entire path. Leave blank to include all files.
+  1. Select the files to check. Only files which match the regular expression given in `selection` are checked. Leave blank to include all files.
   2. The expression given in `regexp` is matched against each selected file name. What part of the file name it is applied to, and how the result is interpreted is governed by the check properties.
 
 
@@ -34,17 +34,19 @@ The check works like this:
 
 <dt><span class="propname">mode</span>
     <span class="proptype"><a href="{{ site.baseurl }}/latest/apidocs/index.html?com/thomasjensen/checkstyle/addons/checks/regexp/RegexpOnFilenameOption.html">Mode</a></span></dt>
-<dd><span class="propdesc">whether <tt>regexp</tt> finds required or illegal matches</span>
+<dd><span class="propdesc">whether <code>regexp</code> finds required or illegal matches. <tt>required</tt> means that all selected files must match the expression. <tt>illegal</tt> means that they must not.</span>
     <span class="propdefault"><tt>illegal</tt></span></dd>
 
 <dt><span class="propname">simple</span>
     <span class="proptype"><a href="http://checkstyle.sourceforge.net/property_types.html#boolean">Boolean</a></span></dt>
-<dd><span class="propdesc">If <code>true</code>, only the simple name of the file will be checked against the pattern specified by <tt>regexp</tt>; if <code>false</code>, the entire canonical path will be checked.
+<dd><span class="propdesc">If <tt>true</tt>, only the simple name of the file will be checked against the pattern specified by <tt>regexp</tt>; if <tt>false</tt>, the entire canonical path will be checked.
     Note that this option applies only to the pattern specified by <tt>regexp</tt>; the <tt>selection</tt> property is <i>always</i> treated as if <tt>simple=false</tt>.</span>
     <span class="propdefault"><tt>true</tt></span></dd>
 </dl>
 
-Since this check is a [FileSetCheck](http://checkstyle.sourceforge.net/writingchecks.html#Writing_FileSetChecks), it inherits the `fileExtensions` property, which, if configured, would take precedence over `selection`.
+Since this check is a [FileSetCheck](http://checkstyle.sourceforge.net/writingchecks.html#Writing_FileSetChecks), it also inherits the `fileExtensions` property, which may be configured independently of `selection`. In that case, both properties must match (e.g. `fileExtensions` *and* `selection`, or either of the two if one is missing).
+
+#### Custom Messages
 
 In addition to the properties, optionally adding a `message` element may benefit this check to make the warning easier to understand. The message key depends on the value of the `mode` option. If `mode=required`, the message key `regexp.filepath.required` is used. If `mode=illegal`, the message key `regexp.filepath.illegal` is used. The message text can make use of placeholders `{0}` (the file name as used by the matcher) and `{1}` (the regular expression used by the matcher).
 
