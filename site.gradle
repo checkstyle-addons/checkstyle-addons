@@ -13,9 +13,12 @@
  * You should have received a copy of the GNU General Public License along with this
  * program.  If not, see <http://www.gnu.org/licenses/>.
  */
+
 import java.nio.file.Files
 import java.nio.file.Paths
 import java.nio.file.StandardCopyOption
+
+import org.apache.tools.ant.filters.ReplaceTokens;
 
 
 task siteCopyJavadoc(type: Copy, dependsOn: javadoc) {
@@ -40,10 +43,12 @@ task siteCopyAllChecks(type: Copy) {
     into('v' + project.version + '/checks') {
         from originalFile;
         rename { String fileName -> fileName.replace(originalFile.name, 'index.html'); }
+        filter(ReplaceTokens, tokens: [version: 'v' + project.version]);
     }
     into('latest/checks') {
         from originalFile;
         rename { String fileName -> fileName.replace(originalFile.name, 'index.html'); }
+        filter(ReplaceTokens, tokens: [version: 'v' + project.version]);
     }
 }
 
