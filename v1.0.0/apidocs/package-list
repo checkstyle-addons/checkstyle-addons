@@ -1,0 +1,3 @@
+com.thomasjensen.checkstyle.addons.checks.coding
+com.thomasjensen.checkstyle.addons.checks.regexp
+com.thomasjensen.checkstyle.addons.sonarqube
