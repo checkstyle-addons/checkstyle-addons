@@ -1,32 +1,27 @@
 ## RegexpOnFilename
 
-This check applies a given regular expression to the names of files.
+This check applies a regular expression to the names of files.
 Depending on the configuration, a warning is logged if a required match is not found, or if an illegal match is found.
 
 This is useful for situations such as:
 
   - Checking that resources in certain directories follow a naming convention
-  - Resource file names contain only legal characters
+  - File names contain only legal characters
   - Files of certain types are created in the right places, e.g. Java files under *src/&#42;/java*
   - Prevent certain files or types of files altogether, by "banning" their names
+  - Ensure that required files are present in certain locations
 
 By default, this check flags leading and trailing spaces in file names.
 
 The check works like this:
 
-  1. If file extensions are configured, it is checked if the file extension applies. As with all [FileSetChecks](http://checkstyle.sourceforge.net/writingchecks.html#Writing_FileSetChecks), this check only ever does anything if the file extension matches. Leave out the property to match all file extensions.
-  2. If configured, the regular expression given in the `selection` property is applied to the canonical file name. Only files that match this expression are checked. Leave out the property to match all files.
-  3. The given `regexp` is matched against the file name. What part of the file name it is applied to, and how the result is interpreted is governed by the check properties.
+  1. Select the files to check. Only files which match the regular expression given in `selection` are checked. The `selection` regexp is applied to the canonical file name, which included the entire path. Leave blank to include all files.
+  2. The expression given in `regexp` is matched against each selected file name. What part of the file name it is applied to, and how the result is interpreted is governed by the check properties.
 
 
 ### Properties
 
 <dl>
-<dt><span class="propname">fileExtensions</span>
-    <span class="proptype"><a href="http://checkstyle.sourceforge.net/property_types.html#stringSet">StringSet</a></span></dt>
-<dd><span class="propdesc">Comma-separated list of file extensions. Leading dots are optional. Spaces after the commas are allowed. Only files with one of these extensions are checked against the regular expression.</span>
-    <span class="propdefault">unrestricted</span></dd>
-
 <dt><span class="propname">selection</span>
     <span class="proptype"><a href="http://checkstyle.sourceforge.net/property_types.html#regexp">regular expression</a></span></dt>
 <dd><span class="propdesc">Limits the check to files whose canonical path name contains the given pattern. The canonical path is the simplest possible absolute path, including the file name (no <code>..</code> elements etc.).</span>
@@ -48,6 +43,8 @@ The check works like this:
     Note that this option applies only to the pattern specified by <tt>regexp</tt>; the <tt>selection</tt> property is <i>always</i> treated as if <tt>simple=false</tt>.</span>
     <span class="propdefault"><tt>true</tt></span></dd>
 </dl>
+
+Since this check is a [FileSetCheck](http://checkstyle.sourceforge.net/writingchecks.html#Writing_FileSetChecks), it inherits the `fileExtensions` property, which, if configured, would take precedence over `selection`.
 
 In addition to the properties, optionally adding a `message` element may benefit this check to make the warning easier to understand. The message key depends on the value of the `mode` option. If `mode=required`, the message key `regexp.filepath.required` is used. If `mode=illegal`, the message key `regexp.filepath.illegal` is used. The message text can make use of placeholders `{0}` (the file name as used by the matcher) and `{1}` (the regular expression used by the matcher).
 
@@ -75,7 +72,7 @@ To configure the check to ensure that Java files reside in java folders, not res
 </module>
 ```
 
-To configure the check to enforce an HTML file naming convention on files in a certain folder:
+To configure the check to enforce a naming convention on files in a certain folder:
 
 ```xml
 <module name="RegexpOnFilename">
@@ -99,5 +96,11 @@ To configure the check to ban GIF files in favor of PNG:
 
 
 ### Parent Module
+
+<div class="alert alert-dismissible alert-warning">
+  <button type="button" class="close" data-dismiss="alert">×</button>
+  <h4>Important: This check goes under <b>Checker</b>, not <b>TreeWalker</b>.</h4>
+  <p>Placing the <i>checkstyle.xml</i> module definition incorrectly is a common mistake.</p>
+</div>
 
 [Checker](http://checkstyle.sourceforge.net/config.html#Checker)
