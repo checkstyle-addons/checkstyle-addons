@@ -3,13 +3,24 @@ layout: default
 sedesc: Additional Checkstyle Checks
 ---
 
-<div class="jumbotron">
-  <h1>{{ site.name }}</h1>
-  <p>{{ site.description }}</p>
-  <p><a class="btn btn-primary btn-md" href="#usage">Get&nbsp;it!</a>
-     <a class="btn btn-default btn-outline-inverse btn-md" target="_blank"
-        href="https://github.com/{{ site.github }}" title="Browse/clone code at GitHub">Sources</a>
-  </p>
+<div class="title">
+<div class="hidden-xs">
+<div class="logo"><img src="images\checkstyle-addons-logo-text.png" alt="{{ site.name }}" /></div>
+<p class="buttons"><a class="btn btn-primary" href="#usage">Get&nbsp;it!</a>
+ <a class="btn btn-default btn-outline-inverse" target="_blank"
+    href="https://github.com/{{ site.github }}" title="Browse/clone code at GitHub">Sources</a>
+</p>
+</div>
+
+<div class="visible-xs">
+<div class="logo"><img src="images\checkstyle-addons-logo.png" alt="{{ site.name }}" /></div>
+<h1>{{ site.name }}</h1>
+<h2>{{ site.description }}</h2>
+<p class="buttons"><a class="btn btn-primary" href="#usage">Get&nbsp;it!</a>
+ <a class="btn btn-default btn-outline-inverse" target="_blank"
+    href="https://github.com/{{ site.github }}" title="Browse/clone code at GitHub">Sources</a>
+</p>
+</div>
 </div>
 
 <p>{{ site.name }} provides additional detectors for the <a href="http://checkstyle.sourceforge.net/" target="_blank">Checkstyle</a>
@@ -20,6 +31,11 @@ sedesc: Additional Checkstyle Checks
 <p>{{ site.name }} is free software under the GNU General Public License, version 3
 (<a href="https://www.gnu.org/copyleft/gpl.html" target="_blank">GPLv3</a>).</p>
 
+<div class="alert alert-dismissible alert-warning">
+  <button type="button" class="close" data-dismiss="alert">×</button>
+  <h4>{{ site.name }} is still under construction.</h4>
+  <p>This means stuff doesn't work yet. This warning will be removed once things have stabilized.</p>
+</div>
 
 {% if site.posts.size > 0 %}  
 <h2>What's New</h2>
