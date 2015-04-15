@@ -26,7 +26,8 @@ import com.puppycrawl.tools.checkstyle.api.TokenTypes;
  * Checks that object instances created explicitly with <code>new</code> are actually used for something. Just being
  * assigned to a variable or passed as a parameter is enough. A full data flow analysis is not performed.
  *
- * <p><a href="http://checkstyle-addons.thomasjensen.com/latest/checks/coding.html#LostInstance">Documentation</a></p>
+ * <p><a href="http://checkstyle-addons.thomasjensen.com/latest/checks/coding.html#LostInstance"
+ * target="_blank">Documentation</a></p>
  *
  * @author Thomas Jensen
  */
