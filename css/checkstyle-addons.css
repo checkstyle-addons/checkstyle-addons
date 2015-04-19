@@ -16,55 +16,55 @@ body {
     padding: 60px 16px;
 }
 
-.title {
+.csa-main-title {
     margin-top: 15px;
     margin-bottom: 2em;
 }
-.title .logo {
+.csa-main-title .logo {
     max-width: 90%;
     height: auto;
     position: relative;
     display: block;
     margin: 0 auto;
 }
-.title .logo img{
+.csa-main-title .logo img{
     max-width: 100% !important;
     height: auto;
     display: block;
 }
-.title .visible-xs {
+.csa-main-title .visible-xs {
     text-align: center;
 }
-.title .visible-xs img {
+.csa-main-title .visible-xs img {
     display: block;
     margin-left: auto;
     margin-right: auto;
 }
-.title .visible-xs h1 {
+.csa-main-title .visible-xs h1 {
     color: #546e7c;
     font-weight: bold;
     font-size: 32px;
     margin-top: 0.5em;
 }
-.title .visible-xs h2 {
+.csa-main-title .visible-xs h2 {
     color: #fc8a3c;
     font-weight: bold;
     font-size: 18px;
     margin-top: 0.5em;
     margin-bottom: 1.5em;
 }
-.title .visible-xs .buttons {
+.csa-main-title .visible-xs .buttons {
     text-align: center;
 }
-.title .hidden-xs .buttons {
+.csa-main-title .hidden-xs .buttons {
     margin-left: 248px;
     margin-top: 1.5em;
 }
-.title .buttons .btn {
+.csa-main-title .buttons .btn {
     padding-left: 24px;
     padding-right: 24px;
 }
-.title .buttons .btn-outline-inverse {
+.csa-main-title .buttons .btn-outline-inverse {
     margin-left: 20px;
 }
 
