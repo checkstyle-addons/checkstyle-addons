@@ -1,0 +1,38 @@
+---
+layout: default
+title: Release History
+---
+
+<h1>Release History</h1>
+
+{% assign anyReleases = false %}
+{% for post in site.posts %}{% if post.release == true %}{% assign anyReleases = true %}{% endif %}{% endfor %}
+
+{% if anyReleases == true %}
+<p>So far, these have been these {{ site.name }} releases:</p><br/>
+
+<table class="table table-striped">
+<tr>
+    <th>Version</th><th>Information</th>
+</tr>
+{% for post in site.posts %}{% if post.release == true %}
+<tr>
+    <td><b>{{ post.title }}</b></td>
+    <td><p><span class="post-date">{{ post.date | date: "%b&nbsp;%-d, %Y" }}</span> –
+        <span class="post-abstract">{{ post.abstract }}</span></p>
+        <div class="post-links">
+            <a class="btn btn-info btn-xs" href="{{ post.url }}">Release Notes</a>
+            <a class="btn btn-primary btn-xs" href="https://github.com/{{ site.github }}/releases/tag/{{ post.title }}">Downloads</a>
+            <a class="btn btn-success btn-xs" href="{{ site.baseurl }}/{{ post.title }}/checks/">Checks</a>
+            <a class="btn btn-default btn-xs" href="https://github.com/{{ site.github }}/tree/{{ post.title }}">Sources</a>
+            <a class="btn btn-default btn-xs" href="{{ site.baseurl }}/{{ post.title }}/apidocs/">Javadoc</a>
+        </div>
+    </td>
+</tr>
+{% endif %}{% endfor %}
+</table>
+{% else %}
+<p>So far, there have been no releases yet. Stay tuned!</p>
+{% endif %}
+
+<p>View <a href="{{ site.baseurl }}/whatsnew.html">all news</a>.</p>
