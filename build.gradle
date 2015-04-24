@@ -65,15 +65,18 @@ idea.module {
 final String jdk6PropName = 'checkstyleaddons_jdk6_javac';
 def javac6 = project.hasProperty(jdk6PropName) ? project.property(jdk6PropName) : System.getenv(jdk6PropName);
 if (javac6 == null) {
-    throw new GradleException('Property \'' + jdk6PropName + '\' not defined in gradle.properties. ' +
-        'It must point to a Java 6 compiler executable.');
+    println('WARNING: Property \'' + jdk6PropName + '\' not defined in gradle.properties. ' +
+        'It must point to a Java 6 compiler executable. Build process compiler will be used. ' +
+        'Note that this will not produce valid artifacts!');
 }
 tasks.withType(JavaCompile) {
     sourceCompatibility = javaVersion;
     targetCompatibility = javaVersion;
     options.encoding = 'UTF-8';
-    options.fork = true;
-    options.forkOptions.executable = javac6;
+    if (javac6 != null) {
+        options.fork = true;
+        options.forkOptions.executable = javac6;
+    }
 }
 
 
