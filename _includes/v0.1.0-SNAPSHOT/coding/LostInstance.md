@@ -18,7 +18,7 @@ if (x < 0)
 
 The instance might have been created to make use of a constructor side effect, but such a case would be a bug in its own right.
 
-Inspired by FindBugs, http://findbugs.sourceforge.net/publications.html
+This check was inspired by the FindBugs detector [RV_EXCEPTION_NOT_THROWN](http://findbugs.sourceforge.net/bugDescriptions.html#RV_EXCEPTION_NOT_THROWN). However, this check is not restricted to exceptions.
 
 
 ### Properties
