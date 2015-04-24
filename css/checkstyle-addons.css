@@ -24,18 +24,6 @@ code {
     margin-top: 15px;
     margin-bottom: 2em;
 }
-.csa-main-title .logo {
-    max-width: 90%;
-    height: auto;
-    position: relative;
-    display: block;
-    margin: 0 auto;
-}
-.csa-main-title .logo img{
-    max-width: 100% !important;
-    height: auto;
-    display: block;
-}
 .csa-main-title .visible-xs {
     text-align: center;
 }
@@ -62,7 +50,7 @@ code {
 }
 .csa-main-title .hidden-xs .buttons {
     margin-left: 248px;
-    margin-top: 1.5em;
+    margin-top: 1em;
 }
 .csa-main-title .buttons .btn {
     padding-left: 24px;
