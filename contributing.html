@@ -3,5 +3,23 @@ layout: default
 title: Contributing
 ---
 
-{% capture includedFile %}{% include pages/contributing.md %}{% endcapture %}
-{{ includedFile | markdownify }}
+<h1>Contributing</h1>
+
+{% capture includedIntro %}{% include pages/contributing.intro.md %}{% endcapture %}
+{{ includedIntro | markdownify }}
+
+<h2 id="current-status">Current Status</h2>
+
+<p>TODO Coverage, more stats</p>
+
+<div id="travis-status" class="panel panel-default">
+  <div class="panel-heading">
+    <h3 id="travis-status-title" class="panel-title">Build Status</h3>
+  </div>
+  <div class="panel-body">
+    <img src="https://travis-ci.org/checkstyle-addons/checkstyle-addons.svg?branch=master" />
+  </div>
+</div>
+
+{% capture includedMain %}{% include pages/contributing.main.md %}{% endcapture %}
+{{ includedMain | markdownify }}
