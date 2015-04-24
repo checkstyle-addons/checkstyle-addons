@@ -6,4 +6,4 @@ release: false
 ---
 
 The {{ site.name }} project was officially started!
-We already have two checks, and a very nice framework for integrating with all kinds of standard software.
+We already have two checks, and a framework for integrating with all kinds of standard software.
