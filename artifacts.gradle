@@ -193,6 +193,7 @@ task jarSonarQube(type: Jar, dependsOn: jar) {
     manifest {
         attributes = [
             'Plugin-Name': project.ext.longName,
+            'Plugin-Base': 'checkstyle',
             'Plugin-Key': pluginKey,
             'Implementation-Build': getGitHash(),
             'Plugin-Description': project.description + ' (based on Checkstyle ' + project.ext.checkstyleVersion + ')',
@@ -202,7 +203,7 @@ task jarSonarQube(type: Jar, dependsOn: jar) {
             'Plugin-SourcesUrl': 'https://github.com/checkstyle-addons/checkstyle-addons',
             'Plugin-IssueTrackerUrl': 'https://github.com/checkstyle-addons/checkstyle-addons/issues',
             'Plugin-Class': 'com.thomasjensen.checkstyle.addons.sonarqube.CheckstyleExtensionPlugin',
-            'Plugin-RequirePlugins': 'java:1.5',
+            'Plugin-RequirePlugins': 'java:1.5,checkstyle:2.2',
             'Plugin-Dependencies': 'META-INF/lib/' + mainCheckJar.getName() + ' ' +
                 flattenPrefixLibs('META-INF/lib/', pubLibs, ' '.toCharacter()),
             'Plugin-License': 'GPLv3',
