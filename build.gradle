@@ -50,6 +50,8 @@ ext {
  */
 idea.project {
     languageLevel = javaVersion;
+    // TODO set file encoding to UTF-8
+    // example: http://mrhaki.blogspot.de/2012/09/gradle-goodness-customize-idea-project.html
 }
 idea.module {
     downloadSources = true;
