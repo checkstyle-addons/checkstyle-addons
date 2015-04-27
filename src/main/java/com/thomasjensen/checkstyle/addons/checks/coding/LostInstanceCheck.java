@@ -39,7 +39,7 @@ public class LostInstanceCheck
      */
     private static final int[] GOOD_PARENTS =
         new int[]{TokenTypes.ASSIGN, TokenTypes.ANNOTATION_MEMBER_VALUE_PAIR, TokenTypes.ARRAY_INIT, TokenTypes.ELIST,
-            TokenTypes.LITERAL_RETURN, TokenTypes.LITERAL_THROW};
+            TokenTypes.FOR_EACH_CLAUSE, TokenTypes.LITERAL_RETURN, TokenTypes.LITERAL_THROW};
 
     /**
      * List of tokens that, when occurring as a parent token of LITERAL_NEW, indicate that LITERAL_NEW stands alone.

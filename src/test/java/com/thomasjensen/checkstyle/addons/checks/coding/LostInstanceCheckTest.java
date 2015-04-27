@@ -51,7 +51,8 @@ public class LostInstanceCheckTest
             "69:35: Instance created here is not used for anything.",
             "78:12: Instance created here is not used for anything.",
             "81:53: Instance created here is not used for anything.",
-            "100:17: Instance created here is not used for anything.",
+            "98:9: Instance created here is not used for anything.",
+            "104:17: Instance created here is not used for anything.",
         };
         verify(checkConfig, getPath("coding/InputLostInstance.java"), expected);
     }

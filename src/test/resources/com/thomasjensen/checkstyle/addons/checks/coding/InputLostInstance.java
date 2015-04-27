@@ -95,6 +95,10 @@ public class InputLostInstance
 
     public Serializable baz()
     {
+        new String[]{"foo", "bar"}; // report this
+        for (final String s : new String[]{"foo", "bar"}) {
+            System.out.println(s);
+        }
         return new Serializable() {
             public void foo() {
                 new IllegalArgumentException(); // report this
