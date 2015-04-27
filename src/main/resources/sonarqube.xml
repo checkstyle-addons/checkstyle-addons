@@ -24,9 +24,7 @@
         <name>Lost Instance</name>
         <category name="coding"/>
         <tag>checkstyle-addons</tag>
-        <description><![CDATA[Checks that object instances created explicitly with <code>new</code> are actually used
-            for something. Just being assigned to a variable or passed as a parameter is enough. A full data flow
-            analysis is not performed.]]></description>
+        <description>Checks that object instances created explicitly with <code>new</code> are actually used for something. Just being assigned to a variable or passed as a parameter is enough. A full data flow analysis is not performed.</description>
         <configKey>Checker/TreeWalker/LostInstance</configKey>
     </rule>
 
@@ -45,15 +43,15 @@
             <description>Only files which match this expression will be checked. Leave blank for unrestricted.</description>
         </param>
         <param key="regexp" type="REGULAR_EXPRESSION">
-            <description>The regular expression to apply to the selected file names.</description>
+            <description>The regular expression to apply to the selected file names. The default expression matches when there are leading or trailing spaces in a file name.</description>
             <defaultValue>^(?:\s+.*|.*?\s+)$</defaultValue>
         </param>
         <param key="mode" type="s[illegal,required]">
-            <description>Determines if the regular expression must or must not match.</description>
+            <description>Determines if the regular expression must match (``required``) or must not match (``illegal``).</description>
             <defaultValue>illegal</defaultValue>
         </param>
         <param key="simple" type="BOOLEAN">
-            <description>Check the simple file name only (true), or the entire path (false).</description>
+            <description>Check the simple file name only (``true``), or the entire path (``false``).</description>
             <defaultValue>true</defaultValue>
         </param>
     </rule>
