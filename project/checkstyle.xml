@@ -297,10 +297,6 @@
         <module name="ParameterAssignment"/>
         <module name="RedundantImport"/>
         <module name="RedundantModifier"/>
-        <module name="RedundantThrows">
-            <property name="allowUnchecked" value="true"/>
-            <property name="allowSubclasses" value="true"/>
-        </module>
         <module name="SimplifyBooleanExpression"/>
         <module name="SimplifyBooleanReturn"/>
         <module name="StringLiteralEquality"/>
