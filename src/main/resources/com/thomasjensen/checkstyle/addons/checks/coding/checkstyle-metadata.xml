@@ -20,11 +20,9 @@
 <checkstyle-metadata>
 <rule-group-metadata name="Checkstyle Addons" priority="1600">
 
-    <rule-metadata name="LostInstance" internal-name="LostInstance" parent="TreeWalker">
+    <rule-metadata name="%LostInstance.name" internal-name="LostInstance" parent="TreeWalker">
         <alternative-name internal-name="com.thomasjensen.checkstyle.addons.checks.coding.LostInstanceCheck"/>
-        <description>Checks that object instances created explicitly with &quot;new&quot; are actually used for
-            something. Just being assigned to a variable or passed as a parameter is enough. A full data flow analysis
-            is not performed.</description>
+        <description>%LostInstance.desc</description>
         <message-key key="lost.instance"/>
     </rule-metadata>
 
