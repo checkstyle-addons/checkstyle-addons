@@ -57,7 +57,8 @@ idea.module {
     downloadSources = true;
     downloadJavadoc = true;
     excludeDirs += file(".idea");
-    excludeDirs += file("delme");
+    excludeDirs += file("_site");
+    excludeDirs += file("_support");
 }
 
 
