@@ -33,8 +33,15 @@ group = 'com.thomasjensen.checkstyle.addons';
 version = '1.0.0';
 description = 'Additional Checkstyle Checks';
 ext {
-    javaVersion = '1.6';
-    checkstyleVersion = '6.1.1';  // 6.1.1 is the latest JDK 6 based version
+    versions = ['Java': '1.7',
+        'Checkstyle': '6.4.1',
+        'FindBugs': '3.0.0',
+        'SonarQube': '3.0',
+        'SQManifest': '4.5.1',
+        'SQJavaPlugin': '3.0',
+        'SQCheckstylePlugin': '2.3'];
+    assert versions.size() == 7;
+    // TODO Establish additional "legacy config" for Java 6
     bundledConfigurations = ['runtime'];
     authorName = 'Thomas Jensen';
     longName = 'Checkstyle Addons';
@@ -49,7 +56,7 @@ ext {
  * Configure IntelliJ IDEA
  */
 idea.project {
-    languageLevel = javaVersion;
+    languageLevel = versions.Java;
     // TODO set file encoding to UTF-8
     // example: http://mrhaki.blogspot.de/2012/09/gradle-goodness-customize-idea-project.html
 }
@@ -67,18 +74,24 @@ idea.module {
  */
 final String jdk6PropName = 'checkstyleaddons_jdk6_javac';
 def javac6 = project.hasProperty(jdk6PropName) ? project.property(jdk6PropName) : System.getenv(jdk6PropName);
-if (javac6 == null) {
-    println('WARNING: Property \'' + jdk6PropName + '\' not defined in gradle.properties. ' +
-        'It must point to a Java 6 compiler executable. Build process compiler will be used. ' +
-        'Note that this will not produce valid artifacts!');
-}
 tasks.withType(JavaCompile) {
-    sourceCompatibility = javaVersion;
-    targetCompatibility = javaVersion;
+    sourceCompatibility = versions.Java;
+    targetCompatibility = versions.Java;
     options.encoding = 'UTF-8';
-    if (javac6 != null) {
+
+    // The warning "Supported source version 'RELEASE_6' from annotation processor 'org.antlr.v4.runtime.misc.
+    // NullUsageProcessor' less than -source '1.7'" is okay and may be ignored. It will go away when Checkstyle
+    // updates to ANTLR 4.5: https://github.com/antlr/antlr4/issues/487
+
+    if ('1.6'.equals(versions.Java) && javac6 != null) {
         options.fork = true;
         options.forkOptions.executable = javac6;
+    }
+    doFirst {
+        if ('1.6'.equals(versions.Java) && javac6 == null) {
+            throw new GradleException('WARNING: Property \'' + jdk6PropName + '\' not defined in gradle.properties. ' +
+                'It must point to a Java 6 compiler executable.');
+        }
     }
 }
 
@@ -102,10 +115,10 @@ sourceSets.test.runtimeClasspath += configurations.provided;
  * Dependencies
  */
 dependencies {
-    provided group: 'com.google.code.findbugs', name: 'annotations', version: '2.0.3';
-    provided group: 'com.google.code.findbugs', name: 'jsr305', version: '2.0.3';
-    provided group: 'org.codehaus.sonar', name: 'sonar-plugin-api', version: '3.0';
-    compile group: 'com.puppycrawl.tools', name: 'checkstyle', version: checkstyleVersion;
+    provided group: 'com.google.code.findbugs', name: 'annotations', version: versions.FindBugs;
+    provided group: 'com.google.code.findbugs', name: 'jsr305', version: versions.FindBugs;
+    provided group: 'org.codehaus.sonar', name: 'sonar-plugin-api', version: versions.SonarQube;
+    compile group: 'com.puppycrawl.tools', name: 'checkstyle', version: versions.Checkstyle;
     testCompile group: 'junit', name: 'junit', version: '4.11';
 }
 
@@ -125,9 +138,15 @@ javadoc {
     options.splitIndex = false;
     options.outputLevel = null;   // specify neither -quiet nor -verbose
     options.header = project.ext.longName;
-    options.links('http://docs.oracle.com/javase/6/docs/api/',
+    if ('1.7'.equals(versions.Java)) {
+        options.links('http://docs.oracle.com/javase/7/docs/api/',
             'http://javadocs.sonarsource.org/3.0/apidocs/',
             'http://checkstyle.sourceforge.net/apidocs/');
+    } else if ('1.6'.equals(versions.Java)) {
+        options.links('http://docs.oracle.com/javase/6/docs/api/',
+            'http://javadocs.sonarsource.org/3.0/apidocs/',
+            'http://checkstyle.sourceforge.net/apidocs/');
+    }
 }
 
 
@@ -137,7 +156,7 @@ javadoc {
 checkstyle {
     configFile file('project/checkstyle.xml');
     configProperties 'projectDir': project.projectDir;
-    toolVersion checkstyleVersion;
+    toolVersion versions.Checkstyle;
     showViolations = true;
     ignoreFailures = false;
 }

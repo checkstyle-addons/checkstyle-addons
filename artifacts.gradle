@@ -102,7 +102,7 @@ jar {
             'Implementation-Vendor': project.ext.authorName,
             'Implementation-Vendor-Id': 'com.thomasjensen',
             'Implementation-Version': project.version,
-            'Checkstyle-Version': project.ext.checkstyleVersion,
+            'Checkstyle-Version': project.ext.versions.Checkstyle,
         ];
         attributes.putAll(mfAttrStd());
     }
@@ -134,19 +134,19 @@ task jarEclipse(type: Jar, dependsOn: classes) {
 
     manifest {
         attributes = [
+            'Bundle-ManifestVersion': '2',
+            'Bundle-Name': project.ext.longName +
+                ' Eclipse-CS Extension (based on Checkstyle ' + project.ext.versions.Checkstyle + ')',
+            'Bundle-SymbolicName': project.group + ';singleton:=true',
+            'Bundle-Version': project.version,
             'Require-Bundle': 'net.sf.eclipsecs.checkstyle,' +
                 'net.sf.eclipsecs.core,' + 'net.sf.eclipsecs.ui',
-            'Bundle-Vendor': project.ext.authorName,
+            'Bundle-RequiredExecutionEnvironment': 'JavaSE-' + project.ext.versions.Java,
             'Eclipse-LazyStart': 'true',
-            'Bundle-Version': project.version,
-            'Bundle-Name': project.ext.longName +
-                ' Eclipse-CS Extension (based on Checkstyle ' + project.ext.checkstyleVersion + ')',
-            'Bundle-ManifestVersion': '2',
+            'Bundle-Vendor': project.ext.authorName,
             'Import-Package': 'org.eclipse.core.resources,' +
                 'org.eclipse.jdt.core.dom,' + 'org.eclipse.jface.resource,' + 'org.eclipse.jface.text,' +
                 'org.eclipse.swt.graphics,' + 'org.eclipse.ui',
-            'Bundle-SymbolicName': project.group + ';singleton:=true',
-            'Bundle-RequiredExecutionEnvironment': 'J2SE-1.6',
         ];
         attributes.putAll(mfAttrStd());
         if (pubLibs?.size() > 0) {
@@ -185,7 +185,7 @@ task jarSonarQube(type: Jar, dependsOn: jar) {
     into('META-INF/lib') {
         from mainCheckJar;
     }
-    Set<File> pubLibs = getPublishedDependencyLibs(project, true);
+    Set<File> pubLibs = getPublishedDependencyLibs(project, false);
     into('META-INF/lib') {
         from pubLibs;
     }
@@ -196,20 +196,23 @@ task jarSonarQube(type: Jar, dependsOn: jar) {
             'Plugin-Base': 'checkstyle',
             'Plugin-Key': pluginKey,
             'Implementation-Build': getGitHash(),
-            'Plugin-Description': project.description + ' (based on Checkstyle ' + project.ext.checkstyleVersion + ')',
+            'Plugin-Description': project.description + ' (based on Checkstyle ' +
+                project.ext.versions.Checkstyle + ')',
             'Plugin-Version': project.version,
             'Plugin-Organization': project.ext.authorName,
             'Plugin-OrganizationUrl': 'https://github.com/checkstyle-addons',
             'Plugin-SourcesUrl': 'https://github.com/checkstyle-addons/checkstyle-addons',
             'Plugin-IssueTrackerUrl': 'https://github.com/checkstyle-addons/checkstyle-addons/issues',
             'Plugin-Class': 'com.thomasjensen.checkstyle.addons.sonarqube.CheckstyleExtensionPlugin',
-            'Plugin-RequirePlugins': 'java:1.5,checkstyle:2.2',
-            'Plugin-Dependencies': 'META-INF/lib/' + mainCheckJar.getName() + ' ' +
+            'Plugin-RequirePlugins': 'java:' + project.ext.versions.SQJavaPlugin +
+                ',checkstyle:' + project.ext.versions.SQCheckstylePlugin,
+            'Plugin-Dependencies': 'META-INF/lib/' + mainCheckJar.getName() + (pubLibs.size() > 0 ? ' ' : '') +
                 flattenPrefixLibs('META-INF/lib/', pubLibs, ' '.toCharacter()),
             'Plugin-License': 'GPLv3',
             'Plugin-Homepage': project.ext.website,
-            //'Plugin-TermsConditionsUrl': config.sonarQubeConfig.pluginTermsConditionsUrl,
-            'Sonar-Version': '3.6'   // earliest version with a working Java plugin (before, Java was built-in)
+            //'Plugin-TermsConditionsUrl': '',
+            'Sonar-Version': project.ext.versions.SQManifest
+            // TODO use same SonarQube version in manifest and compile dependencies
         ];
         attributes.putAll(mfAttrStd());
         attributes.remove('Website');
