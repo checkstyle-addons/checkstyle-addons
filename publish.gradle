@@ -18,10 +18,8 @@ publish {
     dependsOn assemble
 }
 
-def Node addPom(final Node pRoot, final String pArtifactId)
+def Node addPom(final Node pRoot)
 {
-    pRoot.remove(pRoot.get('artifactId'));
-    pRoot.appendNode('artifactId', pArtifactId);
     pRoot.appendNode('name', project.ext.longName);
     pRoot.appendNode('description', project.description);
     pRoot.appendNode('url', project.ext.website);
@@ -68,7 +66,7 @@ def Node addPom(final Node pRoot, final String pArtifactId)
 model {
     tasks.generatePomFileForCheckstyleAddonsPublication {
         pom.withXml {
-            addPom(asNode(), project.name);
+            addPom(asNode());
         }
     }
 }
@@ -77,6 +75,8 @@ publishing {
     publications {
         checkstyleAddons(MavenPublication) {
             artifact jar
+            artifact jarSources
+            artifact jarJavadoc
         }
     }
 }
