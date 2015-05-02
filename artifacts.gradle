@@ -112,7 +112,9 @@ model {
         exclude 'eclipsecs-plugin.xml';
         exclude '**/checkstyle-metadata.*';
 
-        from 'LICENSE';
+        into('META-INF') {
+            from 'LICENSE';
+        }
         into('META-INF/maven/' + project.group + '/' + project.name) {
             from pluginPomProps;
             filter(ReplaceTokens, tokens: [buildTimestamp: project.ext.buildTimestamp.toString()]);
@@ -150,12 +152,46 @@ model {
     }
 }
 
+task jarSources(type: Jar, dependsOn: classes) {
+    from sourceSets.main.allSource
+    exclude '**/*.xml';
+    exclude '**/*.html';
+    exclude '**/*.md';
+    exclude '**/checkstyle-metadata.*';
+    into('META-INF') {
+        from 'LICENSE';
+    }
+    classifier = 'sources';
+    manifest = jar.manifest;
+    doFirst {
+        manifest {
+            attributes 'Build-Timestamp': project.ext.buildTimestamp.toString();
+        }
+    }
+}
+
+task jarJavadoc(type: Jar, dependsOn: javadoc) {
+    from javadoc.destinationDir
+    into('META-INF') {
+        from 'LICENSE';
+    }
+    classifier = 'javadoc';
+    manifest = jar.manifest;
+    doFirst {
+        manifest {
+            attributes 'Build-Timestamp': project.ext.buildTimestamp.toString();
+        }
+    }
+}
+
 
 task jarEclipse(type: Jar, dependsOn: classes) {
     description = 'Checkstyle-Addons: Assembles the Eclipse-CS plugin';
     appendix = 'eclipse';
 
-    from 'LICENSE';
+    into('META-INF') {
+        from 'LICENSE';
+    }
     from(sourceSets.main.output) {
         exclude '**/sonarqube/**';
         exclude '**/*.md';
@@ -209,7 +245,9 @@ task jarSonarQube(type: Jar, dependsOn: jar) {
     archiveName = 'sonar-' + pluginKey + '-' + project.version + '.jar';
     final File mainCheckJar = project.tasks['jar'].getProperties().get('archivePath');
 
-    from 'LICENSE';
+    into('META-INF') {
+        from 'LICENSE';
+    }
     into(project.ext.sqPackage) {
         File dir = new File(sourceSets.main.output.classesDir, project.ext.sqPackage);
         from(dir) {
@@ -265,6 +303,8 @@ task jarSonarQube(type: Jar, dependsOn: jar) {
 
 artifacts {
     archives jar
+    archives jarSources
+    archives jarJavadoc
     archives jarEclipse
     archives jarSonarQube
 }
