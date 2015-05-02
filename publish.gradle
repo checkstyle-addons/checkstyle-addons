@@ -60,8 +60,8 @@ def Node addPom(final Node pRoot, final String pArtifactId)
     dev.appendNode('email', 'checkstyle@thomasjensen.com');
 
     final Node org = pRoot.appendNode('organization');
-    org.appendNode('name', 'Checkstyle Addons');
-    org.appendNode('url', 'https://github.com/checkstyle-addons');
+    org.appendNode('name', project.ext.orgName);
+    org.appendNode('url', project.ext.orgUrl);
     return pRoot;
 }
 
@@ -71,22 +71,12 @@ model {
             addPom(asNode(), project.name);
         }
     }
-
-    tasks.generatePomFileForCheckstyleAddonsMavenPluginPublication {
-        pom.withXml {
-            addPom(asNode(), project.name + '-maven');
-        }
-    }
 }
 
 publishing {
     publications {
         checkstyleAddons(MavenPublication) {
             artifact jar
-        }
-        checkstyleAddonsMavenPlugin(MavenPublication) {
-            artifactId project.name + '-maven';
-            artifact jarMaven
         }
     }
 }

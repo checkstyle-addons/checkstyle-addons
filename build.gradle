@@ -46,6 +46,8 @@ ext {
     bundledConfigurations = ['runtime'];
     authorName = 'Thomas Jensen';
     longName = 'Checkstyle Addons';
+    orgName = 'Checkstyle Addons';
+    orgUrl = 'https://github.com/checkstyle-addons';
     buildTimestamp = new Date();
     sqPackage = 'com/thomasjensen/checkstyle/addons/sonarqube';
     checksPackage = 'com/thomasjensen/checkstyle/addons/checks';
