@@ -1,0 +1,92 @@
+/*
+ * Checkstyle-Addons - Additional Checkstyle checks
+ * Copyright (C) 2015 Thomas Jensen, All rights reserved.
+ *
+ * This program is free software: you can redistribute it and/or modify it under the
+ * terms of the GNU General Public License, version 3, as published by the Free
+ * Software Foundation.
+ *
+ * This program is distributed in the hope that it will be useful, but WITHOUT ANY
+ * WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A
+ * PARTICULAR PURPOSE. See the GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License along with this
+ * program.  If not, see <http://www.gnu.org/licenses/>.
+ */
+
+publish {
+    dependsOn assemble
+}
+
+def Node addPom(final Node pRoot, final String pArtifactId)
+{
+    pRoot.remove(pRoot.get('artifactId'));
+    pRoot.appendNode('artifactId', pArtifactId);
+    pRoot.appendNode('name', project.ext.longName);
+    pRoot.appendNode('description', project.description);
+    pRoot.appendNode('url', project.ext.website);
+
+    final Node deps = pRoot.appendNode('dependencies');
+    for (final String configName : project.ext.bundledConfigurations) {
+        Configuration cfg = project.configurations.getByName(configName);
+        if (cfg == null) {
+            throw new GradleException('Unknown configuration: ' + configName);
+        }
+        for (Dependency d : cfg.allDependencies) {
+            if (!(d instanceof ExternalDependency)) {
+                throw new GradleException('Incompatible dependency: ' + d);
+            }
+            final ExternalDependency jar = (ExternalDependency) d;
+
+            final Node depNode = deps.appendNode('dependency');
+            depNode.appendNode('groupId', jar.getGroup());
+            depNode.appendNode('artifactId', jar.getName());
+            depNode.appendNode('version', jar.getVersion());
+
+            final DependencyArtifact artifcat = jar.getArtifacts().getAt(0);
+            String depClassifier = artifcat != null ? artifcat.getClassifier() : null;
+            if (depClassifier != null) {
+                depNode.appendNode('classifier', depClassifier);
+            }
+            depNode.appendNode('scope', 'compile');
+        }
+    }
+
+    pRoot.appendNode('inceptionYear', '2015');
+
+    final Node devs = pRoot.appendNode('developers');
+    final Node dev = devs.appendNode('developer');
+    dev.appendNode('name', project.ext.authorName);
+    dev.appendNode('email', 'checkstyle@thomasjensen.com');
+
+    final Node org = pRoot.appendNode('organization');
+    org.appendNode('name', 'Checkstyle Addons');
+    org.appendNode('url', 'https://github.com/checkstyle-addons');
+    return pRoot;
+}
+
+model {
+    tasks.generatePomFileForCheckstyleAddonsPublication {
+        pom.withXml {
+            addPom(asNode(), project.name);
+        }
+    }
+
+    tasks.generatePomFileForCheckstyleAddonsMavenPluginPublication {
+        pom.withXml {
+            addPom(asNode(), project.name + '-maven');
+        }
+    }
+}
+
+publishing {
+    publications {
+        checkstyleAddons(MavenPublication) {
+            artifact jar
+        }
+        checkstyleAddonsMavenPlugin(MavenPublication) {
+            artifactId project.name + '-maven';
+            artifact jarMaven
+        }
+    }
+}
