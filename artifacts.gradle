@@ -276,7 +276,7 @@ task jarSonarQube(type: Jar, dependsOn: jar) {
             'Plugin-Organization': project.ext.authorName,
             'Plugin-OrganizationUrl': project.ext.orgUrl,
             'Plugin-SourcesUrl': 'https://github.com/checkstyle-addons/checkstyle-addons',
-            'Plugin-IssueTrackerUrl': 'https://github.com/checkstyle-addons/checkstyle-addons/issues',
+            'Plugin-IssueTrackerUrl': project.ext.issueTrackerUrl,
             'Plugin-Class': 'com.thomasjensen.checkstyle.addons.sonarqube.CheckstyleExtensionPlugin',
             'Plugin-RequirePlugins': 'java:' + project.ext.versions.SQJavaPlugin +
                 ',checkstyle:' + project.ext.versions.SQCheckstylePlugin,

@@ -80,3 +80,41 @@ publishing {
         }
     }
 }
+
+
+task checkProperties << {
+    if (!project.hasProperty('bintray.user')) {
+        throw new GradleException("Couldn't find 'bintray.user' property. " +
+            "Did you forget to specify it in ~/.gradle/gradle.properties?");
+    }
+    if (!project.hasProperty('bintray.apikey')) {
+        throw new GradleException("Couldn't find 'bintray.apikey' property. " +
+            "Did you forget to specify it in ~/.gradle/gradle.properties?");
+    }
+}
+bintray {
+    user = project.property('bintray.user');
+    key = project.property('bintray.apikey');
+
+    publications = ['checkstyleAddons'];
+    publish = true;
+    //dryRun = true; // Whether to run this as dry-run, without deploying
+    pkg {
+        repo = 'checkstyle-addons'
+        userOrg = 'checkstyle-addons';
+        name = project.name;
+        desc = project.description;
+        websiteUrl = project.ext.website;
+        issueTrackerUrl = project.ext.issueTrackerUrl;
+        vcsUrl = 'https://github.com/checkstyle-addons/checkstyle-addons.git';
+        licenses = ['GPL-3.0'];
+        publicDownloadNumbers = true;
+        version {
+            name = project.version;  // Bintray logical version name
+            released = project.ext.buildTimestamp;
+            vcsTag = 'v' + project.version;
+        }
+    }
+}
+tasks['bintrayUpload'].dependsOn('checkProperties');
+
