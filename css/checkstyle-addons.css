@@ -196,7 +196,7 @@ a.csa-offset-anchor { /* used to prevent anchors from being obscured by the fixe
 .checkpage .propdefault{
     display: block;
 }
-.checkpage pre .line-numbers {
+pre .line-numbers {
     display: none;
 }
 
