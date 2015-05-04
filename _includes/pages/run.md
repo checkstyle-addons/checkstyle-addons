@@ -4,10 +4,12 @@ Here's how to use {{ site.name }} with your standard software.
 
 {{ site.name }} uses [semantic versioning](http://semver.org/), so you can always use the latest within a major version, but you should try things out before moving to a higher major version.
 
+{% comment %} ======================================================================================= {% endcomment %}
 <a name="run-gradle" class="csa-offset-anchor"/>
 
 ## Gradle
 
+{% comment %} ======================================================================================= {% endcomment %}
 <a name="run-maven" class="csa-offset-anchor"/>
 
 ## Maven
@@ -45,11 +47,12 @@ In Maven, {{ site.name }} runs as part of the [Maven Checkstyle Plugin](https://
 </project>
 ```
 
-
+{% comment %} ======================================================================================= {% endcomment %}
 <a name="run-ant" class="csa-offset-anchor"/>
 
 ## Ant
 
+{% comment %} ======================================================================================= {% endcomment %}
 <a name="run-intellij" class="csa-offset-anchor"/>
 
 ## IntelliJ IDEA / Android Studio
@@ -61,14 +64,82 @@ In IntelliJ IDEA or Android Studio, {{ site.name }} runs as a third-party addon 
 Checkstyle-IDEA does not offer a visual editor, so you'll have to activate the {{ site.name }} checks by modifying your *checkstyle.xml* directly.
 
 
+{% comment %} ======================================================================================= {% endcomment %}
 <a name="run-eclipse" class="csa-offset-anchor"/>
 
 ## Eclipse
 
+{% comment %} ======================================================================================= {% endcomment %}
 <a name="run-sonarqube" class="csa-offset-anchor"/>
 
 ## SonarQube
 
+In [SonarQube](http://www.sonarqube.org/), {{ site.name }} runs as an extension of the SonarQube Checkstyle Plugin. This infers some dependencies to check. Make sure your SonarQube installation runs on the versions shown in the highlighted column:
+
+<table class="table table-striped" style="width:auto;">
+  <tbody>
+    <tr>
+      <td><a href="http://docs.sonarqube.org/display/SONAR/Checkstyle+Plugin" target="_blank">SonarQube Checkstyle Plugin</a></td>
+      <td>2.0</td>
+      <td>2.1</td>
+      <td>2.1.1</td>
+      <td>2.2</td>
+      <td class="info">2.3</td>
+    </tr>
+    <tr>
+      <td><a href="http://docs.sonarqube.org/display/SONAR/Java+Plugin" target="_blank">SonarQube Java Plugin</a></td>
+      <td>2.0</td>
+      <td colspan="2">2.4 - 2.5.1</td>
+      <td>3.0+</td>
+      <td class="info">3.0+</td>
+    </tr>
+    <tr>
+      <td><a href="http://docs.sonarqube.org/display/SONAR/Upgrading#Upgrading-ReleaseUpgradeNotes" target="_blank">SonarQube Platform</a></td>
+      <td>3.6 - 4.1.2</td>
+      <td colspan="2">4.2 - 4.5</td>
+      <td colspan="2" class="info">4.5.2+ (LTS)</td>
+    </tr>
+    <tr>
+      <td><a href="http://checkstyle.sourceforge.net/releasenotes.html" target="_blank">Checkstyle</a></td>
+      <td>5.6</td>
+      <td>5.6</td>
+      <td>5.6</td>
+      <td>6.1</td>
+      <td class="info">6.4.1</td>
+    </tr>
+    <tr>
+      <td>Java (analysis process)</td>
+      <td>6+</td>
+      <td>6+</td>
+      <td>6+</td>
+      <td>7+<sup>*</sup></td>
+      <td class="info">7+</td>
+    </tr>
+    <tr>
+      <td>Java (code analyzed)</td>
+      <td>&lt;= 7</td>
+      <td>&lt;= 7</td>
+      <td>&lt;= 7</td>
+      <td>&lt;= 8</td>
+      <td class="info">&lt;= 8</td>
+    </tr>
+  </tbody>
+</table>
+
+<sup>*</sup> Here, `6+` should also work. <span class="csa-toggle" onclick="toggle_visibility('sonarqube-deps');">Why?</span>
+
+<p class="csa-toggled-text" id="sonarqube-deps"><b>Background info:</b> The Java analysis process in the Checkstyle 6.1 column is <code>7+</code> only because of SonarQube, which requires Java&nbsp;7 since version <code>4.5.1</code>. And we depend on <code>4.5.2</code> because of version <code>3.0</code> of the SonarQube Java Plugin. The declared dependency of the SonarQube Checkstyle plugin on the SonarQube Java plugin is only <code>2.2</code>, though. This seems like an oversight, but probably indicates that dependency is not critical.</p>
+
+The Checkstyle version is directly determined by the version of the SonarQube Checkstyle plugin, so you don't need to check that explicitly.
+
+<p><a href="https://github.com/{{ site.github }}/releases/download/v{{ site.latest_version }}/sonar-checkstyleaddons-{{ site.latest_version }}.jar" class="btn btn-primary">Download Plugin</a></p>
+
+Drop the downloaded plugin into the *extensions/plugins* folder of your SonarQube installation (where all the other plugins are). Double-check the version of the SonarQube Checkstyle plugin according to the above table. Upgrade that if necessary. Restart SonarQube.
+
+The rules provided by {{ site.name }} are all tagged with `checkstyle-addons`, which is useful to filter them from the overall list of Checkstyle rules.
+
+
+{% comment %} ======================================================================================= {% endcomment %}
 <a name="run-command-line" class="csa-offset-anchor"/>
 
 ## Command Line

@@ -136,6 +136,24 @@ a.csa-offset-anchor { /* used to prevent anchors from being obscured by the fixe
     visibility: hidden;
 }
 
+.csa-toggle {
+    color: #3399F3;
+    cursor: pointer;
+}
+.csa-toggle:hover {
+    text-decoration: underline;
+}
+.csa-toggled-text {
+    padding: 5px;
+    margin-bottom: 1.5em;
+    display: none;
+    font-size: small;
+    background-color: #f5f5f5;
+}
+.csa-toggled-text code {
+    background-color: #fff;
+}
+
 .pagination .reset a {
     border: 0;
     padding-left: 0;
