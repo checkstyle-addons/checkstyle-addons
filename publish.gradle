@@ -93,26 +93,28 @@ task checkProperties << {
     }
 }
 bintray {
-    user = project.property('bintray.user');
-    key = project.property('bintray.apikey');
+    if (project.hasProperty('bintray.user') && project.hasProperty('bintray.apikey')) {
+        user = project.property('bintray.user');
+        key = project.property('bintray.apikey');
 
-    publications = ['checkstyleAddons'];
-    publish = true;
-    //dryRun = true; // Whether to run this as dry-run, without deploying
-    pkg {
-        repo = 'checkstyle-addons'
-        userOrg = 'checkstyle-addons';
-        name = project.name;
-        desc = project.description;
-        websiteUrl = project.ext.website;
-        issueTrackerUrl = project.ext.issueTrackerUrl;
-        vcsUrl = 'https://github.com/checkstyle-addons/checkstyle-addons.git';
-        licenses = ['GPL-3.0'];
-        publicDownloadNumbers = true;
-        version {
-            name = project.version;  // Bintray logical version name
-            released = project.ext.buildTimestamp;
-            vcsTag = 'v' + project.version;
+        publications = ['checkstyleAddons'];
+        publish = true;
+        //dryRun = true; // Whether to run this as dry-run, without deploying
+        pkg {
+            repo = 'checkstyle-addons'
+            userOrg = 'checkstyle-addons';
+            name = project.name;
+            desc = project.description;
+            websiteUrl = project.ext.website;
+            issueTrackerUrl = project.ext.issueTrackerUrl;
+            vcsUrl = 'https://github.com/checkstyle-addons/checkstyle-addons.git';
+            licenses = ['GPL-3.0'];
+            publicDownloadNumbers = true;
+            version {
+                name = project.version;  // Bintray logical version name
+                released = project.ext.buildTimestamp;
+                vcsTag = 'v' + project.version;
+            }
         }
     }
 }
