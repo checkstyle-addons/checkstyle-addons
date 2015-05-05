@@ -57,7 +57,11 @@ In Maven, {{ site.name }} runs as part of the [Maven Checkstyle Plugin](https://
 
 ## IntelliJ IDEA / Android Studio
 
-In IntelliJ IDEA or Android Studio, {{ site.name }} runs as a third-party addon to the [Checkstyle-IDEA plugin](https://plugins.jetbrains.com/plugin/1065). So first make sure you've got Checkstyle-IDEA. If not, install via *File &rarr; Settings... &rarr; Plugins &rarr; Browse Repostories*. After that, you can add {{ site.name }} to the third-party checks:
+In IntelliJ IDEA or Android Studio, {{ site.name }} runs as a third-party addon to the [Checkstyle-IDEA plugin](https://plugins.jetbrains.com/plugin/1065). So first make sure you've got Checkstyle-IDEA. If not, install via *File &rarr; Settings... &rarr; Plugins &rarr; Browse Repostories*.
+
+<p><a href="https://github.com/{{ site.github }}/releases/download/v{{ site.latest_version }}/checkstyle-addons-{{ site.latest_version }}.jar" class="btn btn-primary">Download Checks</a></p>
+
+ After that, you can add {{ site.name }} to the third-party checks:
 
 ![{{ site.name }} in IntelliJ IDEA](images/run-intellij.png)
 
@@ -68,6 +72,10 @@ Checkstyle-IDEA does not offer a visual editor, so you'll have to activate the {
 <a name="run-eclipse" class="csa-offset-anchor"/>
 
 ## Eclipse
+
+<p><a href="https://github.com/{{ site.github }}/releases/download/v{{ site.latest_version }}/checkstyle-addons-eclipse-{{ site.latest_version }}.jar" class="btn btn-primary">Download Plugin</a></p>
+
+
 
 {% comment %} ======================================================================================= {% endcomment %}
 <a name="run-sonarqube" class="csa-offset-anchor"/>
@@ -127,13 +135,13 @@ In [SonarQube](http://www.sonarqube.org/), {{ site.name }} runs as an extension 
   </tbody>
 </table>
 
-The Checkstyle version is directly determined by the version of the SonarQube Checkstyle plugin, so you don't need to check that explicitly.
+The Checkstyle version is directly determined by the version of the SonarQube Checkstyle plugin, so you don't need to check that explicitly. SonarQube 3.6 is the earliest version on which {{ site.name }} could possibly run, even if you built from source.
+
+The rules provided by {{ site.name }} are all tagged with `checkstyle-addons`, which is useful to filter them from the overall list of Checkstyle rules.
 
 <p><a href="https://github.com/{{ site.github }}/releases/download/v{{ site.latest_version }}/sonar-checkstyleaddons-{{ site.latest_version }}.jar" class="btn btn-primary">Download Plugin</a></p>
 
-Drop the downloaded plugin into the *extensions/plugins* folder of your SonarQube installation (where all the other plugins are). Double-check the version of the SonarQube Checkstyle plugin according to the above table. Upgrade that if necessary. Restart SonarQube.
-
-The rules provided by {{ site.name }} are all tagged with `checkstyle-addons`, which is useful to filter them from the overall list of Checkstyle rules.
+**Installation:** Drop the downloaded plugin into the *extensions/plugins* folder of your SonarQube installation (where all the other plugins are). Double-check the version of the SonarQube Checkstyle plugin according to the above table. Upgrade that if necessary. Restart SonarQube.
 
 
 {% comment %} ======================================================================================= {% endcomment %}
