@@ -40,7 +40,7 @@ ext {
         'FindBugs': '3.0.0',
         'SonarQube': '3.0',
         'SQManifest': '4.5.1',
-        'SQJavaPlugin': '3.0',
+        'SQJavaPlugin': '2.2',
         'SQCheckstylePlugin': '2.3'];
     assert versions.size() == 7;
     // TODO Establish additional "legacy config" for Java 6
