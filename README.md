@@ -3,8 +3,8 @@
 # Checkstyle Addons
 **Additional Checkstyle checks**
 
-Checkstyle Addons provides additional detectors for the [Checkstyle](http://checkstyle.sourceforge.net/) static code analysis tool. These are new checks which you cannot currently find in [standard Checkstyle](http://checkstyle.sourceforge.net/checks.html) or among the [SevNTU Checks](http://sevntu-checkstyle.github.io/sevntu.checkstyle/).
-Checkstyle Addons [integrates](http://checkstyle-addons.thomasjensen.com/index.html#usage) with a large number of standard software.
+Checkstyle Addons provides additional detectors for the [Checkstyle](http://checkstyle.sourceforge.net/) static code analysis tool. These are new checks which you cannot currently find in standard Checkstyle or among the SevNTU Checks.
+Checkstyle Addons [integrates](http://checkstyle-addons.thomasjensen.com/run.html) with a large number of standard software.
 
 Checkstyle Addons is free software under the GNU General Public License, version 3
 ([GPLv3](https://www.gnu.org/copyleft/gpl.html)).
