@@ -32,7 +32,7 @@ repositories {
 
 
 group = 'com.thomasjensen.checkstyle.addons';
-version = '1.0.0';
+version = '1.0.1-SNAPSHOT';
 description = 'Additional Checkstyle Checks';
 ext {
     versions = ['Java': '1.7',
