@@ -74,9 +74,9 @@ Checkstyle-IDEA does not offer a visual editor, so you'll have to activate the {
 
 ## SonarQube
 
-In [SonarQube](http://www.sonarqube.org/), {{ site.name }} runs as an extension of the SonarQube Checkstyle Plugin. This infers some dependencies to check. Make sure your SonarQube installation runs on the versions shown in the highlighted column:
+In [SonarQube](http://www.sonarqube.org/), {{ site.name }} runs as an extension of the SonarQube Checkstyle Plugin. Make sure your SonarQube installation runs on the versions shown in the highlighted column:
 
-<table class="table table-striped" style="width:auto;">
+<table class="table table-striped csa-version-table" style="width:auto;">
   <tbody>
     <tr>
       <td><a href="http://docs.sonarqube.org/display/SONAR/Checkstyle+Plugin" target="_blank">SonarQube Checkstyle Plugin</a></td>
@@ -88,16 +88,17 @@ In [SonarQube](http://www.sonarqube.org/), {{ site.name }} runs as an extension 
     </tr>
     <tr>
       <td><a href="http://docs.sonarqube.org/display/SONAR/Java+Plugin" target="_blank">SonarQube Java Plugin</a></td>
-      <td>2.0</td>
-      <td colspan="2">2.4 - 2.5.1</td>
-      <td>3.0+</td>
-      <td class="info">3.0+</td>
+      <td>2.0+</td>
+      <td>2.2+</td>
+      <td>2.2+</td>
+      <td>2.2+</td>
+      <td class="info">2.2+</td>
     </tr>
     <tr>
       <td><a href="http://docs.sonarqube.org/display/SONAR/Upgrading#Upgrading-ReleaseUpgradeNotes" target="_blank">SonarQube Platform</a></td>
       <td>3.6 - 4.1.2</td>
-      <td colspan="2">4.2 - 4.5</td>
-      <td colspan="2" class="info">4.5.2+ (LTS)</td>
+      <td colspan="3" style="text-align:center;">4.2 - 4.4</td>
+      <td class="info">4.5.2+</td>
     </tr>
     <tr>
       <td><a href="http://checkstyle.sourceforge.net/releasenotes.html" target="_blank">Checkstyle</a></td>
@@ -112,7 +113,7 @@ In [SonarQube](http://www.sonarqube.org/), {{ site.name }} runs as an extension 
       <td>6+</td>
       <td>6+</td>
       <td>6+</td>
-      <td>7+<sup>*</sup></td>
+      <td>6+</td>
       <td class="info">7+</td>
     </tr>
     <tr>
@@ -125,10 +126,6 @@ In [SonarQube](http://www.sonarqube.org/), {{ site.name }} runs as an extension 
     </tr>
   </tbody>
 </table>
-
-<sup>*</sup> Here, `6+` should also work. <span class="csa-toggle" onclick="toggle_visibility('sonarqube-deps');">Why?</span>
-
-<p class="csa-toggled-text" id="sonarqube-deps"><b>Background info:</b> The Java analysis process in the Checkstyle 6.1 column is <code>7+</code> only because of SonarQube, which requires Java&nbsp;7 since version <code>4.5.1</code>. And we depend on <code>4.5.2</code> because of version <code>3.0</code> of the SonarQube Java Plugin. The declared dependency of the SonarQube Checkstyle plugin on the SonarQube Java plugin is only <code>2.2</code>, though. This seems like an oversight, but probably indicates that dependency is not critical.</p>
 
 The Checkstyle version is directly determined by the version of the SonarQube Checkstyle plugin, so you don't need to check that explicitly.
 

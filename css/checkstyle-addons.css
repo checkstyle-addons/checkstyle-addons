@@ -49,7 +49,7 @@ code {
     text-align: center;
 }
 .csa-main-title .hidden-xs .buttons {
-    margin-left: 248px;
+    margin-left: 267px;
     margin-top: 1em;
 }
 .csa-main-title .buttons .btn {
@@ -164,6 +164,13 @@ a.csa-offset-anchor { /* used to prevent anchors from being obscured by the fixe
     color: inherit;
     background-color: inherit;
     cursor: default; 
+}
+
+table.csa-version-table td, table.csa-version-table th {
+    border-right: 1px solid #dddddd;
+}
+table.csa-version-table tr td:last-child, table.csa-version-table tr th:last-child {
+    border-right: 0;
 }
 
 .checkpage h2 {
