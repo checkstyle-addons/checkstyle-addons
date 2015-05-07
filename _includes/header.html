@@ -14,10 +14,7 @@
 	<meta name="description" content="{{ site.description }}" />
     <meta name="keywords" content="checkstyle, {{ site.name }}, checkstyle addons, addons, add-ons, code style,
         code analysis, coding standards, java, software quality, static code analysis, static analysis" />
-	<link rel="canonical" href="http://{{ page.sitehost }}/" />
-	{% else %}
-	<!-- regular page -->
-	<link rel="canonical" href="http://{{ page.sitehost }}{{ page.url }}" />
+	<link rel="canonical" href="{{ site.url }}" />
 	{% endif %}
     <link href="{{ site.baseurl}}/css/bootstrap-spacelab.min.css" rel="stylesheet" data-semver="3.3.4" data-require="bootstrap-css" />
     <link href="{{ site.baseurl}}/css/checkstyle-addons.css" rel="stylesheet" />
