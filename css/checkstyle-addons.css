@@ -139,11 +139,20 @@ h1 .version {
     margin-top: 2em;
 }
 
+.csa-run h2 {
+    border-top: 2px solid #ddd;
+    padding-top: 0.8em;
+    margin-top: 1em;
+}
+
 a.csa-offset-anchor { /* used to prevent anchors from being obscured by the fixed header */
     display: block;
     position: relative;
     top: -60px;
     visibility: hidden;
+}
+.csa-run a.csa-offset-anchor {
+    top: -15px;
 }
 
 .csa-toggle {

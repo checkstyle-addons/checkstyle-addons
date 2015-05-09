@@ -9,6 +9,27 @@ Here's how to use {{ site.name }} with your standard software.
 
 ## Gradle
 
+{{ site.name }} is available on [jcenter](https://bintray.com/checkstyle-addons/checkstyle-addons/checkstyle-addons/view), so you can just use it in your Gradle build. In Gradle, {{ site.name }} runs as part of the [Gradle Checkstyle Plugin](https://gradle.org/docs/current/userguide/checkstyle_plugin.html). The classpath is extended to include {{ site.name }}. Note that the Checkstyle tool version must be specified.
+
+```groovy
+plugins {
+    id 'checkstyle'
+}
+repositories {
+    jcenter()
+}
+
+dependencies {
+    checkstyle group: 'com.thomasjensen.checkstyle.addons', name: 'checkstyle-addons', version: '{{ site.latest_version }}'
+}
+
+checkstyle {
+    configFile file('your-checkstyle.xml')
+    toolVersion '{{ site.latest_version_checkstyle }}'   // important
+}
+```
+
+
 {% comment %} ======================================================================================= {% endcomment %}
 <a name="run-maven" class="csa-offset-anchor"/>
 
@@ -16,7 +37,7 @@ Here's how to use {{ site.name }} with your standard software.
 
 {{ site.name }} is available on [jcenter](https://bintray.com/checkstyle-addons/checkstyle-addons/checkstyle-addons/view). In order to use jcenter in your Maven build, you must add it to your Maven *settings.xml*. jcenter offers a superset of Maven Central. Bintray provides a [configuration example](https://github.com/bintray/bintray-examples/blob/master/maven-example/settings.xml) of how to configure your *settings.xml* to use jcenter.
 
-In Maven, {{ site.name }} runs as part of the [Maven Checkstyle Plugin](https://maven.apache.org/plugins/maven-checkstyle-plugin/). The classpath is simply extended to include {{ site.name }}. Note that the explicit dependency on Checkstyle itself must also be specified in order to set the correct Checkstyle version.
+In Maven, {{ site.name }} runs as part of the [Maven Checkstyle Plugin](https://maven.apache.org/plugins/maven-checkstyle-plugin/). The classpath is extended to include {{ site.name }}. Note that the explicit dependency on Checkstyle itself must also be specified in order to set the correct Checkstyle version.
 
 ```xml
 <project>
@@ -52,6 +73,7 @@ In Maven, {{ site.name }} runs as part of the [Maven Checkstyle Plugin](https://
 
 ## Ant
 
+
 {% comment %} ======================================================================================= {% endcomment %}
 <a name="run-intellij" class="csa-offset-anchor"/>
 
@@ -59,7 +81,7 @@ In Maven, {{ site.name }} runs as part of the [Maven Checkstyle Plugin](https://
 
 In IntelliJ IDEA or Android Studio, {{ site.name }} runs as a third-party addon to the [Checkstyle-IDEA plugin](https://plugins.jetbrains.com/plugin/1065). So first make sure you've got Checkstyle-IDEA. If not, install via *File &rarr; Settings... &rarr; Plugins &rarr; Browse Repostories*.
 
-<p><a href="https://github.com/{{ site.github }}/releases/download/v{{ site.latest_version }}/checkstyle-addons-{{ site.latest_version }}.jar" class="btn btn-primary">Download Checks</a></p>
+<p><a href="https://github.com/{{ site.github }}/releases/download/v{{ site.latest_version }}/checkstyle-addons-{{ site.latest_version }}.jar" class="btn btn-primary">Download Plugin</a></p>
 
  After that, you can add {{ site.name }} to the third-party checks:
 
@@ -73,8 +95,15 @@ Checkstyle-IDEA does not offer a visual editor, so you'll have to activate the {
 
 ## Eclipse
 
-<p><a href="https://github.com/{{ site.github }}/releases/download/v{{ site.latest_version }}/checkstyle-addons-eclipse-{{ site.latest_version }}.jar" class="btn btn-primary">Download Plugin</a></p>
+In Eclipse, {{ site.name }} runs as an addon to [Eclipse-CS](http://eclipse-cs.sourceforge.net/). So first make sure you've got Eclipse-CS [installed](http://eclipse-cs.sourceforge.net/#!/install) at **version 6.2 or higher**. Then:
 
+<p><a href="https://github.com/{{ site.github }}/releases/download/v{{ site.latest_version }}/checkstyle-addons-eclipse-{{ site.latest_version }}.jar" class="btn btn-primary">Download Eclipse Plugin</a></p>
+
+**Installation:** Drop the downloaded plugin JAR into the *dropins* folder of your Eclipse installation and restart Eclipse.
+
+In order to verify that {{ site.name }} was installed correctly, open the Checkstyle configuration dialog and you should see a new module category named '{{ site.name }}'. {{ site.name }} fully supports the visual Checkstyle configuration editor of Eclipse-CS:
+
+![{{ site.name }} in Eclipse](images/run-eclipse.png)
 
 
 {% comment %} ======================================================================================= {% endcomment %}
@@ -139,7 +168,7 @@ The Checkstyle version is directly determined by the version of the SonarQube Ch
 
 The rules provided by {{ site.name }} are all tagged with `checkstyle-addons`, which is useful to filter them from the overall list of Checkstyle rules.
 
-<p><a href="https://github.com/{{ site.github }}/releases/download/v{{ site.latest_version }}/sonar-checkstyleaddons-{{ site.latest_version }}.jar" class="btn btn-primary">Download Plugin</a></p>
+<p><a href="https://github.com/{{ site.github }}/releases/download/v{{ site.latest_version }}/sonar-checkstyleaddons-{{ site.latest_version }}.jar" class="btn btn-primary">Download SonarQube Plugin</a></p>
 
 **Installation:** Drop the downloaded plugin into the *extensions/plugins* folder of your SonarQube installation (where all the other plugins are). Double-check the version of the SonarQube Checkstyle plugin according to the above table. Upgrade that if necessary. Restart SonarQube.
 
@@ -148,3 +177,16 @@ The rules provided by {{ site.name }} are all tagged with `checkstyle-addons`, w
 <a name="run-command-line" class="csa-offset-anchor"/>
 
 ## Command Line
+
+Checkstyle can also be run [from the command line](http://checkstyle.sourceforge.net/cmdline.html). In that case, you can add {{ site.name }} to the classpath.
+Make sure to use at least Java&nbsp;7, and at least Checkstyle 6.2. The code you're analyzing can be anything up to Java&nbsp;8.
+
+<p><a href="https://github.com/{{ site.github }}/releases/download/v{{ site.latest_version }}/checkstyle-addons-{{ site.latest_version }}.jar" class="btn btn-primary">Download JAR</a></p>
+
+Now you can run Checkstyle with {{ site.name }} like this:
+
+```
+java -jar checkstyle-{{ site.latest_version_checkstyle }}-all.jar -cp checkstyle-addons-{{ site.latest_version }}.jar -c your-checkstyle.xml
+```
+
+TODO 
