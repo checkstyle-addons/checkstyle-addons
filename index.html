@@ -24,10 +24,10 @@ sedesc: Additional Checkstyle Checks
 </div>
 
 <p>{{ site.name }} provides additional detectors for the <a href="http://checkstyle.sourceforge.net/" target="_blank">Checkstyle</a>
- static code analysis tool. These are new checks which you cannot currently find in
- <a href="http://checkstyle.sourceforge.net/checks.html" target="_blank">standard Checkstyle</a> or among the
- <a href="http://sevntu-checkstyle.github.io/sevntu.checkstyle/" target="_blank">SevNTU Checks</a>.
- {{ site.name }} <a href="#usage">integrates</a> with a large number of standard software.</p>
+static code analysis tool. These are new checks which you cannot currently find in
+standard Checkstyle or among the SevNTU Checks.
+ {{ site.name }} <a href="{{ site.baseurl }}/run.html">integrates</a> with a large number of standard software.</p>
+ 
 <p>{{ site.name }} is free software under the GNU General Public License, version 3
 (<a href="https://www.gnu.org/copyleft/gpl.html" target="_blank">GPLv3</a>).</p>
 
@@ -38,13 +38,19 @@ sedesc: Additional Checkstyle Checks
 <div class="row">
 
 {% for post in site.posts limit:2 %}
+{% capture headingtext %}{{ post.date | date: "%b %-d, %Y" }} - {{ post.title }}{% if post.release == true %} released{% endif %}{% endcapture %}
 <div class="col-sm-5">
 <div class="panel {% if post.release == true %}panel-primary{% else %}panel-default{% endif %}">
-  <div class="panel-heading"><h3 class="panel-title">{% if post.content contains '<!--break-->' %}<a href="{{ post.url }}">{{ post.date | date: "%b %-d, %Y" }} - {{ post.title }}</a>{% else %}{{ post.date | date: "%b %-d, %Y" }} - {{ post.title }}{% endif %}</h3></div>
+  <div class="panel-heading"><h3 class="panel-title">{% if post.content contains '<!--break-->' %}<a href="{{ post.url }}">{{ headingtext }}</a>{% else %}{{ headingtext }}{% endif %}</h3></div>
   <div class="panel-body">
     {{ post.content | split:'<!--break-->' | first }}{% if post.content contains '<!--break-->' %}
     <a href="{{ post.url }}"><br/>... read more</a> {% endif %}{% if post.content contains '<!--break-->' %}</p>{% endif %}
   </div>
+  {% if post.release == true %}
+  <div class="panel-links"><a href="https://github.com/{{ site.github }}/releases/tag/{{ post.title }}">Download</a>
+    - <a href="{{ site.baseurl }}/releases.html">Release History</a>
+  </div>
+  {% endif %}
 </div>
 </div>
 {% endfor %}
@@ -63,8 +69,7 @@ sedesc: Additional Checkstyle Checks
 {% endif %}
 
 
-<a name="usage" class="csa-offset-anchor"></a>
-<h2>Download and Run it!</h2>
+<h2>Download &amp; Run</h2>
 
 {{ site.name }} is packaged as a JAR file which is used in most situations, but for Eclipse and SonarQube, dedicated plugins are provided.<br/>
 Click logo for product-specific installation instructions, or just

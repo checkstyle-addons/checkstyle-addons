@@ -127,7 +127,17 @@ h1 .version {
 .whatsnewposts  .panel {
     margin-bottom: 8px;
 }
+.whatsnewposts  .panel .panel-body p {
+    margin: 0;
+}
+.whatsnewposts .panel .panel-links {
+    padding: 8px 15px;
+    border-top: 1px solid #ddd;
+}
 
+.article .csa-post-links {
+    margin-top: 2em;
+}
 
 a.csa-offset-anchor { /* used to prevent anchors from being obscured by the fixed header */
     display: block;
