@@ -1,4 +1,4 @@
-# Running {{ site.name }}
+# Download &amp; Run
 
 Here's how to use {{ site.name }} with your standard software.
 
@@ -72,6 +72,34 @@ In Maven, {{ site.name }} runs as part of the [Maven Checkstyle Plugin](https://
 <a name="run-ant" class="csa-offset-anchor"/>
 
 ## Ant
+
+In Ant, we must add {{ site.name }} to the classpath of the [Checkstyle Ant Task](http://checkstyle.sourceforge.net/anttask.html). The Ant task is part of the standard Checkstyle distribution. We need **at least Checkstyle 6.2**, better yet, exactly version {{ site.latest_version_checkstyle }}. And of course the {{ site.name }} jar file:
+
+<p><a href="https://github.com/{{ site.github }}/releases/download/v{{ site.latest_version }}/checkstyle-addons-{{ site.latest_version }}.jar" class="btn btn-primary">Download JAR</a></p>
+
+Then, in our Ant *build.xml*, we declare the Checkstyle task as follows:
+
+```xml
+<taskdef resource="checkstyletask.properties">
+    <classpath>
+        <pathelement location="lib/checkstyle-{{ site.latest_version_checkstyle }}-all.jar"/>
+        <pathelement location="lib/checkstyle-addons-{{ site.latest_version }}.jar"/>
+    </classpath>
+</taskdef>
+```
+
+The *checkstyletask.properties* is read from checkstyle-{{ site.latest_version_checkstyle }}-all.jar. The call to the Checkstyle task is standard Ant:
+
+```xml
+<checkstyle config="/path/to/your-checkstyle.xml">
+    <fileset dir="src" includes="**/*.java"/>
+
+    <!-- Where in your build folder to store the cache file used during build for faster analysis -->
+    <property key="checkstyle.cache.file" file="target/cachefile"/>
+</checkstyle>
+```
+
+For more information on Checkstyle Ant task configuration, please refer to its [website](http://checkstyle.sourceforge.net/anttask.html).
 
 
 {% comment %} ======================================================================================= {% endcomment %}
@@ -186,7 +214,7 @@ Make sure to use at least Java&nbsp;7, and at least Checkstyle 6.2. The code you
 Now you can run Checkstyle with {{ site.name }} like this:
 
 ```
-java -jar checkstyle-{{ site.latest_version_checkstyle }}-all.jar -cp checkstyle-addons-{{ site.latest_version }}.jar -c your-checkstyle.xml
+java -cp checkstyle-addons-{{ site.latest_version }}.jar;checkstyle-{{ site.latest_version_checkstyle }}-all.jar com.puppycrawl.tools.checkstyle.Main -c your-checkstyle.xml src
 ```
 
-TODO 
+The above assumes that your sources are in a subdirectory *src*, and that the required JARs and your configuration file are in the current directory.
