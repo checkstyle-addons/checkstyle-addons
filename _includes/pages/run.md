@@ -39,7 +39,7 @@ checkstyle {
 
 In Maven, {{ site.name }} runs as part of the [Maven Checkstyle Plugin](https://maven.apache.org/plugins/maven-checkstyle-plugin/). The classpath is extended to include {{ site.name }}. Note that the explicit dependency on Checkstyle itself must also be specified in order to set the correct Checkstyle version.
 
-```xml
+{% highlight xml %}
 <project>
   <!-- snip -->
   <properties>
@@ -66,7 +66,7 @@ In Maven, {{ site.name }} runs as part of the [Maven Checkstyle Plugin](https://
   </plugin>
 
 </project>
-```
+{% endhighlight %}
 
 {% comment %} ======================================================================================= {% endcomment %}
 <a name="run-ant" class="csa-offset-anchor"/>
