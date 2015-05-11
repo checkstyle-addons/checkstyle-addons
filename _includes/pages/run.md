@@ -11,7 +11,7 @@ Here's how to use {{ site.name }} with your standard software.
 
 {{ site.name }} is available on [jcenter](https://bintray.com/checkstyle-addons/checkstyle-addons/checkstyle-addons/view), so you can just use it in your Gradle build. In Gradle, {{ site.name }} runs as part of the [Gradle Checkstyle Plugin](https://gradle.org/docs/current/userguide/checkstyle_plugin.html). The classpath is extended to include {{ site.name }}. Note that the Checkstyle tool version must be specified.
 
-```groovy
+{% highlight groovy %}
 plugins {
     id 'checkstyle'
 }
@@ -27,7 +27,7 @@ checkstyle {
     configFile file('your-checkstyle.xml')
     toolVersion '{{ site.latest_version_checkstyle }}'   // important
 }
-```
+{% endhighlight %}
 
 
 {% comment %} ======================================================================================= {% endcomment %}
@@ -64,7 +64,6 @@ In Maven, {{ site.name }} runs as part of the [Maven Checkstyle Plugin](https://
       </dependency>
     </dependencies>
   </plugin>
-
 </project>
 {% endhighlight %}
 
@@ -79,25 +78,25 @@ In Ant, we must add {{ site.name }} to the classpath of the [Checkstyle Ant Task
 
 Then, in our Ant *build.xml*, we declare the Checkstyle task as follows:
 
-```xml
+{% highlight xml %}
 <taskdef resource="checkstyletask.properties">
     <classpath>
         <pathelement location="lib/checkstyle-{{ site.latest_version_checkstyle }}-all.jar"/>
         <pathelement location="lib/checkstyle-addons-{{ site.latest_version }}.jar"/>
     </classpath>
 </taskdef>
-```
+{% endhighlight %}
 
 The *checkstyletask.properties* is read from checkstyle-{{ site.latest_version_checkstyle }}-all.jar. The call to the Checkstyle task is standard Ant:
 
-```xml
+{% highlight xml %}
 <checkstyle config="/path/to/your-checkstyle.xml">
     <fileset dir="src" includes="**/*.java"/>
 
     <!-- Where in your build folder to store the cache file used during build for faster analysis -->
     <property key="checkstyle.cache.file" file="target/cachefile"/>
 </checkstyle>
-```
+{% endhighlight %}
 
 For more information on Checkstyle Ant task configuration, please refer to its [website](http://checkstyle.sourceforge.net/anttask.html).
 
