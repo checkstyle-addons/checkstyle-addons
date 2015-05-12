@@ -15,7 +15,7 @@ Here's how to use {{ site.name }} with your standard software.
 
 ## Gradle
 
-{{ site.name }} is available on [jcenter](https://bintray.com/checkstyle-addons/checkstyle-addons/checkstyle-addons/view), so you can just use it in your Gradle build. In Gradle, {{ site.name }} runs as part of the [Gradle Checkstyle Plugin](https://gradle.org/docs/current/userguide/checkstyle_plugin.html). The classpath is extended to include {{ site.name }}. Note that the Checkstyle tool version must be specified.
+{{ site.name }} is available on [jcenter](https://bintray.com/checkstyle-addons/checkstyle-addons/checkstyle-addons/view){:target="_blank"}, so you can just use it in your Gradle build. In Gradle, {{ site.name }} runs as part of the [Gradle Checkstyle Plugin](https://gradle.org/docs/current/userguide/checkstyle_plugin.html){:target="_blank"}. The classpath is extended to include {{ site.name }}. Note that the Checkstyle tool version must be specified.
 
 {% highlight groovy %}
 plugins {
@@ -41,9 +41,9 @@ checkstyle {
 
 ## Maven
 
-{{ site.name }} is available on [jcenter](https://bintray.com/checkstyle-addons/checkstyle-addons/checkstyle-addons/view). In order to use jcenter in your Maven build, you must add it to your Maven *settings.xml*. jcenter offers a superset of Maven Central. Bintray provides a [configuration example](https://github.com/bintray/bintray-examples/blob/master/maven-example/settings.xml) of how to configure your *settings.xml* to use jcenter.
+{{ site.name }} is available on [jcenter](https://bintray.com/checkstyle-addons/checkstyle-addons/checkstyle-addons/view){:target="_blank"}. In order to use jcenter in your Maven build, you must add it to your Maven *settings.xml*. jcenter offers a superset of Maven Central. Bintray provides a [configuration example](https://github.com/bintray/bintray-examples/blob/master/maven-example/settings.xml){:target="_blank"} of how to configure your *settings.xml* to use jcenter.
 
-In Maven, {{ site.name }} runs as part of the [Maven Checkstyle Plugin](https://maven.apache.org/plugins/maven-checkstyle-plugin/). The classpath is extended to include {{ site.name }}. Note that the explicit dependency on Checkstyle itself must also be specified in order to set the correct Checkstyle version.
+In Maven, {{ site.name }} runs as part of the [Maven Checkstyle Plugin](https://maven.apache.org/plugins/maven-checkstyle-plugin/){:target="_blank"}. The classpath is extended to include {{ site.name }}. Note that the explicit dependency on Checkstyle itself must also be specified in order to set the correct Checkstyle version.
 
 {% highlight xml %}
 <project>
@@ -78,7 +78,7 @@ In Maven, {{ site.name }} runs as part of the [Maven Checkstyle Plugin](https://
 
 ## Ant
 
-In Ant, we must add {{ site.name }} to the classpath of the [Checkstyle Ant Task](http://checkstyle.sourceforge.net/anttask.html). The Ant task is part of the standard Checkstyle distribution. We need **at least Checkstyle 6.2**, better yet, exactly version {{ site.latest_version_checkstyle }}. And of course the {{ site.name }} jar file:
+In Ant, we must add {{ site.name }} to the classpath of the [Checkstyle Ant Task](http://checkstyle.sourceforge.net/anttask.html){:target="_blank"}. The Ant task is part of the standard Checkstyle distribution. We need **at least Checkstyle 6.2**, better yet, exactly version {{ site.latest_version_checkstyle }}. And of course the {{ site.name }} jar file:
 
 <p><a href="https://github.com/{{ site.github }}/releases/download/v{{ site.latest_version }}/checkstyle-addons-{{ site.latest_version }}.jar" class="btn btn-primary">Download JAR</a></p>
 
@@ -104,7 +104,7 @@ The *checkstyletask.properties* is read from checkstyle-{{ site.latest_version_c
 </checkstyle>
 {% endhighlight %}
 
-For more information on Checkstyle Ant task configuration, please refer to its [website](http://checkstyle.sourceforge.net/anttask.html).
+For more information on Checkstyle Ant task configuration, please refer to its [website](http://checkstyle.sourceforge.net/anttask.html){:target="_blank"}.
 
 
 {% comment %} ======================================================================================= {% endcomment %}
@@ -112,7 +112,7 @@ For more information on Checkstyle Ant task configuration, please refer to its [
 
 ## IntelliJ IDEA / Android Studio
 
-In IntelliJ IDEA or Android Studio, {{ site.name }} runs as a third-party addon to the [Checkstyle-IDEA plugin](https://plugins.jetbrains.com/plugin/1065). So first make sure you've got Checkstyle-IDEA. If not, install via *File &rarr; Settings... &rarr; Plugins &rarr; Browse Repostories*.
+In IntelliJ IDEA or Android Studio, {{ site.name }} runs as a third-party addon to the [Checkstyle-IDEA plugin](https://plugins.jetbrains.com/plugin/1065){:target="_blank"}. So first make sure you've got Checkstyle-IDEA. If not, install via *File &rarr; Settings... &rarr; Plugins &rarr; Browse Repostories*.
 
 <p><a href="https://github.com/{{ site.github }}/releases/download/v{{ site.latest_version }}/checkstyle-addons-{{ site.latest_version }}.jar" class="btn btn-primary">Download Plugin</a></p>
 
@@ -128,7 +128,7 @@ Checkstyle-IDEA does not offer a visual editor, so you'll have to activate the {
 
 ## Eclipse
 
-In Eclipse, {{ site.name }} runs as an addon to [Eclipse-CS](http://eclipse-cs.sourceforge.net/). So first make sure you've got Eclipse-CS [installed](http://eclipse-cs.sourceforge.net/#!/install) at **version 6.2 or higher**. Then:
+In Eclipse, {{ site.name }} runs as an addon to [Eclipse-CS](http://eclipse-cs.sourceforge.net/){:target="_blank"}. So first make sure you've got Eclipse-CS [installed](http://eclipse-cs.sourceforge.net/#!/install){:target="_blank"} at **version 6.2 or higher**. Then:
 
 <p><a href="https://github.com/{{ site.github }}/releases/download/v{{ site.latest_version }}/checkstyle-addons-eclipse-{{ site.latest_version }}.jar" class="btn btn-primary">Download Eclipse Plugin</a></p>
 
@@ -144,7 +144,7 @@ In order to verify that {{ site.name }} was installed correctly, open the Checks
 
 ## SonarQube
 
-In [SonarQube](http://www.sonarqube.org/), {{ site.name }} runs as an extension of the SonarQube Checkstyle Plugin. Make sure your SonarQube installation runs on the versions shown in the highlighted column:
+In [SonarQube](http://www.sonarqube.org/){:target="_blank"}, {{ site.name }} runs as an extension of the SonarQube Checkstyle Plugin. Make sure your SonarQube installation runs on the versions shown in the highlighted column:
 
 <table class="table table-striped csa-version-table" style="width:auto;">
   <tbody>
@@ -211,7 +211,7 @@ The rules provided by {{ site.name }} are all tagged with `checkstyle-addons`, w
 
 ## Command Line
 
-Checkstyle can also be run [from the command line](http://checkstyle.sourceforge.net/cmdline.html). In that case, you can add {{ site.name }} to the classpath.
+Checkstyle can also be run [from the command line](http://checkstyle.sourceforge.net/cmdline.html){:target="_blank"}. In that case, you can add {{ site.name }} to the classpath.
 Make sure to use at least Java&nbsp;7, and at least Checkstyle 6.2. The code you're analyzing can be anything up to Java&nbsp;8.
 
 <p><a href="https://github.com/{{ site.github }}/releases/download/v{{ site.latest_version }}/checkstyle-addons-{{ site.latest_version }}.jar" class="btn btn-primary">Download JAR</a></p>
