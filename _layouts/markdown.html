@@ -1,0 +1,9 @@
+{% include header.html %}
+
+<div class="csa-content">
+{% if page.surrounding-div != '' %}<div class="{{ page.surrounding-div }}">{% endif %}
+{% capture pageTextMarkdown %}{{ content }}{% endcapture %}{{ pageTextMarkdown | markdownify }}
+{% if page.surrounding-div != '' %}</div>{% endif %}
+</div>
+
+{% include footer.html %}
