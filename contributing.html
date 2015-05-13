@@ -1,25 +1,89 @@
 ---
-layout: default
+layout: markdown
 title: Contributing
 ---
 
-<h1>Contributing</h1>
+# Contributing
 
-{% capture includedIntro %}{% include pages/contributing.intro.md %}{% endcapture %}
-{{ includedIntro | markdownify }}
+Great to see you on this page! It means you are interested in how {{ site.name }} is built or you are even considering a contribution.
 
-<h2 id="current-status">Current Status</h2>
+If you've got an idea or - even better - some *code* for a new high-quality check, we should talk about getting it on board. In fact, you can put it on board yourself by creating a pull request for it (more below). The same is true for all kinds of improvements, including this website itself.
 
-<p>TODO Coverage, more stats</p>
+## Current Status
 
-<div id="travis-status" class="panel panel-default">
+{{ site.name }} is using the [Travis](https://travis-ci.org/checkstyle-addons/checkstyle-addons){:target="_blank"} Continuous Integration system. Every push to *master* and every pull request are automatically built by Travis-CI. If the Travis status is *passing*{:style="color:#468847;"}, then it was successfully built with different JDKs, and all unit tests were successful.
+Test coverage is measured by [Coveralls](https://coveralls.io/r/checkstyle-addons/checkstyle-addons){:target="_blank"}. The badge below shows the current coverage, which is recomputed upon every successful build. Also, the coverage is calculated for every pull request, and reported on the pull request's discussion page.
+
+<div id="travis-status" class="panel panel-success">
   <div class="panel-heading">
     <h3 id="travis-status-title" class="panel-title">Build Status</h3>
   </div>
   <div class="panel-body">
-    <img src="https://travis-ci.org/checkstyle-addons/checkstyle-addons.svg?branch=master" />
+    <a href="https://travis-ci.org/checkstyle-addons/checkstyle-addons" target="_blank"><img
+       src="https://travis-ci.org/checkstyle-addons/checkstyle-addons.svg?branch=master"
+       alt="Build Status" height="20" /></a>
+    <a href="https://coveralls.io/r/checkstyle-addons/checkstyle-addons?branch=master" target="_blank"><img
+       src="https://coveralls.io/repos/checkstyle-addons/checkstyle-addons/badge.svg?branch=master"
+       alt="Coverage Status" height="20" /></a>
   </div>
 </div>
 
-{% capture includedMain %}{% include pages/contributing.main.md %}{% endcapture %}
-{{ includedMain | markdownify }}
+
+## Collaboration Model
+
+{{ site.name }} follows a *Fork & Pull* collaboration model, which means that all changes go through [pull requests](https://help.github.com/articles/using-pull-requests/).
+Please feel free to suggest anything that's good. If you are going to expend a lot of work, it may make sense to [open an issue](https://help.github.com/articles/creating-an-issue/) about it first, so we can discuss your plans.
+
+
+## Building from Source
+
+In order to build {{ site.name }} yourself, follow these steps:
+
+  1. Make sure you have the prerequisites set up:
+    - [Git](http://git-scm.com/){:target="_blank"}
+    - [Java 7 SDK](http://www.oracle.com/technetwork/java/javase/downloads/jdk7-downloads-1880260.html){:target="_blank"}, which must be used for the build
+  1. Clone the {{ site.name }} repo by running on the command line:
+     `git clone https://github.com/{{ site.github }}.git`
+  1. `cd checkstyle-addons`
+  1. `gradlew build`
+     This will take care of everything needed for a successful build of {{ site.name }}, including download and installation of Gradle.
+  1. Find the fresh artifacts in build/libs. Done!
+
+
+## Running the Website Locally
+
+Running the website locally is important in order to be able to test changes before they go online. The {{ site.name }} website is based on [Jekyll](http://jekyllrb.com/){:target="_blank"}, GitHub's lightweight but powerful CMS. The website theme is Thomas Park's [SpaceLab theme](http://bootswatch.com/spacelab/){:target="_blank"}, which is based on [Bootstrap](http://getbootstrap.com/css/){:target="_blank"}. Markdown is GitHub-flavored markdown ([GFM](https://help.github.com/articles/github-flavored-markdown/){:target="_blank"}), processed by [kramdown](http://kramdown.gettalong.org/){:target="_blank"}. Syntax highlighting by [Pygments](http://pygments.org/){:target="_blank"}. It is technically possible to use [Jemoji](https://help.github.com/articles/emoji-on-github-pages/){:target="_blank"} in the bodies of pages and posts. :+1:
+
+  1. Check the prerequisites:
+    - [Git](http://git-scm.com/){:target="_blank"}
+    - [Ruby](https://www.ruby-lang.org/en/documentation/installation/){:target="_blank"} 2.0.0 (Jekyll is a Ruby Gem)
+    - [Python](https://www.python.org/downloads/){:target="_blank"} 2.7.9 (required by the Pygments syntax highlighter)
+    Make sure both Ruby and Python are on the PATH.
+  1. Install Jekyll for [Linux/Unix](http://jekyllrb.com/docs/installation/){:target="_blank"} or [Windows](http://jekyll-windows.juthilo.com/){:target="_blank"}
+  1. Install Pygments highlighter by typing `python -m pip install Pygments` on the command line. Pygments is the highlighter required by GitHub at this time.
+  1. Install wdm for auto-regeneration: `gem install wdm`
+  1. Update Pygments to at least version 0.6.1: `gem update pygments`
+  1. Clone the {{ site.name }} repo by running on the command line:
+     `git clone https://github.com/{{ site.github }}.git`
+  1. `cd checkstyle-addons`
+  1. `git checkout gh-pages`
+  1. `jekyll serve`
+    Now you can browse the website at *http://localhost:4000*
+  
+
+## Resources
+
+A quick list of development resources:
+
+  - [Sources](https://github.com/{{ site.github }}) on GitHub
+  - [Javadoc]({{ site.baseurl }}/latest/apidocs/) (current version)
+    Javadoc for previous versions may be found in the [release history]({{ site.baseurl }}/releases.html).
+  - [Change log](https://github.com/{{ site.github }}/commits/master)
+  - This website is also hosted on GitHub: [website sources](https://github.com/{{ site.github }}/tree/gh-pages)
+
+
+## Quality Matters
+
+While {{ site.name }} tries to be as open as possible for new ideas and new code, it is also focused on quality. Thus, there are a small number of criteria that new code must meet:
+
+TODO acceptance criteria for PRs

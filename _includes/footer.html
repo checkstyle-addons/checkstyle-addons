@@ -8,27 +8,6 @@
     
 {% include analytics.html %}
     <script src="https://code.jquery.com/jquery-2.1.3.min.js"></script>
-	{% if page.title == 'Contributing' %}
-    <script>
-    $(document).ready(function() {
-        $.ajax({
-            url: "http://api.travis-ci.org/repos/checkstyle-addons/checkstyle-addons",
-            dataType: "xml",
-            success: function(xmlDoc, textStatus, jqXHR) {
-                $status = $(xmlDoc).find("Project").attr("lastBuildStatus");
-                if ($status == "Success") {
-                    $('#travis-status').attr( 'class', 'panel panel-success' );
-                    $('#travis-status-title').append(': good');
-                }
-                else {
-                    $('#travis-status').attr( 'class', 'panel panel-danger' );
-                    $('#travis-status-title').append(': failed');
-                }
-            }
-        });
-    });
-    </script>
-	{% endif %}
     <script src="{{ site.baseurl}}/js/bootstrap.min.js"></script>
 </body>
 </html>

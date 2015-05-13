@@ -155,6 +155,13 @@ a.csa-offset-anchor { /* used to prevent anchors from being obscured by the fixe
     top: -15px;
 }
 
+#travis-status {
+    width: 295px;
+}
+#travis-status .panel-body a {
+    margin-right: 1em;
+}
+
 .csa-toggle {
     color: #3399F3;
     cursor: pointer;
