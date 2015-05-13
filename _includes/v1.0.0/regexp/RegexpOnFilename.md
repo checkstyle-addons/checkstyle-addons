@@ -53,56 +53,55 @@ In addition to the properties, optionally adding a `message` element may benefit
 
 ### Examples
 
-To configure the check to detect leading and trailing spaces in file names:
+By default, the check detects leading and trailing spaces in file names. It is recommended to still add a custom message as shown, but that's optional.
 
-```xml
+{% highlight xml %}
 <module name="RegexpOnFilename">
   <message key="regexp.filepath.illegal" value="Filename ''{0}'' contains leading or trailing spaces."/>
 </module>
-```
+{% endhighlight %}
 
-To configure the check to ensure that Java files reside in java folders, not resource folders:
+To configure the check to ensure that Java files reside in Java source folders, not resource folders:
 
-```xml
+{% highlight xml %}
 <module name="RegexpOnFilename">
-  <property name="fileExtensions" value="java"/>
+  <property name="selection" value="\.java$"/>
   <property name="regexp" value="[\\/]src[\\/](?:test|main)[\\/]java[\\/]"/>
   <property name="mode" value="required"/>
   <property name="simple" value="false"/>
   <message key="regexp.filepath.required"
       value="The Java file ''{0}'' must reside in a Java source folder."/>
 </module>
-```
+{% endhighlight %}
 
-To configure the check to enforce a naming convention on files in a certain folder:
+This check is also useful to enforce arbitrary naming conventions. In the following example, we require all HTML files in a folder *html/view* to start with the prefix `view_`:
 
-```xml
+{% highlight xml %}
 <module name="RegexpOnFilename">
-  <property name="fileExtensions" value="html"/>
-  <property name="selection" value="[\\/]src[\\/]main[\\/]resources[\\/]html[\\/]views[\\/]"/>
+  <property name="selection" value="[\\/]src[\\/]main[\\/]resources[\\/]html[\\/]views[\\/].+?\.html$"/>
   <property name="regexp" value="^view_.*"/>
   <property name="mode" value="required"/>
   <message key="regexp.filepath.required" value="Name of ''{0}'' must start with ''view_''."/>
 </module>
-```
+{% endhighlight %}
 
 To configure the check to ban GIF files in favor of PNG:
 
-```xml
+{% highlight xml %}
 <module name="RegexpOnFilename">
-  <property name="fileExtensions" value="gif"/>
+  <property name="selection" value="(?i)\.gif$"/>
   <property name="regexp" value="."/>
   <message key="regexp.filepath.illegal" value="''{0}'' must be in PNG format, not GIF."/>
 </module>
-```
+{% endhighlight %}
+
+The `(?i)` at the start of the `selection` expression turns on case insensitivity, so that `.gif`, `.GIF`, or even `.Gif` are all matched.
 
 
 ### Parent Module
 
-<div class="alert alert-dismissible alert-warning">
-  <button type="button" class="close" data-dismiss="alert">×</button>
-  <h4>Important: This check goes under <b>Checker</b>, not <b>TreeWalker</b>.</h4>
-  <p>Placing the <i>checkstyle.xml</i> module definition incorrectly is a common mistake.</p>
+<div class="alert alert-info">
+  <p>Important: This check goes directly under <b>Checker</b>, not under <b>TreeWalker</b>.</p>
 </div>
 
 [Checker](http://checkstyle.sourceforge.net/config.html#Checker)
