@@ -52,6 +52,11 @@ def Node addPom(final Node pRoot)
 
     pRoot.appendNode('inceptionYear', '2015');
 
+    final Node lics = pRoot.appendNode('licenses');
+    final Node lic = lics.appendNode('license');
+    lic.appendNode('name', 'GNU General Public License, Version 3');
+    lic.appendNode('url', 'https://www.gnu.org/copyleft/gpl.html');
+
     final Node devs = pRoot.appendNode('developers');
     final Node dev = devs.appendNode('developer');
     dev.appendNode('name', project.ext.authorName);
@@ -60,6 +65,12 @@ def Node addPom(final Node pRoot)
     final Node org = pRoot.appendNode('organization');
     org.appendNode('name', project.ext.orgName);
     org.appendNode('url', project.ext.orgUrl);
+
+    final Node scm = pRoot.appendNode('scm');
+    scm.appendNode('connection', 'scm:git:git@github.com:' + project.ext.github + '.git');
+    scm.appendNode('developerConnection', 'scm:git:git@github.com:' + project.ext.github + '.git');
+    scm.appendNode('url', 'git@github.com:' + project.ext.github + '.git');
+
     return pRoot;
 }
 
@@ -91,9 +102,15 @@ task checkProperties << {
         throw new GradleException("Couldn't find 'bintray.apikey' property. " +
             "Did you forget to specify it in ~/.gradle/gradle.properties?");
     }
+    if (!project.hasProperty('bintray.gpg.passphrase')) {
+        throw new GradleException("Couldn't find 'bintray.gpg.passphrase' property. " +
+            "Did you forget to specify it in ~/.gradle/gradle.properties?");
+    }
 }
 bintray {
-    if (project.hasProperty('bintray.user') && project.hasProperty('bintray.apikey')) {
+    if (project.hasProperty('bintray.user') && project.hasProperty('bintray.apikey')
+        && project.hasProperty('bintray.gpg.passphrase'))
+    {
         user = project.property('bintray.user');
         key = project.property('bintray.apikey');
 
@@ -114,6 +131,19 @@ bintray {
                 name = project.version;  // Bintray logical version name
                 released = project.ext.buildTimestamp;
                 vcsTag = 'v' + project.version;
+                gpg {
+                    sign = true;
+                    passphrase = project.property('bintray.gpg.passphrase');
+                }
+                //mavenCentralSync {
+                //    sync = true;
+                //    user = 'userToken' //OSS user token
+                //    password = 'paasword' //OSS user password
+                //    close = '1'
+                //    // Optional property. By default the staging repository is closed and artifacts are released to
+                //    // Maven Central. You can optionally turn this behaviour off (by puting 0 as value) and release
+                //    // the version manually.
+                //}
             }
         }
     }

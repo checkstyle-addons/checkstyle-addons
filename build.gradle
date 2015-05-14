@@ -20,7 +20,7 @@ plugins {
     id 'checkstyle';
     id 'idea';
     id 'maven-publish';
-    id 'com.jfrog.bintray' version '1.0';
+    id 'com.jfrog.bintray' version '1.2';
     //id 'com.github.johnrengelman.shadow' version '1.2.1';
 }
 
@@ -32,7 +32,7 @@ repositories {
 
 
 group = 'com.thomasjensen.checkstyle.addons';
-version = '1.0.1-SNAPSHOT';
+version = '1.0.1';
 description = 'Additional Checkstyle Checks';
 ext {
     versions = ['Java': '1.7',
@@ -49,7 +49,8 @@ ext {
     longName = 'Checkstyle Addons';
     orgName = 'Checkstyle Addons';
     orgUrl = 'https://github.com/checkstyle-addons';
-    issueTrackerUrl = 'https://github.com/checkstyle-addons/checkstyle-addons/issues';
+    github = 'checkstyle-addons/checkstyle-addons';
+    issueTrackerUrl = "https://github.com/${github}/issues";
     buildTimestamp = new Date();
     sqPackage = 'com/thomasjensen/checkstyle/addons/sonarqube';
     checksPackage = 'com/thomasjensen/checkstyle/addons/checks';
