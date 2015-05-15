@@ -2,48 +2,48 @@
 layout: markdown
 title: Download &amp; Run
 surrounding-div: csa-run
+maven-central-link: http://search.maven.org/#search%7Cga%7C1%7Cg%3Acom.thomasjensen.checkstyle.addons%20AND%20a%3Acheckstyle-addons
+bintray-link: https://bintray.com/checkstyle-addons/checkstyle-addons/checkstyle-addons/view
 ---
 
 # Download &amp; Run
 
 Here's how to use {{ site.name }} with your standard software.
 
+{{ site.name }} is also distributed via [Maven Central]({{ page.maven-central-link }}){:target="_blank"} and [Bintray jcenter]({{ page.bintray-link }}){:target="_blank"}, so major build tools can automatically access it.
+
 {{ site.name }} uses [semantic versioning](http://semver.org/){:target="_blank"}, so you can always use the latest within a major version, but you should try things out before moving to a higher major version.
 
-{% comment %} ======================================================================================= {% endcomment %}
+
+<!-- ======================================================================================= -->
 <a name="run-gradle" class="csa-offset-anchor"/>
 
 ## Gradle
 
-{{ site.name }} is available on [jcenter](https://bintray.com/checkstyle-addons/checkstyle-addons/checkstyle-addons/view){:target="_blank"}, so you can just use it in your Gradle build. In Gradle, {{ site.name }} runs as part of the [Gradle Checkstyle Plugin](https://gradle.org/docs/current/userguide/checkstyle_plugin.html){:target="_blank"}. The classpath is extended to include {{ site.name }}. Note that the Checkstyle tool version must be specified.
+{{ site.name }} is available on [Maven Central]({{ page.maven-central-link }}){:target="_blank"} and [jcenter]({{ page.bintray-link }}){:target="_blank"}, so you can just use it in your Gradle build. In Gradle, {{ site.name }} runs as part of the [Gradle Checkstyle Plugin](https://gradle.org/docs/current/userguide/checkstyle_plugin.html){:target="_blank"}. The classpath is extended to include {{ site.name }}. Note that the Checkstyle tool version must be specified.
 
 {% highlight groovy %}
 plugins {
-    id 'checkstyle'
+    id 'checkstyle'  // regular Checkstyle plugin
 }
-repositories {
-    jcenter()
-}
-
 dependencies {
     checkstyle group: 'com.thomasjensen.checkstyle.addons', name: 'checkstyle-addons', version: '{{ site.latest_version }}'
 }
-
 checkstyle {
     configFile file('your-checkstyle.xml')
     toolVersion '{{ site.latest_version_checkstyle }}'   // important
 }
 {% endhighlight %}
 
+You could also use the version notation `version: '{{ site.latest_major }}.+'` in order to always get the latest compatible version.
 
-{% comment %} ======================================================================================= {% endcomment %}
+
+<!-- ======================================================================================= -->
 <a name="run-maven" class="csa-offset-anchor"/>
 
 ## Maven
 
-{{ site.name }} is available on [jcenter](https://bintray.com/checkstyle-addons/checkstyle-addons/checkstyle-addons/view){:target="_blank"}. In order to use jcenter in your Maven build, you must add it to your Maven *settings.xml*. jcenter offers a superset of Maven Central. Bintray provides a [configuration example](https://github.com/bintray/bintray-examples/blob/master/maven-example/settings.xml){:target="_blank"} of how to configure your *settings.xml* to use jcenter.
-
-In Maven, {{ site.name }} runs as part of the [Maven Checkstyle Plugin](https://maven.apache.org/plugins/maven-checkstyle-plugin/){:target="_blank"}. The classpath is extended to include {{ site.name }}. Note that the explicit dependency on Checkstyle itself must also be specified in order to set the correct Checkstyle version.
+{{ site.name }} is available on [Maven Central]({{ page.maven-central-link }}){:target="_blank"}, so you can just use it in your Maven build. In Maven, {{ site.name }} runs as part of the [Maven Checkstyle Plugin](https://maven.apache.org/plugins/maven-checkstyle-plugin/){:target="_blank"}. The classpath is extended to include {{ site.name }}. Note that the explicit dependency on Checkstyle itself must also be specified in order to set the correct Checkstyle version.
 
 {% highlight xml %}
 <project>
@@ -73,7 +73,8 @@ In Maven, {{ site.name }} runs as part of the [Maven Checkstyle Plugin](https://
 </project>
 {% endhighlight %}
 
-{% comment %} ======================================================================================= {% endcomment %}
+
+<!-- ======================================================================================= -->
 <a name="run-ant" class="csa-offset-anchor"/>
 
 ## Ant
@@ -106,8 +107,10 @@ The *checkstyletask.properties* is read from checkstyle-{{ site.latest_version_c
 
 For more information on Checkstyle Ant task configuration, please refer to its [website](http://checkstyle.sourceforge.net/anttask.html){:target="_blank"}.
 
+If you use Ivy for dependency management in Ant, you can take advantage of the fact that {{ site.name }} is on Maven Central.
 
-{% comment %} ======================================================================================= {% endcomment %}
+
+<!-- ======================================================================================= -->
 <a name="run-intellij" class="csa-offset-anchor"/>
 
 ## IntelliJ IDEA / Android Studio
@@ -123,7 +126,7 @@ In IntelliJ IDEA or Android Studio, {{ site.name }} runs as a third-party addon 
 Checkstyle-IDEA does not offer a visual editor, so you'll have to activate the {{ site.name }} checks by modifying your *checkstyle.xml* directly.
 
 
-{% comment %} ======================================================================================= {% endcomment %}
+<!-- ======================================================================================= -->
 <a name="run-eclipse" class="csa-offset-anchor"/>
 
 ## Eclipse
@@ -139,7 +142,7 @@ In order to verify that {{ site.name }} was installed correctly, open the Checks
 ![{{ site.name }} in Eclipse](images/run-eclipse.png)
 
 
-{% comment %} ======================================================================================= {% endcomment %}
+<!-- ======================================================================================= -->
 <a name="run-sonarqube" class="csa-offset-anchor"/>
 
 ## SonarQube
@@ -206,7 +209,7 @@ The rules provided by {{ site.name }} are all tagged with `checkstyle-addons`, w
 **Installation:** Drop the downloaded plugin into the *extensions/plugins* folder of your SonarQube installation (where all the other plugins are). Double-check the version of the SonarQube Checkstyle plugin according to the above table. Upgrade that if necessary. Restart SonarQube.
 
 
-{% comment %} ======================================================================================= {% endcomment %}
+<!-- ======================================================================================= -->
 <a name="run-command-line" class="csa-offset-anchor"/>
 
 ## Command Line
