@@ -56,15 +56,14 @@ Running the website locally is important in order to be able to test changes bef
 
   1. Check the prerequisites:
     - [Git](http://git-scm.com/){:target="_blank"}
-    - [Ruby](https://www.ruby-lang.org/en/documentation/installation/){:target="_blank"} 2.0.0 (Jekyll is a Ruby Gem)
+    - Ruby 2.0.0 ([Windows Installer](http://rubyinstaller.org/downloads/){:target="_blank"}, [Unix/Linux](https://www.ruby-lang.org/en/documentation/installation/){:target="_blank"}), needed because Jekyll is a Ruby Gem
     - [Python](https://www.python.org/downloads/){:target="_blank"} 2.7.9 (required by the Pygments syntax highlighter)
     Make sure both Ruby and Python are on the PATH.
   1. Install Jekyll for [Linux/Unix](http://jekyllrb.com/docs/installation/){:target="_blank"} or [Windows](http://jekyll-windows.juthilo.com/){:target="_blank"}
   1. Install Pygments highlighter by typing `python -m pip install Pygments` on the command line. Pygments is the highlighter required by GitHub at this time.
-  1. Install wdm for auto-regeneration: `gem install wdm`
-  1. Update Pygments to at least version 0.6.1: `gem update pygments`
-  1. Clone the {{ site.name }} repo by running on the command line:
-     `git clone https://github.com/{{ site.github }}.git`
+  1. Install wdm for auto-regeneration (`gem install wdm`) and Jemojis (`gem install jemoji`)
+  1. If Pygments is on a revision older than 0.6.1 (`gem list`), update Pygments (`gem update pygments`)
+  1. Clone the {{ site.name }} repo: `git clone https://github.com/{{ site.github }}.git`
   1. `cd checkstyle-addons`
   1. `git checkout gh-pages`
   1. `jekyll serve`
@@ -86,4 +85,9 @@ A quick list of development resources:
 
 While {{ site.name }} tries to be as open as possible for new ideas and new code, it is also focused on quality. Thus, there are a small number of criteria that new code must meet:
 
-TODO acceptance criteria for PRs
+  - Travis must report green, which basically means that `gradle build` runs without errors.
+  - No Checkstyle violations
+  - Full unit test coverage
+  - Meaningful documentation
+  
+People rely on {{ site.name }} to work as documented, so it is most important to minimize bugs and have good documentation. The idea is to provide a stable and correct tool, so fixing known bugs if and when they arise has the highest priority (more than new features).
