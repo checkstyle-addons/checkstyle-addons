@@ -24,7 +24,9 @@
         <name>Lost Instance</name>
         <category name="coding"/>
         <tag>checkstyle-addons</tag>
-        <description>Checks that object instances created explicitly with <code>new</code> are actually used for something. Just being assigned to a variable or passed as a parameter is enough. A full data flow analysis is not performed.</description>
+        <description><![CDATA[Checks that object instances created explicitly with <code>new</code> are actually used for something. Just being assigned to a variable or passed as a parameter is enough. A full data flow analysis is not performed.
+            <a href="http://checkstyle-addons.thomasjensen.com/v@version@/checks/coding.html#LostInstance"
+               target="_blank">Full Documentation</a>]]></description>
         <configKey>Checker/TreeWalker/LostInstance</configKey>
     </rule>
 
@@ -36,7 +38,9 @@
         <name>Regexp On Filename</name>
         <category name="regexp"/>
         <tag>checkstyle-addons</tag>
-        <description>Checks the names of files against a regular expression.</description>
+        <description><![CDATA[Checks the names of files against a regular expression.
+            <a href="http://checkstyle-addons.thomasjensen.com/v@version@/checks/regexp.html#RegexpOnFilename"
+                    target="_blank">Full Documentation</a>]]></description>
         <configKey>Checker/RegexpOnFilename</configKey>
         <cardinality>MULTIPLE</cardinality>
         <param key="selection" type="REGULAR_EXPRESSION">

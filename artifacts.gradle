@@ -194,10 +194,16 @@ task jarEclipse(type: Jar, dependsOn: classes) {
     }
     from(sourceSets.main.output) {
         exclude '**/sonarqube/**';
+        exclude '**/sonarqube';
         exclude '**/*.md';
         exclude '**/checks/all_checks.html';
         exclude 'sonarqube.xml';
+        exclude '**/checkstyle-metadata.*';
         rename { String fileName -> fileName.replace('eclipsecs-plugin.xml', 'plugin.xml'); }
+    }
+    from(sourceSets.main.output) {
+        include '**/checkstyle-metadata.*';
+        filter(ReplaceTokens, tokens: [version: project.version]);
     }
     Set<File> pubLibs = getPublishedDependencyLibs(project, false);
     into('lib') {
@@ -249,12 +255,14 @@ task jarSonarQube(type: Jar, dependsOn: jar) {
         from 'LICENSE';
     }
     into(project.ext.sqPackage) {
-        File dir = new File(sourceSets.main.output.classesDir, project.ext.sqPackage);
-        from(dir) {
+        from(new File(sourceSets.main.output.classesDir, project.ext.sqPackage)) {
             include 'CheckstyleExtensionPlugin.class';
             include 'CheckstyleExtensionRepository.class';
         }
+    }
+    into(project.ext.sqPackage) {
         from new File(sourceSets.main.output.resourcesDir, 'sonarqube.xml');
+        filter(ReplaceTokens, tokens: [version: project.version]);
     }
     into('META-INF/lib') {
         from mainCheckJar;
