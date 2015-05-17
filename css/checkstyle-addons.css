@@ -64,12 +64,16 @@ code {
     padding-left: 5rem;
 }
 .footer {
-    padding: 0.3em 16px;
+    padding: 4px 16px;
     text-align: left;
+    width: 100%;
+    position: fixed;
+    bottom: 0;
+    left: 0;
 }
 @media (max-width: 512px) {
     body {
-        padding: 50px 5px;
+        padding: 50px 5px 0;  /* top horz bottom */
     }
     .jumbotron {
         padding: 16px 5px;
@@ -80,8 +84,17 @@ code {
         padding-left: 2.5rem;
     }
     .footer {
-        padding: 0.3em 0px;
+        padding: 4px 0 0;
         text-align: center;
+        width: auto;
+        position: static;
+        bottom: auto;
+        left: auto;
+        margin-left: -5px;
+        margin-right: -5px;
+    }
+    .footer p {
+        margin-bottom: 0;
     }
 }
 
@@ -98,6 +111,9 @@ a.navbar-brand {
 }
 
 
+h1 {
+    font-size: 34px;
+}
 h2 {
     margin-top: 32px;
     margin-bottom: 16px;
@@ -275,12 +291,8 @@ table.table-striped tr:last-child {
 }
 
 .footer {
-    width: 100%;
     height: 50px;
     background-color: #eeeeee;
-    position: fixed;
-    bottom: 0;
-    left: 0;
     background-image: linear-gradient(#e4e4e4, #eee 50%, #fff);
     background-repeat: no-repeat;
     border-top: 1px solid #d5d5d5;
