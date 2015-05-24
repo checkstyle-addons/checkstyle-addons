@@ -1,20 +1,22 @@
-<!DOCTYPE suppressions PUBLIC "-//Puppy Crawl//DTD Suppressions 1.1//EN"
-    "http://www.puppycrawl.com/dtds/suppressions_1_1.dtd">
+<?xml version="1.0" encoding="UTF-8"?>
 <!--
     Checkstyle-Addons - Additional Checkstyle checks
-    Copyright (C) 2015 Thomas Jensen, All rights reserved.
+    Copyright (C) 2015 Thomas Jensen
 
-    This library is free software; you can redistribute it and/or modify it under the
-    terms of the GNU Lesser General Public License, version 3, as published by the
-    Free Software Foundation.
+    This program is free software: you can redistribute it and/or modify it under the
+    terms of the GNU General Public License, version 3, as published by the Free
+    Software Foundation.
 
-    This library is distributed in the hope that it will be useful, but WITHOUT ANY
+    This program is distributed in the hope that it will be useful, but WITHOUT ANY
     WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A
-    PARTICULAR PURPOSE. See the GNU Lesser General Public License for more details.
+    PARTICULAR PURPOSE. See the GNU General Public License for more details.
 
-    You should have received a copy of the GNU Lesser General Public License along
-    with this library. If not, see <http://www.gnu.org/licenses/>.
+    You should have received a copy of the GNU General Public License along with this
+    program.  If not, see http://www.gnu.org/licenses/.
  -->
+<!DOCTYPE suppressions PUBLIC "-//Puppy Crawl//DTD Suppressions 1.1//EN"
+    "http://www.puppycrawl.com/dtds/suppressions_1_1.dtd">
+
 <suppressions>
 
     <!-- Test classes are subject to a relaxed ruleset only. -->
@@ -31,6 +33,9 @@
     <!-- Suppress the naming convention for test classes on production code (only one is active at a time) -->
     <suppress files="[\\/]src[\\/]main[\\/].*" id="TypeNameTest" />
     <suppress files="[\\/]src[\\/]main[\\/].*" id="MethodNameTest" />
+
+    <!-- Do not run Checkstyle on test data -->
+    <suppress files="[\\/]src[\\/]test[\\/]resources[\\/].*" checks="." />
 
     <suppress files="[\\/]Base(?:FileSet)?CheckTestSupport\.java" checks="Header" />
     <suppress files="[\\/]BaseCheckTestSupport\.java" checks="AbstractClassName" />
