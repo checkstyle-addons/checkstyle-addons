@@ -1,0 +1,37 @@
+## IllegalMethodCall
+
+Flags calls to methods with certain names. Occurrences are flagged based on the name alone; the type of the object to which the method belongs is not taken into account.
+
+This is a low-tech mechanism for certain types of code governance, such as preventing use of reflection through `Class.forName()` or `Constructor.newInstance()`.
+
+
+### Properties
+
+This check must be configured explicitly for certain method names; it does nothing by default.
+
+<dl>
+<dt><span class="propname">illegalMethodNames</span>
+    <span class="proptype"><a href="http://checkstyle.sourceforge.net/property_types.html#stringSet">StringSet</a></span></dt>
+<dd><span class="propdesc">Comma-separated list of plain method names, no parameters, no parentheses</span>
+    <span class="propdefault">none</span></dd>
+</dl>
+
+#### Custom Messages
+
+In addition to the properties, optionally adding a `message` element may benefit this check to make the warning easier to understand. The message key is `illegal.method.call`, and it takes one parameter, which is the name of the flagged method.
+
+
+### Examples
+
+Configure the check like this:
+
+{% highlight xml %}
+<module name="IllegalMethodCall">
+  <property name="illegalMethodNames" value="forName, newInstance"/>
+</module>
+{% endhighlight %}
+ 
+
+### Parent Module
+
+[TreeWalker](http://checkstyle.sourceforge.net/config.html#TreeWalker){:target="_blank"}

@@ -2,6 +2,11 @@
 layout: default
 check_version: @version@
 check_list:
+  - check: IllegalMethodCall
+    category: coding
+    since: v1.1.0
+    desc: Flag calls to illegal methods based on their names
+
   - check: LostInstance
     category: coding
     since: v0.1.0

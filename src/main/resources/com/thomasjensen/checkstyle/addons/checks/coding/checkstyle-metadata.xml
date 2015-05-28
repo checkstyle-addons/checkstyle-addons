@@ -26,5 +26,14 @@
         <message-key key="lost.instance"/>
     </rule-metadata>
 
+    <rule-metadata name="%IllegalMethodCall.name" internal-name="IllegalMethodCall" parent="TreeWalker">
+        <alternative-name internal-name="com.thomasjensen.checkstyle.addons.checks.coding.IllegalMethodCallCheck"/>
+        <description>%IllegalMethodCall.desc</description>
+        <property-metadata name="illegalMethodNames" datatype="String">
+            <description>%IllegalMethodCall.illegalMethodNames</description>
+        </property-metadata>
+        <message-key key="illegal.method.call"/>
+    </rule-metadata>
+
 </rule-group-metadata>
 </checkstyle-metadata>

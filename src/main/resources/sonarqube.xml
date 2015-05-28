@@ -17,6 +17,24 @@
 <rules>
 
     <!-- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -->
+    <!-- IllegalMethodCall                                                                     -->
+    <!-- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -->
+    <rule>
+        <key>com.thomasjensen.checkstyle.addons.checks.coding.IllegalMethodCallCheck</key>
+        <name>Illegal Method Call</name>
+        <category name="coding"/>
+        <tag>checkstyle-addons</tag>
+        <description><![CDATA[<p>Flags calls to methods with certain names. Occurrences are flagged based on the name
+            alone; the type of the object to which the method belongs is not taken into account.</p>
+            <p><a href="http://checkstyle-addons.thomasjensen.com/v@version@/checks/coding.html#IllegalMethodCall"
+               target="_blank">Full Documentation</a></p>]]></description>
+        <configKey>Checker/TreeWalker/IllegalMethodCall</configKey>
+        <param key="illegalMethodNames" type="s{}">
+            <description>Comma-separated list of plain method names, no parameters, no parentheses</description>
+        </param>
+    </rule>
+
+    <!-- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -->
     <!-- LostInstance                                                                          -->
     <!-- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -->
     <rule>

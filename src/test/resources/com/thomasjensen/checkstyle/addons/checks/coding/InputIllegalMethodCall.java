@@ -1,0 +1,36 @@
+package com.thomasjensen.checkstyle.addons.checks.coding;
+// @formatter:off
+
+public class InputIllegalMethodCall
+{
+    private static final Class<?> field = Class.forName("com.foo.Bar");  // report this
+
+    static {
+        Class.forName("com.foo.Bar");  // report this
+        String error1 = Class.forName("com.foo.Bar").getName();  // report this
+    }
+
+    public void foo()
+    {
+        // Class.forName("com.foo.Bar")        // no problem, comment
+        String error2 = Class.forName("com.foo.Bar").getName();  // report this
+        String good = "Class.forName(\"com.foo.Bar\"); is the illegal method call";  // no problem, String
+        String.valueOf(Class.forName("com.foo.Bar").getName().toCharArray());  // report this
+        java.lang.Class.forName("com.foo.Bar").getName();  // report this
+        forName("com.foo.Bar");  // report this
+
+        InputIllegalMethodCall obj = new InputIllegalMethodCall();
+        obj.<String>forName("com.foo.Bar");  // report this
+    }
+
+    private void forName(final String pFoo)
+    {
+        String forName = "no problem";
+    }
+
+
+    private <T> T forName(final T pFoo)
+    {
+        return pFoo;
+    }
+}
