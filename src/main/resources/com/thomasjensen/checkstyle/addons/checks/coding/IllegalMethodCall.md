@@ -3,6 +3,7 @@
 Flags calls to methods with certain names. Occurrences are flagged based on the name alone; the type of the object to which the method belongs is not taken into account.
 
 This is a low-tech mechanism for certain types of code governance, such as preventing use of reflection through `Class.forName()` or `Constructor.newInstance()`.
+The scattergun approach used by this check may get you some false positives, which may have to be suppressed. 
 
 
 ### Properties
@@ -18,7 +19,7 @@ This check must be configured explicitly for certain method names; it does nothi
 
 #### Custom Messages
 
-In addition to the properties, optionally adding a `message` element may benefit this check to make the warning easier to understand. The message key is `illegal.method.call`, and it takes one parameter, which is the name of the flagged method.
+In addition to the properties, optionally adding a `message` element may benefit this check to make the warning easier to understand. The message key is `illegal.method.call`, and it features one optional placeholder (`{0}`), which is the name of the flagged method. The placeholder is useful when the list of illegal method names contains more than 1 entry.
 
 
 ### Examples
@@ -30,7 +31,16 @@ Configure the check like this:
   <property name="illegalMethodNames" value="forName, newInstance"/>
 </module>
 {% endhighlight %}
- 
+
+Example using a custom message:
+
+{% highlight xml %}
+<module name="IllegalMethodCall">
+  <property name="illegalMethodNames" value="finalize"/>
+  <message key="illegal.method.call" value="Finalizer called explicitly"/>
+</module>
+{% endhighlight %}
+
 
 ### Parent Module
 
