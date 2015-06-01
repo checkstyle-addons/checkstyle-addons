@@ -15,6 +15,14 @@ This check must be configured explicitly for certain method names; it does nothi
     <span class="proptype"><a href="http://checkstyle.sourceforge.net/property_types.html#stringSet">StringSet</a></span></dt>
 <dd><span class="propdesc">Comma-separated list of plain method names, no parameters, no parentheses</span>
     <span class="propdefault">none</span></dd>
+
+<dt><span class="propname">excludedQualifiers</span>
+    <span class="proptype"><a href="http://checkstyle.sourceforge.net/property_types.html#stringSet">StringSet</a></span></dt>
+<dd><span class="propdesc">Comma-separated list of method call qualifiers which indicate that a call should be excluded.
+        For example, if the call was <code>JAXBContext.newInstance();</code>, then <code>JAXBContext</code>
+        is the qualifier (anything that comes before the dot). In other words, method calls with one of the qualifiers
+        listed here are <i>not</i> illegal.</span>
+    <span class="propdefault">none</span></dd>
 </dl>
 
 #### Custom Messages
@@ -29,6 +37,7 @@ Configure the check like this:
 {% highlight xml %}
 <module name="IllegalMethodCall">
   <property name="illegalMethodNames" value="forName, newInstance"/>
+  <property name="excludedQualifiers" value="JAXBContext, Charset"/>
 </module>
 {% endhighlight %}
 

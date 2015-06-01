@@ -15,9 +15,12 @@ package com.thomasjensen.checkstyle.addons.checks.coding;
  * program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+import java.io.IOException;
+
 import com.puppycrawl.tools.checkstyle.DefaultConfiguration;
 import com.thomasjensen.checkstyle.addons.BaseCheckTestSupport;
 import junit.framework.TestCase;
+import org.junit.BeforeClass;
 import org.junit.Test;
 
 
@@ -29,6 +32,19 @@ import org.junit.Test;
 public class IllegalMethodCallCheckTest
     extends BaseCheckTestSupport
 {
+    private static String sInputFilePath = null;
+
+
+
+    @BeforeClass
+    public static void setUp()
+        throws IOException
+    {
+        sInputFilePath = getPath("coding/InputIllegalMethodCall.java");
+    }
+
+
+
     @Test
     public void testDefault()
         throws Exception
@@ -44,8 +60,10 @@ public class IllegalMethodCallCheckTest
             "19:25: Illegal method call: forName()",
             "20:9: Illegal method call: forName()",
             "23:21: Illegal method call: forName()",
+            "40:16: Illegal method call: forName()",
+            "41:23: Illegal method call: forName()",
         };
-        verify(checkConfig, getPath("coding/InputIllegalMethodCall.java"), expected);
+        verify(checkConfig, sInputFilePath, expected);
     }
 
 
@@ -56,7 +74,7 @@ public class IllegalMethodCallCheckTest
     {
         final DefaultConfiguration checkConfig = createCheckConfig(IllegalMethodCallCheck.class);
         final String[] expected = {};
-        verify(checkConfig, getPath("coding/InputIllegalMethodCall.java"), expected);
+        verify(checkConfig, sInputFilePath, expected);
     }
 
 
@@ -68,7 +86,7 @@ public class IllegalMethodCallCheckTest
         final DefaultConfiguration checkConfig = createCheckConfig(IllegalMethodCallCheck.class);
         checkConfig.addAttribute("illegalMethodNames", "");
         final String[] expected = {};
-        verify(checkConfig, getPath("coding/InputIllegalMethodCall.java"), expected);
+        verify(checkConfig, sInputFilePath, expected);
     }
 
 
@@ -79,6 +97,51 @@ public class IllegalMethodCallCheckTest
         int[] tokens = new IllegalMethodCallCheck().getRequiredTokens();
         TestCase.assertNotNull(tokens);
         TestCase.assertEquals(1, tokens.length);
+    }
+
+
+
+    @Test
+    public void testExclusions1()
+        throws Exception
+    {
+        final DefaultConfiguration checkConfig = createCheckConfig(IllegalMethodCallCheck.class);
+        checkConfig.addAttribute("illegalMethodNames", "forName");
+        checkConfig.addAttribute("excludedQualifiers", "Inner1");
+        final String[] expected = {
+            "6:49: Illegal method call: forName()",
+            "9:15: Illegal method call: forName()",
+            "10:31: Illegal method call: forName()",
+            "16:31: Illegal method call: forName()",
+            "18:30: Illegal method call: forName()",
+            "19:25: Illegal method call: forName()",
+            "20:9: Illegal method call: forName()",
+            "23:21: Illegal method call: forName()",
+            "41:23: Illegal method call: forName()",
+        };
+        verify(checkConfig, sInputFilePath, expected);
+    }
+
+
+
+    @Test
+    public void testExclusions2()
+        throws Exception
+    {
+        final DefaultConfiguration checkConfig = createCheckConfig(IllegalMethodCallCheck.class);
+        checkConfig.addAttribute("illegalMethodNames", "forName");
+        checkConfig.addAttribute("excludedQualifiers", "Inner1, Inner1.Inner2");
+        final String[] expected = {
+            "6:49: Illegal method call: forName()",
+            "9:15: Illegal method call: forName()",
+            "10:31: Illegal method call: forName()",
+            "16:31: Illegal method call: forName()",
+            "18:30: Illegal method call: forName()",
+            "19:25: Illegal method call: forName()",
+            "20:9: Illegal method call: forName()",
+            "23:21: Illegal method call: forName()",
+        };
+        verify(checkConfig, sInputFilePath, expected);
     }
 }
 

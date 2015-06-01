@@ -23,6 +23,7 @@ import javax.annotation.Nonnull;
 import com.puppycrawl.tools.checkstyle.api.Check;
 import com.puppycrawl.tools.checkstyle.api.DetailAST;
 import com.puppycrawl.tools.checkstyle.api.TokenTypes;
+import com.puppycrawl.tools.checkstyle.checks.CheckUtils;
 
 
 /**
@@ -38,6 +39,8 @@ public class IllegalMethodCallCheck
     extends Check
 {
     private Set<String> illegalMethodNames = null;
+
+    private Set<String> excludedQualifiers = new HashSet<String>();
 
 
 
@@ -64,9 +67,28 @@ public class IllegalMethodCallCheck
             final DetailAST methodNameAst = findCalledMethodName(pAst);
             final String methodName = methodNameAst.getText();
             if (illegalMethodNames.contains(methodName)) {
-                log(methodNameAst, "illegal.method.call", methodName);
+                final String qualifier = extractQualifier(pAst, methodName);
+                if (!excludedQualifiers.contains(qualifier)) {
+                    log(methodNameAst, "illegal.method.call", methodName);
+                }
             }
         }
+    }
+
+
+
+    @Nonnull
+    private String extractQualifier(@Nonnull final DetailAST pAst, @Nonnull final String pMethodName)
+    {
+        String result = "";
+        final String fullCall = CheckUtils.createFullType(pAst).getText();
+        if (fullCall.length() > pMethodName.length() + 1) {
+            int sepDotPos = fullCall.length() - pMethodName.length() - 1;
+            if (fullCall.charAt(sepDotPos) == '.') {
+                result = fullCall.substring(0, sepDotPos);
+            }
+        }
+        return result;
     }
 
 
@@ -98,5 +120,19 @@ public class IllegalMethodCallCheck
         final Set<String> methodNames = new HashSet<String>();
         Collections.addAll(methodNames, pIllegalMethodNames);
         illegalMethodNames = methodNames;
+    }
+
+
+
+    /**
+     * Setter.
+     *
+     * @param pExcludedQualifiers the list of excluded contexts
+     */
+    public void setExcludedQualifiers(final String... pExcludedQualifiers)
+    {
+        final Set<String> newExclusions = new HashSet<String>();
+        Collections.addAll(newExclusions, pExcludedQualifiers);
+        excludedQualifiers = newExclusions;
     }
 }

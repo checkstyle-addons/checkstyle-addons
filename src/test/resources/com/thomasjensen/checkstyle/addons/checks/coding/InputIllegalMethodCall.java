@@ -33,4 +33,26 @@ public class InputIllegalMethodCall
     {
         return pFoo;
     }
+
+
+    private bar()
+    {
+        Inner1.forName("com.foo.Bar");  // report this
+        Inner1.Inner2.forName("com.foo.Bar");  // report this
+    }
+
+
+
+    public static class Inner1 {
+        private static void forName(final String pFoo)
+        {
+            // comment
+        }
+        public static class Inner2 {
+            private static void forName(final String pFoo)
+            {
+                // comment
+            }
+        }
+    }
 }
