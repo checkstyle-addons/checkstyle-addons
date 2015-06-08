@@ -227,8 +227,11 @@ table.csa-version-table tr td:last-child, table.csa-version-table tr th:last-chi
 .checkpage dl {
     margin-bottom: 2rem;
 }
-.checkpage > dl > dt:nth-of-type(2n), .checkpage > dl > dd:nth-of-type(2n) {
+.checkpage dl > dt:nth-of-type(2n), .checkpage dl > dd:nth-of-type(2n) {
     background-color: #f9f9f9;
+}
+.checkpage dl > dd:nth-of-type(2n) code {
+    background-color: white;
 }
 .checkpage dt {
     float: left;
@@ -262,6 +265,17 @@ table.csa-version-table tr td:last-child, table.csa-version-table tr th:last-chi
 }
 .checkpage .propdefault{
     display: block;
+}
+.checkpage dl dl.inner {
+    margin: 0;
+}
+.checkpage dl dl.inner > dd, .checkpage dl dl.inner > dt {
+    border: 0;
+    padding: 0 5px 0 0;
+}
+.checkpage dl dl.inner > dt:after {
+    content: " – ";
+    font-weight: normal;
 }
 pre .line-numbers {
     display: none;
