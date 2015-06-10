@@ -109,7 +109,7 @@ public abstract class BaseCheckTestSupport
         final DefaultConfiguration dc = new DefaultConfiguration("configuration");
         final DefaultConfiguration twConf = createCheckConfig(TreeWalker.class);
         // make sure that the tests always run with this charset
-        dc.addAttribute("charset", "iso-8859-1");
+        dc.addAttribute("charset", "UTF-8");
         dc.addChild(twConf);
         twConf.addChild(pConfig);
         return dc;
@@ -120,15 +120,6 @@ public abstract class BaseCheckTestSupport
     protected static String getPath(final String pFilename)
         throws IOException
     {
-        return new File("src/test/resources/com/thomasjensen/checkstyle/addons/checks/" + pFilename).getCanonicalPath();
-    }
-
-
-
-    protected static String getSrcPath(final String pFilename)
-        throws IOException
-    {
-
         return new File("src/test/resources/com/thomasjensen/checkstyle/addons/checks/" + pFilename).getCanonicalPath();
     }
 
