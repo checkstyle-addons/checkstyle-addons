@@ -24,6 +24,7 @@
     -->
     <package name="com.thomasjensen.checkstyle.addons.checks">
         <package name="coding" />
+        <package name="misc" />
         <package name="regexp" />
     </package>
 </checkstyle-packages>

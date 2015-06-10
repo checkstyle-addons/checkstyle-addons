@@ -51,6 +51,69 @@
     </rule>
 
     <!-- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -->
+    <!-- PropertyCatalog                                                                       -->
+    <!-- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -->
+    <rule>
+        <key>com.thomasjensen.checkstyle.addons.checks.misc.PropertyCatalogCheck</key>
+        <name>Property out of sync</name>
+        <category name="misc"/>
+        <tag>checkstyle-addons</tag>
+        <description><![CDATA[<p>This check helps to keep a property file in sync with a piece of code that contains
+            the property keys.</p>
+            <p><a href="http://checkstyle-addons.thomasjensen.com/v@version@/checks/misc.html#PropertyCatalog"
+               target="_blank">Full Documentation</a></p>]]></description>
+        <configKey>Checker/TreeWalker/PropertyCatalog</configKey>
+        <param key="selection" type="REGULAR_EXPRESSION">
+            <description>Regular expression to select the property catalog. Each selected type must have a
+            corresponding property file. Applied to the binary class name, not to the file path. Partial matches
+            allowed.</description>
+            <defaultValue>^(?!x)x</defaultValue>
+        </param>
+        <param key="excludedFields" type="REGULAR_EXPRESSION">
+            <description>Regular expression to match fields that should be ignored. Applied to the field name.
+            Expression must match the entire field name.</description>
+            <defaultValue>serialVersionUID</defaultValue>
+        </param>
+        <param key="enumArgument" type="BOOLEAN">
+            <description>If ``true``, the first argument of the enum constructor is used as property key. If ``false``,
+            the enum constant itself is used as the property key. Ignored if the type is not an ``enum``.</description>
+            <defaultValue>false</defaultValue>
+        </param>
+        <param key="propertyFile" type="STRING">
+            <description><![CDATA[<p>Template path to the property file. For constructing the path, the following
+            placeholders may be used (examples for ``com.foo.Bar$Inner``):</p>
+            <table>
+            <tr><th>Placeholder</th><th>Content</th><th>Example</th></tr>
+            <tr><td>``{0}``</td><td>the original binary class name</td><td>``com.foo.Bar$Inner``</td></tr>
+            <tr><td>``{1}``</td><td>the binary class name as a path</td><td>``com/foo/Bar/Inner``</td></tr>
+            <tr><td>``{2}``</td><td>fully qualified name of the outer class</td><td>``com.foo.Bar``</td></tr>
+            <tr><td>``{3}``</td><td>fully qualified name of the outer class as a path</td><td>``com/foo/Bar``</td></tr>
+            <tr><td>``{4}``</td><td>fully qualified name of the outer class as a path of ``..``'s</td><td>``../../..``</td></tr>
+            <tr><td>``{5}``</td><td>the package name as a path</td><td>``com/foo``</td></tr>
+            <tr><td>``{6}``</td><td>simple name of the outer class</td><td>``Bar``</td></tr>
+            <tr><td>``{7}``</td><td>simple name of the inner class</td><td>``Inner``</td></tr>
+            </table>]]></description>
+        </param>
+        <param key="propertyFileEncoding" type="STRING">
+            <description>Character encoding of the property files. Only relevant if non-ASCII characters appear in the
+            property keys.</description>
+            <defaultValue>UTF-8</defaultValue>
+        </param>
+        <param key="reportDuplicates" type="BOOLEAN">
+            <description>Whether to report duplicate references</description>
+            <defaultValue>true</defaultValue>
+        </param>
+        <param key="reportOrphans" type="BOOLEAN">
+            <description>Whether to report unreferenced properties which exist in the property file</description>
+            <defaultValue>true</defaultValue>
+        </param>
+        <param key="caseSensitive" type="BOOLEAN">
+            <description>Should property keys be case sensitive?</description>
+            <defaultValue>true</defaultValue>
+        </param>
+    </rule>
+
+    <!-- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -->
     <!-- RegexpOnFilename                                                                      -->
     <!-- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -->
     <rule>
