@@ -118,7 +118,7 @@ task site (dependsOn: [processResources, siteCopyAllChecks, siteCopyJavadoc]) {
                 sb.append("\n");
             }
 
-            // liist of checks in this category
+            // list of checks in this category
             sb.append("check_list:\n");
             for (String s : frontMatterFileSet) {
                 sb.append("  - ");
