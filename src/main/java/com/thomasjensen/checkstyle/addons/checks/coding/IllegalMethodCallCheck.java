@@ -23,7 +23,7 @@ import javax.annotation.Nonnull;
 import com.puppycrawl.tools.checkstyle.api.Check;
 import com.puppycrawl.tools.checkstyle.api.DetailAST;
 import com.puppycrawl.tools.checkstyle.api.TokenTypes;
-import com.puppycrawl.tools.checkstyle.checks.CheckUtils;
+import com.thomasjensen.checkstyle.addons.util.Util;
 
 
 /**
@@ -81,8 +81,8 @@ public class IllegalMethodCallCheck
     private String extractQualifier(@Nonnull final DetailAST pAst, @Nonnull final String pMethodName)
     {
         String result = "";
-        final String fullCall = CheckUtils.createFullType(pAst).getText();
-        if (fullCall.length() > pMethodName.length() + 1) {
+        final String fullCall = Util.getFullIdent(pAst);
+        if (fullCall != null && fullCall.length() > pMethodName.length() + 1) {
             int sepDotPos = fullCall.length() - pMethodName.length() - 1;
             if (fullCall.charAt(sepDotPos) == '.') {
                 result = fullCall.substring(0, sepDotPos);

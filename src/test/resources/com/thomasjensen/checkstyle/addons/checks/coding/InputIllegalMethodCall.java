@@ -42,12 +42,26 @@ public class InputIllegalMethodCall
     }
 
 
+    private void baz()
+    {
+        Inner1 inner1 = new Inner1();
+        String foo = inner1.method1("foo");
+        inner1.<String>method1("foo");
+    }
+
 
     public static class Inner1 {
         private static void forName(final String pFoo)
         {
             // comment
         }
+
+        private <T> T method1(final T pFoo)
+        {
+            // comment
+            return pFoo;
+        }
+
         public static class Inner2 {
             private static void forName(final String pFoo)
             {
