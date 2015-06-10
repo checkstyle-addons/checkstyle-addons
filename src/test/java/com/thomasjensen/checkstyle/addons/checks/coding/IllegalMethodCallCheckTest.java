@@ -143,5 +143,33 @@ public class IllegalMethodCallCheckTest
         };
         verify(checkConfig, sInputFilePath, expected);
     }
+
+
+
+    @Test
+    public void testTypeArgument1()
+        throws Exception
+    {
+        final DefaultConfiguration checkConfig = createCheckConfig(IllegalMethodCallCheck.class);
+        checkConfig.addAttribute("illegalMethodNames", "method1");
+        final String[] expected = {
+            "48:29: Illegal method call: method1()",
+            "49:24: Illegal method call: method1()",
+        };
+        verify(checkConfig, sInputFilePath, expected);
+    }
+
+
+
+    @Test
+    public void testTypeArgument2Exclusion()
+        throws Exception
+    {
+        final DefaultConfiguration checkConfig = createCheckConfig(IllegalMethodCallCheck.class);
+        checkConfig.addAttribute("illegalMethodNames", "method1");
+        checkConfig.addAttribute("excludedQualifiers", "inner1");
+        final String[] expected = {};
+        verify(checkConfig, sInputFilePath, expected);
+    }
 }
 
