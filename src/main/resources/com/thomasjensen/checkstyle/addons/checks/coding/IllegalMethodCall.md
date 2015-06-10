@@ -20,8 +20,10 @@ This check must be configured explicitly for certain method names; it does nothi
     <span class="proptype"><a href="http://checkstyle.sourceforge.net/property_types.html#stringSet">StringSet</a></span></dt>
 <dd><span class="propdesc">Comma-separated list of method call qualifiers which indicate that a call should be excluded.
         For example, if the call was <code>JAXBContext.newInstance();</code>, then <code>JAXBContext</code>
-        is the qualifier (anything that comes before the dot). In other words, method calls with one of the qualifiers
-        listed here are <i>not</i> illegal.</span>
+        is the qualifier (the part of the full identifier that comes before the dot). In other words, method calls
+        with one of the qualifiers listed here are <i>not</i> illegal. Note that only identifiers can be used here,
+        not expressions. Also, type arguments are ignored: For example, <code>Foo.&lt;String&gt;legalMethod(arg)</code>
+        has the qualifier <code>Foo</code>.</span>
     <span class="propdefault">none</span></dd>
 </dl>
 
