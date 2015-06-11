@@ -153,6 +153,14 @@ javadoc {
             'http://javadocs.sonarsource.org/3.0/apidocs/',
             'http://checkstyle.sourceforge.net/apidocs/');
     }
+
+    // javadoc does not inherit the proxy settings (https://issues.gradle.org/browse/GRADLE-1228)
+    if (System.properties['http.proxyHost'] != null) {
+        options.jFlags('-DproxyHost=' + System.properties['http.proxyHost'],
+                '-DproxyPort=' + System.properties['http.proxyPort'],
+                '-DproxyUser=' + System.properties['http.proxyUser'],
+                '-DproxyPassword=' + System.properties['http.proxyPassword']);
+    }
 }
 
 
