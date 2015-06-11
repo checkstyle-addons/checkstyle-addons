@@ -32,6 +32,9 @@
         <property-metadata name="illegalMethodNames" datatype="String">
             <description>%IllegalMethodCall.illegalMethodNames</description>
         </property-metadata>
+        <property-metadata name="excludedQualifiers" datatype="String">
+            <description>%IllegalMethodCall.excludedQualifiers</description>
+        </property-metadata>
         <message-key key="illegal.method.call"/>
     </rule-metadata>
 
