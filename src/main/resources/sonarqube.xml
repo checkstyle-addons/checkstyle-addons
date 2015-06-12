@@ -87,7 +87,10 @@
             - ``{4}`` - fully qualified name of the outer class as a path of ``..``'s, for example ``../../..``
             - ``{5}`` - the package name as a path, for example ``com/foo``
             - ``{6}`` - simple name of the outer class, for example ``Bar``
-            - ``{7}`` - simple name of the inner class, for example ``Inner``</description>
+            - ``{7}`` - simple name of the inner class, for example ``Inner``
+            - ``{8}`` - simple name of the first subdirectory below the current working directory on the path to the message catalog, for example ``subdir1``
+            - ``{9}`` - simple name of the next subdirectory on the path to the message catalog, for example ``subdir2``
+            - ``{10}`` - simple name of the third subdirectory on the path to the message catalog, for example ``subdir3``</description>
         </param>
         <param key="propertyFileEncoding" type="STRING">
             <description>Character encoding of the property files. Only relevant if non-ASCII characters appear in the property keys.</description>

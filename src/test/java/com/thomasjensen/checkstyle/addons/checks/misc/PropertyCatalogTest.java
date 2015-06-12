@@ -16,6 +16,7 @@ package com.thomasjensen.checkstyle.addons.checks.misc;
  */
 
 import java.io.File;
+import java.io.IOException;
 
 import com.puppycrawl.tools.checkstyle.DefaultConfiguration;
 import com.thomasjensen.checkstyle.addons.BaseCheckTestSupport;
@@ -33,24 +34,42 @@ public class PropertyCatalogTest
 {
     @Test
     public void testPropertyFileTemplate()
+        throws IOException
     {
-        PropertyCatalogCheck check = new PropertyCatalogCheck();
-        check.setPropertyFile("|{0}|{1}|{2}|{3}|{4}|{5}|{6}|{7}|");
+        PropertyCatalogCheck check = new PropertyCatalogCheck(getPath("misc/InputPropertyCatalog1.java"));
+        check.setPropertyFile("|{0}|{1}|{2}|{3}|{4}|{5}|{6}|{7}|{8}|{9}|{10}|");
 
         String s = check.buildPropertyFilePath("com.foo.Bar$Inner");
-        Assert.assertEquals("|com.foo.Bar$Inner|com/foo/Bar/Inner|com.foo.Bar|com/foo/Bar|../../..|com/foo|Bar|Inner|",
+        Assert.assertEquals("|com.foo.Bar$Inner|com/foo/Bar/Inner|com.foo.Bar|com/foo/Bar|../../..|com/foo|Bar|Inner|"
+                + "src|test|resources|",
             s);
 
         s = check.buildPropertyFilePath("com.foo.Bar$Inner1$Inner2");
         Assert.assertEquals(
-            "|com.foo.Bar$Inner1$Inner2|com/foo/Bar/Inner1/Inner2|com.foo.Bar|com/foo/Bar|../../..|com/foo|Bar|Inner2|",
+            "|com.foo.Bar$Inner1$Inner2|com/foo/Bar/Inner1/Inner2|com.foo.Bar|com/foo/Bar|../../..|com/foo|Bar|Inner2|"
+                + "src|test|resources|",
             s);
 
         s = check.buildPropertyFilePath("com.foo.Bar");
-        Assert.assertEquals("|com.foo.Bar|com/foo/Bar|com.foo.Bar|com/foo/Bar|../../..|com/foo|Bar|null|", s);
+        Assert.assertEquals("|com.foo.Bar|com/foo/Bar|com.foo.Bar|com/foo/Bar|../../..|com/foo|Bar|null|"
+            + "src|test|resources|", s);
 
         s = check.buildPropertyFilePath("Bar");
-        Assert.assertEquals("|Bar|Bar|Bar|Bar|..||Bar|null|", s);
+        Assert.assertEquals("|Bar|Bar|Bar|Bar|..||Bar|null|src|test|resources|", s);
+    }
+
+
+
+    @Test
+    public void testPropertyFileTemplateParent()
+        throws IOException
+    {
+        PropertyCatalogCheck check = new PropertyCatalogCheck(getPath("misc/InputPropertyCatalog1.java"));
+        check.setPropertyFile("{8}");
+
+        String s = check.buildPropertyFilePath("com.foo.Bar$Inner");
+        Assert.assertNotNull(s);
+        Assert.assertTrue(s.length() > 0);
     }
 
 

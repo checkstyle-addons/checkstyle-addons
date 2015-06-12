@@ -76,6 +76,8 @@ public class PropertyCatalogCheck
      */
     private final Deque<Set<CatalogEntry>> catalogEntries = new LinkedList<Set<CatalogEntry>>();
 
+    private final File mockFile;
+
     /*
      * --------------- Check properties: ---------------------------------------------------------------------------
      */
@@ -106,6 +108,34 @@ public class PropertyCatalogCheck
 
     /** <code>true</code> if property keys should be case sensitive, <code>false</code> otherwise */
     private boolean caseSensitiveKeys = true;
+
+
+
+    /**
+     * Constructor.
+     */
+    public PropertyCatalogCheck()
+    {
+        this(null);
+    }
+
+
+
+    PropertyCatalogCheck(final String pMockFile)
+    {
+        super();
+        mockFile = pMockFile != null ? new File(pMockFile) : null;
+    }
+
+
+
+    private File getCurrentFilename()
+    {
+        if (mockFile != null) {
+            return mockFile;
+        }
+        return new File(getFileContents().getFilename());
+    }
 
 
 
@@ -144,7 +174,7 @@ public class PropertyCatalogCheck
             return;
         }
 
-        final File propFile = new File(buildPropertyFilePath(pBinaryClassName));
+        final File propFile = normalize(buildPropertyFilePath(pBinaryClassName));
         final Map<String, String> props = loadPropertyFile(propFile);
         if (props == null) {
             String absolutePath = propFile.getAbsolutePath();
@@ -154,6 +184,18 @@ public class PropertyCatalogCheck
         }
 
         checkCatalog(pAst, collectedEntries, props, propFile);
+    }
+
+
+
+    private File normalize(@Nonnull final String pFilePath)
+    {
+        File result = new File(pFilePath);
+        if (!result.isAbsolute()) {
+            final File cwd = Util.canonize(new File("."));
+            result = Util.canonize(new File(cwd, pFilePath));
+        }
+        return result;
     }
 
 
@@ -232,8 +274,44 @@ public class PropertyCatalogCheck
         pg = pg != null ? pg.replace('.', '/') : "";
         final String pkgPath = pg.endsWith("/") ? pg.substring(0, pg.length() - 1) : "";
 
+        final int numSubdirs = 3;
+        String[] subdir = getFirstSubdirs(numSubdirs);
+
         return MessageFormat.format(propertyFileTemplate, pBinaryClassName, completePath, outerFqcn, outerFqcnPath,
-            outerFqcnBackrefs, pkgPath, outerSimpleName, innerSimpleName);
+            outerFqcnBackrefs, pkgPath, outerSimpleName, innerSimpleName, subdir[0], subdir[1], subdir[2]);
+    }
+
+
+
+    /**
+     * Assuming that the currently analyzed file is located below the current working directory, this method returns a
+     * new array of exactly <code>pNumSubdirs</code> elements containing the simple names of the directories on the path
+     * to the currently analyzed file, starting just below the current working directory.
+     *
+     * @param pNumSubdirs the number of subdirectory names to return. If fewer exist, they are padded with
+     * <code>null</code>
+     * @return the first n subdirs, where non-existing elements are <code>null</code>
+     */
+    @Nonnull
+    private String[] getFirstSubdirs(final int pNumSubdirs)
+    {
+        String[] result = new String[pNumSubdirs];
+        Arrays.fill(result, null);
+
+        final File cwd = Util.canonize(new File("."));
+        final File thisFile = Util.canonize(getCurrentFilename());
+        if (thisFile.getPath().startsWith(cwd.getPath())) {
+
+            final String relPath = thisFile.getPath().substring(cwd.getPath().length() + 1);  // incl. separator char
+            final String[] pathElements = relPath.split(Pattern.quote(File.separator), pNumSubdirs + 1);
+            int i = 0;
+            for (String elem : pathElements) {
+                if (i < pNumSubdirs) {
+                    result[i++] = elem;
+                }
+            }
+        }
+        return result;
     }
 
 
