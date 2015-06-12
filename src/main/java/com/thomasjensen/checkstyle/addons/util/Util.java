@@ -153,6 +153,7 @@ public final class Util
      * @param pFile a file
      * @return the canonical representation, or the absolute representation
      */
+    @Nonnull
     public static File canonize(@Nonnull final File pFile)
     {
         File result = null;
