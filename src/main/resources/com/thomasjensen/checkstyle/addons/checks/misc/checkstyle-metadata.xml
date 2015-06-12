@@ -33,6 +33,9 @@
         <property-metadata name="enumArgument" datatype="Boolean" default-value="false">
             <description>%PropertyCatalog.enumArgument</description>
         </property-metadata>
+        <property-metadata name="baseDir" datatype="String" default-value=".">
+            <description>%PropertyCatalog.baseDir</description>
+        </property-metadata>
         <property-metadata name="propertyFile" datatype="String">
             <description>%PropertyCatalog.propertyFile</description>
         </property-metadata>

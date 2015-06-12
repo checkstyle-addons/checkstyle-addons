@@ -78,6 +78,10 @@
             <description>If ``true``, the first argument of the enum constructor is used as property key. If ``false``, the enum constant itself is used as the property key. Ignored if the type is not an ``enum``.</description>
             <defaultValue>false</defaultValue>
         </param>
+        <param key="baseDir" type="STRING">
+            <description>Base directory to assume for the check execution, usually the project root</description>
+            <defaultValue>.</defaultValue>
+        </param>
         <param key="propertyFile" type="STRING">
             <description>Template path to the property file. For constructing the path, the following placeholders may be used (examples for ``com.foo.Bar$Inner``):
             - ``{0}`` - the original binary class name, for example ``com.foo.Bar$Inner``

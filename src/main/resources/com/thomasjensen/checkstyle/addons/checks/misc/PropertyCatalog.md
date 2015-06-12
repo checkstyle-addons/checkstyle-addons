@@ -106,9 +106,14 @@ This check find duplicate keys in the Java code, but not in the property file. U
         enum, then this property is ignored.</span>
     <span class="propdefault"><code>false</code></span></dd>
 
+<dt><span class="propname">baseDir</span>
+    <span class="proptype"><a href="http://checkstyle.sourceforge.net/property_types.html#string">String</a></span></dt>
+<dd><span class="propdesc">Base directory to assume for the check execution, usually the project root</span>
+    <span class="propdefault"><code>.</code></span></dd>
+
 <dt><span class="propname">propertyFile</span>
     <span class="proptype"><a href="http://checkstyle.sourceforge.net/property_types.html#string">String</a></span></dt>
-<dd><span class="propdesc">Template for the property file path. In this template, the following placeholders may be
+<dd><span class="propdesc">Template for the property file path. Relative paths are resolved against the <code>baseDir</code>. In this template, the following placeholders may be
     used (examples are for <code>com.foo.Bar$Inner</code>):</span>
     <dl class="inner"><dt><code>{0}</code></dt>
         <dd>the original binary class name (<code>com.foo.Bar$Inner</code>)</dd>
@@ -127,7 +132,7 @@ This check find duplicate keys in the Java code, but not in the property file. U
         <dt><code>{7}</code></dt>
         <dd>simple name of the inner class (<code>Inner</code>)</dd>
         <dt><code>{8}</code></dt>
-        <dd>simple name of the first subdirectory below the current working directory on the path to the message catalog (<code>subdir1</code>). This placeholder, as well as ``{9}`` and ``{10}`` are useful if your project being analyzed consists of submodules.</dd>
+        <dd>simple name of the first subdirectory below the <code>baseDir</code> on the path to the message catalog (<code>subdir1</code>). This placeholder, as well as ``{9}`` and ``{10}`` are useful if your project being analyzed consists of submodules.</dd>
         <dt><code>{9}</code></dt>
         <dd>simple name of the next subdirectory on the path to the message catalog (<code>subdir2</code>)</dd>
         <dt><code>{10}</code></dt>
@@ -165,15 +170,16 @@ In the following example, it is assumed that you have a naming convention which 
 {% highlight xml %}
 <module name="PropertyCatalog">
   <property name="selection" value="\wCatalog$"/>
-  <property name="propertyFile" value="${workspace_loc}/MyProject/src/main/resources/{1}.properties"/>
+  <property name="baseDir" value="${workspace_loc}"/>
+  <property name="propertyFile" value="MyProject/src/main/resources/{1}.properties"/>
 </module>
 {% endhighlight %}
 
-The above example is for [Eclipse](http://eclipse-cs.sourceforge.net/#!/properties), where `${workspace_loc}` may be used to refer to the file system location of the current workspace. For SonarQube, you may use relative file paths. For the other environments, you may define a custom [module property](http://checkstyle.sourceforge.net/config.html#Properties), which you dynamically set to the project directory. Example for Gradle (here, `projectDir` was used instead of `workspace_loc`):
+The above example is for Eclipse, where `${workspace_loc}` may be used to [refer](http://eclipse-cs.sourceforge.net/#!/properties) to the file system location of the current workspace. For SonarQube, you may use relative file paths. For the other environments, you may define a custom [module property](http://checkstyle.sourceforge.net/config.html#Properties), which you dynamically set to the project directory. Example for Gradle:
 
 {% highlight groovy %}
 checkstyle {
-    configProperties 'projectDir': project.projectDir;
+    configProperties 'workspace_loc': project.projectDir;
 }
 {% endhighlight %}
 

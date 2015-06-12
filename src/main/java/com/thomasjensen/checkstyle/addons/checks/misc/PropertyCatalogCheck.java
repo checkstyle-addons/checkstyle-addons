@@ -20,6 +20,8 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStreamReader;
+import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Method;
 import java.nio.charset.Charset;
 import java.text.MessageFormat;
 import java.util.Arrays;
@@ -39,6 +41,7 @@ import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 
 import com.puppycrawl.tools.checkstyle.api.DetailAST;
+import com.puppycrawl.tools.checkstyle.api.FileContents;
 import com.puppycrawl.tools.checkstyle.api.TokenTypes;
 import com.thomasjensen.checkstyle.addons.checks.AbstractAddonsCheck;
 import com.thomasjensen.checkstyle.addons.util.Util;
@@ -81,6 +84,9 @@ public class PropertyCatalogCheck
     /*
      * --------------- Check properties: ---------------------------------------------------------------------------
      */
+
+    /** the base directory to be assumed for this check, usually the project's root directory */
+    private File baseDir = Util.canonize(new File("."));
 
     /** Regexp that matches the Java sources which are property catalogs */
     private Pattern selection = Util.NEVER_MATCH;
@@ -134,7 +140,38 @@ public class PropertyCatalogCheck
         if (mockFile != null) {
             return mockFile;
         }
-        return new File(getFileContents().getFilename());
+
+        // the remainder of this method is a workaround for Checkstyle issue #1205
+        // https://github.com/checkstyle/checkstyle/issues/1205
+        final FileContents fileContents = getFileContents();
+        Method getFilename = null;
+        try {
+            getFilename = fileContents.getClass().getMethod("getFileName");
+        }
+        catch (NoSuchMethodException e) {
+            try {
+                getFilename = fileContents.getClass().getMethod("getFilename");
+            }
+            catch (NoSuchMethodException e1) {
+                throw new UnsupportedOperationException("FileContents.getFilename()", e);
+            }
+        }
+
+        String filename = null;
+        if (getFilename != null) {
+            try {
+                filename = (String) getFilename.invoke(fileContents);
+            }
+            catch (IllegalAccessException e) {
+                throw new UnsupportedOperationException("FileContents.getFilename()", e);
+            }
+            catch (InvocationTargetException e) {
+                throw new UnsupportedOperationException("FileContents.getFilename()", e);
+            }
+        }
+
+        File result = filename != null ? new File(filename) : null;
+        return result;
     }
 
 
@@ -192,8 +229,7 @@ public class PropertyCatalogCheck
     {
         File result = new File(pFilePath);
         if (!result.isAbsolute()) {
-            final File cwd = Util.canonize(new File("."));
-            result = Util.canonize(new File(cwd, pFilePath));
+            result = Util.canonize(new File(baseDir, pFilePath));
         }
         return result;
     }
@@ -298,11 +334,10 @@ public class PropertyCatalogCheck
         String[] result = new String[pNumSubdirs];
         Arrays.fill(result, null);
 
-        final File cwd = Util.canonize(new File("."));
         final File thisFile = Util.canonize(getCurrentFilename());
-        if (thisFile.getPath().startsWith(cwd.getPath())) {
+        if (thisFile.getPath().startsWith(baseDir.getPath())) {
 
-            final String relPath = thisFile.getPath().substring(cwd.getPath().length() + 1);  // incl. separator char
+            final String relPath = thisFile.getPath().substring(baseDir.getPath().length() + 1); // incl. separator char
             final String[] pathElements = relPath.split(Pattern.quote(File.separator), pNumSubdirs + 1);
             int i = 0;
             for (String elem : pathElements) {
@@ -485,6 +520,13 @@ public class PropertyCatalogCheck
             result = selection.matcher(pBinaryClassName).find();
         }
         return result;
+    }
+
+
+
+    public void setBaseDir(final String pBaseDir)
+    {
+        baseDir = Util.canonize(new File(pBaseDir));
     }
 
 
