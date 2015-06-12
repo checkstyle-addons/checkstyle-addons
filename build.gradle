@@ -190,6 +190,12 @@ tasks.withType(Test) { task ->
         append = false
     }
 }
+test {
+    testLogging {
+        events 'started', 'skipped', 'passed', 'failed';
+        exceptionFormat 'full';
+    }
+}
 
 
 /*
