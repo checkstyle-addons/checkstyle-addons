@@ -16,6 +16,7 @@ package com.thomasjensen.checkstyle.addons.util;
  */
 
 import java.io.Closeable;
+import java.io.File;
 import java.io.IOException;
 
 import com.puppycrawl.tools.checkstyle.api.DetailAST;
@@ -66,5 +67,21 @@ public class UtilTest
         ast.setColumnNo(0);
         ast.setText("foo");
         Assert.assertNull(Util.getFirstIdent(ast));
+    }
+
+
+
+    @Test
+    public void testCanonize()
+    {
+        File f = new File(".");
+        File c = Util.canonize(f);
+        Assert.assertTrue(c.isAbsolute());
+        Assert.assertFalse(c.getPath().contains("/./") || c.getPath().contains("\\.\\"));
+
+        f = new File("./\u0000");
+        c = Util.canonize(f);
+        Assert.assertTrue(c.isAbsolute());
+        Assert.assertTrue(c.getPath().endsWith("." + File.separator + '\u0000'));
     }
 }

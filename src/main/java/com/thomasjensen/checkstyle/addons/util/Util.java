@@ -16,6 +16,7 @@ package com.thomasjensen.checkstyle.addons.util;
  */
 
 import java.io.Closeable;
+import java.io.File;
 import java.io.IOException;
 import java.util.regex.Pattern;
 import javax.annotation.CheckForNull;
@@ -142,5 +143,25 @@ public final class Util
                 // ignore
             }
         }
+    }
+
+
+
+    /**
+     * Calls getCanonicalFile() on the given File; if that doesn't work, call getAbsoluteFile() on it.
+     *
+     * @param pFile a file
+     * @return the canonical representation, or the absolute representation
+     */
+    public static File canonize(@Nonnull final File pFile)
+    {
+        File result = null;
+        try {
+            result = pFile.getCanonicalFile();
+        }
+        catch (IOException e) {
+            result = pFile.getAbsoluteFile();
+        }
+        return result;
     }
 }
