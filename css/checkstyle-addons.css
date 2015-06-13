@@ -273,6 +273,9 @@ table.csa-version-table tr td:last-child, table.csa-version-table tr th:last-chi
     border: 0;
     padding: 0 5px 0 0;
 }
+.checkpage dl dl.inner > dt:nth-of-type(2n), .checkpage dl dl.inner > dd:nth-of-type(2n) {
+    background-color: inherit;
+}
 .checkpage dl dl.inner > dt:after {
     content: " – ";
     font-weight: normal;
