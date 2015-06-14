@@ -14,8 +14,8 @@ The property catalog code could look like this (other forms are possible, see be
 {% highlight java %}
 public enum PropertyCatalog {
   SomeConstant("zero"),
-  AnotherConstant("two"),  // Duplicate!
-  AThirdConstant("two"),
+  AnotherConstant("two"),
+  AThirdConstant("two"),  // Duplicate!
   YetAnotherConstant("three");
 
   private final int code;
@@ -132,7 +132,7 @@ This check find duplicate keys in the Java code, but not in the property file. U
         <dt><code>{7}</code></dt>
         <dd>simple name of the inner class (<code>Inner</code>)</dd>
         <dt><code>{8}</code></dt>
-        <dd>simple name of the first subdirectory below the <code>baseDir</code> on the path to the message catalog (<code>subdir1</code>). This placeholder, as well as ``{9}`` and ``{10}`` are useful if your project being analyzed consists of submodules.</dd>
+        <dd>simple name of the first subdirectory below the <code>baseDir</code> on the path to the message catalog (<code>subdir1</code>). This placeholder, as well as <code>{9}</code> and <code>{10}</code> are useful if your project being analyzed consists of submodules.</dd>
         <dt><code>{9}</code></dt>
         <dd>simple name of the next subdirectory on the path to the message catalog (<code>subdir2</code>)</dd>
         <dt><code>{10}</code></dt>
