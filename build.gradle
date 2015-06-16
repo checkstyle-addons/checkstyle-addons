@@ -35,13 +35,7 @@ group = 'com.thomasjensen.checkstyle.addons';
 version = '1.2.2-SNAPSHOT';
 description = 'Additional Checkstyle Checks';
 ext {
-    versions = ['Java': '1.7',
-        'Checkstyle': '6.4.1',
-        'FindBugs': '3.0.0',
-        'SonarQube': '3.0',
-        'SQManifest': '4.5.1',
-        'SQJavaPlugin': '2.2',
-        'SQCheckstylePlugin': '2.3'];
+    versions = readDependencyVersions();
     assert versions.size() == 7;
     // TODO Establish additional "legacy config" for Java 6
     bundledConfigurations = ['runtime'];
@@ -195,6 +189,34 @@ test {
         events 'started', 'skipped', 'passed', 'failed';
         exceptionFormat 'full';
     }
+}
+
+
+/*
+ * Read project/deps_<config>.properties to build the dependency map
+ */
+def Map<String, String> readDependencyVersions()
+{
+    final String depsPropName = 'checkstyleaddons_deps';
+    def depsCfgName = project.hasProperty(depsPropName) ? project.property(depsPropName) : System.getenv(depsPropName);
+    if (depsCfgName == null) {
+        depsCfgName = 'default';
+    }
+    final File depsCfgFile = new File("project/deps_${depsCfgName}.properties");
+
+    System.out.println('--------------------------------------------------------------------------------------------');
+    System.out.println('Dependency configuration: ' + depsCfgFile);
+
+    def props = new Properties();
+    depsCfgFile.withInputStream {
+        InputStream stream -> props.load(stream);
+    }
+
+    System.out.println(props.getProperty('Description'));
+    System.out.println('--------------------------------------------------------------------------------------------');
+
+    props.remove('Description');
+    return new HashMap<>(props);
 }
 
 
