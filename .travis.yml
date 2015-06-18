@@ -4,16 +4,23 @@ jdk:
   - openjdk7
   - oraclejdk7
 
-# This will be reactivated when Java 6 legacy support is enabled in the build files.
-# When that happens, we should make sure that the compiler vendor matched the build compiler vendor
-#env:
-#  global:
-#    - checkstyleaddons_jdk6_javac=/usr/lib/jvm/java-6-openjdk-amd64/bin/javac
-
 before_install:
   - ls -a
   - pwd
 #  - sudo update-alternatives --config java
 
+env:
+  -
+  - checkstyleaddons_deps=cs6.1.1
+  - checkstyleaddons_deps=java6 checkstyleaddons_jdk6_javac=/usr/lib/jvm/java-6-openjdk-amd64/bin/javac
+
 after_success:
   - ./gradlew jacocoTestReport coveralls
+
+cache:
+  directories:
+  - ~/.gradle
+
+#branches:
+#  only:
+#  - master
