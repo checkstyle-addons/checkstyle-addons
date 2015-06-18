@@ -70,7 +70,7 @@ idea.module {
 
 
 /*
- * Compile with Java 6 for now
+ * Sometimes a different compiler is requested
  */
 final String jdk6PropName = 'checkstyleaddons_jdk6_javac';
 def javac6 = project.hasProperty(jdk6PropName) ? project.property(jdk6PropName) : System.getenv(jdk6PropName);
@@ -89,10 +89,14 @@ tasks.withType(JavaCompile) {
     }
     doFirst {
         if ('1.6'.equals(versions.Java) && javac6 == null) {
-            throw new GradleException('WARNING: Property \'' + jdk6PropName + '\' not defined in gradle.properties. ' +
+            throw new GradleException('ERROR: Property \'' + jdk6PropName + '\' not defined in gradle.properties. ' +
                 'It must point to a Java 6 compiler executable.');
         }
     }
+}
+if ("NOT_SUPPORTED".equals(versions.SonarQube)) {
+    sourceSets.main.java.exclude '**/sonarqube/**';
+    sourceSets.test.java.exclude '**/sonarqube/**';
 }
 
 
@@ -117,7 +121,9 @@ sourceSets.test.runtimeClasspath += configurations.provided;
 dependencies {
     provided group: 'com.google.code.findbugs', name: 'annotations', version: versions.FindBugs;
     provided group: 'com.google.code.findbugs', name: 'jsr305', version: versions.FindBugs;
-    provided group: 'org.codehaus.sonar', name: 'sonar-plugin-api', version: versions.SonarQube;
+    if (!"NOT_SUPPORTED".equals(versions.SonarQube)) {
+        provided group: 'org.codehaus.sonar', name: 'sonar-plugin-api', version: versions.SonarQube;
+    }
     compile group: 'com.puppycrawl.tools', name: 'checkstyle', version: versions.Checkstyle;
     testCompile group: 'junit', name: 'junit', version: '4.11';
 }
@@ -164,7 +170,7 @@ javadoc {
 checkstyle {
     configFile file('project/checkstyle.xml');
     configProperties 'projectDir': project.projectDir;
-    toolVersion versions.Checkstyle;
+    toolVersion '6.4.1';  // depends on our checkstyle.xml; has nothing to do with the version used for building
     showViolations = true;
     ignoreFailures = false;
 }

@@ -247,6 +247,10 @@ def String getGitHash() {
 
 task jarSonarQube(type: Jar, dependsOn: jar) {
     description = 'Checkstyle-Addons: Assembles the SonarQube plugin';
+    if ("NOT_SUPPORTED".equals(versions.SonarQube)) {
+        enabled = false;
+    }
+
     final String pluginKey = 'checkstyleaddons';
     archiveName = 'sonar-' + pluginKey + '-' + project.version + '.jar';
     final File mainCheckJar = project.tasks['jar'].getProperties().get('archivePath');
