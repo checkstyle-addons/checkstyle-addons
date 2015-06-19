@@ -21,6 +21,6 @@ cache:
   directories:
   - ~/.gradle
 
-#branches:
-#  only:
-#  - master
+branches:
+  only:
+  - master
