@@ -35,9 +35,9 @@ group = 'com.thomasjensen.checkstyle.addons';
 version = '1.2.2-SNAPSHOT';
 description = 'Additional Checkstyle Checks';
 ext {
-    versions = readDependencyVersions();
+    depConfig = getActiveDepConfig();
+    versions = readDependencyVersions(depConfig);
     assert versions.size() == 7;
-    // TODO Establish additional "legacy config" for Java 6
     bundledConfigurations = ['runtime'];
     authorName = 'Thomas Jensen';
     longName = 'Checkstyle Addons';
@@ -72,8 +72,6 @@ idea.module {
 /*
  * Sometimes a different compiler is requested
  */
-final String jdk6PropName = 'checkstyleaddons_jdk6_javac';
-def javac6 = project.hasProperty(jdk6PropName) ? project.property(jdk6PropName) : System.getenv(jdk6PropName);
 tasks.withType(JavaCompile) {
     sourceCompatibility = versions.Java;
     targetCompatibility = versions.Java;
@@ -83,6 +81,8 @@ tasks.withType(JavaCompile) {
     // NullUsageProcessor' less than -source '1.7'" is okay and may be ignored. It will go away when Checkstyle
     // updates to ANTLR 4.5: https://github.com/antlr/antlr4/issues/487
 
+    final String jdk6PropName = 'checkstyleaddons_jdk6_javac';
+    def javac6 = project.hasProperty(jdk6PropName) ? project.property(jdk6PropName) : System.getenv(jdk6PropName);
     if ('1.6'.equals(versions.Java) && javac6 != null) {
         options.fork = true;
         options.forkOptions.executable = javac6;
@@ -149,7 +149,8 @@ javadoc {
             'http://javadocs.sonarsource.org/3.0/apidocs/',
             'http://checkstyle.sourceforge.net/apidocs/');
     } else if ('1.6'.equals(versions.Java)) {
-        options.links('http://docs.oracle.com/javase/6/docs/api/',
+        options.links('https://jsr-305.googlecode.com/svn/trunk/javadoc/',
+            'http://docs.oracle.com/javase/6/docs/api/',
             'http://javadocs.sonarsource.org/3.0/apidocs/',
             'http://checkstyle.sourceforge.net/apidocs/');
     }
@@ -199,16 +200,21 @@ test {
 
 
 /*
- * Read project/deps_<config>.properties to build the dependency map
+ * Read project/deps_${depConfig}.properties to build the dependency map
  */
-def Map<String, String> readDependencyVersions()
+def String getActiveDepConfig()
 {
     final String depsPropName = 'checkstyleaddons_deps';
     def depsCfgName = project.hasProperty(depsPropName) ? project.property(depsPropName) : System.getenv(depsPropName);
     if (depsCfgName == null) {
         depsCfgName = 'default';
     }
-    final File depsCfgFile = new File("project/deps_${depsCfgName}.properties");
+    return depsCfgName;
+}
+
+def Map<String, String> readDependencyVersions(final String pDepConfig)
+{
+    final File depsCfgFile = new File("project/deps_${pDepConfig}.properties");
 
     System.out.println('--------------------------------------------------------------------------------------------');
     System.out.println('Dependency configuration: ' + depsCfgFile);

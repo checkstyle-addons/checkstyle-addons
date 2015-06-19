@@ -58,10 +58,14 @@ def Set<File> getPublishedDependencyLibs(final Project pProject, final boolean p
     return result;
 }
 
+
+
 def boolean isCheckstyle(final ResolvedDependency pDependency) {
     return pDependency != null && 'com.puppycrawl.tools'.equals(pDependency.getModuleGroup()) &&
         'checkstyle'.equals(pDependency.getModuleName());
 }
+
+
 
 def String flattenPrefixLibs(final String pPrefix, final Set<File> pLibs, final char pSeparator)
 {
@@ -81,6 +85,7 @@ def String flattenPrefixLibs(final String pPrefix, final Set<File> pLibs, final 
 }
 
 
+
 def void buildPluginPomProps(final File pPomPropsFile)
 {
     List<String> entries = new ArrayList<>();
@@ -93,10 +98,14 @@ def void buildPluginPomProps(final File pPomPropsFile)
 }
 
 
-//project.tasks['jar'].dependsOn project.tasks['generatePomFileForCheckstyleAddonsPublication'];
+
 model {
     tasks.jar {
         dependsOn project.tasks['generatePomFileForCheckstyleAddonsPublication'];
+
+        if (!"default".equals(project.ext.depConfig)) {
+            appendix = project.ext.depConfig;
+        }
 
         final File pluginPom = tasks.generatePomFileForCheckstyleAddonsPublication.destination;
         inputs.files pluginPom;
@@ -152,6 +161,8 @@ model {
     }
 }
 
+
+
 task jarSources(type: Jar, dependsOn: classes) {
     from sourceSets.main.allSource
     exclude '**/*.xml';
@@ -160,6 +171,10 @@ task jarSources(type: Jar, dependsOn: classes) {
     exclude '**/checkstyle-metadata.*';
     into('META-INF') {
         from 'LICENSE';
+    }
+
+    if (!"default".equals(project.ext.depConfig)) {
+        appendix = project.ext.depConfig;
     }
     classifier = 'sources';
     manifest = jar.manifest;
@@ -170,10 +185,16 @@ task jarSources(type: Jar, dependsOn: classes) {
     }
 }
 
+
+
 task jarJavadoc(type: Jar, dependsOn: javadoc) {
     from javadoc.destinationDir
     into('META-INF') {
         from 'LICENSE';
+    }
+
+    if (!"default".equals(project.ext.depConfig)) {
+        appendix = project.ext.depConfig;
     }
     classifier = 'javadoc';
     manifest = jar.manifest;
@@ -185,9 +206,10 @@ task jarJavadoc(type: Jar, dependsOn: javadoc) {
 }
 
 
+
 task jarEclipse(type: Jar, dependsOn: classes) {
     description = 'Checkstyle-Addons: Assembles the Eclipse-CS plugin';
-    appendix = 'eclipse';
+    appendix = "default".equals(project.ext.depConfig) ? 'eclipse' : ('eclipse-' + project.ext.depConfig);
 
     into('META-INF') {
         from 'LICENSE';
@@ -239,10 +261,12 @@ task jarEclipse(type: Jar, dependsOn: classes) {
 }
 
 
+
 def String getGitHash() {
     def grgit = Grgit.open(project.file('.'));
     return grgit.head().id;
 }
+
 
 
 task jarSonarQube(type: Jar, dependsOn: jar) {
@@ -252,7 +276,9 @@ task jarSonarQube(type: Jar, dependsOn: jar) {
     }
 
     final String pluginKey = 'checkstyleaddons';
-    archiveName = 'sonar-' + pluginKey + '-' + project.version + '.jar';
+    archiveName = 'sonar-' + pluginKey +
+            ("default".equals(project.ext.depConfig) ? '' : ('-' + project.ext.depConfig)) +
+            '-' + project.version + '.jar';
     final File mainCheckJar = project.tasks['jar'].getProperties().get('archivePath');
 
     into('META-INF') {
@@ -326,6 +352,7 @@ def Map<String, String> mfAttrStd() {
     Map<String, String> result = new HashMap<>();
     result.put('Manifest-Version', '1.0');
     result.put('Website', project.ext.website);
+    result.put('Dependency-Configuration', project.ext.depConfig);
     result.put('Created-By', GradleVersion.current().toString());
     result.put('Built-By', System.getProperty('user.name'));
     result.put('Build-Jdk', Jvm.current());
