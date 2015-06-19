@@ -32,7 +32,7 @@ repositories {
 
 
 group = 'com.thomasjensen.checkstyle.addons';
-version = '1.2.2-SNAPSHOT';
+version = readVersionProps();
 description = 'Additional Checkstyle Checks';
 ext {
     depConfig = getActiveDepConfig();
@@ -229,6 +229,29 @@ def Map<String, String> readDependencyVersions(final String pDepConfig)
 
     props.remove('Description');
     return new HashMap<>(props);
+}
+
+def String readVersionProps()
+{
+    final File versionFile = new File("project/version.properties");
+    def props = new Properties();
+    versionFile.withInputStream {
+        InputStream stream -> props.load(stream);
+    }
+    
+    final StringBuilder sb = new StringBuilder();
+    sb.append(props.getProperty('major'));
+    sb.append('.');
+    sb.append(props.getProperty('minor'));
+    sb.append('.');
+    sb.append(props.getProperty('patch'));
+    if (!Boolean.parseBoolean(props.getProperty('release'))) {
+        sb.append('-SNAPSHOT');
+    }
+    
+    final String v = sb.toString();
+    System.out.println('Building version: ' + v);
+    return v;
 }
 
 
