@@ -1,0 +1,30 @@
+/*
+ * Checkstyle-Addons - Additional Checkstyle checks
+ * Copyright (C) 2015 Thomas Jensen, All rights reserved.
+ *
+ * This program is free software: you can redistribute it and/or modify it under the
+ * terms of the GNU General Public License, version 3, as published by the Free
+ * Software Foundation.
+ *
+ * This program is distributed in the hope that it will be useful, but WITHOUT ANY
+ * WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A
+ * PARTICULAR PURPOSE. See the GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License along with this
+ * program.  If not, see <http://www.gnu.org/licenses/>.
+ */
+
+
+// We read the dependency configuration name and use it to modify the project name and artifact ID
+def String getActiveDepConfig()
+{
+    final String depsPropName = 'checkstyleaddons_deps';
+    def depsCfgName = settings.hasProperty(depsPropName) ? settings.getProperty(depsPropName) : System.getenv(depsPropName);
+    if (depsCfgName == null) {
+        depsCfgName = 'default';
+    }
+    return depsCfgName;
+}
+final String myDepConfig = getActiveDepConfig();
+
+rootProject.name='checkstyle-addons' + ("default".equals(myDepConfig) ? '' : ('-' + myDepConfig));

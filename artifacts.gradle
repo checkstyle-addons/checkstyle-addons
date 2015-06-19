@@ -103,10 +103,6 @@ model {
     tasks.jar {
         dependsOn project.tasks['generatePomFileForCheckstyleAddonsPublication'];
 
-        if (!"default".equals(project.ext.depConfig)) {
-            appendix = project.ext.depConfig;
-        }
-
         final File pluginPom = tasks.generatePomFileForCheckstyleAddonsPublication.destination;
         inputs.files pluginPom;
 
@@ -173,9 +169,6 @@ task jarSources(type: Jar, dependsOn: classes) {
         from 'LICENSE';
     }
 
-    if (!"default".equals(project.ext.depConfig)) {
-        appendix = project.ext.depConfig;
-    }
     classifier = 'sources';
     manifest = jar.manifest;
     doFirst {
@@ -193,9 +186,6 @@ task jarJavadoc(type: Jar, dependsOn: javadoc) {
         from 'LICENSE';
     }
 
-    if (!"default".equals(project.ext.depConfig)) {
-        appendix = project.ext.depConfig;
-    }
     classifier = 'javadoc';
     manifest = jar.manifest;
     doFirst {
@@ -209,7 +199,7 @@ task jarJavadoc(type: Jar, dependsOn: javadoc) {
 
 task jarEclipse(type: Jar, dependsOn: classes) {
     description = 'Checkstyle-Addons: Assembles the Eclipse-CS plugin';
-    appendix = "default".equals(project.ext.depConfig) ? 'eclipse' : ('eclipse-' + project.ext.depConfig);
+    appendix = 'eclipse';
 
     into('META-INF') {
         from 'LICENSE';
