@@ -272,6 +272,7 @@ table.csa-version-table td.orange {
     border-bottom: 1px solid #dddddd;
     padding-top: 5px;
     padding-bottom: 6px;
+    padding-right: 2px;
 }
 .checkpage dd p {
     margin-bottom: 0;
@@ -334,6 +335,133 @@ div.post-links a.btn {
 }
 table.table-striped tr:last-child {
     border-bottom: 1px solid rgb(221, 221, 221);
+}
+
+/* ------- START Jimmy Bonney Rotation ------- from http://jimmybonney.com/articles/column_header_rotation_css/ */
+
+table.table-header-rotated-jb {
+    width: 96%;
+    margin-top: 1.5em;
+}
+table.table-header-rotated-jb td {
+    width: 40px;
+    border-left: 1px solid #dddddd;
+    border-right: 1px solid #dddddd;
+    text-align: center;
+}
+table.table-header-rotated-jb td.no:before {
+    content: '--';
+}
+table.table-header-rotated-jb td.yes:before {
+    content: '\a0\a0\a0✓\a0\a0\a0';  /* \a0 = &nbsp; */
+}
+table.table-header-rotated-jb tbody > tr:hover {
+    background-color: #def2fc;
+}
+
+table.table-header-rotated-jb tr.subheading > th, table.table-header-rotated-jb tr.subheading_bottom > td {
+    padding: 1px 0;
+    margin: 0;
+    font-size: 0.7em;
+    font-weight: normal;
+    text-align: center;
+    border-right: 1px solid #dddddd;
+    border-top: 0;
+    background-color: white;
+}
+table.table-header-rotated-jb tr.subheading_bottom  {
+    border-top: 2px solid #dddddd;
+}
+table.table-header-rotated-jb tr.subheading_bottom > td > a, table.table-header-rotated-jb tr.subheading > th > a {
+    display: block;
+    width: 100%;
+    height: 100%;
+}
+table.table-header-rotated-jb tr.subheading_bottom > td:first-child {
+    border-left: 0;
+}
+table.table-header-rotated-jb tr.subheading > th:last-child {
+    border-right: 0;
+}
+table.table-header-rotated-jb tr.subheading > th:hover, table.table-header-rotated-jb tr.subheading_bottom > td:hover {
+    background-color: #def2fc;
+    font-weight: bold;
+}
+table.table-header-rotated-jb tr.subheading_bottom > td.nolink:hover, table.table-header-rotated-jb tr.subheading > th.nolink:hover {
+    background-color: white;
+    cursor: inherit;
+    font-weight: normal;
+    text-decoration: none;
+}
+
+/* horizontal groups by checkstyle java level */
+table.table-header-rotated-jb tr.javaLevel {
+    border-top: 2px solid #dddddd;
+}
+/* vertical groups by topic */
+table.table-header-rotated-jb tr > td:nth-child(7),  table.table-header-rotated-jb tr.subheading > th:nth-child(7),  table.table-header-rotated-jb th.rotate-45:nth-child(7) > div,
+table.table-header-rotated-jb tr > td:nth-child(10), table.table-header-rotated-jb tr.subheading > th:nth-child(10), table.table-header-rotated-jb th.rotate-45:nth-child(10) > div,
+table.table-header-rotated-jb tr > td:nth-child(11), table.table-header-rotated-jb tr.subheading > th:nth-child(11), table.table-header-rotated-jb th.rotate-45:nth-child(11) > div,
+table.table-header-rotated-jb tr > td:nth-child(13), table.table-header-rotated-jb tr.subheading > th:nth-child(13), table.table-header-rotated-jb th.rotate-45:nth-child(13) > div,
+table.table-header-rotated-jb tr > td:nth-child(16), table.table-header-rotated-jb tr.subheading > th:nth-child(16), table.table-header-rotated-jb th.rotate-45:nth-child(16) > div {
+    border-left: 2px solid #dddddd;
+}
+
+table.table-header-rotated-jb th.rotate-45 {
+    height: 80px;
+    width: 40px;
+    min-width: 40px;
+    max-width: 40px;
+    position: relative;
+    vertical-align: bottom;
+    padding: 0;
+    font-size: 12px;
+    line-height: 0.8;
+    border-bottom: 0;
+}
+
+table.table-header-rotated-jb th.rotate-45 > div {
+    position: relative;
+    top: 0px;
+    left: 40px; /* 80 * tan(45) / 2 = 40 where 80 is the height on the cell and 45 is the transform angle*/
+    height: 100%;
+    -ms-transform:skew(-45deg,0deg);
+    -moz-transform:skew(-45deg,0deg);
+    -webkit-transform:skew(-45deg,0deg);
+    -o-transform:skew(-45deg,0deg);
+    transform:skew(-45deg,0deg);
+    overflow: hidden;
+    border-left: 1px solid #dddddd;
+    border-right: 1px solid #dddddd;
+    border-top: 0;
+}
+
+table.table-header-rotated-jb th.rotate-45 span {
+    -ms-transform:translateX(10px) skew(45deg,0deg) rotate(315deg);
+    -moz-transform:translateX(10px) skew(45deg,0deg) rotate(315deg);
+    -webkit-transform:translateX(10px) skew(45deg,0deg) rotate(315deg);
+    -o-transform:translateX(10px) skew(45deg,0deg) rotate(315deg);
+    transform:translateX(10px) skew(45deg,0deg) rotate(315deg);
+    position: absolute;
+    bottom: 30px; /* 40 cos(45) = 28 with an additional 2px margin*/
+    left: -25px; /*Because it looked good, but there is probably a mathematical link here as well*/
+    display: inline-block;
+    width: 85px; /* 80 / cos(45) - 40 cos (45) = 85 where 80 is the height of the cell, 40 the width of the cell and 45 the transform angle*/
+    text-align: left;
+    line-height: 1em;
+}
+
+table.table-header-rotated-jb tr > td:last-child, table.table-header-rotated-jb tr > th:last-child > div {
+    border-right: 0;
+}
+table.table-header-rotated-jb tr > th:first-child > div {
+    border-left: 0;
+}
+
+/* ------- END Jimmy Bonney Rotation ------- */
+
+.csa-small {
+    font-size: smaller;
 }
 
 .footer {
