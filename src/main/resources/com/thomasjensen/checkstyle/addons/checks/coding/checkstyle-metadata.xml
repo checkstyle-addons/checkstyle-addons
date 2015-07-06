@@ -20,12 +20,18 @@
 <checkstyle-metadata>
 <rule-group-metadata name="Checkstyle Addons" priority="1600">
 
+    <!-- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -->
+    <!-- LostInstance                                                                          -->
+    <!-- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -->
     <rule-metadata name="%LostInstance.name" internal-name="LostInstance" parent="TreeWalker">
         <alternative-name internal-name="com.thomasjensen.checkstyle.addons.checks.coding.LostInstanceCheck"/>
         <description>%LostInstance.desc</description>
         <message-key key="lost.instance"/>
     </rule-metadata>
 
+    <!-- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -->
+    <!-- IllegalMethodCall                                                                     -->
+    <!-- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -->
     <rule-metadata name="%IllegalMethodCall.name" internal-name="IllegalMethodCall" parent="TreeWalker">
         <alternative-name internal-name="com.thomasjensen.checkstyle.addons.checks.coding.IllegalMethodCallCheck"/>
         <description>%IllegalMethodCall.desc</description>
