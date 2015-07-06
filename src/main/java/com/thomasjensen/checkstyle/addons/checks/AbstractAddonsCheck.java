@@ -47,9 +47,6 @@ public abstract class AbstractAddonsCheck
         TokenTypes.PACKAGE_DEF, TokenTypes.ENUM_DEF, TokenTypes.CLASS_DEF, TokenTypes.INTERFACE_DEF,
         TokenTypes.ANNOTATION_DEF)));
 
-    /** Flag used to cancel checking an input class (in case of errors in the check) */
-    private boolean stopChecking = false;
-
     /** fully qualified name of the outer (or only) class */
     private String iOuterClassName = null;
 
@@ -112,9 +109,6 @@ public abstract class AbstractAddonsCheck
     public void beginTree(final DetailAST pRootAst)
     {
         super.beginTree(pRootAst);
-        if (isCheckStopped()) {
-            return;
-        }
 
         iClassDeclarationPositions.clear();
         iBinaryNameStack.clear();
@@ -129,9 +123,6 @@ public abstract class AbstractAddonsCheck
     public final void finishTree(final DetailAST pRootAst)
     {
         super.finishTree(pRootAst);
-        if (isCheckStopped()) {
-            return;
-        }
         finishTree(iOuterClassName, pRootAst);
     }
 
@@ -143,6 +134,7 @@ public abstract class AbstractAddonsCheck
      * @param pFqcn the fully qualified class name of the outer class
      * @param pRootAst the root of the tree
      */
+    @SuppressWarnings({"unused", "EmptyMethod"})
     protected void finishTree(@Nonnull final String pFqcn, @Nonnull final DetailAST pRootAst)
     {
         // optionally filled in by subclass
@@ -152,9 +144,11 @@ public abstract class AbstractAddonsCheck
 
     /**
      * Called to process a token.
+     *
      * @param pBinaryClassName the currently active binary class name
      * @param pAst the token to process
      */
+    @SuppressWarnings("unused")
     protected void visitToken(@Nullable final String pBinaryClassName, @Nonnull final DetailAST pAst)
     {
         // optionally filled in by subclass
@@ -164,9 +158,11 @@ public abstract class AbstractAddonsCheck
 
     /**
      * Called after all the child nodes have been processed.
+     *
      * @param pBinaryClassName the currently active binary class name
      * @param pAst the token being completed
      */
+    @SuppressWarnings("unused")
     protected void leaveToken(@Nullable final String pBinaryClassName, @Nonnull final DetailAST pAst)
     {
         // optionally filled in by subclass
@@ -175,13 +171,15 @@ public abstract class AbstractAddonsCheck
 
 
     /**
-     * Called after visiting a CLASS_DEF, INTERFACE_DEF, ANNOTATION_DEF, or ENUM_DEF token and successfully
-     * determining the type's binary class name. This is useful in a Java source file with nested inner classes.
-     * If the implementing check registers for any of the above tokens, the regular call to
-     * {@link #visitToken(String, DetailAST)} will be performed in addition to (after) this one.
+     * Called after visiting a CLASS_DEF, INTERFACE_DEF, ANNOTATION_DEF, or ENUM_DEF token and successfully determining
+     * the type's binary class name. This is useful in a Java source file with nested inner classes. If the implementing
+     * check registers for any of the above tokens, the regular call to {@link #visitToken(String, DetailAST)} will be
+     * performed in addition to (after) this one.
+     *
      * @param pBinaryClassName the binary class name of the visited type
      * @param pAst the token to process
      */
+    @SuppressWarnings("unused")
     protected void visitKnownType(@Nonnull final String pBinaryClassName, @Nonnull final DetailAST pAst)
     {
         // optionally filled in by subclass
@@ -191,12 +189,14 @@ public abstract class AbstractAddonsCheck
 
     /**
      * Called after leaving a CLASS_DEF, INTERFACE_DEF, ANNOTATION_DEF, or ENUM_DEF token and the type's binary class
-     * name is known. This is useful in a Java source file with nested inner classes.
-     * If the implementing check registers for any of the above tokens, the regular call to
-     * {@link #leaveToken(String, DetailAST)} will be performed in addition to (before) this one.
+     * name is known. This is useful in a Java source file with nested inner classes. If the implementing check
+     * registers for any of the above tokens, the regular call to {@link #leaveToken(String, DetailAST)} will be
+     * performed in addition to (before) this one.
+     *
      * @param pBinaryClassName the binary class name of the visited type
      * @param pAst the token being completed
      */
+    @SuppressWarnings("unused")
     protected void leaveKnownType(@Nonnull final String pBinaryClassName, @Nonnull final DetailAST pAst)
     {
         // optionally filled in by subclass
@@ -208,9 +208,6 @@ public abstract class AbstractAddonsCheck
     public final void visitToken(final DetailAST pAst)
     {
         super.visitToken(pAst);
-        if (isCheckStopped()) {
-            return;
-        }
 
         switch (pAst.getType()) {
             case TokenTypes.PACKAGE_DEF:
@@ -264,6 +261,7 @@ public abstract class AbstractAddonsCheck
 
 
     @CheckForNull
+    @SuppressWarnings("unused")
     protected DetailAST getClassDeclarationPosition(@Nonnull final String pBinaryName)
     {
         return iClassDeclarationPositions.get(pBinaryName);
@@ -275,9 +273,6 @@ public abstract class AbstractAddonsCheck
     public final void leaveToken(final DetailAST pAst)
     {
         super.leaveToken(pAst);
-        if (isCheckStopped()) {
-            return;
-        }
 
         if (getRelevantTokens().contains(Integer.valueOf(pAst.getType()))) {
             leaveToken(getCurrentBinaryName(), pAst);
@@ -303,14 +298,13 @@ public abstract class AbstractAddonsCheck
 
 
 
-
     /**
      * Gets the binary name of the class currently being traversed on the AST. Normally, this is the single class in the
      * .java file, but it could also be a (nested) named inner class. Whenever a new CLASS_DEF or similar token is
      * visited, the result of this method would change.
      *
-     * @return current binary name, or <code>null</code> if no CLASS_DEF or similar token has been encountered yet
-     * (e.g. while we are still going through the <code>import</code> statements)
+     * @return current binary name, or <code>null</code> if no CLASS_DEF or similar token has been encountered yet (e.g.
+     * while we are still going through the <code>import</code> statements)
      */
     @CheckForNull
     protected String getCurrentBinaryName()
@@ -320,22 +314,21 @@ public abstract class AbstractAddonsCheck
 
 
 
+    /**
+     * Gets the simple name of the current class, interface, annotation, or enum.
+     * @return the simple class name, or <code>null</code> if we are outside of a type definition
+     */
+    @CheckForNull
+    protected String getCurrentSimpleName()
+    {
+        return iClassDefStack.peek();
+    }
+
+
+
+    @SuppressWarnings("unused")
     protected String getMyPackage()
     {
         return iMyPackage;
-    }
-
-
-
-    protected boolean isCheckStopped()
-    {
-        return stopChecking;
-    }
-
-
-
-    protected void stopChecking()
-    {
-        stopChecking = true;
     }
 }
