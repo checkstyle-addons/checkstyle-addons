@@ -86,6 +86,7 @@ public abstract class BaseCheckTestSupport
 
 
 
+    @SuppressWarnings("PMD.AvoidThrowingRawExceptionTypes")
     protected Checker createChecker(final Configuration pCheckConfig)
         throws Exception
     {
@@ -125,6 +126,7 @@ public abstract class BaseCheckTestSupport
 
 
 
+    @SuppressWarnings("PMD.AvoidThrowingRawExceptionTypes")
     protected void verify(final Configuration pConfig, final String pFileName, final String[] pExpected)
         throws Exception
     {
@@ -133,6 +135,7 @@ public abstract class BaseCheckTestSupport
 
 
 
+    @SuppressWarnings("PMD.AvoidThrowingRawExceptionTypes")
     protected void verify(final Checker pChecker, final String pFileName, final String[] pExpected)
         throws Exception
     {
@@ -141,6 +144,7 @@ public abstract class BaseCheckTestSupport
 
 
 
+    @SuppressWarnings("PMD.AvoidThrowingRawExceptionTypes")
     protected void verify(final Checker pChecker, final String pProcessedFilename, final String pMessageFileName,
         final String[] pExpected)
         throws Exception
@@ -150,6 +154,7 @@ public abstract class BaseCheckTestSupport
 
 
 
+    @SuppressWarnings("PMD.AvoidThrowingRawExceptionTypes")
     protected void verify(final Checker pChecker, final File[] pProcessedFiles, final String pMessageFileName,
         final String[] pExpected)
         throws Exception

@@ -30,7 +30,6 @@ public final class CheckstyleExtensionPlugin
     extends SonarPlugin
 {
     @Override
-    @SuppressWarnings("unchecked")
     public List<?> getExtensions()
     {
         return Collections.singletonList(CheckstyleExtensionRepository.class);

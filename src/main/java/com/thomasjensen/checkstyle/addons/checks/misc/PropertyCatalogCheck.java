@@ -153,7 +153,7 @@ public class PropertyCatalogCheck
                 getFilename = fileContents.getClass().getMethod("getFilename");
             }
             catch (NoSuchMethodException e1) {
-                throw new UnsupportedOperationException("FileContents.getFilename()", e);
+                throw new UnsupportedOperationException("FileContents.getFilename()", e1);
             }
         }
 
@@ -197,7 +197,7 @@ public class PropertyCatalogCheck
     @Override
     protected void visitKnownType(@Nonnull final String pBinaryClassName, @Nonnull final DetailAST pAst)
     {
-        this.catalogEntries.push(new TreeSet<CatalogEntry>());
+        catalogEntries.push(new TreeSet<CatalogEntry>());
         skipType.push(Boolean.valueOf(!isPropertyCatalog(pBinaryClassName)));
     }
 
