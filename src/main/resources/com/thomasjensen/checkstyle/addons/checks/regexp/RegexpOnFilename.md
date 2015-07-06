@@ -33,7 +33,7 @@ The check works like this:
     <span class="propdefault"><tt>^(?:\s+.*|.*?\s+)$</tt></span></dd>
 
 <dt><span class="propname">mode</span>
-    <span class="proptype"><a href="{{ site.baseurl }}/latest/apidocs/index.html?com/thomasjensen/checkstyle/addons/checks/regexp/RegexpOnFilenameOption.html">Mode</a></span></dt>
+    <span class="proptype"><a href="{{ site.baseurl }}/{{ page.check_version }}/apidocs/index.html?com/thomasjensen/checkstyle/addons/checks/regexp/RegexpOnFilenameOption.html">Mode</a></span></dt>
 <dd><span class="propdesc">whether <code>regexp</code> finds required or illegal matches. <tt>required</tt> means that all selected files must match the expression. <tt>illegal</tt> means that they must not.</span>
     <span class="propdefault"><tt>illegal</tt></span></dd>
 
