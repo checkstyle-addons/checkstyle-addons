@@ -50,7 +50,7 @@ The following example checks that the current method name is passed as the first
 </module>
 {% endhighlight %}
 
-In the next example, the `getLogger` method takes the current class as its first argument. The class may be specified either as a simple class name, as a fully qualified class name (both literal Strings), or as a class object (as `MyClass.class`).
+In the next example, the `getLogger` method takes the current class as its first argument. The class shall be specified as a simple class object (e.g. `MyClass.class`). Just `getClass()` would not work. Calls where the argument is not a class object are ignored. Note the optional custom message, which allows tailoring the violation text to the particular use case:
 
 {% highlight xml %}
 <module name="LocationReference">
