@@ -15,6 +15,11 @@ package com.thomasjensen.checkstyle.addons.checks.regexp;
  * program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+import javax.annotation.Nonnull;
+
+import com.thomasjensen.checkstyle.addons.util.Util;
+
+
 /**
  * Represents the possible modes of operation for the {@link RegexpOnFilenameCheck}.
  *
@@ -33,4 +38,20 @@ public enum RegexpOnFilenameOption
      * regexp matched anyway.
      */
     ILLEGAL;
+
+
+
+    /**
+     * Variant of {@link Enum#valueOf} that ignores value case.
+     *
+     * @param pValue the String value
+     * @return the enum value
+     *
+     * @throws IllegalArgumentException the given String value does not match a valid enum value
+     */
+    @Nonnull
+    public static RegexpOnFilenameOption valueOfIgnoreCase(@Nonnull final String pValue)
+    {
+        return Util.valueOfIgnoreCase(pValue, RegexpOnFilenameOption.class);
+    }
 }

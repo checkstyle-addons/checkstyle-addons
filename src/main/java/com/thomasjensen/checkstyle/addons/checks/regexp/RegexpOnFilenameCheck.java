@@ -74,7 +74,7 @@ public class RegexpOnFilenameCheck
 
     public void setMode(final String pMode)
     {
-        mode = Enum.valueOf(RegexpOnFilenameOption.class, pMode.trim().toUpperCase(Locale.ENGLISH));
+        mode = RegexpOnFilenameOption.valueOfIgnoreCase(pMode);
     }
 
 
