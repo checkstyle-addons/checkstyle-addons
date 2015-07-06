@@ -20,25 +20,28 @@
 <checkstyle-metadata>
 <rule-group-metadata name="Checkstyle Addons" priority="1600">
 
+    <!-- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -->
+    <!-- RegexpOnFilename                                                                      -->
+    <!-- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -->
     <rule-metadata name="%RegexpOnFilename.name" internal-name="RegexpOnFilename" parent="Checker">
         <alternative-name internal-name="com.thomasjensen.checkstyle.addons.checks.regexp.RegexpOnFilenameCheck"/>
         <description>%RegexpOnFilename.desc</description>
 
         <property-metadata name="selection" datatype="Regex">
-            <description>Only files which match this expression in addition to the file extensions will be checked. Leave blank for unrestricted.</description>
+            <description>%RegexpOnFilename.selection</description>
         </property-metadata>
         <property-metadata name="regexp" datatype="Regex" default-value="^(?:\s+.*|.*?\s+)$">
-            <description>The regular expression to apply to the selected file names.</description>
+            <description>%RegexpOnFilename.regexp</description>
         </property-metadata>
         <property-metadata name="mode" datatype="SingleSelect" default-value="illegal">
-            <description>Determines if the regular expression must (required) or must not match (illegal).</description>
+            <description>%RegexpOnFilename.mode</description>
             <enumeration>
                 <property-value-option value="illegal"/>
                 <property-value-option value="required"/>
             </enumeration>
         </property-metadata>
         <property-metadata name="simple" datatype="Boolean" default-value="true">
-            <description>Check the simple file name only (checked), or the entire path (unchecked).</description>
+            <description>%RegexpOnFilename.simple</description>
         </property-metadata>
 
         <message-key key="regexp.filepath.illegal"/>
