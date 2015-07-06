@@ -18,6 +18,9 @@ package com.thomasjensen.checkstyle.addons.util;
 import java.io.Closeable;
 import java.io.File;
 import java.io.IOException;
+import java.util.Collections;
+import java.util.HashSet;
+import java.util.Set;
 import java.util.regex.Pattern;
 import javax.annotation.CheckForNull;
 import javax.annotation.Nonnull;
@@ -164,5 +167,95 @@ public final class Util
             result = pFile.getAbsoluteFile();
         }
         return result;
+    }
+
+
+
+    /**
+     * Creates a new immutable {@link HashSet} which contains a union of the two given sets.
+     *
+     * @param pColl1 first set
+     * @param pColl2 second set
+     * @param <E> type of all contained elements
+     * @return union set
+     */
+    @Nonnull
+    public static <E> Set<E> union(@Nullable final Set<E> pColl1, @Nullable final Set<E> pColl2)
+    {
+        final Set<E> result = new HashSet<E>();
+        if (pColl1 != null) {
+            result.addAll(pColl1);
+        }
+        if (pColl2 != null) {
+            result.addAll(pColl2);
+        }
+        return Collections.unmodifiableSet(result);
+    }
+
+
+
+    /**
+     * Find the left-most token in the given AST. The left-most token is the token with the smallest column number. Only
+     * token which are located on the same line as the given AST are considered.
+     *
+     * @param pAst the root of a subtree. This token is also considered for the result.
+     * @return the left-most token
+     */
+    @Nonnull
+    public static DetailAST findLeftMostTokenInLine(@Nonnull final DetailAST pAst)
+    {
+        return findLeftMostTokenInLineInternal(pAst, pAst.getLineNo(), pAst.getColumnNo());
+    }
+
+
+
+    @Nonnull
+    private static DetailAST findLeftMostTokenInLineInternal(@Nonnull final DetailAST pAst, final int pLine,
+        final int pColumn)
+    {
+        DetailAST result = pAst;
+        int col = pColumn;
+        for (DetailAST ast = pAst.getFirstChild(); ast != null; ast = ast.getNextSibling()) {
+            if (ast.getLineNo() > pLine) {
+                break;
+            }
+            int currentCol = ast.getColumnNo();
+            if (currentCol < col) {
+                col = currentCol;
+                result = ast;
+            }
+
+            DetailAST subTree = findLeftMostTokenInLineInternal(ast, pLine, col);
+            currentCol = subTree.getColumnNo();
+            if (currentCol < col) {
+                col = currentCol;
+                result = subTree;
+            }
+        }
+        return result;
+    }
+
+
+
+    /**
+     * Variant of {@link Enum#valueOf} that ignores value case.
+     *
+     * @param pValue the String value
+     * @param pEnumClass the class object of the enum type
+     * @param <E> the enum type
+     * @return the enum value
+     *
+     * @throws IllegalArgumentException the given String value does not match a valid enum value
+     */
+    @Nonnull
+    public static <E extends Enum<E>> E valueOfIgnoreCase(@Nonnull final String pValue,
+        @Nonnull final Class<E> pEnumClass)
+    {
+        for (E e : pEnumClass.getEnumConstants()) {
+            if (e.name().equalsIgnoreCase(pValue)) {
+                return e;
+            }
+        }
+        throw new IllegalArgumentException("illegal value for " + pEnumClass.getSimpleName() + ": " + pValue);
     }
 }

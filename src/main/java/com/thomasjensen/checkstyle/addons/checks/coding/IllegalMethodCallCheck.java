@@ -20,10 +20,9 @@ import java.util.HashSet;
 import java.util.Set;
 import javax.annotation.Nonnull;
 
-import com.puppycrawl.tools.checkstyle.api.Check;
 import com.puppycrawl.tools.checkstyle.api.DetailAST;
 import com.puppycrawl.tools.checkstyle.api.TokenTypes;
-import com.thomasjensen.checkstyle.addons.util.Util;
+import com.thomasjensen.checkstyle.addons.checks.AbstractMethodCallCheck;
 
 
 /**
@@ -36,7 +35,7 @@ import com.thomasjensen.checkstyle.addons.util.Util;
  * @author Thomas Jensen
  */
 public class IllegalMethodCallCheck
-    extends Check
+    extends AbstractMethodCallCheck
 {
     private Set<String> illegalMethodNames = null;
 
@@ -45,67 +44,32 @@ public class IllegalMethodCallCheck
 
 
     @Override
-    public int[] getDefaultTokens()
+    protected boolean isCheckActive()
     {
-        return new int[]{TokenTypes.METHOD_CALL};
+        return illegalMethodNames != null && !illegalMethodNames.isEmpty();
     }
 
 
 
     @Override
-    public int[] getRequiredTokens()
+    protected boolean isRelevantCall(@Nonnull final String pQualifier, @Nonnull final String pMethodName)
     {
-        return getDefaultTokens();
+        return illegalMethodNames.contains(pMethodName) && !excludedQualifiers.contains(pQualifier);
     }
 
 
 
     @Override
-    public void visitToken(final DetailAST pAst)
+    protected void visitMethodCall(@Nonnull final String pMethodName, @Nonnull final DetailAST pMethodCallAst)
     {
-        if (illegalMethodNames != null && !illegalMethodNames.isEmpty()) {
-            final DetailAST methodNameAst = findCalledMethodName(pAst);
-            final String methodName = methodNameAst.getText();
-            if (illegalMethodNames.contains(methodName)) {
-                final String qualifier = extractQualifier(pAst, methodName);
-                if (!excludedQualifiers.contains(qualifier)) {
-                    log(methodNameAst, "illegal.method.call", methodName);
-                }
+        DetailAST highlight = pMethodCallAst;
+        if (pMethodCallAst.getType() == TokenTypes.METHOD_CALL) {
+            highlight = pMethodCallAst.findFirstToken(TokenTypes.IDENT);
+            if (highlight == null) {
+                highlight = pMethodCallAst.findFirstToken(TokenTypes.DOT).getLastChild();
             }
         }
-    }
-
-
-
-    @Nonnull
-    private String extractQualifier(@Nonnull final DetailAST pAst, @Nonnull final String pMethodName)
-    {
-        String result = "";
-        final String fullCall = Util.getFullIdent(pAst);
-        if (fullCall != null && fullCall.length() > pMethodName.length() + 1) {
-            int sepDotPos = fullCall.length() - pMethodName.length() - 1;
-            if (fullCall.charAt(sepDotPos) == '.') {
-                result = fullCall.substring(0, sepDotPos);
-            }
-        }
-        return result;
-    }
-
-
-
-    @Nonnull
-    private DetailAST findCalledMethodName(@Nonnull final DetailAST pAst)
-    {
-        final DetailAST firstChild = pAst.getFirstChild();
-        if (firstChild.getType() == TokenTypes.IDENT) {
-            return firstChild;
-        }
-        else if (firstChild.getType() == TokenTypes.DOT) {
-            return firstChild.getLastChild();
-        }
-        else {
-            throw new IllegalStateException("Unexpected token type: " + TokenTypes.getTokenName(firstChild.getType()));
-        }
+        log(highlight, "illegal.method.call", pMethodName);
     }
 
 

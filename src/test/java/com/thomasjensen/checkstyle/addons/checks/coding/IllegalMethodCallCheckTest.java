@@ -19,7 +19,6 @@ import java.io.IOException;
 
 import com.puppycrawl.tools.checkstyle.DefaultConfiguration;
 import com.thomasjensen.checkstyle.addons.BaseCheckTestSupport;
-import junit.framework.TestCase;
 import org.junit.BeforeClass;
 import org.junit.Test;
 
@@ -87,16 +86,6 @@ public class IllegalMethodCallCheckTest
         checkConfig.addAttribute("illegalMethodNames", "");
         final String[] expected = {};
         verify(checkConfig, sInputFilePath, expected);
-    }
-
-
-
-    @Test
-    public void testRequiredTokens()
-    {
-        int[] tokens = new IllegalMethodCallCheck().getRequiredTokens();
-        TestCase.assertNotNull(tokens);
-        TestCase.assertEquals(1, tokens.length);
     }
 
 

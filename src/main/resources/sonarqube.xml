@@ -38,6 +38,36 @@
     </rule>
 
     <!-- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -->
+    <!-- LocationReference                                                                     -->
+    <!-- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -->
+    <rule>
+        <key>com.thomasjensen.checkstyle.addons.checks.misc.LocationReferenceCheck</key>
+        <name>Broken Code Location Reference</name>
+        <category name="misc"/>
+        <tag>checkstyle-addons</tag>
+        <description><![CDATA[<p>This check helps in cases where the name of the current method or class must be used
+            as an argument to a method call or as initial value of a declared variable. It compares the actual argument
+            to the current method or class name, and flags it if a mismatch is detected.</p>
+            <p><a href="http://checkstyle-addons.thomasjensen.com/v@version@/checks/misc.html#LocationReference"
+               target="_blank">Full Documentation</a></p>]]></description>
+        <configKey>Checker/TreeWalker/LocationReference</configKey>
+        <param key="methodCalls" type="s{}">
+            <description>Comma-separated list of method calls that should be checked</description>
+        </param>
+        <param key="variableNames" type="s{}">
+            <description>Comma-separated list of variable names whose declarations should be checked</description>
+        </param>
+        <param key="location" type="s[method,simpleclass,fullclass,classobject]">
+            <description>The location information expected here. Possible values are ``method``, ``simpleclass``, ``fullclass``, or ``classobject``.</description>
+            <defaultValue>method</defaultValue>
+        </param>
+        <param key="argumentPosition" type="INTEGER">
+            <description>The position of the location reference as an index of the argument list (used only for method calls; ignored for variable assignments)</description>
+            <defaultValue>0</defaultValue>
+        </param>
+    </rule>
+
+    <!-- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -->
     <!-- LostInstance                                                                          -->
     <!-- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -->
     <rule>

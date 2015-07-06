@@ -18,6 +18,9 @@ package com.thomasjensen.checkstyle.addons.util;
 import java.io.Closeable;
 import java.io.File;
 import java.io.IOException;
+import java.util.Arrays;
+import java.util.HashSet;
+import java.util.Set;
 
 import com.puppycrawl.tools.checkstyle.api.DetailAST;
 import org.junit.Assert;
@@ -83,5 +86,33 @@ public class UtilTest
         c = Util.canonize(f);
         Assert.assertTrue(c.isAbsolute());
         Assert.assertTrue(c.getPath().endsWith("." + File.separator + '\u0000'));
+    }
+
+
+
+    @Test
+    public void testUnion()
+    {
+        Set<String> set1 = new HashSet<String>(Arrays.asList("a", "b", "c"));
+        Set<String> set2 = new HashSet<String>(Arrays.asList("c", "d", "e"));
+        Set<String> union = Util.union(set1, set2);
+        Assert.assertEquals(set1.size() + set2.size() - 1, union.size());
+    }
+
+
+
+    @Test
+    public void testUnionNull()
+    {
+        Set<String> someSet = new HashSet<String>(Arrays.asList("a", "b", "c"));
+        Set<String> union = Util.union(someSet, null);
+        Assert.assertEquals(someSet, union);
+
+        union = Util.union(null, someSet);
+        Assert.assertEquals(someSet, union);
+
+        union = Util.union(null, null);
+        Assert.assertNotNull(union);
+        Assert.assertTrue(union.isEmpty());
     }
 }

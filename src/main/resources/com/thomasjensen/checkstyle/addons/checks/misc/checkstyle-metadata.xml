@@ -20,6 +20,41 @@
 <checkstyle-metadata>
 <rule-group-metadata name="Checkstyle Addons" priority="1600">
 
+    <!-- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -->
+    <!-- LocationReference                                                                     -->
+    <!-- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -->
+    <rule-metadata name="%LocationReference.name" internal-name="LocationReference" parent="TreeWalker">
+        <alternative-name internal-name="com.thomasjensen.checkstyle.addons.checks.misc.LocationReferenceCheck"/>
+        <description>%LocationReference.desc</description>
+
+        <property-metadata name="methodCalls" datatype="String">
+            <description>%LocationReference.methodCalls</description>
+        </property-metadata>
+        <property-metadata name="variableNames" datatype="String">
+            <description>%LocationReference.variableNames</description>
+        </property-metadata>
+        <property-metadata name="location" datatype="SingleSelect" default-value="method">
+            <description>%LocationReference.location</description>
+            <enumeration>
+                <property-value-option value="method"/>
+                <property-value-option value="simpleclass"/>
+                <property-value-option value="fullclass"/>
+                <property-value-option value="classobject"/>
+            </enumeration>
+        </property-metadata>
+        <property-metadata name="argumentPosition" datatype="Integer" default-value="0">
+            <description>%LocationReference.argumentPosition</description>
+        </property-metadata>
+
+        <message-key key="locationreference.mismatch.method"/>
+        <message-key key="locationreference.mismatch.simpleclass"/>
+        <message-key key="locationreference.mismatch.fullclass"/>
+        <message-key key="locationreference.mismatch.classobject"/>
+    </rule-metadata>
+
+    <!-- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -->
+    <!-- PropertyCatalog                                                                       -->
+    <!-- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -->
     <rule-metadata name="%PropertyCatalog.name" internal-name="PropertyCatalog" parent="TreeWalker">
         <alternative-name internal-name="com.thomasjensen.checkstyle.addons.checks.misc.PropertyCatalogCheck"/>
         <description>%PropertyCatalog.desc</description>
