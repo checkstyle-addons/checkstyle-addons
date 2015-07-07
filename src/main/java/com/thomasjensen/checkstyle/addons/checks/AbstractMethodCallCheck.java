@@ -199,7 +199,8 @@ public abstract class AbstractMethodCallCheck
             return firstChild.getLastChild();
         }
         else {
-            throw new IllegalStateException("Unexpected token type: " + TokenTypes.getTokenName(firstChild.getType()));
+            throw new IllegalStateException("Unexpected token type: " + getApiFixer().getTokenName(
+                firstChild.getType()));
         }
     }
 }

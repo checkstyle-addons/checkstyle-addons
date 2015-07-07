@@ -41,7 +41,6 @@ import javax.annotation.Nullable;
 import com.puppycrawl.tools.checkstyle.api.DetailAST;
 import com.puppycrawl.tools.checkstyle.api.TokenTypes;
 import com.thomasjensen.checkstyle.addons.checks.AbstractAddonsCheck;
-import com.thomasjensen.checkstyle.addons.util.CheckstyleApiFixer;
 import com.thomasjensen.checkstyle.addons.util.Util;
 
 
@@ -76,8 +75,6 @@ public class PropertyCatalogCheck
      * currently active class; this is used for properly scoping nested inner classes.
      */
     private final Deque<Set<CatalogEntry>> catalogEntries = new LinkedList<Set<CatalogEntry>>();
-
-    private final CheckstyleApiFixer apiFixer;
 
     /*
      * --------------- Check properties: ---------------------------------------------------------------------------
@@ -127,8 +124,7 @@ public class PropertyCatalogCheck
 
     PropertyCatalogCheck(final String pMockFile)
     {
-        super();
-        apiFixer = new CheckstyleApiFixer(this, pMockFile);
+        super(pMockFile);
     }
 
 
@@ -291,7 +287,7 @@ public class PropertyCatalogCheck
         String[] result = new String[pNumSubdirs];
         Arrays.fill(result, null);
 
-        final File thisFile = Util.canonize(apiFixer.getCurrentFileName());
+        final File thisFile = Util.canonize(getApiFixer().getCurrentFileName());
         if (thisFile.getPath().startsWith(baseDir.getPath())) {
 
             final String relPath = thisFile.getPath().substring(baseDir.getPath().length() + 1); // incl. separator char

@@ -24,6 +24,7 @@ import javax.annotation.Nullable;
 
 import com.puppycrawl.tools.checkstyle.api.Check;
 import com.puppycrawl.tools.checkstyle.api.FileContents;
+import com.puppycrawl.tools.checkstyle.api.TokenTypes;
 
 
 /**
@@ -112,6 +113,50 @@ public class CheckstyleApiFixer
         }
 
         File result = filename != null ? new File(filename) : null;
+        return result;
+    }
+
+
+
+    /**
+     * Returns the name of a token for a given ID.
+     *
+     * @param pTokenId the ID of the token name to get
+     * @return a token name as returned by Checkstyle
+     * @throws UnsupportedOperationException no known variant of <code>getTokenName()</code> could be found
+     */
+    @Nonnull
+    public String getTokenName(final int pTokenId)
+    {
+        String usedClass = "TokenTypes";
+        Method getTokenName = null;
+        try {
+            getTokenName = TokenTypes.class.getMethod("getTokenName", int.class);
+        }
+        catch (NoSuchMethodException e) {
+            usedClass = "Utils";
+            try {
+                final Class<?> utilsClass = Class.forName("com.puppycrawl.tools.checkstyle.Utils");
+                getTokenName = utilsClass.getMethod("getTokenName", int.class);
+            }
+            catch (ClassNotFoundException e1) {
+                throw new UnsupportedOperationException(usedClass + ".getTokenName()", e1);
+            }
+            catch (NoSuchMethodException e1) {
+                throw new UnsupportedOperationException(usedClass + ".getTokenName()", e1);
+            }
+        }
+
+        String result = null;
+        try {
+            result = (String) getTokenName.invoke(null, pTokenId);
+        }
+        catch (IllegalAccessException e) {
+            throw new UnsupportedOperationException(usedClass + ".getTokenName()", e);
+        }
+        catch (InvocationTargetException e) {
+            throw new UnsupportedOperationException(usedClass + ".getTokenName()", e);
+        }
         return result;
     }
 }

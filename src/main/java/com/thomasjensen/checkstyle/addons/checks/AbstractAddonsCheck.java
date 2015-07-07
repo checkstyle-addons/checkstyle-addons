@@ -32,6 +32,7 @@ import javax.annotation.Nullable;
 import com.puppycrawl.tools.checkstyle.api.Check;
 import com.puppycrawl.tools.checkstyle.api.DetailAST;
 import com.puppycrawl.tools.checkstyle.api.TokenTypes;
+import com.thomasjensen.checkstyle.addons.util.CheckstyleApiFixer;
 import com.thomasjensen.checkstyle.addons.util.Util;
 
 
@@ -62,11 +63,21 @@ public abstract class AbstractAddonsCheck
     /** Package that the currently checked class resides in */
     private String iMyPackage = null;
 
+    private final CheckstyleApiFixer apiFixer;
+
 
 
     protected AbstractAddonsCheck()
     {
+        this(null);
+    }
+
+
+
+    protected AbstractAddonsCheck(@Nullable final String pMockfile)
+    {
         super();
+        apiFixer = new CheckstyleApiFixer(this, pMockfile);
     }
 
 
@@ -243,7 +254,7 @@ public abstract class AbstractAddonsCheck
             sb.append(iMyPackage);
             sb.append('.');
         }
-        for (Iterator<String> iter = iClassDefStack.descendingIterator(); iter.hasNext();) {
+        for (Iterator<String> iter = iClassDefStack.descendingIterator(); iter.hasNext(); ) {
             sb.append(iter.next());
             if (iter.hasNext()) {
                 sb.append('$');
@@ -316,6 +327,7 @@ public abstract class AbstractAddonsCheck
 
     /**
      * Gets the simple name of the current class, interface, annotation, or enum.
+     *
      * @return the simple class name, or <code>null</code> if we are outside of a type definition
      */
     @CheckForNull
@@ -330,5 +342,13 @@ public abstract class AbstractAddonsCheck
     protected String getMyPackage()
     {
         return iMyPackage;
+    }
+
+
+
+    @Nonnull
+    protected CheckstyleApiFixer getApiFixer()
+    {
+        return apiFixer;
     }
 }
