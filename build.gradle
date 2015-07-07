@@ -200,21 +200,22 @@ test {
 
 
 /*
- * Read project/deps_${depConfig}.properties to build the dependency map
+ * Read project/dependencyConfigs/deps_${depConfig}.properties to build the dependency map
  */
 def String getActiveDepConfig()
 {
     final String depsPropName = 'checkstyleaddons_deps';
     def depsCfgName = project.hasProperty(depsPropName) ? project.property(depsPropName) : System.getenv(depsPropName);
     if (depsCfgName == null) {
-        depsCfgName = 'default';
+        depsCfgName = 'cs6.4.1';   // default
     }
     return depsCfgName;
 }
 
+
 def Map<String, String> readDependencyVersions(final String pDepConfig)
 {
-    final File depsCfgFile = new File("project/deps_${pDepConfig}.properties");
+    final File depsCfgFile = new File("project/dependencyConfigs/${pDepConfig}.properties");
 
     System.out.println('--------------------------------------------------------------------------------------------');
     System.out.println('Dependency configuration: ' + depsCfgFile);
@@ -224,12 +225,14 @@ def Map<String, String> readDependencyVersions(final String pDepConfig)
         InputStream stream -> props.load(stream);
     }
 
-    System.out.println(props.getProperty('Description'));
+    if (props.getProperty('Description') != null) {
+        System.out.println('    (' + props.getProperty('Description') + ')');
+        props.remove('Description');
+    }
     System.out.println('--------------------------------------------------------------------------------------------');
-
-    props.remove('Description');
     return new HashMap<>(props);
 }
+
 
 def String readVersionProps()
 {
@@ -238,7 +241,7 @@ def String readVersionProps()
     versionFile.withInputStream {
         InputStream stream -> props.load(stream);
     }
-    
+
     final StringBuilder sb = new StringBuilder();
     sb.append(props.getProperty('major'));
     sb.append('.');
@@ -248,7 +251,7 @@ def String readVersionProps()
     if (!Boolean.parseBoolean(props.getProperty('release'))) {
         sb.append('-SNAPSHOT');
     }
-    
+
     final String v = sb.toString();
     System.out.println('Building version: ' + v);
     return v;

@@ -11,7 +11,7 @@ set -e
 declare -a depConfigs
 declare -i i=0
 IFS=$'\n'
-for depConfig in $(/bin/ls project/deps*.properties | sed -e "s/project\/deps_\([^p]*\).properties$/\1/"); do
+for depConfig in $(/bin/ls project/dependencyConfigs/*.properties | sed -e "s/project\/dependencyConfigs\/\([^p]*\).properties$/\1/"); do
     depConfigs[$i]=${depConfig}
     ((i++))
 done
