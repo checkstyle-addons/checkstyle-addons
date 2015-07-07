@@ -51,6 +51,7 @@
             <p><a href="http://checkstyle-addons.thomasjensen.com/v@version@/checks/misc.html#LocationReference"
                target="_blank">Full Documentation</a></p>]]></description>
         <configKey>Checker/TreeWalker/LocationReference</configKey>
+        <cardinality>MULTIPLE</cardinality>
         <param key="methodCalls" type="s{}">
             <description>Comma-separated list of method calls that should be checked</description>
         </param>
