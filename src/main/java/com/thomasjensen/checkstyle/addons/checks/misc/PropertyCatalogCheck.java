@@ -20,8 +20,6 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStreamReader;
-import java.lang.reflect.InvocationTargetException;
-import java.lang.reflect.Method;
 import java.nio.charset.Charset;
 import java.text.MessageFormat;
 import java.util.Arrays;
@@ -41,9 +39,9 @@ import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 
 import com.puppycrawl.tools.checkstyle.api.DetailAST;
-import com.puppycrawl.tools.checkstyle.api.FileContents;
 import com.puppycrawl.tools.checkstyle.api.TokenTypes;
 import com.thomasjensen.checkstyle.addons.checks.AbstractAddonsCheck;
+import com.thomasjensen.checkstyle.addons.util.CheckstyleApiFixer;
 import com.thomasjensen.checkstyle.addons.util.Util;
 
 
@@ -79,7 +77,7 @@ public class PropertyCatalogCheck
      */
     private final Deque<Set<CatalogEntry>> catalogEntries = new LinkedList<Set<CatalogEntry>>();
 
-    private final File mockFile;
+    private final CheckstyleApiFixer apiFixer;
 
     /*
      * --------------- Check properties: ---------------------------------------------------------------------------
@@ -130,48 +128,7 @@ public class PropertyCatalogCheck
     PropertyCatalogCheck(final String pMockFile)
     {
         super();
-        mockFile = pMockFile != null ? new File(pMockFile) : null;
-    }
-
-
-
-    private File getCurrentFilename()
-    {
-        if (mockFile != null) {
-            return mockFile;
-        }
-
-        // the remainder of this method is a workaround for Checkstyle issue #1205
-        // https://github.com/checkstyle/checkstyle/issues/1205
-        final FileContents fileContents = getFileContents();
-        Method getFilename = null;
-        try {
-            getFilename = fileContents.getClass().getMethod("getFileName");
-        }
-        catch (NoSuchMethodException e) {
-            try {
-                getFilename = fileContents.getClass().getMethod("getFilename");
-            }
-            catch (NoSuchMethodException e1) {
-                throw new UnsupportedOperationException("FileContents.getFilename()", e1);
-            }
-        }
-
-        String filename = null;
-        if (getFilename != null) {
-            try {
-                filename = (String) getFilename.invoke(fileContents);
-            }
-            catch (IllegalAccessException e) {
-                throw new UnsupportedOperationException("FileContents.getFilename()", e);
-            }
-            catch (InvocationTargetException e) {
-                throw new UnsupportedOperationException("FileContents.getFilename()", e);
-            }
-        }
-
-        File result = filename != null ? new File(filename) : null;
-        return result;
+        apiFixer = new CheckstyleApiFixer(this, pMockFile);
     }
 
 
@@ -334,7 +291,7 @@ public class PropertyCatalogCheck
         String[] result = new String[pNumSubdirs];
         Arrays.fill(result, null);
 
-        final File thisFile = Util.canonize(getCurrentFilename());
+        final File thisFile = Util.canonize(apiFixer.getCurrentFileName());
         if (thisFile.getPath().startsWith(baseDir.getPath())) {
 
             final String relPath = thisFile.getPath().substring(baseDir.getPath().length() + 1); // incl. separator char
