@@ -8,6 +8,7 @@ import java.io.InputStreamReader;
 import java.io.LineNumberReader;
 import java.io.OutputStream;
 import java.io.PrintStream;
+import java.io.UnsupportedEncodingException;
 import java.util.Collections;
 import java.util.List;
 import java.util.Locale;
@@ -39,7 +40,7 @@ public abstract class BaseCheckTestSupport
     protected static class BriefLogger
         extends DefaultLogger
     {
-        public BriefLogger(final OutputStream pOut)
+        public BriefLogger(final OutputStream pOut) throws UnsupportedEncodingException
         {
             super(pOut, true);
         }
