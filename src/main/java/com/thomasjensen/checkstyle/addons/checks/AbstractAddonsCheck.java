@@ -254,7 +254,7 @@ public abstract class AbstractAddonsCheck
             sb.append(iMyPackage);
             sb.append('.');
         }
-        for (Iterator<String> iter = iClassDefStack.descendingIterator(); iter.hasNext(); ) {
+        for (Iterator<String> iter = iClassDefStack.descendingIterator(); iter.hasNext();) {
             sb.append(iter.next());
             if (iter.hasNext()) {
                 sb.append('$');
