@@ -180,15 +180,21 @@ checkstyle {
 /*
  * JaCoCo test coverage configuration
  */
-jacocoTestReport {
-    reports {
-        xml.enabled = true;   // coveralls plugin depends on xml format report
-        html.enabled = true;
-    }
-}
+String[] excludedClasses = ['**/com/thomasjensen/checkstyle/addons/util/CheckstyleApiFixer*'];
 tasks.withType(Test) { task ->
     jacoco {
-        append = false
+        append = false;
+        excludes = excludedClasses;
+    }
+    jacocoTestReport {
+        reports {
+            html.enabled = true;
+            xml.enabled = true;     // coveralls plugin depends on xml format report
+            csv.enabled = false;
+        }
+        doFirst {
+            classDirectories = fileTree(dir: sourceSets.main.output.classesDir).exclude(excludedClasses);
+        }
     }
 }
 test {
