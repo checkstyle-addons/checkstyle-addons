@@ -40,3 +40,8 @@ for depConfig in "${depConfigs[@]}"; do
     ./gradlew -Pcheckstyleaddons_deps=${depConfig} clean build
     cp -aiv build/libs/* ${artifactTargetDir}
 done
+
+echo
+echo "SUCCESS"
+echo
+read -p "Press any key ... " -n1 -s
