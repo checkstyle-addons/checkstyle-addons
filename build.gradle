@@ -35,6 +35,7 @@ group = 'com.thomasjensen.checkstyle.addons';
 version = readVersionProps();
 description = 'Additional Checkstyle Checks';
 ext {
+    depConfigDefault = 'cs6.4.1';
     depConfig = getActiveDepConfig();
     versions = readDependencyVersions(depConfig);
     assert versions.size() == 7;
@@ -206,14 +207,14 @@ test {
 
 
 /*
- * Read project/dependencyConfigs/deps_${depConfig}.properties to build the dependency map
+ * Read project/dependencyConfigs/${depConfig}.properties to build the dependency map
  */
 def String getActiveDepConfig()
 {
     final String depsPropName = 'checkstyleaddons_deps';
     def depsCfgName = project.hasProperty(depsPropName) ? project.property(depsPropName) : System.getenv(depsPropName);
     if (depsCfgName == null) {
-        depsCfgName = 'cs6.4.1';   // default
+        depsCfgName = project.ext.depConfigDefault;
     }
     return depsCfgName;
 }
@@ -262,6 +263,7 @@ def String readVersionProps()
     System.out.println('Building version: ' + v);
     return v;
 }
+
 
 
 /*

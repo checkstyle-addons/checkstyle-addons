@@ -14,17 +14,4 @@
  * program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-
-// We read the dependency configuration name and use it to modify the project name and artifact ID
-def String getActiveDepConfig()
-{
-    final String depsPropName = 'checkstyleaddons_deps';
-    def depsCfgName = settings.hasProperty(depsPropName) ? settings.getProperty(depsPropName) : System.getenv(depsPropName);
-    if (depsCfgName == null) {
-        depsCfgName = 'default';
-    }
-    return depsCfgName;
-}
-final String myDepConfig = getActiveDepConfig();
-
-rootProject.name='checkstyle-addons' + ("default".equals(myDepConfig) ? '' : ('-' + myDepConfig));
+rootProject.name='checkstyle-addons';

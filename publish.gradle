@@ -21,6 +21,9 @@ publish {
 def Node addPom(final Node pRoot)
 {
     pRoot.appendNode('name', project.ext.longName);
+    if (!project.ext.depConfigDefault.equals('cs' + project.ext.versions.Checkstyle)) {
+        pRoot.appendNode('classifier', 'cs' + project.ext.versions.Checkstyle);
+    }
     pRoot.appendNode('description', project.description);
     pRoot.appendNode('url', project.ext.website);
 
