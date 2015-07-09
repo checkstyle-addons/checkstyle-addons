@@ -136,6 +136,10 @@ model {
         into('META-INF') {
             from 'LICENSE';
         }
+        into('META-INF/maven/' + project.group + '/' + project.name) {
+            from pluginPomProps;
+            filter(ReplaceTokens, tokens: [buildTimestamp: project.ext.buildTimestamp.toString()]);
+        }
 
         manifest {
             attributes = ['Specification-Title'     : project.name,
@@ -156,10 +160,6 @@ model {
             into('META-INF/maven/' + project.group + '/' + project.name) {
                 from pluginPom;
                 rename {String fileName -> fileName.replace('pom-default.xml', 'pom.xml');}
-            }
-            into('META-INF/maven/' + project.group + '/' + project.name) {
-                from pluginPomProps;
-                filter(ReplaceTokens, tokens: [buildTimestamp: project.ext.buildTimestamp.toString()]);
             }
             from(pluginPom) {
                 rename {String fileName -> fileName.replace('pom-default.xml', 'pom.xml');}
