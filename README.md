@@ -1,5 +1,5 @@
 [![Build Status](https://travis-ci.org/checkstyle-addons/checkstyle-addons.svg?branch=master)](https://travis-ci.org/checkstyle-addons/checkstyle-addons) [![Coverage Status](https://coveralls.io/repos/checkstyle-addons/checkstyle-addons/badge.svg?branch=master)](https://coveralls.io/r/checkstyle-addons/checkstyle-addons?branch=master) [ ![Download](https://api.bintray.com/packages/checkstyle-addons/checkstyle-addons/checkstyle-addons/images/download.svg) ](https://github.com/checkstyle-addons/checkstyle-addons/releases/latest)
-[![Maven Central](https://maven-badges.herokuapp.com/maven-central/com.thomasjensen.checkstyle.addons/checkstyle-addons/badge.svg)](http://search.maven.org/#search%7Cga%7C1%7Cg%3Acom.thomasjensen.checkstyle.addons%20AND%20a%3Acheckstyle-addons)
+[![Maven Central](https://maven-badges.herokuapp.com/maven-central/com.thomasjensen.checkstyle.addons/checkstyle-addons/badge.svg)](http://search.maven.org/#search%7Cgav%7C1%7Cg%3Acom.thomasjensen.checkstyle.addons%20AND%20a%3Acheckstyle-addons)
 
 # Checkstyle Addons
 **Additional Checkstyle checks**
