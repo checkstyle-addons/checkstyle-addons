@@ -11,7 +11,7 @@ longContent: true
 
 Here's how to use {{ site.name }} with your standard software.
 
-{{ site.name }} is also distributed via [Maven Central]({{ page.maven-central-link }}){:target="_blank"} and [Bintray jcenter]({{ page.bintray-link }}){:target="_blank"}, so major build tools can automatically access it.
+{{ site.name }} is also distributed via [Maven Central]({{ page.maven-central-link }}) and [Bintray jcenter]({{ page.bintray-link }}), so major build tools can automatically access it.
 
 {{ site.name }} uses [semantic versioning](http://semver.org/){:target="_blank"}, so you can always use the latest within a major version, but you should try things out before moving to a higher major version.
 
@@ -21,7 +21,7 @@ Here's how to use {{ site.name }} with your standard software.
 
 ## Gradle
 
-{{ site.name }} is available on [Maven Central]({{ page.maven-central-link }}){:target="_blank"} and [jcenter]({{ page.bintray-link }}){:target="_blank"}, so you can just use it in your Gradle build. In Gradle, {{ site.name }} runs as part of the [Gradle Checkstyle Plugin](https://gradle.org/docs/current/userguide/checkstyle_plugin.html){:target="_blank"}. The classpath is extended to include {{ site.name }}. Note that the Checkstyle tool version must be specified.
+{{ site.name }} is available on [Maven Central]({{ page.maven-central-link }}) and [jcenter]({{ page.bintray-link }}), so you can just use it in your Gradle build. In Gradle, {{ site.name }} runs as part of the [Gradle Checkstyle Plugin](https://gradle.org/docs/current/userguide/checkstyle_plugin.html){:target="_blank"}. The classpath is extended to include {{ site.name }}. Note that the Checkstyle tool version must be specified.
 
 {% highlight groovy %}
 plugins {
@@ -44,7 +44,7 @@ You could also use the version notation `version: '{{ site.latest_major }}.+'` i
 
 ## Maven
 
-{{ site.name }} is available on [Maven Central]({{ page.maven-central-link }}){:target="_blank"}, so you can just use it in your Maven build. In Maven, {{ site.name }} runs as part of the [Maven Checkstyle Plugin](https://maven.apache.org/plugins/maven-checkstyle-plugin/){:target="_blank"}. The classpath is extended to include {{ site.name }}. Note that the explicit dependency on Checkstyle itself must also be specified in order to set the correct Checkstyle version.
+{{ site.name }} is available on [Maven Central]({{ page.maven-central-link }}), so you can just use it in your Maven build. In Maven, {{ site.name }} runs as part of the [Maven Checkstyle Plugin](https://maven.apache.org/plugins/maven-checkstyle-plugin/){:target="_blank"}. The classpath is extended to include {{ site.name }}. Note that the explicit dependency on Checkstyle itself must also be specified in order to set the correct Checkstyle version.
 
 {% highlight xml %}
 <project>
