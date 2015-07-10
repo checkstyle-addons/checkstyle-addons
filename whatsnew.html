@@ -12,7 +12,7 @@ title: What's New
     <th>Date</th><th>Post</th>
 </tr>
 {% for post in site.posts %}
-<tr {% if post.release == true %}class="info"{% endif %}>
+<tr {% if post.emphasis == true %}class="info"{% endif %}>
     <td><b>{{ post.date | date: "%b&nbsp;%-d, %Y" }}</b></td>
     {% capture headingtext %}{{ post.title }}{% if post.release == true %} released{% endif %}{% endcapture %}
     <td><span class="post-title">{% if post.content contains '<!--break-->' or post.release == true %}<a href="{{ post.url }}">{{ headingtext }}</a>{% else %}{{ headingtext }}{% endif %}</span><br/>
