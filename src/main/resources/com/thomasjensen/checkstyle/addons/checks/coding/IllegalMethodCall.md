@@ -55,4 +55,4 @@ Example using a custom message:
 
 ### Parent Module
 
-[TreeWalker](http://checkstyle.sourceforge.net/config.html#TreeWalker){:target="_blank"}
+[TreeWalker](http://checkstyle.sourceforge.net/config.html#TreeWalker)
