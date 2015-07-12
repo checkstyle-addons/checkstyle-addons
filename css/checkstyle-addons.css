@@ -216,6 +216,24 @@ a.csa-offset-anchor { /* used to prevent anchors from being obscured by the fixe
     cursor: default; 
 }
 
+div.csa-largeImageWrapper {
+    overflow-x: auto;
+    overflow-y: hidden;
+    white-space: nowrap;
+    margin-bottom: 1em;
+}
+div.highlight {
+    white-space: pre;
+    word-wrap: normal;
+    overflow-x: auto;
+    overflow-y: hidden;
+}
+div.highlight > pre, div.highlight > pre code {
+    white-space: pre !important;
+    word-break: keep-all;
+    word-wrap: normal;
+}
+
 table.csa-version-table td, table.csa-version-table th {
     border-right: 1px solid #dddddd;
 }
