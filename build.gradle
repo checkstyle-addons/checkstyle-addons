@@ -104,7 +104,7 @@ class DependencyConfigsTask extends DefaultTask
             props.remove('Description');
         }
         if (pPublished) {
-            int expectedNumber = 8;
+            int expectedNumber = 9;
             if (props.getProperty('PublicationSuffix') != null) {
                 expectedNumber++;
             }
@@ -116,7 +116,7 @@ class DependencyConfigsTask extends DefaultTask
                 Collections.unmodifiableSortedSet(new TreeSet<String>(Arrays.asList(testAgainstStr.split(',\\s*')))));
         }
         else {
-            assert props.size() == 7;
+            assert props.size() == 8;
         }
         props.put('Published', Boolean.valueOf(pPublished));
 
@@ -446,7 +446,9 @@ def void addDependencies(final Map<String, String> pDepVersions, final Configura
     pProvidedConf.dependencies.add(fb2);
     if (hasSonarQube) {
         Dependency sq = project.dependencies.create('org.codehaus.sonar:sonar-plugin-api:' + pDepVersions.SonarQube);
+        Dependency slf4jNop = project.dependencies.create('org.slf4j:slf4j-nop:' + pDepVersions.SQslf4jNop);
         pProvidedConf.dependencies.add(sq);
+        pProvidedConf.dependencies.add(slf4jNop);
     }
 
     // compile
