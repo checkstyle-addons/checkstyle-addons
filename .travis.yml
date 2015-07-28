@@ -4,6 +4,8 @@ jdk:
   - openjdk7
   - oraclejdk7
 
+sudo: false
+
 before_install:
   - ls -a
   - pwd
