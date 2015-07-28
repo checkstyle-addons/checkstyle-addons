@@ -25,7 +25,7 @@ task siteCopyJavadoc(type: Copy, dependsOn: javadoc) {
     description = project.ext.longName + ': Copy Javadoc to site directory';
 
     destinationDir = new File(project.buildDir, 'site');
-    into('v' + project.version + '/apidocs') {
+    into("v${project.version}/apidocs") {
         from fileTree(dir: javadoc.destinationDir);
     }
     into('latest/apidocs') {
@@ -40,15 +40,15 @@ task siteCopyAllChecks(type: Copy) {
     destinationDir = new File(project.buildDir, 'site');
     final File originalFile = new File(sourceSets.main.resources.srcDirs.iterator().next(),
         '/' + project.ext.checksPackage + '/all_checks.html');
-    into('v' + project.version + '/checks') {
+    into("v${project.version}/checks") {
         from originalFile;
         rename { String fileName -> fileName.replace(originalFile.name, 'index.html'); }
-        filter(ReplaceTokens, tokens: [version: 'v' + project.version]);
+        filter(ReplaceTokens, tokens: [version: "v${project.version}".toString()]);
     }
     into('latest/checks') {
         from originalFile;
         rename { String fileName -> fileName.replace(originalFile.name, 'index.html'); }
-        filter(ReplaceTokens, tokens: [version: 'v' + project.version]);
+        filter(ReplaceTokens, tokens: [version: "v${project.version}".toString()]);
     }
 }
 
@@ -65,10 +65,10 @@ task site (dependsOn: [processResources, siteCopyAllChecks, siteCopyJavadoc]) {
     outputs.dir(siteDir);
 
     doLast {
-        File includesVersionDir = new File(siteDir, '_includes/v' + project.version);
+        File includesVersionDir = new File(siteDir, "_includes/v${project.version}");
         includesVersionDir.mkdirs();
 
-        File versionChecksDir = new File(siteDir, 'v' + project.version + '/checks');
+        File versionChecksDir = new File(siteDir, "v${project.version}/checks");
         versionChecksDir.mkdirs();
         File latestChecksDir = new File(siteDir, 'latest/checks');
         latestChecksDir.mkdirs();
@@ -92,7 +92,7 @@ task site (dependsOn: [processResources, siteCopyAllChecks, siteCopyJavadoc]) {
             for (File f : cat.value) {
                 Files.copy(Paths.get(f.toURI()), Paths.get(new File(mdDir, f.name).toURI()),
                     StandardCopyOption.REPLACE_EXISTING, StandardCopyOption.COPY_ATTRIBUTES);
-                frontMatterFileSet.add('v' + project.version + '/' + cat.key + '/' + f.name);
+                frontMatterFileSet.add("v${project.version}/${cat.key}/${f.name}".toString());
             }
 
             File catPage = new File(versionChecksDir, cat.key + '.html');
@@ -102,7 +102,7 @@ task site (dependsOn: [processResources, siteCopyAllChecks, siteCopyJavadoc]) {
 
             // current version
             sb.append("check_version: v");
-            sb.append(project.version);
+            sb.append(project.version.toString());
             sb.append("\n");
 
             // current check category

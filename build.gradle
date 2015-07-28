@@ -13,6 +13,16 @@
  * You should have received a copy of the GNU General Public License along with this
  * program.  If not, see <http://www.gnu.org/licenses/>.
  */
+buildscript {
+    repositories {
+        mavenLocal()
+        mavenCentral()
+    }
+    dependencies {
+        classpath 'org.ajoberstar:gradle-git:1.2.0';
+    }
+}
+
 plugins {
     id 'java';
     id 'jacoco';
@@ -31,15 +41,18 @@ repositories {
 }
 
 
+
+import org.ajoberstar.grgit.Grgit
+
 group = 'com.thomasjensen.checkstyle.addons';
 version = readVersionProps();
 description = 'Additional Checkstyle Checks';
 ext {
-    depConfigDefault = 'cs6.4.1';
-    depConfig = getActiveDepConfig();
-    versions = readDependencyVersions(depConfig);
-    assert versions.size() == 7;
+    depConfigDefault = 'cs6.4.1';   // MUST be one that supports SonarQube (for IDE compilation) + PUBLISHED
+    // versionDefaults defined by DependencyConfigsTask
     bundledConfigurations = ['runtime'];
+    defaultPublication = 'checkstyleAddons';   // name of the default Gradle publication
+    jdk6PropName = 'checkstyleaddons_jdk6_javac';
     authorName = 'Thomas Jensen';
     longName = 'Checkstyle Addons';
     orgName = 'Checkstyle Addons';
@@ -47,87 +60,555 @@ ext {
     github = 'checkstyle-addons/checkstyle-addons';
     issueTrackerUrl = "https://github.com/${github}/issues";
     buildTimestamp = new Date();
+    sqPluginKey = 'checkstyleaddons';
     sqPackage = 'com/thomasjensen/checkstyle/addons/sonarqube';
     checksPackage = 'com/thomasjensen/checkstyle/addons/checks';
     website = 'http://checkstyle-addons.thomasjensen.com/';
+    gitRepo = Grgit.open(project.file('.'));
+    gitHash = gitRepo.head().id;
 }
+
 
 
 /*
- * Configure IntelliJ IDEA
+ * Read all dependency configurations from 'project/dependencyConfigs' and make them available
  */
-idea.project {
-    languageLevel = versions.Java;
-    // TODO set file encoding to UTF-8
-    // example: http://mrhaki.blogspot.de/2012/09/gradle-goodness-customize-idea-project.html
-}
-idea.module {
-    downloadSources = true;
-    downloadJavadoc = true;
-    excludeDirs += file(".idea");
-    excludeDirs += file("_site");
-    excludeDirs += file("_support");
-}
+class DependencyConfigsTask extends DefaultTask
+{
+    protected final File depConfigDir = new File((File) project.projectDir, 'project/dependencyConfigs');
+
+    public final FileCollection allDepConfigs = project.files {
+        depConfigDir.listFiles(new FilenameFilter() {
+            @Override
+            boolean accept(final File pDir, final String pName) {
+                return pName.endsWith('.properties');
+            }
+        });
+    };
+
+    public final SortedMap<String, Map<String, String>> depVersions = readAllDependencyVersions(project, allDepConfigs);
+
+    public final Set<String> publications = getPublicationList(project, depVersions);
+
+    public final Set<String> activeDepConfigs = depVersions.keySet();
 
 
-/*
- * Sometimes a different compiler is requested
- */
-tasks.withType(JavaCompile) {
-    sourceCompatibility = versions.Java;
-    targetCompatibility = versions.Java;
-    options.encoding = 'UTF-8';
+    private static Map<String, String> readDependencyVersions(final File pDepConfig, final boolean pPublished)
+    {
+        def props = new Properties();
+        pDepConfig.withInputStream {
+            InputStream stream -> props.load(stream);
+        }
 
-    // The warning "Supported source version 'RELEASE_6' from annotation processor 'org.antlr.v4.runtime.misc.
-    // NullUsageProcessor' less than -source '1.7'" is okay and may be ignored. It will go away when Checkstyle
-    // updates to ANTLR 4.5: https://github.com/antlr/antlr4/issues/487
+        if (props.getProperty('Description') != null) {
+            props.remove('Description');
+        }
+        if (pPublished) {
+            int expectedNumber = 8;
+            if (props.getProperty('PublicationSuffix') != null) {
+                expectedNumber++;
+            }
+            String testAgainstStr = props.getProperty('TestAgainst');
+            if (testAgainstStr == null || props.size() != expectedNumber) {
+                throw new GradleException('Broken dependency configuration: ' + pDepConfig.getName());
+            }
+            props.put('TestAgainst',
+                Collections.unmodifiableSortedSet(new TreeSet<String>(Arrays.asList(testAgainstStr.split(',\\s*')))));
+        }
+        else {
+            assert props.size() == 7;
+        }
+        props.put('Published', Boolean.valueOf(pPublished));
 
-    final String jdk6PropName = 'checkstyleaddons_jdk6_javac';
-    def javac6 = project.hasProperty(jdk6PropName) ? project.property(jdk6PropName) : System.getenv(jdk6PropName);
-    if ('1.6'.equals(versions.Java) && javac6 != null) {
-        options.fork = true;
-        options.forkOptions.executable = javac6;
+        return Collections.unmodifiableMap(new HashMap<>(props));
     }
-    doFirst {
-        if ('1.6'.equals(versions.Java) && javac6 == null) {
-            throw new GradleException('ERROR: Property \'' + jdk6PropName + '\' not defined in gradle.properties. ' +
-                'It must point to a Java 6 compiler executable.');
+
+
+    private static SortedMap<String, Map<String, String>> readAllDependencyVersions(final Project pProject,
+        final FileCollection pAllDepConfigs)
+    {
+        SortedMap<String, Map<String, String>> result = new TreeMap<>();
+        for (final File depCfg : pAllDepConfigs) {
+            int dotPos = depCfg.getName().lastIndexOf('.'.getAt(0));
+            if (dotPos > 0) {
+                boolean published = false;
+                if (depCfg.getName().substring(0, dotPos).endsWith('.pub')) {
+                    dotPos -= '.pub'.length();
+                    published = true;
+                }
+                final String depConfName = depCfg.getName().substring(0, dotPos);
+                final Map<String, String> dvs = readDependencyVersions(depCfg, published);
+                final String myJavaLevel = dvs.Java;
+                if (!'1.6'.equals(myJavaLevel) || pProject.getJdk6Compiler() != null) {
+                    result.put(depConfName, dvs);
+                } else {
+                    pProject.logger.warn('WARNING: Skipping dependency configuration \'' + depConfName +
+                        '\' because of missing JDK6 compiler configuration.');
+                    pProject.logger.warn('Property \'' + pProject.ext.jdk6PropName + '\' not defined in gradle.' +
+                        'properties. It must point to a Java 6 compiler executable.');
+                }
+            }
+        }
+        return Collections.unmodifiableSortedMap(result);
+    }
+
+
+    private static Set<String> getPublicationList(final Project pProject,
+        final SortedMap<String, Map<String, String>> pDepVersions)
+    {
+        final Set<String> result = new HashSet<>();
+        for (final Map.Entry<String, Map<String, String>> entry : pDepVersions) {
+            final String depConfName = entry.getKey();
+            final Map<String, String> dvs = entry.getValue();
+            if (dvs.Published) {
+                String pubName = pProject.ext.defaultPublication;
+                if (!pProject.ext.depConfigDefault.equals(depConfName)) {
+                    pubName += '-' + dvs.PublicationSuffix;
+                }
+                result.add(pubName);
+            }
+        }
+        return Collections.unmodifiableSet(result);
+    }
+
+
+
+    /**
+     * Convert the given standard, or general, object name into the name of the object which works specifically with one
+     * Checkstyle version. Objects can be tasks, configurations, or soure sets.
+     * @param pGeneralName the general object name, for example <tt>assemble</tt>
+     * @param pDepConfig the name of the dependency configuration to use, for example <tt>cs6.8.1</tt>
+     * @return the specific object name, for example <tt>assemble681</tt>
+     * @throws IllegalArgumentException the specified general name or dependency configuration were unknown
+     */
+    public String specificName(final String pGeneralName, final String pDepConfig)
+    {
+        final Map<String, String> theVersions = depVersions.get(pDepConfig);
+        if (theVersions == null || pGeneralName == null) {
+            throw new IllegalArgumentException('unknown depConfig or general name');
+        }
+        final String csVersComp = theVersions.Checkstyle.replaceAll('\\.','');
+
+        String result = null;
+        switch(pGeneralName) {
+            case 'assemble':
+                result = 'assemble' + csVersComp;
+                break;
+            case 'main':
+                result = 'main' + theVersions.Checkstyle;  // sic
+                break;
+            case 'test':
+                result = 'test' + theVersions.Checkstyle;  // sic
+                break;
+            case 'compileJava':
+                result = 'compileMain' + csVersComp + 'Java';
+                break;
+            case 'compileTestJava':
+                result = 'compileTest' + csVersComp + 'Java';
+                break;
+            case 'generatePomProperties':
+                result = 'generatePomProperties' + csVersComp;
+                break;
+            case 'generatePom':
+                result = 'generatePom' + csVersComp;
+                break;
+            case 'jar':
+                result = 'jar' + csVersComp;
+                break;
+            case 'jarEclipse':
+                result = 'jarEclipse' + csVersComp;
+                break;
+            case 'jarSonarqube':
+                result = 'jarSonarqube' + csVersComp;
+                break;
+            case 'classes':
+                result = 'main' + csVersComp + 'Classes';
+                break;
+            case 'testClasses':
+                result = 'test' + csVersComp + 'Classes';
+                break;
+            case 'provided':
+                result = 'provided' + csVersComp;
+                break;
+            case 'mainCompile':
+                result = 'main' + csVersComp + 'Compile';
+                break;
+            case 'mainRuntime':
+                result = 'main' + csVersComp + 'Runtime';
+                break;
+            case 'testCompile':
+                result = 'test' + csVersComp + 'Compile';
+                break;
+            case 'testRuntime':
+                result = 'test' + csVersComp + 'Runtime';
+                break;
+            default:
+                throw new IllegalArgumentException('unknown general name');
+        }
+        return result;
+    }
+
+
+    public String xcheckName(final String pDepConfigToCheck, final String pDepConfig4Cs)
+    {
+        final Map<String, String> theVersions1 = depVersions.get(pDepConfigToCheck);
+        final Map<String, String> theVersions2 = depVersions.get(pDepConfig4Cs);
+        if (theVersions1 == null || theVersions2 == null) {
+            throw new IllegalArgumentException('unknown depConfig');
+        }
+        final String dc1 = theVersions1.Checkstyle.replaceAll('\\.', '');
+        final String dc2 = theVersions2.Checkstyle.replaceAll('\\.', '');
+        return 'xtest' + dc1 + 'against' + dc2;
+    }
+}
+task depConfigs(type: DependencyConfigsTask) {
+    description = project.ext.longName + ': Read active dependency configurations from ' + depConfigDir;
+
+    inputs.files allDepConfigs;
+
+    project.ext.versionDefaults = depVersions.get(depConfigDefault);
+
+    println "Dependency configurations found: ${activeDepConfigs}; default: ${project.ext.depConfigDefault}";
+}
+
+
+
+/*
+ * Set up build for each dependency configuration
+ */
+tasks.depConfigs.activeDepConfigs.each { final String depCfg ->
+
+    if (depConfigDefault.equals(depCfg)) {
+        return;   // no extra stuff for the default config - important to make IDE configuration work
+    }
+
+    final DependencyConfigsTask dcn = tasks.depConfigs;
+    final Map<String, String> depVersions = dcn.depVersions.get(depCfg);
+    final String csVersComp = depVersions.Checkstyle.replaceAll('\\.','');
+    final boolean hasSonarQube = !"NOT_SUPPORTED".equals(depVersions.SonarQube);
+    final boolean isPublished = depVersions.Published;
+    final File depCfgFile = tasks.depConfigs.allDepConfigs.filter { final File f ->
+        f.getName().startsWith(depCfg + '.p');
+    }.getSingleFile();
+
+    // 'main' sourceSet
+    SourceSet mainSourceSet = project.sourceSets.create(dcn.specificName('main', depCfg));
+    mainSourceSet.java {
+        srcDirs  = ['src/main/java'];
+        if (!hasSonarQube) {
+            excludes = ['**/sonarqube/**'];
+        }
+    }
+    mainSourceSet.resources {
+        srcDirs  = ['src/main/resources'];
+    }
+
+    // 'test' sourceSet
+    SourceSet testSourceSet = project.sourceSets.create(dcn.specificName('test', depCfg));
+    testSourceSet.java {
+        srcDirs  = ['src/test/java'];
+        if (!hasSonarQube) {
+            excludes = ['**/sonarqube/**'];
+        }
+    }
+    testSourceSet.resources {
+        srcDirs  = ['src/test/resources'];
+    }
+    testSourceSet.compileClasspath += files(mainSourceSet.output.classesDir);
+    testSourceSet.compileClasspath += files(mainSourceSet.output.resourcesDir);
+    testSourceSet.runtimeClasspath += files(mainSourceSet.output.classesDir);
+    testSourceSet.runtimeClasspath += files(mainSourceSet.output.resourcesDir);
+/*
+    println "-- test";
+    println 'compileConfigurationName = ' + sourceSets['test'].getCompileConfigurationName();
+    println 'runtimeConfigurationName = ' + sourceSets['test'].getRuntimeConfigurationName();
+    println 'output.classesDir = ' + sourceSets['test'].output.classesDir;
+    println 'output.resourcesDir = ' + sourceSets['test'].output.resourcesDir;
+    sourceSets['test'].java.each {println "java = " + it;}
+    sourceSets['test'].compileClasspath.each {println 'compile = ' + it;}
+    sourceSets['test'].runtimeClasspath.each {println 'runtime = ' + it;}
+
+    println '-- test' + depVersions.Checkstyle;
+    println 'compileConfigurationName = ' + sourceSets['test' + depVersions.Checkstyle].getCompileConfigurationName();
+    println 'runtimeConfigurationName = ' + sourceSets['test' + depVersions.Checkstyle].getRuntimeConfigurationName();
+    println 'output.classesDir = ' + sourceSets['test' + depVersions.Checkstyle].output.classesDir;
+    println 'output.resourcesDir = ' + sourceSets['test' + depVersions.Checkstyle].output.resourcesDir;
+    sourceSets['test' + depVersions.Checkstyle].java.each {println "java = " + it;}
+    sourceSets['test' + depVersions.Checkstyle].compileClasspath.each {println 'compile = ' + it;}
+    sourceSets['test' + depVersions.Checkstyle].runtimeClasspath.each {println 'runtime = ' + it;}
+
+    //println sourceSets*.each { println it.name + ':\t' + it.output.classesDir };
+    //println sourceSets*.each { println it.name + ':\t' + it.output.resourcesDir };
+    println "--";
+*/
+    // 'provided' configuration
+    Configuration providedConf = project.configurations.create(dcn.specificName('provided', depCfg));
+    providedConf.setDescription("Provided classpath for source sets '${mainSourceSet.name}' and '${testSourceSet.name}'");
+
+    // 'compile' configuration
+    Configuration compileConf = project.configurations[dcn.specificName('mainCompile', depCfg)];
+    compileConf.setDescription("Compile classpath for source set '${mainSourceSet.name}'");
+
+    // 'runtime' configuration
+    Configuration runtimeConf = project.configurations[dcn.specificName('mainRuntime', depCfg)];
+    runtimeConf.setDescription("Runtime classpath for source set '${mainSourceSet.name}'");
+
+    // 'testCompile' configuration
+    Configuration testCompileConf = project.configurations[dcn.specificName('testCompile', depCfg)];
+    testCompileConf.setDescription("Compile classpath for source set '${testSourceSet.name}'");
+    testCompileConf.extendsFrom(compileConf);
+
+    // 'testRuntime' configuration (description text only)
+    Configuration testRuntimeConf = project.configurations[dcn.specificName('testRuntime', depCfg)];
+    testRuntimeConf.setDescription("Runtime classpath for source set '${testSourceSet.name}'");
+
+    // Dependencies
+    addDependencies(depVersions, compileConf, testCompileConf, providedConf);
+    mainSourceSet.compileClasspath += providedConf;
+    mainSourceSet.runtimeClasspath += providedConf;
+    testSourceSet.compileClasspath += providedConf;
+    testSourceSet.runtimeClasspath += providedConf;
+
+    // 'compileJava' task
+    Task compileTask = project.tasks[dcn.specificName('compileJava', depCfg)];
+    compileTask.setDescription("${project.ext.longName}: ${compileTask.description} (Java level: ${depVersions.Java})");
+    compileTask.setGroup(BasePlugin.BUILD_GROUP);
+    compileTask.inputs.file(depCfgFile);
+
+    // 'compileTestJava' task
+    Task testCompileTask = project.tasks[dcn.specificName('compileTestJava', depCfg)];
+    testCompileTask.setDescription("${project.ext.longName}: ${testCompileTask.description} "
+        + "(Java level: ${depVersions.Java})");
+    testCompileTask.setGroup(BasePlugin.BUILD_GROUP);
+    testCompileTask.dependsOn compileTask;
+    testCompileTask.inputs.file(depCfgFile);
+
+    // 'testClasses' task
+    Task testClassesTask = project.tasks[dcn.specificName('testClasses', depCfg)];
+    testClassesTask.setDescription("${project.ext.longName}: ${testClassesTask.description}");
+    testClassesTask.dependsOn project.tasks['main' + csVersComp + 'Classes'];
+
+    if (!isPublished) {
+        return;  // no need for additional tasks if we don't publish for this Checkstyle version
+    }
+
+    // 'test' task
+    Task testTask = project.tasks.create(name: 'test' + csVersComp, type: Test);
+    testTask.setDescription("${project.ext.longName}: Runs the unit tests in ${testSourceSet.name}.");
+    testTask.setGroup(LifecycleBasePlugin.VERIFICATION_GROUP);
+    testTask.taskDependencies.each { TaskDependency tDep ->
+        tDep.values = [project.tasks['main' + csVersComp + 'Classes'], project.tasks['test' + csVersComp + 'Classes']];
+    }
+    project.tasks.check.dependsOn testTask;
+    testTask.testClassesDir = testSourceSet.output.classesDir;
+    testTask.reports.html.setDestination(new File((File) project.reportsDir, 'tests' + csVersComp));
+    testTask.reports.getJunitXml().enabled = false;
+    testTask.classpath.getFrom().clear();
+    testTask.classpath += files(testSourceSet.output.classesDir);
+    testTask.classpath += files(testSourceSet.output.resourcesDir);
+    testTask.classpath += files(mainSourceSet.output.classesDir);
+    testTask.classpath += files(mainSourceSet.output.resourcesDir);
+    testTask.classpath += files(testRuntimeConf.getFiles());
+    testTask.classpath += files(providedConf.getFiles());
+    testTask.configure {
+        jacoco {
+            enabled = false;
+        }
+        testLogging(configureTestLogging());
+    }
+    /*
+    println '--- ' + testTask.name;
+    println 'testClassesDir = ' + testTask.testClassesDir;
+    println 'testSrcDirs = ' + testTask.testSrcDirs.collect { it; }
+    println 'reports = ' + testTask.reports.html.entryPoint;
+    println 'workingDir = ' + testTask.workingDir;
+    testTask.classpath.each { println "classpath = " + it; }
+    */
+
+    [compileTask, testCompileTask].each { final JavaCompile pTask -> configureCompileTask(pTask, depVersions.Java); }
+}
+//println 'SourceSets: ' + (sourceSets.collect { it.name });
+
+
+
+/*
+ * Dependencies
+ */
+def void addDependencies(final Map<String, String> pDepVersions, final Configuration pCompileConf,
+    final Configuration pTestCompileConf, final Configuration pProvidedConf)
+{
+    final boolean hasSonarQube = !"NOT_SUPPORTED".equals(pDepVersions.SonarQube);
+
+    // provided
+    Dependency fb1 = project.dependencies.create('com.google.code.findbugs:annotations:' + pDepVersions.FindBugs);
+    Dependency fb2 = project.dependencies.create('com.google.code.findbugs:jsr305:' + pDepVersions.FindBugs);
+    pProvidedConf.dependencies.add(fb1);
+    pProvidedConf.dependencies.add(fb2);
+    if (hasSonarQube) {
+        Dependency sq = project.dependencies.create('org.codehaus.sonar:sonar-plugin-api:' + pDepVersions.SonarQube);
+        pProvidedConf.dependencies.add(sq);
+    }
+
+    // compile
+    Dependency csDep = project.dependencies.create('com.puppycrawl.tools:checkstyle:' + pDepVersions.Checkstyle);
+    pCompileConf.dependencies.add(csDep);
+
+    // testCompile
+    Dependency junitDep = project.dependencies.create('junit:junit:4.11');
+    pTestCompileConf.dependencies.add(junitDep);
+}
+project.configurations.create('provided');
+addDependencies(project.ext.versionDefaults,
+    project.configurations.compile, project.configurations.testCompile, project.configurations.provided);
+
+
+
+/*
+ * Set up cross-check feature. We provide an 'xcheck' task which depends on a number of Test tasks that run the
+ * unit tests compiled against every Checkstyle version against all the other Checkstyle libraries. In this way, we
+ * find out which versions are compatible.
+ */
+tasks.depConfigs.activeDepConfigs.each { final String depCfgToCheck ->
+    final DependencyConfigsTask dcn = (DependencyConfigsTask) tasks.depConfigs;
+    final Map<String, String> depVersionsToCheck = dcn.depVersions.get(depCfgToCheck);
+    final String csVersCompToCheck = depVersionsToCheck.Checkstyle.replaceAll('\\.','');
+    final boolean checkingDefault = depCfgToCheck.equals(project.ext.depConfigDefault);
+    if (!depVersionsToCheck.Published || depVersionsToCheck.TestAgainst.size() == 0) {
+        return;
+    }
+
+    depVersionsToCheck.TestAgainst.each { final String depCfg4Cs ->
+        if (depCfgToCheck.equals(depCfg4Cs)) {
+            return;
+        }
+
+        final Map<String, String> depVersions4Cs = dcn.depVersions.get(depCfg4Cs);
+        final String csVersComp4Cs = depVersions4Cs.Checkstyle.replaceAll('\\.','');
+
+        Task xtestTask = project.tasks.create(name: dcn.xcheckName(depCfgToCheck, depCfg4Cs), type: Test);
+        xtestTask.setDescription("${project.ext.longName}: Runs the unit tests for Checkstyle " +
+            "${depVersionsToCheck.Checkstyle} against Checkstyle ${depVersions4Cs.Checkstyle}.");
+        xtestTask.setGroup(LifecycleBasePlugin.VERIFICATION_GROUP);
+        xtestTask.taskDependencies.each { TaskDependency tDep ->
+            tDep.values = [project.tasks[checkingDefault ? 'classes' : dcn.specificName('classes', depCfgToCheck)],
+                   project.tasks[checkingDefault ? 'testClasses' : dcn.specificName('testClasses', depCfgToCheck)]];
+        }
+
+        SourceSet mainSourceSet = (SourceSet) project.sourceSets[
+            checkingDefault ? 'main' : dcn.specificName('main', depCfgToCheck)];
+        SourceSet testSourceSet = (SourceSet) project.sourceSets[
+            checkingDefault ? 'test' : dcn.specificName('test', depCfgToCheck)];
+        Configuration providedConf = project.configurations[
+            checkingDefault ? 'provided' : dcn.specificName('provided', depCfgToCheck)];
+        Configuration testRuntimeConf = project.configurations[depCfg4Cs.equals(project.ext.depConfigDefault) ?
+            'testRuntime' : dcn.specificName('testRuntime', depCfg4Cs)];
+        xtestTask.testClassesDir = testSourceSet.output.classesDir;
+        xtestTask.reports.getHtml().enabled = false;
+        xtestTask.reports.getJunitXml().enabled = false;
+        xtestTask.classpath.getFrom().clear();
+        xtestTask.classpath += files(testSourceSet.output.classesDir);
+        xtestTask.classpath += files(testSourceSet.output.resourcesDir);
+        xtestTask.classpath += files(mainSourceSet.output.classesDir);
+        xtestTask.classpath += files(mainSourceSet.output.resourcesDir);
+        xtestTask.classpath += files(testRuntimeConf.getFiles());
+        xtestTask.classpath += files(providedConf.getFiles());
+        xtestTask.configure {
+            jacoco {
+                enabled = false;
+            }
+            testLogging {
+                events = [];
+            }
         }
     }
 }
-if ("NOT_SUPPORTED".equals(versions.SonarQube)) {
-    sourceSets.main.java.exclude '**/sonarqube/**';
-    sourceSets.test.java.exclude '**/sonarqube/**';
+task xcheck {
+    setGroup(LifecycleBasePlugin.VERIFICATION_GROUP);
+    setDescription("${project.ext.longName}: Runs the unit tests against other Checkstyle versions " +
+        "which they were not compiled for");
+    dependsOn tasks.check;
+    Set<Task> xtestTasks = tasks.findAll { final Task t -> t.name.startsWith('xtest'); };
+    xtestTasks.each { dependsOn it; }
 }
+tasks.build.dependsOn tasks.xcheck;
+
 
 
 /*
- * 'Provided' configuration for JARs which need not be packaged
+ * Remove superfluous Checkstyle tasks that were created for our additional source sets. We only run Checkstyle on the
+ * 'main' and 'test' source sets. The Checkstyle plugin is configured to do that below, but it still creates these
+ * undead tasks. So we clean up after it by removing them.
  */
-configurations {
-    provided
+project.tasks.withType(Checkstyle) { Task task ->
+    if (!"checkstyleMain".equals(task.name) && !"checkstyleTest".equals(task.name)) {
+        project.tasks.remove(task);
+    }
 }
-idea.module {
-    scopes.PROVIDED.plus += [configurations.provided];
+
+
+
+def String getJdk6Compiler()
+{
+    String result = System.getenv((String) project.ext.jdk6PropName);
+    if (project.hasProperty((String) project.ext.jdk6PropName)) {
+        result = project.property((String) project.ext.jdk6PropName);
+    }
+    return result;
 }
+
+
+
+def void configureCompileTask(final JavaCompile pTask, final String pJavaLevel)
+{
+    pTask.sourceCompatibility = pJavaLevel;
+    pTask.targetCompatibility = pJavaLevel;
+    pTask.options.encoding = 'UTF-8';
+
+    // The warning "Supported source version 'RELEASE_6' from annotation processor 'org.antlr.v4.runtime.misc.
+    // NullUsageProcessor' less than -source '1.7'" is okay and may be ignored. It goes away when Checkstyle
+    // updates to ANTLR 4.5: https://github.com/antlr/antlr4/issues/487 (which it did in version 6.5)
+
+    if ('1.6'.equals(pJavaLevel)) {
+        pTask.options.fork = true;
+        def javac6 = getJdk6Compiler();
+        if (javac6 == null) {
+            throw new GradleException('ERROR: Property \'' + project.ext.jdk6PropName +
+                '\' not defined in gradle.properties. It must point to a Java 6 compiler executable.');
+        }
+        pTask.options.forkOptions.executable = javac6;
+    }
+}
+
+
+
+[tasks.compileJava, tasks.compileTestJava].each { final JavaCompile pTask ->
+    configureCompileTask(pTask, (String) versionDefaults.Java);
+}
+
 sourceSets.main.compileClasspath += configurations.provided;
 sourceSets.main.runtimeClasspath += configurations.provided;
 sourceSets.test.compileClasspath += configurations.provided;
 sourceSets.test.runtimeClasspath += configurations.provided;
 
 
+
 /*
- * Dependencies
+ * Configure IntelliJ IDEA
  */
-dependencies {
-    provided group: 'com.google.code.findbugs', name: 'annotations', version: versions.FindBugs;
-    provided group: 'com.google.code.findbugs', name: 'jsr305', version: versions.FindBugs;
-    if (!"NOT_SUPPORTED".equals(versions.SonarQube)) {
-        provided group: 'org.codehaus.sonar', name: 'sonar-plugin-api', version: versions.SonarQube;
-    }
-    compile group: 'com.puppycrawl.tools', name: 'checkstyle', version: versions.Checkstyle;
-    testCompile group: 'junit', name: 'junit', version: '4.11';
+idea.project {
+    languageLevel = project.ext.versionDefaults.Java;
+    // TODO set file encoding to UTF-8
+    // example: http://mrhaki.blogspot.de/2012/09/gradle-goodness-customize-idea-project.html
 }
+idea.module {
+    downloadSources = true;
+    downloadJavadoc = true;
+    excludeDirs += file('.idea');
+    excludeDirs += file('_site');
+    excludeDirs += file('_support');
+    scopes.PROVIDED.plus += [configurations.provided];
+}
+
 
 
 /*
@@ -145,11 +626,12 @@ javadoc {
     options.splitIndex = false;
     options.outputLevel = null;   // specify neither -quiet nor -verbose
     options.header = project.ext.longName;
-    if ('1.7'.equals(versions.Java)) {
-        options.links('http://docs.oracle.com/javase/7/docs/api/',
+    if ('1.7'.equals(project.ext.versionDefaults.Java)) {
+        options.links('https://jsr-305.googlecode.com/svn/trunk/javadoc/',
+            'http://docs.oracle.com/javase/7/docs/api/',
             'http://javadocs.sonarsource.org/3.0/apidocs/',
             'http://checkstyle.sourceforge.net/apidocs/');
-    } else if ('1.6'.equals(versions.Java)) {
+    } else if ('1.6'.equals(project.ext.versionDefaults.Java)) {
         options.links('https://jsr-305.googlecode.com/svn/trunk/javadoc/',
             'http://docs.oracle.com/javase/6/docs/api/',
             'http://javadocs.sonarsource.org/3.0/apidocs/',
@@ -172,6 +654,7 @@ javadoc {
 checkstyle {
     configFile file('project/checkstyle.xml');
     configProperties 'projectDir': project.projectDir;
+    sourceSets = [project.sourceSets.main, project.sourceSets.test];
     toolVersion '6.4.1';  // depends on our checkstyle.xml; has nothing to do with the version used for building
     showViolations = true;
     ignoreFailures = false;
@@ -181,12 +664,20 @@ checkstyle {
 /*
  * JaCoCo test coverage configuration
  */
+final Test realTest = (Test) project.tasks['test'];
+realTest.dependsOn(tasks.testClasses);
+realTest.classpath += files((File) project.sourceSets.test.output.classesDir);
+realTest.classpath += files((File) project.sourceSets.test.output.resourcesDir);
+realTest.classpath += files((File) project.sourceSets.main.output.classesDir);
+realTest.classpath += files((File) project.sourceSets.main.output.resourcesDir);
+realTest.classpath += files((Set<File>) project.configurations['testRuntime'].getFiles());
 String[] excludedClasses = ['**/com/thomasjensen/checkstyle/addons/util/CheckstyleApiFixer*'];
-tasks.withType(Test) { task ->
+test {
     jacoco {
         append = false;
         excludes = excludedClasses;
     }
+    testLogging(configureTestLogging());
     jacocoTestReport {
         reports {
             html.enabled = true;
@@ -198,46 +689,18 @@ tasks.withType(Test) { task ->
         }
     }
 }
-test {
-    testLogging {
-        events 'started', 'skipped', 'passed', 'failed';
+
+
+def Closure configureTestLogging()
+{
+    return {
+        events 'failed';
+        showStackTraces = true;
+        showExceptions = true;
+        showCauses = true;
+        showStandardStreams = true;
         exceptionFormat 'full';
-    }
-}
-
-
-/*
- * Read project/dependencyConfigs/${depConfig}.properties to build the dependency map
- */
-def String getActiveDepConfig()
-{
-    final String depsPropName = 'checkstyleaddons_deps';
-    def depsCfgName = project.hasProperty(depsPropName) ? project.property(depsPropName) : System.getenv(depsPropName);
-    if (depsCfgName == null) {
-        depsCfgName = project.ext.depConfigDefault;
-    }
-    return depsCfgName;
-}
-
-
-def Map<String, String> readDependencyVersions(final String pDepConfig)
-{
-    final File depsCfgFile = new File("project/dependencyConfigs/${pDepConfig}.properties");
-
-    System.out.println('--------------------------------------------------------------------------------------------');
-    System.out.println('Dependency configuration: ' + depsCfgFile);
-
-    def props = new Properties();
-    depsCfgFile.withInputStream {
-        InputStream stream -> props.load(stream);
-    }
-
-    if (props.getProperty('Description') != null) {
-        System.out.println('    (' + props.getProperty('Description') + ')');
-        props.remove('Description');
-    }
-    System.out.println('--------------------------------------------------------------------------------------------');
-    return new HashMap<>(props);
+    };
 }
 
 

@@ -13,16 +13,7 @@
  * You should have received a copy of the GNU General Public License along with this
  * program.  If not, see <http://www.gnu.org/licenses/>.
  */
-buildscript {
-    repositories {
-        mavenCentral()
-    }
-    dependencies {
-        classpath 'org.ajoberstar:gradle-git:1.1.0';
-    }
-}
 
-import org.ajoberstar.grgit.Grgit;
 import org.apache.tools.ant.filters.ReplaceTokens;
 import org.gradle.internal.jvm.Jvm;
 
@@ -32,157 +23,496 @@ import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 
 
-/**
- * Scan the dependencies of the specified configurations and return a list of File objects for each dependency.
- * Resolves the configurations if they are still unresolved.
- * @param pProject the project
- * @param pIncludeCheckstyle flag indicating if the dependency on Checkstyle should be included in the result
- * @return list of files
- */
-def Set<File> getPublishedDependencyLibs(final Project pProject, final boolean pIncludeCheckstyle)
-{
-    Set<File> result = new HashSet<>();
-    for (final String configName : ext.bundledConfigurations) {
-        Configuration cfg = pProject.configurations.getByName(configName);
-        if (cfg == null) {
-            throw new GradleScriptException("Unknown configuration: " + configName, null);
+
+tasks.depConfigs.activeDepConfigs.each { final String depCfg ->
+
+    final Map<String, String> depVersions = tasks.depConfigs.depVersions.get(depCfg);
+    final String csVersComp = depVersions.Checkstyle.replaceAll('\\.','');
+    final boolean isDefaultDepConfig = project.ext.depConfigDefault.equals(depCfg);
+    final boolean hasSonarQube = !"NOT_SUPPORTED".equals(depVersions.SonarQube);
+    final boolean isPublished = depVersions.Published;
+
+    if (!isPublished) {
+        return;
+    }
+
+    // 'generatePomProperties' task
+    final String pomPropsTaskName = 'generatePomProperties' + (isDefaultDepConfig ? '' : csVersComp);
+    final GeneratePomPropsTask pomPropsTask = (GeneratePomPropsTask) project.tasks.create(
+        name: pomPropsTaskName, type: GeneratePomPropsTask);
+    pomPropsTask.setAppendix(depVersions.PublicationSuffix);
+
+    // 'generatePom' task
+    if (!isDefaultDepConfig) {
+        Class<?> generatePomTaskClass = project.tasks['generatePom'].getClass();
+        Task generatePomTask = project.tasks.create(name: 'generatePom' + csVersComp, type: generatePomTaskClass);
+        String appendix = depVersions.PublicationSuffix;
+        generatePomTask.setDescription("${project.ext.longName}: Generates the Maven POM file for publication " +
+            "'checkstyleAddons' (appendix: " + appendix + ').');
+        generatePomTask.setAppendix(appendix);
+        generatePomTask.addBundledConfigs(project.configurations['main' + csVersComp + 'Runtime']);
+    }
+
+    // 'jar' task
+    final String jarTaskName = 'jar' + (isDefaultDepConfig ? 'Default' : csVersComp);
+    final CreateJarTask jarTask = (CreateJarTask) project.tasks.create(name: jarTaskName, type: CreateJarTask);
+    jarTask.configureFor(depCfg);
+    project.artifacts {
+        archives jarTask;
+    }
+
+    // Add JAR to list of artifacts to publish
+    if (isPublished) {
+        String pubName = 'checkstyleAddons';
+        if (!isDefaultDepConfig) {
+            pubName += '-' + depVersions.PublicationSuffix;
         }
-        for (ResolvedDependency dep : cfg.getResolvedConfiguration().getFirstLevelModuleDependencies()) {
-            if (pIncludeCheckstyle || !isCheckstyle(dep)) {
-                for (ResolvedArtifact artifact : dep.allModuleArtifacts) {
-                    result.add(artifact.file);
-                }
-            }
+        MavenPublication pub = publishing.publications.create(pubName, MavenPublication.class);
+        final String pubArtifactId = project.name + (isDefaultDepConfig ? '' : ('-' + depVersions.PublicationSuffix));
+        pub.setArtifactId(pubArtifactId);
+        pub.artifact(jarTask);
+    }
+
+    // 'jarEclipse' task
+    final String eclipseTaskName = 'jarEclipse' + (isDefaultDepConfig ? 'Default' : csVersComp);
+    final CreateJarEclipseTask jarEclipseTask = (CreateJarEclipseTask) project.tasks.create(name: eclipseTaskName,
+        type: CreateJarEclipseTask);
+    jarEclipseTask.configureFor(depCfg);
+    project.artifacts {
+        archives jarEclipseTask;
+    }
+
+    // 'jarSonarqube' task
+    CreateJarSonarqubeTask jarSqTask = null;
+    if (hasSonarQube) {
+        final String sqTaskName = 'jarSonarqube' + (isDefaultDepConfig ? 'Default' : csVersComp);
+        jarSqTask = (CreateJarSonarqubeTask) project.tasks.create(name: sqTaskName, type: CreateJarSonarqubeTask);
+        jarSqTask.configureFor(depCfg);
+        project.artifacts {
+            archives jarSqTask;
         }
     }
-    return result;
+
+    // 'assemble' task for Checkstyle-version-specific artifacts
+    // Dependencies on 'jarJavadoc' and 'jarSources' are set later when the tasks are created
+    final Task assembleTask = project.tasks.create(name: 'assemble' + csVersComp);
+    assembleTask.setGroup(BasePlugin.BUILD_GROUP);
+    assembleTask.setDescription("${project.ext.longName}: Assembles the outputs of this project pertaining to " +
+        "Checkstyle ${depVersions.Checkstyle}.");
+    assembleTask.dependsOn(jarTask);
+    assembleTask.dependsOn(jarEclipseTask);
+    if (jarSqTask != null) {
+        assembleTask.dependsOn(jarSqTask);
+    }
 }
 
 
 
-def boolean isCheckstyle(final ResolvedDependency pDependency) {
-    return pDependency != null && 'com.puppycrawl.tools'.equals(pDependency.getModuleGroup()) &&
-        'checkstyle'.equals(pDependency.getModuleName());
-}
-
-
-
-def String flattenPrefixLibs(final String pPrefix, final Set<File> pLibs, final char pSeparator)
+class GeneratePomPropsTask extends DefaultTask
 {
-    Set<String> set = new HashSet<>();
-    final String prefix = pPrefix.endsWith('/') ? pPrefix : (pPrefix + '/');
-    for (final File f : pLibs) {
-        set.add(prefix + f.getName());
-    }
-    StringBuilder sb = new StringBuilder();
-    for (final Iterator<String> iter = set.iterator(); iter.hasNext();) {
-        sb.append(iter.next());
-        if (iter.hasNext()) {
-            sb.append(pSeparator);
-        }
-    }
-    return sb.toString();
-}
-
-
-
-def String getCsaClassifier()
-{
-    String result = 'cs' + project.ext.versions.Checkstyle;
-    if (project.ext.depConfigDefault.equals(result)) {
-        result = null;
-    }
-    return result;
-}
-
-
-
-class GeneratePomPropsTask extends DefaultTask {
     public final File pluginPomProps = new File(getTemporaryDir(), 'pom.properties');
-}
-task generatePomProperties(type: GeneratePomPropsTask) {
-    description = project.ext.longName + ': Create file \'pom.properties\' for use in JAR';
 
-    inputs.property('groupId', project.group);
-    inputs.property('artifactId', project.name);
-    inputs.property('version', project.version);
-    if (getCsaClassifier() != null) {
-        inputs.property('classifier', getCsaClassifier());
+    public String appendix = null;
+
+
+    public GeneratePomPropsTask()
+    {
+        super();
+        setGroup(BasePlugin.BUILD_GROUP);
+
+        configure {
+            inputs.property('groupId', project.group);
+            inputs.property('artifactId', project.name);
+            inputs.property('version', project.version);
+            if (this.appendix != null) {
+                inputs.property('appendix', getAppendix());
+            }
+            outputs.file(pluginPomProps);
+        }
+
+        doLast {
+            String effectiveArtifactId = inputs.getProperties().get('artifactId');
+            if (getAppendix() != null) {
+                effectiveArtifactId += '-' + getAppendix();
+            }
+
+            List<String> entries = new ArrayList<>();
+            entries.add('#Generated by Maven');
+            entries.add('#@buildTimestamp@');
+            entries.add('groupId=' + (String) inputs.getProperties().get('groupId'));
+            entries.add('artifactId=' + effectiveArtifactId);
+            entries.add('version=' + (String) inputs.getProperties().get('version'));
+
+            pluginPomProps.getParentFile().mkdirs();
+            Files.write(pluginPomProps.toPath(), entries, StandardCharsets.UTF_8);
+        }
     }
-    outputs.file(pluginPomProps);
 
-    doLast {
-        List<String> entries = new ArrayList<>();
-        entries.add('#Generated by Maven');
-        entries.add('#@buildTimestamp@');
-        entries.add('groupId=' + (String) inputs.getProperties().get('groupId'));
-        entries.add('artifactId=' + (String)inputs.getProperties().get('artifactId'));
-        entries.add('version=' + (String)inputs.getProperties().get('version'));
-        String clsf = (String) inputs.getProperties().get('classifier');
-        if (clsf != null) {
-            entries.add('classifier=' + clsf);
+
+    public String getAppendix()
+    {
+        return this.appendix;
+    }
+
+    public setAppendix(final String pAppendix)
+    {
+        this.appendix = pAppendix;
+        if (pAppendix != null) {
+            inputs.property('appendix', pAppendix);
+            setDescription("${project.ext.longName}: Create file 'pom.properties' for use in JAR " +
+                "(appendix: ${pAppendix})");
         }
-
-        pluginPomProps.getParentFile().mkdirs();
-        Files.write(pluginPomProps.toPath(), entries, StandardCharsets.UTF_8);
+        else {
+            inputs.getProperties().remove('appendix');
+            setDescription("${project.ext.longName}: Create file 'pom.properties' for use in JAR (no appendix)");
+        }
     }
 }
 
 
 
-model {
-    tasks.jar {
-        dependsOn project.tasks['generatePomFileForCheckstyleAddonsPublication'];
-        dependsOn project.tasks['generatePomProperties'];
+public class CreateJarTask extends Jar
+{
+    public CreateJarTask()
+    {
+        super();
+        setGroup(BasePlugin.BUILD_GROUP);
+        setDescription("${project.ext.longName}: Assembles a jar archive containing the classes of '");
+    }
 
-        classifier = getCsaClassifier();
 
-        final File pluginPom = tasks.generatePomFileForCheckstyleAddonsPublication.destination;
-        inputs.files pluginPom;
-        final File pomPropsFile = project.tasks['generatePomProperties'].pluginPomProps;
-        inputs.files pomPropsFile;
+    public static Map<String, String> mfAttrStd(final Project pProject, final String pDepConfig)
+    {
+        Map<String, String> result = new HashMap<>();
+        result.put('Manifest-Version', '1.0');
+        result.put('Website', (String) pProject.ext.website);
+        result.put('Dependency-Configuration', pDepConfig);
+        result.put('Created-By', GradleVersion.current().toString());
+        result.put('Built-By', System.getProperty('user.name'));
+        result.put('Build-Jdk', Jvm.current().toString());
+        return result;
+    }
 
-        exclude '**/sonarqube/**';
-        exclude 'sonarqube.xml';
-        exclude '**/*.md';
-        exclude '**/checks/all_checks.html';
-        exclude 'eclipsecs-plugin.xml';
-        exclude '**/checkstyle-metadata.*';
 
-        into('META-INF') {
-            from 'LICENSE';
+    /**
+     * Configure this task instance for a given dependency configuration.
+     * @param pDepConfig the name of the dependency configuration. May be <code>null</code> to indicate the default
+     *          dependency configuration
+     */
+    public void configureFor(final String pDepConfig)
+    {
+        // Dependency Configuration
+        final String depConfig = pDepConfig != null ? pDepConfig : project.ext.depConfigDefault;
+        final String checkstyleVersion = project.tasks.depConfigs.depVersions.get(depConfig).Checkstyle;
+        final String appendix = project.tasks.depConfigs.depVersions.get(depConfig).PublicationSuffix;
+        final boolean isDefaultConfig = pDepConfig == null || pDepConfig.equals(project.ext.depConfigDefault);
+
+        // set appendix for archive name
+        if (appendix != null) {
+            setAppendix(appendix);
         }
 
-        manifest {
-            attributes = ['Specification-Title'     : project.name,
-                          'Specification-Vendor'    : project.ext.authorName,
-                          'Specification-Vendor-Id' : 'com.thomasjensen',
-                          'Specification-Version'   : project.version,
-                          'Implementation-Title'    : project.name,
-                          'Implementation-Vendor'   : project.ext.authorName,
-                          'Implementation-Vendor-Id': 'com.thomasjensen',
-                          'Implementation-Version'  : project.version,
-                          'Implementation-Build'    : getGitHash(),
-                          'Checkstyle-Version'      : project.ext.versions.Checkstyle,];
-            attributes.putAll(mfAttrStd());
+        // compressed Checkstyle version
+        String csVersComp = '';
+        if (!isDefaultConfig) {
+            csVersComp = checkstyleVersion.replaceAll('\\.', '');
         }
 
-        doFirst {
+        // Dependency on pom.properties generating task
+        dependsOn('generatePomProperties' + csVersComp);
+        final File pomPropsUsed = project.tasks['generatePomProperties' + csVersComp].pluginPomProps;
+        inputs.file(pomPropsUsed);
+
+        // Dependency on pom.xml generating task
+        dependsOn('generatePom' + csVersComp);
+        final File pomUsed = project.tasks['generatePom' + csVersComp].pomFile;
+        inputs.file(pomUsed);
+
+        // Dependency on 'classes' task (compile and resources)
+        if (isDefaultConfig) {
+            dependsOn('classes');
+        }
+        else {
+            dependsOn('main' + csVersComp + 'Classes');
+        }
+
+        // SourceSet that fits the dependency configuration
+        SourceSet mainSourceSet;
+        if (isDefaultConfig) {
+            mainSourceSet = project.sourceSets.main;
+            setDescription(getDescription() + 'main\'.');
+        }
+        else {
+            mainSourceSet = (SourceSet) project.sourceSets['main' + checkstyleVersion];
+            setDescription(getDescription() + ('main' + checkstyleVersion) + '\'.');
+        }
+
+        // Configuration of JAR file contents
+        configure {
+            from(mainSourceSet.output.classesDir);
+            from(mainSourceSet.output.resourcesDir);
+
+            exclude '**/sonarqube/**';
+            exclude 'sonarqube.xml';
+            exclude '**/*.md';
+            exclude '**/checks/all_checks.html';
+            exclude 'eclipsecs-plugin.xml';
+            exclude '**/checkstyle-metadata.*';
+
+            into('META-INF') {
+                from 'LICENSE';
+            }
+
             // add generated pom.properties to archive, setting build timestamp in the process
             into('META-INF/maven/' + project.group + '/' + project.name) {
-                from pomPropsFile;
+                from pomPropsUsed;
                 filter(ReplaceTokens, tokens: [buildTimestamp: project.ext.buildTimestamp.toString()]);
             }
 
             // add generated POM to archive
             into('META-INF/maven/' + project.group + '/' + project.name) {
-                from pluginPom;
-                rename {String fileName -> fileName.replace('pom-default.xml', 'pom.xml');}
+                from pomUsed;
             }
-            from(pluginPom) {
-                rename {String fileName -> fileName.replace('pom-default.xml', 'pom.xml');}
+            from(pomUsed);
+
+            // Manifest
+            String effectiveName = project.name;
+            if (appendix != null) {
+                effectiveName += '-' + appendix;
+            }
+            manifest {
+                attributes = ['Specification-Title'     : effectiveName,
+                              'Specification-Vendor'    : project.ext.authorName,
+                              'Specification-Vendor-Id' : 'com.thomasjensen',
+                              'Specification-Version'   : project.version,
+                              'Implementation-Title'    : effectiveName,
+                              'Implementation-Vendor'   : project.ext.authorName,
+                              'Implementation-Vendor-Id': 'com.thomasjensen',
+                              'Implementation-Version'  : project.version,
+                              'Implementation-Build'    : project.ext.gitHash,
+                              'Checkstyle-Version'      : checkstyleVersion,];
+                attributes.putAll(mfAttrStd(project, depConfig));
+            }
+        }
+
+        doFirst {
+            // add build timestamp in execution phase so that it does not count for the up-to-date check
+            manifest {
+                attributes 'Build-Timestamp': project.ext.buildTimestamp.toString();
+            }
+        }
+    }
+}
+
+tasks.jar {
+    enabled = false;
+}
+
+
+
+task jarSources(type: Jar) {
+    description = project.ext.longName + ': Build the source JAR';
+    // sources JAR does not depend on the Checkstyle version
+
+    from sourceSets.main.allJava;
+    into('META-INF') {
+        from 'LICENSE';
+    }
+
+    classifier = 'sources';
+    doFirst {
+        manifest = tasks['jarDefault'].manifest;
+        manifest {
+            attributes 'Build-Timestamp': project.ext.buildTimestamp.toString();
+        }
+    }
+}
+
+MavenPublication pub = (MavenPublication) publishing.publications.findByName('checkstyleAddons');
+pub.artifact(jarSources);
+
+Task defaultAssembleTask = tasks[(String) tasks.depConfigs.specificName('assemble', project.ext.depConfigDefault)];
+defaultAssembleTask.dependsOn jarSources;
+
+
+
+task jarJavadoc(type: Jar, dependsOn: javadoc) {
+    description = project.ext.longName + ': Build the javadoc JAR';
+    // Javadoc JAR does not depend on the Checkstyle version
+
+    from javadoc.destinationDir;
+    into('META-INF') {
+        from 'LICENSE';
+    }
+
+    classifier = 'javadoc';
+    doFirst {
+        manifest = tasks['jarDefault'].manifest;
+        manifest {
+            attributes 'Build-Timestamp': project.ext.buildTimestamp.toString();
+        }
+    }
+}
+pub.artifact(jarJavadoc);
+defaultAssembleTask.dependsOn jarJavadoc;
+
+
+
+public class CreateJarEclipseTask extends Jar
+{
+    public CreateJarEclipseTask()
+    {
+        super();
+        setGroup(BasePlugin.BUILD_GROUP);
+        setAppendix('eclipse');
+    }
+
+
+    private static boolean isCheckstyle(final ResolvedDependency pDependency) {
+        return pDependency != null && 'com.puppycrawl.tools'.equals(pDependency.getModuleGroup()) &&
+            'checkstyle'.equals(pDependency.getModuleName());
+    }
+
+
+    /**
+     * Scan the dependencies of the specified configurations and return a list of File objects for each dependency.
+     * Resolves the configurations if they are still unresolved.
+     * @param pProject the project
+     * @param pIncludeCheckstyle flag indicating if the dependency on Checkstyle should be included in the result
+     * @return list of files
+     */
+    public static Set<File> getPublishedDependencyLibs(final Project pProject, final boolean pIncludeCheckstyle)
+    {
+        Set<File> result = new HashSet<>();
+        for (final String configName : pProject.ext.bundledConfigurations) {
+            Configuration cfg = pProject.configurations.getByName(configName);
+            if (cfg == null) {
+                throw new GradleScriptException("Unknown configuration: " + configName, null);
+            }
+            for (ResolvedDependency dep : cfg.getResolvedConfiguration().getFirstLevelModuleDependencies()) {
+                if (pIncludeCheckstyle || !isCheckstyle(dep)) {
+                    for (ResolvedArtifact artifact : dep.allModuleArtifacts) {
+                        result.add(artifact.file);
+                    }
+                }
+            }
+        }
+        return result;
+    }
+
+
+    public static String flattenPrefixLibs(final String pPrefix, final Set<File> pLibs, final char pSeparator)
+    {
+        Set<String> set = new HashSet<>();
+        final String prefix = pPrefix.endsWith('/') ? pPrefix : (pPrefix + '/');
+        for (final File f : pLibs) {
+            set.add(prefix + f.getName());
+        }
+        StringBuilder sb = new StringBuilder();
+        for (final Iterator<String> iter = set.iterator(); iter.hasNext();) {
+            sb.append(iter.next());
+            if (iter.hasNext()) {
+                sb.append(pSeparator);
+            }
+        }
+        return sb.toString();
+    }
+
+
+    public void configureFor(final String pDepConfig)
+    {
+        // Dependency Configuration
+        final String depConfig = pDepConfig != null ? pDepConfig : project.ext.depConfigDefault;
+        final String checkstyleVersion = project.tasks.depConfigs.depVersions.get(depConfig).Checkstyle;
+        final String myJavaLevel = project.tasks.depConfigs.depVersions.get(depConfig).Java;
+        final String pubSuffix = project.tasks.depConfigs.depVersions.get(depConfig).PublicationSuffix;
+        final boolean isDefaultConfig = pDepConfig == null || pDepConfig.equals(project.ext.depConfigDefault);
+
+        setDescription("${project.ext.longName}: Assembles the Eclipse-CS plugin for Checkstyle ${checkstyleVersion}");
+
+        // adjust archive name
+        if (pubSuffix != null) {
+            setAppendix(pubSuffix + '-' + getAppendix());
+        }
+
+        // compressed Checkstyle version
+        String csVersComp = '';
+        if (!isDefaultConfig) {
+            csVersComp = checkstyleVersion.replaceAll('\\.', '');
+        }
+
+        // Dependency on 'classes' task (compile and resources)
+        if (isDefaultConfig) {
+            dependsOn('classes');
+        }
+        else {
+            dependsOn('main' + csVersComp + 'Classes');
+        }
+
+        // SourceSet that fits the dependency configuration
+        SourceSet mainSourceSet;
+        if (isDefaultConfig) {
+            mainSourceSet = project.sourceSets.main;
+        }
+        else {
+            mainSourceSet = (SourceSet) project.sourceSets['main' + checkstyleVersion];
+        }
+
+        // Inputs for up-to-date checking
+        inputs.property('groupId', project.group);
+        inputs.property('version', project.version);
+        inputs.property('name', project.ext.longName);
+        inputs.property('authorName', project.ext.authorName);
+
+        // Configuration of JAR file contents
+        configure {
+            into('META-INF') {
+                from 'LICENSE';
             }
 
+            from(mainSourceSet.output) {
+                exclude '**/sonarqube/**';
+                exclude '**/sonarqube';
+                exclude '**/*.md';
+                exclude '**/checks/all_checks.html';
+                exclude 'sonarqube.xml';
+                exclude '**/checkstyle-metadata.*';
+                rename { String fileName -> fileName.replace('eclipsecs-plugin.xml', 'plugin.xml'); }
+            }
+            from(mainSourceSet.output) {
+                include '**/checkstyle-metadata.*';
+                filter(ReplaceTokens, tokens: [version: inputs.properties.version]);
+            }
+
+            Set<File> pubLibs = getPublishedDependencyLibs(project, false);
+            into('lib') {
+                from pubLibs;
+            }
+
+            manifest {
+                attributes = [
+                    'Bundle-ManifestVersion': '2',
+                    'Bundle-Name': inputs.properties.name +
+                        ' Eclipse-CS Extension (based on Checkstyle ' + checkstyleVersion + ')',
+                    'Bundle-SymbolicName': inputs.properties.groupId + ';singleton:=true',
+                    'Bundle-Version': inputs.properties.version,
+                    'Require-Bundle': 'net.sf.eclipsecs.checkstyle,' +
+                        'net.sf.eclipsecs.core,' + 'net.sf.eclipsecs.ui',
+                    'Bundle-RequiredExecutionEnvironment': 'JavaSE-' + myJavaLevel,
+                    'Eclipse-LazyStart': 'true',
+                    'Bundle-Vendor': inputs.properties.authorName,
+                    'Import-Package': 'org.eclipse.core.resources,' +
+                        'org.eclipse.jdt.core.dom,' + 'org.eclipse.jface.resource,' + 'org.eclipse.jface.text,' +
+                        'org.eclipse.swt.graphics,' + 'org.eclipse.ui',
+                ];
+                attributes.putAll(CreateJarTask.mfAttrStd(project, depConfig));
+                if (pubLibs?.size() > 0) {
+                    attributes.put('Bundle-ClassPath', '.,' + flattenPrefixLibs('lib/', pubLibs, ','.toCharacter()));
+                }
+            }
+        }
+
+        doFirst {
             // add build timestamp in execution phase so that it does not count for the up-to-date check
             manifest {
                 attributes 'Build-Timestamp': project.ext.buildTimestamp.toString();
@@ -193,204 +523,128 @@ model {
 
 
 
-task jarSources(type: Jar, dependsOn: classes) {
-    description = project.ext.longName + ': Build the source JAR';
-
-    // build sources JAR only for default Checkstyle version
-    enabled = getCsaClassifier() == null;
-
-    from sourceSets.main.allSource
-    exclude '**/*.xml';
-    exclude '**/*.html';
-    exclude '**/*.md';
-    exclude '**/checkstyle-metadata.*';
-    into('META-INF') {
-        from 'LICENSE';
+public class CreateJarSonarqubeTask extends Jar
+{
+    public CreateJarSonarqubeTask()
+    {
+        super();
+        setGroup(BasePlugin.BUILD_GROUP);
     }
 
-    classifier = 'sources';
-    manifest = jar.manifest;
-    doFirst {
-        manifest {
-            attributes 'Build-Timestamp': project.ext.buildTimestamp.toString();
+
+    public void configureFor(final String pDepConfig)
+    {
+        // Dependency Configuration
+        final String depConfig = pDepConfig != null ? pDepConfig : project.ext.depConfigDefault;
+        final Map<String, String> theVersions = project.tasks.depConfigs.depVersions.get(depConfig);
+        final String checkstyleVersion = theVersions.Checkstyle;
+        final boolean isDefaultConfig = pDepConfig == null || pDepConfig.equals(project.ext.depConfigDefault);
+
+        setDescription("${project.ext.longName}: Assembles the SonarQube plugin for Checkstyle ${checkstyleVersion}");
+
+        // Inputs for up-to-date checking
+        inputs.property('groupId', project.group);
+        inputs.property('version', project.version);
+        inputs.property('name', project.ext.longName);
+        inputs.property('description', project.description);
+        inputs.property('authorName', project.ext.authorName);
+        inputs.property('sqPluginKey', project.ext.sqPluginKey);
+        inputs.property('sqPackage', project.ext.sqPackage);
+        inputs.property('gitHash', project.ext.gitHash);
+        inputs.property('orgUrl', project.ext.orgUrl);
+        inputs.property('issueTrackerUrl', project.ext.issueTrackerUrl);
+        inputs.property('website', project.ext.website);
+
+        // archive name
+        setArchiveName("sonar-${inputs.properties.sqPluginKey}-${inputs.properties.version}" +
+            (isDefaultConfig ? '' : "-csp${theVersions.SQCheckstylePlugin}") + '.jar');
+
+        // compressed Checkstyle version
+        String csVersComp = '';
+        if (!isDefaultConfig) {
+            csVersComp = checkstyleVersion.replaceAll('\\.', '');
+        }
+
+        // Dependency on 'jar' task and archive
+        final String jarTaskName = 'jar' + (isDefaultConfig ? 'Default' : csVersComp);
+        dependsOn(jarTaskName);
+        final File jarFile = (File) project.tasks[jarTaskName].getProperties().get('archivePath');
+        inputs.file jarFile;
+
+        // SourceSet that fits the dependency configuration
+        SourceSet mainSourceSet;
+        if (isDefaultConfig) {
+            mainSourceSet = project.sourceSets.main;
+        }
+        else {
+            mainSourceSet = (SourceSet) project.sourceSets['main' + checkstyleVersion];
+        }
+
+        // Configuration of JAR file contents
+        configure {
+            into('META-INF') {
+                from 'LICENSE';
+            }
+            into(inputs.properties.sqPackage) {
+                from(new File(mainSourceSet.output.classesDir, inputs.properties.sqPackage)) {
+                    include 'CheckstyleExtensionPlugin.class';
+                    include 'CheckstyleExtensionRepository.class';
+                }
+            }
+            into(inputs.properties.sqPackage) {
+                from new File(mainSourceSet.output.resourcesDir, 'sonarqube.xml');
+                filter(ReplaceTokens, tokens: [version: inputs.properties.version]);
+            }
+            into('META-INF/lib') {
+                from jarFile;
+            }
+            Set<File> pubLibs = CreateJarEclipseTask.getPublishedDependencyLibs(project, false);
+            into('META-INF/lib') {
+                from pubLibs;
+            }
+
+            manifest {
+                attributes = [
+                    'Plugin-Name': inputs.properties.name,
+                    'Plugin-Base': 'checkstyle',
+                    'Plugin-Key': inputs.properties.sqPluginKey,
+                    'Implementation-Build': inputs.properties.gitHash,
+                    'Plugin-Description': inputs.properties.description + ' (based on Checkstyle ' +
+                        checkstyleVersion + ')',
+                    'Plugin-Version': inputs.properties.version,
+                    'Plugin-Organization': inputs.properties.authorName,
+                    'Plugin-OrganizationUrl': inputs.properties.orgUrl,
+                    'Plugin-SourcesUrl': 'https://github.com/checkstyle-addons/checkstyle-addons',
+                    'Plugin-IssueTrackerUrl': inputs.properties.issueTrackerUrl,
+                    'Plugin-Class': 'com.thomasjensen.checkstyle.addons.sonarqube.CheckstyleExtensionPlugin',
+                    'Plugin-RequirePlugins': 'java:' + theVersions.SQJavaPlugin +
+                        ',checkstyle:' + theVersions.SQCheckstylePlugin,
+                    'Plugin-Dependencies': 'META-INF/lib/' + jarFile.getName() + (pubLibs.size() > 0 ? ' ' : '') +
+                        CreateJarEclipseTask.flattenPrefixLibs('META-INF/lib/', pubLibs, ' '.toCharacter()),
+                    'Plugin-License': 'GPLv3',
+                    'Plugin-Homepage': inputs.properties.website,
+                    //'Plugin-TermsConditionsUrl': '',
+                    'Sonar-Version': theVersions.SQManifest
+                    // TODO use same SonarQube version in manifest and compile dependencies
+                ];
+                attributes.putAll(CreateJarTask.mfAttrStd(project, depConfig));
+                attributes.remove('Website');
+            }
+        }
+
+        doFirst {
+            final DateFormat sdf = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ssZ");  // required by SonarQube
+            manifest {
+                attributes 'Plugin-BuildDate': sdf.format(project.ext.buildTimestamp);
+            }
         }
     }
 }
 
-
-
-task jarJavadoc(type: Jar, dependsOn: javadoc) {
-    description = project.ext.longName + ': Build the javadoc JAR';
-
-    // build javadoc JAR only for default Checkstyle version
-    enabled = getCsaClassifier() == null;
-
-    from javadoc.destinationDir
-    into('META-INF') {
-        from 'LICENSE';
-    }
-
-    classifier = 'javadoc';
-    manifest = jar.manifest;
-    doFirst {
-        manifest {
-            attributes 'Build-Timestamp': project.ext.buildTimestamp.toString();
-        }
-    }
-}
-
-
-
-task jarEclipse(type: Jar, dependsOn: classes) {
-    description = project.ext.longName + ': Assembles the Eclipse-CS plugin';
-    appendix = 'eclipse';
-    classifier = getCsaClassifier();
-
-    into('META-INF') {
-        from 'LICENSE';
-    }
-    from(sourceSets.main.output) {
-        exclude '**/sonarqube/**';
-        exclude '**/sonarqube';
-        exclude '**/*.md';
-        exclude '**/checks/all_checks.html';
-        exclude 'sonarqube.xml';
-        exclude '**/checkstyle-metadata.*';
-        rename { String fileName -> fileName.replace('eclipsecs-plugin.xml', 'plugin.xml'); }
-    }
-    from(sourceSets.main.output) {
-        include '**/checkstyle-metadata.*';
-        filter(ReplaceTokens, tokens: [version: project.version]);
-    }
-    Set<File> pubLibs = getPublishedDependencyLibs(project, false);
-    into('lib') {
-        from pubLibs;
-    }
-
-    manifest {
-        attributes = [
-            'Bundle-ManifestVersion': '2',
-            'Bundle-Name': project.ext.longName +
-                ' Eclipse-CS Extension (based on Checkstyle ' + project.ext.versions.Checkstyle + ')',
-            'Bundle-SymbolicName': project.group + ';singleton:=true',
-            'Bundle-Version': project.version,
-            'Require-Bundle': 'net.sf.eclipsecs.checkstyle,' +
-                'net.sf.eclipsecs.core,' + 'net.sf.eclipsecs.ui',
-            'Bundle-RequiredExecutionEnvironment': 'JavaSE-' + project.ext.versions.Java,
-            'Eclipse-LazyStart': 'true',
-            'Bundle-Vendor': project.ext.authorName,
-            'Import-Package': 'org.eclipse.core.resources,' +
-                'org.eclipse.jdt.core.dom,' + 'org.eclipse.jface.resource,' + 'org.eclipse.jface.text,' +
-                'org.eclipse.swt.graphics,' + 'org.eclipse.ui',
-        ];
-        attributes.putAll(mfAttrStd());
-        if (pubLibs?.size() > 0) {
-            attributes.put('Bundle-ClassPath', '.,' + flattenPrefixLibs('lib/', pubLibs, ','.toCharacter()));
-        }
-    }
-    doFirst {
-        manifest {
-            attributes 'Build-Timestamp': project.ext.buildTimestamp.toString();
-        }
-    }
-}
-
-
-
-def String getGitHash() {
-    def grgit = Grgit.open(project.file('.'));
-    return grgit.head().id;
-}
-
-
-
-task jarSonarQube(type: Jar, dependsOn: jar) {
-    description = project.ext.longName + ': Assembles the SonarQube plugin';
-    if ("NOT_SUPPORTED".equals(versions.SonarQube)) {
-        enabled = false;
-    }
-
-    final String pluginKey = 'checkstyleaddons';
-    archiveName = 'sonar-' + pluginKey + '-' + project.version +
-            (getCsaClassifier() != null ? ('-' + getCsaClassifier()) : '') + '.jar';
-    final File mainCheckJar = project.tasks['jar'].getProperties().get('archivePath');
-
-    into('META-INF') {
-        from 'LICENSE';
-    }
-    into(project.ext.sqPackage) {
-        from(new File(sourceSets.main.output.classesDir, project.ext.sqPackage)) {
-            include 'CheckstyleExtensionPlugin.class';
-            include 'CheckstyleExtensionRepository.class';
-        }
-    }
-    into(project.ext.sqPackage) {
-        from new File(sourceSets.main.output.resourcesDir, 'sonarqube.xml');
-        filter(ReplaceTokens, tokens: [version: project.version]);
-    }
-    into('META-INF/lib') {
-        from mainCheckJar;
-    }
-    Set<File> pubLibs = getPublishedDependencyLibs(project, false);
-    into('META-INF/lib') {
-        from pubLibs;
-    }
-
-    manifest {
-        attributes = [
-            'Plugin-Name': project.ext.longName,
-            'Plugin-Base': 'checkstyle',
-            'Plugin-Key': pluginKey,
-            'Implementation-Build': getGitHash(),
-            'Plugin-Description': project.description + ' (based on Checkstyle ' +
-                project.ext.versions.Checkstyle + ')',
-            'Plugin-Version': project.version,
-            'Plugin-Organization': project.ext.authorName,
-            'Plugin-OrganizationUrl': project.ext.orgUrl,
-            'Plugin-SourcesUrl': 'https://github.com/checkstyle-addons/checkstyle-addons',
-            'Plugin-IssueTrackerUrl': project.ext.issueTrackerUrl,
-            'Plugin-Class': 'com.thomasjensen.checkstyle.addons.sonarqube.CheckstyleExtensionPlugin',
-            'Plugin-RequirePlugins': 'java:' + project.ext.versions.SQJavaPlugin +
-                ',checkstyle:' + project.ext.versions.SQCheckstylePlugin,
-            'Plugin-Dependencies': 'META-INF/lib/' + mainCheckJar.getName() + (pubLibs.size() > 0 ? ' ' : '') +
-                flattenPrefixLibs('META-INF/lib/', pubLibs, ' '.toCharacter()),
-            'Plugin-License': 'GPLv3',
-            'Plugin-Homepage': project.ext.website,
-            //'Plugin-TermsConditionsUrl': '',
-            'Sonar-Version': project.ext.versions.SQManifest
-            // TODO use same SonarQube version in manifest and compile dependencies
-        ];
-        attributes.putAll(mfAttrStd());
-        attributes.remove('Website');
-    }
-
-    doFirst {
-        final DateFormat sdf = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ssZ");  // required by SonarQube
-        manifest {
-            attributes 'Plugin-BuildDate': sdf.format(project.ext.buildTimestamp);
-        }
-    }
-}
 
 
 artifacts {
-    archives jar
-    if (getCsaClassifier() == null) {
-        archives jarSources
-        archives jarJavadoc
-    }
-    archives jarEclipse
-    archives jarSonarQube
-}
-
-
-def Map<String, String> mfAttrStd() {
-    Map<String, String> result = new HashMap<>();
-    result.put('Manifest-Version', '1.0');
-    result.put('Website', project.ext.website);
-    result.put('Dependency-Configuration', project.ext.depConfig);
-    result.put('Created-By', GradleVersion.current().toString());
-    result.put('Built-By', System.getProperty('user.name'));
-    result.put('Build-Jdk', Jvm.current());
-    return result;
+    archives jarSources
+    archives jarJavadoc
+    // all the other artifacts are added dynamically
 }

@@ -14,96 +14,207 @@
  * program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-publish {
-    dependsOn assemble
-}
+import groovy.xml.MarkupBuilder;
 
-def Node addPom(final Node pRoot)
+
+
+public class GeneratePomFile extends DefaultTask
 {
-    pRoot.appendNode('name', project.ext.longName);
-    if (!project.ext.depConfigDefault.equals('cs' + project.ext.versions.Checkstyle)) {
-        pRoot.appendNode('classifier', 'cs' + project.ext.versions.Checkstyle);
-    }
-    pRoot.appendNode('description', project.description);
-    pRoot.appendNode('url', project.ext.website);
+    public final File pomFile = new File(getTemporaryDir(), 'pom.xml');
 
-    final Node deps = pRoot.appendNode('dependencies');
-    for (final String configName : project.ext.bundledConfigurations) {
-        Configuration cfg = project.configurations.getByName(configName);
-        if (cfg == null) {
-            throw new GradleException('Unknown configuration: ' + configName);
-        }
-        for (Dependency d : cfg.allDependencies) {
-            if (!(d instanceof ExternalDependency)) {
-                throw new GradleException('Incompatible dependency: ' + d);
+    private String appendix = null;
+
+    protected final List<Configuration> bundledConfigs = new ArrayList<>();
+
+
+    public GeneratePomFile()
+    {
+        super();
+        setGroup(PublishingPlugin.PUBLISH_TASK_GROUP);
+
+        configure {
+            inputs.property('groupId', project.group);
+            inputs.property('artifactId', project.name);
+            inputs.property('version', project.version);
+            if (getAppendix() != null) {
+                inputs.property('appendix', getAppendix());
             }
-            final ExternalDependency jar = (ExternalDependency) d;
+            inputs.property('name', project.ext.longName);
+            inputs.property('description', project.description);
+            inputs.property('url', project.ext.website);
+            inputs.property('authorName', project.ext.authorName);
+            inputs.property('orgName', project.ext.orgName);
+            inputs.property('orgUrl', project.ext.orgUrl);
+            inputs.property('github', project.ext.github);
 
-            final Node depNode = deps.appendNode('dependency');
-            depNode.appendNode('groupId', jar.getGroup());
-            depNode.appendNode('artifactId', jar.getName());
-            depNode.appendNode('version', jar.getVersion());
+            outputs.file(pomFile);
+        }
 
-            final DependencyArtifact artifcat = jar.getArtifacts().getAt(0);
-            String depClassifier = artifcat != null ? artifcat.getClassifier() : null;
-            if (depClassifier != null) {
-                depNode.appendNode('classifier', depClassifier);
+        doLast {
+            pomFile.getParentFile().mkdirs();
+            createPom();
+        }
+    }
+
+
+    protected void createPom()
+    {
+        def writer = new StringWriter();
+        def printer = new IndentPrinter(writer, '    ', true);
+        def xml = new MarkupBuilder(printer)
+        xml.doubleQuotes = true;
+        xml.mkp.xmlDeclaration(version: '1.0', encoding: 'UTF-8');
+        String effectiveArtifactId = inputs.properties.artifactId;
+        if (getAppendix() != null) {
+            effectiveArtifactId += '-' + getAppendix();
+        }
+
+        xml.project(
+            'xmlns': 'http://maven.apache.org/POM/4.0.0',
+            'xsi:schemaLocation': 'http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd',
+            'xmlns:xsi': 'http://www.w3.org/2001/XMLSchema-instance')
+        {
+            modelVersion('4.0.0');
+            groupId(inputs.properties.groupId);
+            artifactId(effectiveArtifactId);
+            version([:], inputs.properties.version);        // empty map resolves overloading conflict
+            name([:], inputs.properties.name);
+            if (inputs.properties.classifier != null) {
+                classifier([:], inputs.properties.classifier);
             }
-            depNode.appendNode('scope', 'compile');
+            description([:], inputs.properties.description);
+            url(inputs.properties.url);
+
+            if (bundledConfigs.size() > 0) {
+                dependencies {
+                    for (final Configuration cfg : bundledConfigs) {
+                        for (Dependency d : cfg.allDependencies) {
+                            if (!(d instanceof ExternalDependency)) {
+                                throw new GradleException('Incompatible dependency: ' + d);
+                            }
+                            final ExternalDependency jar = (ExternalDependency) d;
+
+                            dependency {
+                                groupId(jar.getGroup());
+                                artifactId(jar.getName());
+                                version([:], jar.getVersion());
+
+                                final DependencyArtifact artifcat = jar.getArtifacts().getAt(0);
+                                final String depClassifier = artifcat != null ? artifcat.getClassifier() : null;
+                                if (depClassifier != null) {
+                                    classifier([:], depClassifier);
+                                }
+                                scope('compile');
+                            }
+                        }
+                    }
+                }
+            }
+
+            inceptionYear('2015');
+
+            licenses {
+                license {
+                    name([:], 'GNU General Public License, Version 3');
+                    url('https://www.gnu.org/copyleft/gpl.html');
+                }
+            }
+            developers {
+                developer {
+                    name([:], inputs.properties.authorName);
+                    email('checkstyle@thomasjensen.com');
+                }
+            }
+            organization {
+                name([:], inputs.properties.orgName);
+                url(inputs.properties.orgUrl);
+            }
+            scm {
+                connection('scm:git:git@github.com:' + inputs.properties.github + '.git');
+                developerConnection('scm:git:git@github.com:' + inputs.properties.github + '.git');
+                url('git@github.com:' + inputs.properties.github + '.git');
+            }
+        }
+
+        pomFile.withWriter('UTF-8') { it << writer.toString() };
+    }
+
+
+    public String getAppendix()
+    {
+        return this.appendix;
+    }
+
+
+    public setAppendix(final String pAppendix)
+    {
+        this.appendix = pAppendix;
+        if (pAppendix != null) {
+            inputs.property('appendix', pAppendix);
+        }
+        else {
+            inputs.getProperties().remove('appendix');
         }
     }
 
-    pRoot.appendNode('inceptionYear', '2015');
 
-    final Node lics = pRoot.appendNode('licenses');
-    final Node lic = lics.appendNode('license');
-    lic.appendNode('name', 'GNU General Public License, Version 3');
-    lic.appendNode('url', 'https://www.gnu.org/copyleft/gpl.html');
-
-    final Node devs = pRoot.appendNode('developers');
-    final Node dev = devs.appendNode('developer');
-    dev.appendNode('name', project.ext.authorName);
-    dev.appendNode('email', 'checkstyle@thomasjensen.com');
-
-    final Node org = pRoot.appendNode('organization');
-    org.appendNode('name', project.ext.orgName);
-    org.appendNode('url', project.ext.orgUrl);
-
-    final Node scm = pRoot.appendNode('scm');
-    scm.appendNode('connection', 'scm:git:git@github.com:' + project.ext.github + '.git');
-    scm.appendNode('developerConnection', 'scm:git:git@github.com:' + project.ext.github + '.git');
-    scm.appendNode('url', 'git@github.com:' + project.ext.github + '.git');
-
-    return pRoot;
-}
-
-model {
-    tasks.generatePomFileForCheckstyleAddonsPublication {
-        pom.withXml {
-            addPom(asNode());
+    public void addBundledConfigs(final Configuration... pConfigs)
+    {
+        if (pConfigs != null && pConfigs.length > 0) {
+            for (Configuration cfg : pConfigs) {
+                if (cfg != null) {
+                    boolean duplicate = false;
+                    for (Configuration c : bundledConfigs) {
+                        if (c.getName().equals(cfg.getName())) {
+                            duplicate = true;
+                            break;
+                        }
+                    }
+                    if (!duplicate) {
+                        bundledConfigs.add(cfg);
+                    }
+                }
+            }
         }
     }
 }
+task generatePom(type: GeneratePomFile) {
+    setDescription(project.ext.longName +
+        ': Generates the Maven POM file for publication \'checkstyleAddons\' (no appendix).');
+    addBundledConfigs(project.configurations['runtime']);
+}
 
-publishing {
-    publications {
-        checkstyleAddons(MavenPublication) {
-            artifact jar
-            artifact jarSources
-            artifact jarJavadoc
-        }
+
+
+tasks.all { final Task pTask ->
+    if ('publishCheckstyleAddonsPublicationToMavenLocal'.equals(pTask.name)) {
+        pTask.dependsOn tasks.generatePom;
+    }
+    else if ('publishCheckstyleAddons-java6PublicationToMavenLocal'.equals(pTask.name)) {
+        pTask.dependsOn tasks.generatePom61;
+    }
+    else if ('generatePomFileForCheckstyleAddonsPublication'.equals(pTask.name)) {
+        enabled = false;  // we do this manually
+        destination = new File(project.buildDir, 'tmp/generatePom/pom.xml');
+    }
+    else if ('generatePomFileForCheckstyleAddons-java6Publication'.equals(pTask.name)) {
+        enabled = false;  // we do this manually
+        destination = new File(project.buildDir, 'tmp/generatePom61/pom.xml');
     }
 }
+
 
 
 task checkProperties << {
-    ['bintray.user', 'bintray.apikey', 'bintray.gpg.passphrase', 'sonatype.user', 'sonatype.password'].each { String prp ->
+    ['bintray.user', 'bintray.apikey', 'bintray.gpg.passphrase', 'sonatype.user', 'sonatype.password'].each {
+        final String prp ->
         if (!project.hasProperty(prp)) {
             throw new GradleException("Could not find property \'${prp}\'. " +
                 'Did you forget to specify it in ~/.gradle/gradle.properties?');
         }
     }
 }
+
 bintray {
     if (project.hasProperty('bintray.user') && project.hasProperty('bintray.apikey')
         && project.hasProperty('bintray.gpg.passphrase') && project.hasProperty('sonatype.user')
@@ -112,7 +223,7 @@ bintray {
         user = project.property('bintray.user');
         key = project.property('bintray.apikey');
 
-        publications = ['checkstyleAddons'];
+        publications = tasks.depConfigs.publications.toArray(new String[tasks.depConfigs.publications.size()]);
         publish = true;
         dryRun = true;   // comment out for actual release deployment
         pkg {
