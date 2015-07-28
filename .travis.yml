@@ -16,7 +16,7 @@ env:
   - checkstyleaddons_jdk6_javac=/usr/lib/jvm/java-6-openjdk-amd64/bin/javac
 
 script:
-  - ./gradlew build
+  - ./gradlew clean build site
 
 after_success:
   - ./gradlew jacocoTestReport coveralls
