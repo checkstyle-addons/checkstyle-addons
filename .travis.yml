@@ -10,18 +10,8 @@ before_install:
 #  - sudo update-alternatives --config java
 
 env:
-  - checkstyleaddons_deps=cs6.0 checkstyleaddons_jdk6_javac=/usr/lib/jvm/java-6-openjdk-amd64/bin/javac
-  - checkstyleaddons_deps=cs6.1 checkstyleaddons_jdk6_javac=/usr/lib/jvm/java-6-openjdk-amd64/bin/javac
-  - checkstyleaddons_deps=cs6.1.1
-  - checkstyleaddons_deps=cs6.2
-  - checkstyleaddons_deps=cs6.3
-  - checkstyleaddons_deps=cs6.4
-  -
-  - checkstyleaddons_deps=cs6.5
-  - checkstyleaddons_deps=cs6.6
-  - checkstyleaddons_deps=cs6.7
-  - checkstyleaddons_deps=cs6.8
-  - checkstyleaddons_deps=cs6.8.1
+  global:
+  - checkstyleaddons_jdk6_javac=/usr/lib/jvm/java-6-openjdk-amd64/bin/javac
 
 after_success:
   - ./gradlew jacocoTestReport coveralls
