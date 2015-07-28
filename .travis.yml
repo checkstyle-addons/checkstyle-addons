@@ -10,13 +10,14 @@ before_install:
   - ls -a
   - pwd
 #  - sudo update-alternatives --config java
+  - ./gradlew clean
 
 env:
   global:
   - checkstyleaddons_jdk6_javac=/usr/lib/jvm/java-6-openjdk-amd64/bin/javac
 
 script:
-  - ./gradlew clean build site
+  - ./gradlew check xcheck site
 
 after_success:
   - ./gradlew jacocoTestReport coveralls
