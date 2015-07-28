@@ -27,8 +27,8 @@ import java.text.SimpleDateFormat;
 tasks.depConfigs.activeDepConfigs.each { final String depCfg ->
 
     final Map<String, String> depVersions = tasks.depConfigs.depVersions.get(depCfg);
-    final String csVersComp = depVersions.Checkstyle.replaceAll('\\.','');
-    final boolean isDefaultDepConfig = project.ext.depConfigDefault.equals(depCfg);
+    final String csVersComp = depVersions.CsVersComp;
+    final boolean isDefaultDepConfig = depVersions.Default;
     final boolean hasSonarQube = !"NOT_SUPPORTED".equals(depVersions.SonarQube);
     final boolean isPublished = depVersions.Published;
 

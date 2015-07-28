@@ -187,19 +187,27 @@ task generatePom(type: GeneratePomFile) {
 
 
 tasks.all { final Task pTask ->
-    if ('publishCheckstyleAddonsPublicationToMavenLocal'.equals(pTask.name)) {
-        pTask.dependsOn tasks.generatePom;
-    }
-    else if ('publishCheckstyleAddons-java6PublicationToMavenLocal'.equals(pTask.name)) {
-        pTask.dependsOn tasks.generatePom61;
-    }
-    else if ('generatePomFileForCheckstyleAddonsPublication'.equals(pTask.name)) {
-        enabled = false;  // we do this manually
-        destination = new File(project.buildDir, 'tmp/generatePom/pom.xml');
-    }
-    else if ('generatePomFileForCheckstyleAddons-java6Publication'.equals(pTask.name)) {
-        enabled = false;  // we do this manually
-        destination = new File(project.buildDir, 'tmp/generatePom61/pom.xml');
+    for (final Map.Entry<String, Map<String, String>> entry : tasks.depConfigs.publications) {
+        final String pubNameCap = entry.getKey().capitalize();
+        final Map<String, String> dvs = entry.getValue();
+
+        // local publication depends on the pom.xml
+        if (pTask.name.endsWith('PublicationToMavenLocal')) {
+            final String taskName = "publish${pubNameCap}PublicationToMavenLocal";
+            if (taskName.equals(pTask.name)) {
+                pTask.dependsOn tasks['generatePom' + (dvs.Default ? '' : dvs.CsVersComp)];
+            }
+        }
+
+        // the default task for POM creation is replaced by our own
+        else if (pTask.name.startsWith('generatePomFileFor')) {
+            final String taskName = "generatePomFileFor${pubNameCap}Publication";
+            if (taskName.equals(pTask.name)) {
+                pTask.enabled = false;  // we do this manually
+                pTask.destination = new File(project.buildDir, 'tmp/generatePom' + (dvs.Default ? '' : dvs.CsVersComp) +
+                    '/pom.xml');
+            }
+        }
     }
 }
 
@@ -223,7 +231,8 @@ bintray {
         user = project.property('bintray.user');
         key = project.property('bintray.apikey');
 
-        publications = tasks.depConfigs.publications.toArray(new String[tasks.depConfigs.publications.size()]);
+        Set<String> pubNames = tasks.depConfigs.publications.keySet();
+        publications = pubNames.toArray(new String[pubNames.size()]);
         publish = true;
         dryRun = true;   // comment out for actual release deployment
         pkg {

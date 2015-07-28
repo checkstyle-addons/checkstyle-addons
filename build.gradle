@@ -75,6 +75,8 @@ ext {
  */
 class DependencyConfigsTask extends DefaultTask
 {
+    private static final String PUB_INDICATOR = '.pub';
+
     protected final File depConfigDir = new File((File) project.projectDir, 'project/dependencyConfigs');
 
     public final FileCollection allDepConfigs = project.files {
@@ -86,14 +88,17 @@ class DependencyConfigsTask extends DefaultTask
         });
     };
 
+    /** map from dependency configuration names to their corresponding dependency versions */
     public final SortedMap<String, Map<String, String>> depVersions = readAllDependencyVersions(project, allDepConfigs);
 
-    public final Set<String> publications = getPublicationList(project, depVersions);
+    /** map from publication name to dependency versions for the corresponding dependency configuration */
+    public final Map<String, Map<String, String>> publications = getPublicationList(project, depVersions);
 
     public final Set<String> activeDepConfigs = depVersions.keySet();
 
 
-    private static Map<String, String> readDependencyVersions(final File pDepConfig, final boolean pPublished)
+    private static Map<String, String> readDependencyVersions(final Project pProject, final File pDepConfig,
+        final boolean pPublished)  // TODO should be Map<String, Object>
     {
         def props = new Properties();
         pDepConfig.withInputStream {
@@ -119,8 +124,28 @@ class DependencyConfigsTask extends DefaultTask
             assert props.size() == 8;
         }
         props.put('Published', Boolean.valueOf(pPublished));
+        props.put('Name', nameFromFile(pDepConfig));
+        props.put('CsVersComp', props.getProperty('Checkstyle').replaceAll('\\.',''));
+        props.put('Default', Boolean.valueOf(pProject.ext.depConfigDefault.equals(props.getProperty('Name'))));
 
         return Collections.unmodifiableMap(new HashMap<>(props));
+    }
+
+
+    private static String nameFromFile(final File pDepConfigFile)
+    {
+        String result = null;
+        int dotPos = pDepConfigFile.getName().lastIndexOf('.'.getAt(0));
+        if (dotPos > 0) {
+            if (pDepConfigFile.getName().substring(0, dotPos).endsWith(PUB_INDICATOR)) {
+                dotPos -= PUB_INDICATOR.length();
+            }
+            result = pDepConfigFile.getName().substring(0, dotPos);
+        }
+        if (result == null || result.length() == 0) {
+            throw new GradleException('Invalid dependency configuration file name: ' + pDepConfigFile.getName());
+        }
+        return result;
     }
 
 
@@ -129,34 +154,27 @@ class DependencyConfigsTask extends DefaultTask
     {
         SortedMap<String, Map<String, String>> result = new TreeMap<>();
         for (final File depCfg : pAllDepConfigs) {
-            int dotPos = depCfg.getName().lastIndexOf('.'.getAt(0));
-            if (dotPos > 0) {
-                boolean published = false;
-                if (depCfg.getName().substring(0, dotPos).endsWith('.pub')) {
-                    dotPos -= '.pub'.length();
-                    published = true;
-                }
-                final String depConfName = depCfg.getName().substring(0, dotPos);
-                final Map<String, String> dvs = readDependencyVersions(depCfg, published);
-                final String myJavaLevel = dvs.Java;
-                if (!'1.6'.equals(myJavaLevel) || pProject.getJdk6Compiler() != null) {
-                    result.put(depConfName, dvs);
-                } else {
-                    pProject.logger.warn('WARNING: Skipping dependency configuration \'' + depConfName +
-                        '\' because of missing JDK6 compiler configuration.');
-                    pProject.logger.warn('Property \'' + pProject.ext.jdk6PropName + '\' not defined in gradle.' +
-                        'properties. It must point to a Java 6 compiler executable.');
-                }
+            final String depConfName = nameFromFile(depCfg);
+            final boolean published = depCfg.getName().substring(depConfName.length()).startsWith(PUB_INDICATOR);
+            final Map<String, String> dvs = readDependencyVersions(pProject, depCfg, published);
+            final String myJavaLevel = dvs.Java;
+            if (!'1.6'.equals(myJavaLevel) || pProject.getJdk6Compiler() != null) {
+                result.put(depConfName, dvs);
+            } else {
+                pProject.logger.warn('WARNING: Skipping dependency configuration \'' + depConfName +
+                    '\' because of missing JDK6 compiler configuration.');
+                pProject.logger.warn('Property \'' + pProject.ext.jdk6PropName + '\' not defined in gradle.' +
+                    'properties. It must point to a Java 6 compiler executable.');
             }
         }
         return Collections.unmodifiableSortedMap(result);
     }
 
 
-    private static Set<String> getPublicationList(final Project pProject,
+    private static Map<String, Map<String, String>> getPublicationList(final Project pProject,
         final SortedMap<String, Map<String, String>> pDepVersions)
     {
-        final Set<String> result = new HashSet<>();
+        final Map<String, Map<String, String>> result = new HashMap<>();
         for (final Map.Entry<String, Map<String, String>> entry : pDepVersions) {
             final String depConfName = entry.getKey();
             final Map<String, String> dvs = entry.getValue();
@@ -165,10 +183,10 @@ class DependencyConfigsTask extends DefaultTask
                 if (!pProject.ext.depConfigDefault.equals(depConfName)) {
                     pubName += '-' + dvs.PublicationSuffix;
                 }
-                result.add(pubName);
+                result.put(pubName, dvs);
             }
         }
-        return Collections.unmodifiableSet(result);
+        return Collections.unmodifiableMap(result);
     }
 
 
@@ -187,12 +205,11 @@ class DependencyConfigsTask extends DefaultTask
         if (theVersions == null || pGeneralName == null) {
             throw new IllegalArgumentException('unknown depConfig or general name');
         }
-        final String csVersComp = theVersions.Checkstyle.replaceAll('\\.','');
 
         String result = null;
         switch(pGeneralName) {
             case 'assemble':
-                result = 'assemble' + csVersComp;
+                result = 'assemble' + theVersions.CsVersComp;
                 break;
             case 'main':
                 result = 'main' + theVersions.Checkstyle;  // sic
@@ -201,46 +218,46 @@ class DependencyConfigsTask extends DefaultTask
                 result = 'test' + theVersions.Checkstyle;  // sic
                 break;
             case 'compileJava':
-                result = 'compileMain' + csVersComp + 'Java';
+                result = 'compileMain' + theVersions.CsVersComp + 'Java';
                 break;
             case 'compileTestJava':
-                result = 'compileTest' + csVersComp + 'Java';
+                result = 'compileTest' + theVersions.CsVersComp + 'Java';
                 break;
             case 'generatePomProperties':
-                result = 'generatePomProperties' + csVersComp;
+                result = 'generatePomProperties' + theVersions.CsVersComp;
                 break;
             case 'generatePom':
-                result = 'generatePom' + csVersComp;
+                result = 'generatePom' + theVersions.CsVersComp;
                 break;
             case 'jar':
-                result = 'jar' + csVersComp;
+                result = 'jar' + theVersions.CsVersComp;
                 break;
             case 'jarEclipse':
-                result = 'jarEclipse' + csVersComp;
+                result = 'jarEclipse' + theVersions.CsVersComp;
                 break;
             case 'jarSonarqube':
-                result = 'jarSonarqube' + csVersComp;
+                result = 'jarSonarqube' + theVersions.CsVersComp;
                 break;
             case 'classes':
-                result = 'main' + csVersComp + 'Classes';
+                result = 'main' + theVersions.CsVersComp + 'Classes';
                 break;
             case 'testClasses':
-                result = 'test' + csVersComp + 'Classes';
+                result = 'test' + theVersions.CsVersComp + 'Classes';
                 break;
             case 'provided':
-                result = 'provided' + csVersComp;
+                result = 'provided' + theVersions.CsVersComp;
                 break;
             case 'mainCompile':
-                result = 'main' + csVersComp + 'Compile';
+                result = 'main' + theVersions.CsVersComp + 'Compile';
                 break;
             case 'mainRuntime':
-                result = 'main' + csVersComp + 'Runtime';
+                result = 'main' + theVersions.CsVersComp + 'Runtime';
                 break;
             case 'testCompile':
-                result = 'test' + csVersComp + 'Compile';
+                result = 'test' + theVersions.CsVersComp + 'Compile';
                 break;
             case 'testRuntime':
-                result = 'test' + csVersComp + 'Runtime';
+                result = 'test' + theVersions.CsVersComp + 'Runtime';
                 break;
             default:
                 throw new IllegalArgumentException('unknown general name');
@@ -256,8 +273,8 @@ class DependencyConfigsTask extends DefaultTask
         if (theVersions1 == null || theVersions2 == null) {
             throw new IllegalArgumentException('unknown depConfig');
         }
-        final String dc1 = theVersions1.Checkstyle.replaceAll('\\.', '');
-        final String dc2 = theVersions2.Checkstyle.replaceAll('\\.', '');
+        final String dc1 = theVersions1.CsVersComp;
+        final String dc2 = theVersions2.CsVersComp;
         return 'xtest' + dc1 + 'against' + dc2;
     }
 }
@@ -282,9 +299,9 @@ tasks.depConfigs.activeDepConfigs.each { final String depCfg ->
         return;   // no extra stuff for the default config - important to make IDE configuration work
     }
 
-    final DependencyConfigsTask dcn = tasks.depConfigs;
+    final DependencyConfigsTask dcn = (DependencyConfigsTask) tasks.depConfigs;
     final Map<String, String> depVersions = dcn.depVersions.get(depCfg);
-    final String csVersComp = depVersions.Checkstyle.replaceAll('\\.','');
+    final String csVersComp = depVersions.CsVersComp;
     final boolean hasSonarQube = !"NOT_SUPPORTED".equals(depVersions.SonarQube);
     final boolean isPublished = depVersions.Published;
     final File depCfgFile = tasks.depConfigs.allDepConfigs.filter { final File f ->
@@ -446,9 +463,11 @@ def void addDependencies(final Map<String, String> pDepVersions, final Configura
     pProvidedConf.dependencies.add(fb2);
     if (hasSonarQube) {
         Dependency sq = project.dependencies.create('org.codehaus.sonar:sonar-plugin-api:' + pDepVersions.SonarQube);
-        Dependency slf4jNop = project.dependencies.create('org.slf4j:slf4j-nop:' + pDepVersions.SQslf4jNop);
         pProvidedConf.dependencies.add(sq);
-        pProvidedConf.dependencies.add(slf4jNop);
+        if (!'NOT_SUPPORTED'.equals(pDepVersions.SQslf4jNop)) {
+            Dependency slf4jNop = project.dependencies.create('org.slf4j:slf4j-nop:' + pDepVersions.SQslf4jNop);
+            pProvidedConf.dependencies.add(slf4jNop);
+        }
     }
 
     // compile
@@ -473,7 +492,7 @@ addDependencies(project.ext.versionDefaults,
 tasks.depConfigs.activeDepConfigs.each { final String depCfgToCheck ->
     final DependencyConfigsTask dcn = (DependencyConfigsTask) tasks.depConfigs;
     final Map<String, String> depVersionsToCheck = dcn.depVersions.get(depCfgToCheck);
-    final String csVersCompToCheck = depVersionsToCheck.Checkstyle.replaceAll('\\.','');
+    final String csVersCompToCheck = depVersionsToCheck.CsVersComp;
     final boolean checkingDefault = depCfgToCheck.equals(project.ext.depConfigDefault);
     if (!depVersionsToCheck.Published || depVersionsToCheck.TestAgainst.size() == 0) {
         return;
@@ -485,7 +504,7 @@ tasks.depConfigs.activeDepConfigs.each { final String depCfgToCheck ->
         }
 
         final Map<String, String> depVersions4Cs = dcn.depVersions.get(depCfg4Cs);
-        final String csVersComp4Cs = depVersions4Cs.Checkstyle.replaceAll('\\.','');
+        final String csVersComp4Cs = depVersions4Cs.CsVersComp;
 
         Task xtestTask = project.tasks.create(name: dcn.xcheckName(depCfgToCheck, depCfg4Cs), type: Test);
         xtestTask.setDescription("${project.ext.longName}: Runs the unit tests for Checkstyle " +
