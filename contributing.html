@@ -40,15 +40,25 @@ Please feel free to suggest anything that's good. If you are going to expend a l
 
 In order to build {{ site.name }} yourself, follow these steps:
 
-  1. Make sure you have the prerequisites set up:
-    - [Git](http://git-scm.com/){:target="_blank"}
-    - [Java 7 SDK](http://www.oracle.com/technetwork/java/javase/downloads/jdk7-downloads-1880260.html){:target="_blank"}, which must be used for the build
-  1. Clone the {{ site.name }} repo by running on the command line:
+ 1. Make sure you have the prerequisites set up:
+   - [Git](http://git-scm.com/){:target="_blank"}
+   - [Java 7 SDK](http://www.oracle.com/technetwork/java/javase/downloads/jdk7-downloads-1880260.html){:target="_blank"}, which must be used for the build
+   - [Java 6 SDK](http://www.oracle.com/technetwork/java/javase/downloads/java-archive-downloads-javase6-419409.html){:target="_blank"} - Both Java 6 and 7 are required to build {{ site.name }}. This is because {{ site.name }} is compatible with Java 6 based, older versions of Checkstyle.
+ 1. Make sure that your environment variable `JAVA_HOME` points to the Java&nbsp;7 SDK, for example `C:\PROGRA~1\Java\jdk1.7.0_80` (Windows).
+ 1. If you don't have a Gradle User Home yet, set it up by creating an empty directory called `.gradle` somewhere, for example `d:\.gradle` (Windows) or `~/.gradle` (Unix). Create an environment variable `GRADLE_USER_HOME` which points to this directory. This directory may grow quite large over time, because Gradle uses it to cache all downloaded stuff.
+ 1. Create an empty text file in `GRADLE_USER_HOME` called `gradle.properties`. Inside, add the following lines:
+
+        org.gradle.daemon=true
+        org.gradle.jvmargs=-Xmx1536m -XX:MaxPermSize=384m
+        checkstyleaddons_jdk6_javac=C:/PROGRA~1/Java/jdk1.6.0_45/bin/javac.exe
+
+    The `checkstyleaddons_jdk6_javac` must point to the Java&nbsp;6 compiler executable (adjust this depending on where you installed your Java&nbsp;6 SDK), and should not contain spaces. The other two settings are optional and may be left out if the build works for you.
+ 1. Clone the {{ site.name }} repo by running on the command line:
      `git clone https://github.com/{{ site.github }}.git`
-  1. `cd checkstyle-addons`
-  1. `gradlew build`
+ 1. `cd checkstyle-addons`
+ 1. `gradlew build`
      This will take care of everything needed for a successful build of {{ site.name }}, including download and installation of Gradle.
-  1. Find the fresh artifacts in build/libs. Done!
+ 1. Find the fresh artifacts in build/libs. Done!
 
 
 ## Running the Website Locally
