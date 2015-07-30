@@ -20,6 +20,7 @@ import java.io.IOException;
 
 import com.puppycrawl.tools.checkstyle.DefaultConfiguration;
 import com.thomasjensen.checkstyle.addons.BaseCheckTestSupport;
+import com.thomasjensen.checkstyle.addons.checks.BinaryName;
 import org.junit.Assert;
 import org.junit.Test;
 
@@ -39,22 +40,22 @@ public class PropertyCatalogTest
         PropertyCatalogCheck check = new PropertyCatalogCheck(getPath("misc/InputPropertyCatalog1.java"));
         check.setPropertyFile("|{0}|{1}|{2}|{3}|{4}|{5}|{6}|{7}|{8}|{9}|{10}|");
 
-        String s = check.buildPropertyFilePath("com.foo.Bar$Inner");
+        String s = check.buildPropertyFilePath(new BinaryName("com.foo", "Bar", "Inner"));
         Assert.assertEquals("|com.foo.Bar$Inner|com/foo/Bar/Inner|com.foo.Bar|com/foo/Bar|../../..|com/foo|Bar|Inner|"
                 + "src|test|resources|",
             s);
 
-        s = check.buildPropertyFilePath("com.foo.Bar$Inner1$Inner2");
+        s = check.buildPropertyFilePath(new BinaryName("com.foo", "Bar", "Inner1", "Inner2"));
         Assert.assertEquals(
             "|com.foo.Bar$Inner1$Inner2|com/foo/Bar/Inner1/Inner2|com.foo.Bar|com/foo/Bar|../../..|com/foo|Bar|Inner2|"
                 + "src|test|resources|",
             s);
 
-        s = check.buildPropertyFilePath("com.foo.Bar");
+        s = check.buildPropertyFilePath(new BinaryName("com.foo", "Bar"));
         Assert.assertEquals("|com.foo.Bar|com/foo/Bar|com.foo.Bar|com/foo/Bar|../../..|com/foo|Bar|null|"
             + "src|test|resources|", s);
 
-        s = check.buildPropertyFilePath("Bar");
+        s = check.buildPropertyFilePath(new BinaryName(null, "Bar"));
         Assert.assertEquals("|Bar|Bar|Bar|Bar|..||Bar|null|src|test|resources|", s);
     }
 
@@ -67,7 +68,7 @@ public class PropertyCatalogTest
         PropertyCatalogCheck check = new PropertyCatalogCheck(getPath("misc/InputPropertyCatalog1.java"));
         check.setPropertyFile("{8}");
 
-        String s = check.buildPropertyFilePath("com.foo.Bar$Inner");
+        String s = check.buildPropertyFilePath(new BinaryName("com.foo", "Bar", "Inner"));
         Assert.assertNotNull(s);
         Assert.assertTrue(s.length() > 0);
     }

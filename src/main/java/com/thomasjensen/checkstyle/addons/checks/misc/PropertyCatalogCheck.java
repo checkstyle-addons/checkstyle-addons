@@ -32,7 +32,6 @@ import java.util.Properties;
 import java.util.Set;
 import java.util.TreeMap;
 import java.util.TreeSet;
-import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import javax.annotation.CheckForNull;
 import javax.annotation.Nonnull;
@@ -41,6 +40,7 @@ import javax.annotation.Nullable;
 import com.puppycrawl.tools.checkstyle.api.DetailAST;
 import com.puppycrawl.tools.checkstyle.api.TokenTypes;
 import com.thomasjensen.checkstyle.addons.checks.AbstractAddonsCheck;
+import com.thomasjensen.checkstyle.addons.checks.BinaryName;
 import com.thomasjensen.checkstyle.addons.util.Util;
 
 
@@ -58,14 +58,6 @@ public class PropertyCatalogCheck
     /** AST tokens that we want to visit */
     private static final Set<Integer> TOKENS = Collections.unmodifiableSet(new TreeSet<Integer>(Arrays.asList(
         TokenTypes.ENUM_CONSTANT_DEF, TokenTypes.VARIABLE_DEF)));
-
-    /**
-     * Parses a binary class name to find (matching groups):<ol> <li>the fully qualified name of the outer class</li>
-     * <li>the package name of the outer class, including a final <code>'.'</code></li> <li>the simple name of the outer
-     * class</li> <li>the simple name of the inner class, if existing (may be missing)</li> </ol>
-     */
-    private static final Pattern BINARY_NAME_PARSER = Pattern.compile(
-        "^(((?:[^\\.]+\\.)*)([^\\$]+))(?:\\$(?:[^\\$]+\\$)*([^\\$]+)|$)");
 
     /** speed up processing by skipping types which are not property catalogs */
     private final Deque<Boolean> skipType = new LinkedList<Boolean>();
@@ -148,7 +140,7 @@ public class PropertyCatalogCheck
 
 
     @Override
-    protected void visitKnownType(@Nonnull final String pBinaryClassName, @Nonnull final DetailAST pAst)
+    protected void visitKnownType(@Nonnull final BinaryName pBinaryClassName, @Nonnull final DetailAST pAst)
     {
         catalogEntries.push(new TreeSet<CatalogEntry>());
         skipType.push(Boolean.valueOf(!isPropertyCatalog(pBinaryClassName)));
@@ -157,7 +149,7 @@ public class PropertyCatalogCheck
 
 
     @Override
-    protected void leaveKnownType(@Nonnull final String pBinaryClassName, @Nonnull final DetailAST pAst)
+    protected void leaveKnownType(@Nonnull final BinaryName pBinaryClassName, @Nonnull final DetailAST pAst)
     {
         final Set<CatalogEntry> collectedEntries = catalogEntries.pop();
         if (skipType.pop().booleanValue()) {
@@ -247,21 +239,19 @@ public class PropertyCatalogCheck
 
 
     @Nonnull
-    String buildPropertyFilePath(@Nonnull final String pBinaryClassName)
+    String buildPropertyFilePath(@Nonnull final BinaryName pBinaryClassName)
     {
-        final Matcher matcher = BINARY_NAME_PARSER.matcher(pBinaryClassName);
-        matcher.matches();
+        final String bcn = pBinaryClassName.toString();
 
-        final String completePath = pBinaryClassName.replace('.', '/').replace('$', '/');
-        final String outerFqcn = matcher.group(1);
+        final String completePath = bcn.replace('.', '/').replace('$', '/');
+        final String outerFqcn = pBinaryClassName.getOuterFqcn();
         final String outerFqcnPath = outerFqcn.replace('.', '/');
         final String outerFqcnBackrefs = outerFqcnPath.replaceAll("[^/]+", "..");
-        final String outerSimpleName = matcher.group(3);
-        final String innerSimpleName = matcher.group(4);
+        final String outerSimpleName = pBinaryClassName.getOuterSimpleName();
+        final String innerSimpleName = pBinaryClassName.getInnerSimpleName();
 
-        String pg = matcher.group(2);
-        pg = pg != null ? pg.replace('.', '/') : "";
-        final String pkgPath = pg.endsWith("/") ? pg.substring(0, pg.length() - 1) : "";
+        String pg = pBinaryClassName.getPackage();
+        final String pkgPath = pg != null ? pg.replace('.', '/') : "";
 
         final int numSubdirs = 3;
         String[] subdir = getFirstSubdirs(numSubdirs);
@@ -340,7 +330,7 @@ public class PropertyCatalogCheck
 
 
     @Override
-    protected void visitToken(@Nullable final String pBinaryClassName, @Nonnull final DetailAST pAst)
+    protected void visitToken(@Nullable final BinaryName pBinaryClassName, @Nonnull final DetailAST pAst)
     {
         if (skipType.peek().booleanValue()) {
             return;
@@ -466,11 +456,11 @@ public class PropertyCatalogCheck
 
 
 
-    private boolean isPropertyCatalog(@Nullable final String pBinaryClassName)
+    private boolean isPropertyCatalog(@Nullable final BinaryName pBinaryClassName)
     {
         boolean result = false;
         if (pBinaryClassName != null) {
-            result = selection.matcher(pBinaryClassName).find();
+            result = selection.matcher(pBinaryClassName.toString()).find();
         }
         return result;
     }

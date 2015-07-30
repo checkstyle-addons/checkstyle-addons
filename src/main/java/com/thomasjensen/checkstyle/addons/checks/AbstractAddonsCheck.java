@@ -15,13 +15,14 @@ package com.thomasjensen.checkstyle.addons.checks;
  * program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.Deque;
 import java.util.HashMap;
 import java.util.HashSet;
-import java.util.Iterator;
 import java.util.LinkedList;
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.TreeSet;
@@ -48,17 +49,17 @@ public abstract class AbstractAddonsCheck
         TokenTypes.PACKAGE_DEF, TokenTypes.ENUM_DEF, TokenTypes.CLASS_DEF, TokenTypes.INTERFACE_DEF,
         TokenTypes.ANNOTATION_DEF)));
 
-    /** fully qualified name of the outer (or only) class */
-    private String iOuterClassName = null;
+    /** binary name of the outer (or only) class */
+    private BinaryName iOuterClassName = null;
 
     /** Map from binary class names to ASTs */
-    private final Map<String, DetailAST> iClassDeclarationPositions = new HashMap<String, DetailAST>();
+    private final Map<BinaryName, DetailAST> iClassDeclarationPositions = new HashMap<BinaryName, DetailAST>();
 
     /** CLASS_DEF/IDENTs as encountered */
     private final Deque<String> iClassDefStack = new LinkedList<String>();
 
     /** Encountered binary class names in the current Java file */
-    private final Deque<String> iBinaryNameStack = new LinkedList<String>();
+    private final Deque<BinaryName> iBinaryNameStack = new LinkedList<BinaryName>();
 
     /** Package that the currently checked class resides in */
     private String iMyPackage = null;
@@ -142,11 +143,11 @@ public abstract class AbstractAddonsCheck
     /**
      * Called after a tree is fully processed. Ideal place to report on information collected whilst processing a tree.
      *
-     * @param pFqcn the fully qualified class name of the outer class
+     * @param pOuterClassName the fully qualified class name of the outer class
      * @param pRootAst the root of the tree
      */
     @SuppressWarnings({"unused", "EmptyMethod"})
-    protected void finishTree(@Nonnull final String pFqcn, @Nonnull final DetailAST pRootAst)
+    protected void finishTree(@Nonnull final BinaryName pOuterClassName, @Nonnull final DetailAST pRootAst)
     {
         // optionally filled in by subclass
     }
@@ -160,7 +161,7 @@ public abstract class AbstractAddonsCheck
      * @param pAst the token to process
      */
     @SuppressWarnings("unused")
-    protected void visitToken(@Nullable final String pBinaryClassName, @Nonnull final DetailAST pAst)
+    protected void visitToken(@Nullable final BinaryName pBinaryClassName, @Nonnull final DetailAST pAst)
     {
         // optionally filled in by subclass
     }
@@ -174,7 +175,7 @@ public abstract class AbstractAddonsCheck
      * @param pAst the token being completed
      */
     @SuppressWarnings("unused")
-    protected void leaveToken(@Nullable final String pBinaryClassName, @Nonnull final DetailAST pAst)
+    protected void leaveToken(@Nullable final BinaryName pBinaryClassName, @Nonnull final DetailAST pAst)
     {
         // optionally filled in by subclass
     }
@@ -184,14 +185,14 @@ public abstract class AbstractAddonsCheck
     /**
      * Called after visiting a CLASS_DEF, INTERFACE_DEF, ANNOTATION_DEF, or ENUM_DEF token and successfully determining
      * the type's binary class name. This is useful in a Java source file with nested inner classes. If the implementing
-     * check registers for any of the above tokens, the regular call to {@link #visitToken(String, DetailAST)} will be
-     * performed in addition to (after) this one.
+     * check registers for any of the above tokens, the regular call to {@link #visitToken(BinaryName, DetailAST)} will
+     * be performed in addition to (after) this one.
      *
      * @param pBinaryClassName the binary class name of the visited type
      * @param pAst the token to process
      */
     @SuppressWarnings("unused")
-    protected void visitKnownType(@Nonnull final String pBinaryClassName, @Nonnull final DetailAST pAst)
+    protected void visitKnownType(@Nonnull final BinaryName pBinaryClassName, @Nonnull final DetailAST pAst)
     {
         // optionally filled in by subclass
     }
@@ -201,14 +202,14 @@ public abstract class AbstractAddonsCheck
     /**
      * Called after leaving a CLASS_DEF, INTERFACE_DEF, ANNOTATION_DEF, or ENUM_DEF token and the type's binary class
      * name is known. This is useful in a Java source file with nested inner classes. If the implementing check
-     * registers for any of the above tokens, the regular call to {@link #leaveToken(String, DetailAST)} will be
+     * registers for any of the above tokens, the regular call to {@link #leaveToken(BinaryName, DetailAST)} will be
      * performed in addition to (before) this one.
      *
      * @param pBinaryClassName the binary class name of the visited type
      * @param pAst the token being completed
      */
     @SuppressWarnings("unused")
-    protected void leaveKnownType(@Nonnull final String pBinaryClassName, @Nonnull final DetailAST pAst)
+    protected void leaveKnownType(@Nonnull final BinaryName pBinaryClassName, @Nonnull final DetailAST pAst)
     {
         // optionally filled in by subclass
     }
@@ -249,18 +250,9 @@ public abstract class AbstractAddonsCheck
         final String simpleName = Util.getFirstIdent(pAst);
         iClassDefStack.push(simpleName);
 
-        StringBuilder sb = new StringBuilder();
-        if (iMyPackage != null) {
-            sb.append(iMyPackage);
-            sb.append('.');
-        }
-        for (Iterator<String> iter = iClassDefStack.descendingIterator(); iter.hasNext();) {
-            sb.append(iter.next());
-            if (iter.hasNext()) {
-                sb.append('$');
-            }
-        }
-        final String binaryName = sb.toString();
+        final List<String> names = new ArrayList<String>(iClassDefStack);
+        Collections.reverse(names);
+        final BinaryName binaryName = new BinaryName(iMyPackage, names);
 
         iBinaryNameStack.push(binaryName);
         iClassDeclarationPositions.put(binaryName, pAst);
@@ -273,7 +265,7 @@ public abstract class AbstractAddonsCheck
 
     @CheckForNull
     @SuppressWarnings("unused")
-    protected DetailAST getClassDeclarationPosition(@Nonnull final String pBinaryName)
+    protected DetailAST getClassDeclarationPosition(@Nonnull final BinaryName pBinaryName)
     {
         return iClassDeclarationPositions.get(pBinaryName);
     }
@@ -318,7 +310,7 @@ public abstract class AbstractAddonsCheck
      * while we are still going through the <code>import</code> statements)
      */
     @CheckForNull
-    protected String getCurrentBinaryName()
+    protected BinaryName getCurrentBinaryName()
     {
         return iBinaryNameStack.peek();
     }

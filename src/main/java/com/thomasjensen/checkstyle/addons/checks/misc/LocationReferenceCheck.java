@@ -26,6 +26,7 @@ import javax.annotation.Nullable;
 import com.puppycrawl.tools.checkstyle.api.DetailAST;
 import com.puppycrawl.tools.checkstyle.api.TokenTypes;
 import com.thomasjensen.checkstyle.addons.checks.AbstractMethodCallCheck;
+import com.thomasjensen.checkstyle.addons.checks.BinaryName;
 import com.thomasjensen.checkstyle.addons.util.Util;
 
 
@@ -111,7 +112,7 @@ public class LocationReferenceCheck
                 break;
 
             case FullClass:
-                expected = getCurrentBinaryName();
+                expected = getCurrentBinaryName().toString();
                 if (expected != null) {
                     expected = expected.replace('$', '.');
                 }
@@ -159,7 +160,7 @@ public class LocationReferenceCheck
 
 
     @Override
-    protected void visitToken(@Nullable final String pBinaryClassName, @Nonnull final DetailAST pAst)
+    protected void visitToken(@Nullable final BinaryName pBinaryClassName, @Nonnull final DetailAST pAst)
     {
         super.visitToken(pBinaryClassName, pAst);
         if (!variableNames.isEmpty() && pAst.getType() == TokenTypes.VARIABLE_DEF) {

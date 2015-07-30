@@ -113,7 +113,7 @@ public abstract class AbstractMethodCallCheck
 
 
     @Override
-    protected void visitToken(@Nullable final String pBinaryClassName, @Nonnull final DetailAST pAst)
+    protected void visitToken(@Nullable final BinaryName pBinaryClassName, @Nonnull final DetailAST pAst)
     {
         if (isCheckActive()) {
             /*
@@ -157,7 +157,7 @@ public abstract class AbstractMethodCallCheck
 
 
     @Override
-    protected void leaveToken(@Nullable final String pBinaryClassName, @Nonnull final DetailAST pAst)
+    protected void leaveToken(@Nullable final BinaryName pBinaryClassName, @Nonnull final DetailAST pAst)
     {
         /*
          * tracking of current method name
