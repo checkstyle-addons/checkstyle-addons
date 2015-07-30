@@ -218,7 +218,7 @@ a.csa-offset-anchor { /* used to prevent anchors from being obscured by the fixe
 
 div.csa-largeImageWrapper {
     overflow-x: auto;
-    overflow-y: hidden;
+    overflow-y: visible;
     white-space: nowrap;
     margin-bottom: 1em;
 }
@@ -226,7 +226,7 @@ div.highlight {
     white-space: pre;
     word-wrap: normal;
     overflow-x: auto;
-    overflow-y: hidden;
+    overflow-y: visible;
 }
 div.highlight > pre, div.highlight > pre code {
     white-space: pre !important;
