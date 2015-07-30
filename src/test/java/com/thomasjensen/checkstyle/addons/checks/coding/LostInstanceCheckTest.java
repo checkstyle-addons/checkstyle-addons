@@ -17,7 +17,6 @@ package com.thomasjensen.checkstyle.addons.checks.coding;
 
 import com.puppycrawl.tools.checkstyle.DefaultConfiguration;
 import com.thomasjensen.checkstyle.addons.BaseCheckTestSupport;
-import junit.framework.TestCase;
 import org.junit.Test;
 
 
@@ -33,9 +32,8 @@ public class LostInstanceCheckTest
     public void testDefault()
         throws Exception
     {
-        final DefaultConfiguration checkConfig =
-            createCheckConfig(LostInstanceCheck.class);
-        final String[] expected = {
+        final DefaultConfiguration checkConfig = createCheckConfig(LostInstanceCheck.class);
+        final String[] expected = {//
             "13:9: Instance created here is not used for anything.",
             "39:22: Instance created here is not used for anything.",
             "40:35: Instance created here is not used for anything.",
@@ -52,19 +50,9 @@ public class LostInstanceCheckTest
             "78:12: Instance created here is not used for anything.",
             "81:53: Instance created here is not used for anything.",
             "98:9: Instance created here is not used for anything.",
-            "104:17: Instance created here is not used for anything.",
+            "104:17: Instance created here is not used for anything." //
         };
         verify(checkConfig, getPath("coding/InputLostInstance.java"), expected);
-    }
-
-
-
-    @Test
-    public void testRequiredTokens()
-    {
-        int[] tokens = new LostInstanceCheck().getRequiredTokens();
-        TestCase.assertNotNull(tokens);
-        TestCase.assertEquals(1, tokens.length);
     }
 }
 

@@ -16,23 +16,28 @@ package com.thomasjensen.checkstyle.addons.checks.coding;
  */
 
 import java.util.Arrays;
+import java.util.Collections;
+import java.util.Set;
+import javax.annotation.Nonnull;
+import javax.annotation.Nullable;
 
-import com.puppycrawl.tools.checkstyle.api.Check;
 import com.puppycrawl.tools.checkstyle.api.DetailAST;
 import com.puppycrawl.tools.checkstyle.api.TokenTypes;
+import com.thomasjensen.checkstyle.addons.checks.AbstractAddonsCheck;
+import com.thomasjensen.checkstyle.addons.checks.BinaryName;
 
 
 /**
  * Checks that object instances created explicitly with <code>new</code> are actually used for something. Just being
  * assigned to a variable or passed as a parameter is enough. A full data flow analysis is not performed.
- *
+ * <p/>
  * <p><a href="http://checkstyle-addons.thomasjensen.com/latest/checks/coding.html#LostInstance"
  * target="_blank">Documentation</a></p>
  *
  * @author Thomas Jensen
  */
 public class LostInstanceCheck
-    extends Check
+    extends AbstractAddonsCheck
 {
     /**
      * List of tokens that, when occurring as a parent token of LITERAL_NEW, indicate that LITERAL_NEW does not stand
@@ -62,28 +67,20 @@ public class LostInstanceCheck
 
 
     @Override
-    public int[] getDefaultTokens()
+    public Set<Integer> getRelevantTokens()
     {
-        return new int[]{TokenTypes.LITERAL_NEW};
+        return Collections.singleton(Integer.valueOf(TokenTypes.LITERAL_NEW));
     }
 
 
 
     @Override
-    public int[] getRequiredTokens()
-    {
-        return getDefaultTokens();
-    }
-
-
-
-    @Override
-    public void visitToken(final DetailAST pAST)
+    public void visitToken(@Nullable final BinaryName pBinaryClassName, @Nonnull final DetailAST pAst)
     {
         boolean isLost = false;
 
-        if (!isBeingDereferenced(pAST)) {
-            for (DetailAST a = pAST.getParent(); a.getType() != TokenTypes.EOF; a = a.getParent()) {
+        if (!isBeingDereferenced(pAst)) {
+            for (DetailAST a = pAst.getParent(); a.getType() != TokenTypes.EOF; a = a.getParent()) {
                 if (a.getType() == TokenTypes.ELIST) {
                     final int parentType = a.getParent().getType();
                     if (parentType == TokenTypes.FOR_INIT || parentType == TokenTypes.FOR_ITERATOR) {
@@ -102,7 +99,7 @@ public class LostInstanceCheck
         }
 
         if (isLost) {
-            log(pAST, "lost.instance");
+            log(pAst, "lost.instance");
         }
     }
 
