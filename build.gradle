@@ -584,6 +584,7 @@ def void configureCompileTask(final JavaCompile pTask, final String pJavaLevel)
     pTask.sourceCompatibility = pJavaLevel;
     pTask.targetCompatibility = pJavaLevel;
     pTask.options.encoding = 'UTF-8';
+    pTask.options.deprecation = true;
 
     // The warning "Supported source version 'RELEASE_6' from annotation processor 'org.antlr.v4.runtime.misc.
     // NullUsageProcessor' less than -source '1.7'" is okay and may be ignored. It goes away when Checkstyle
