@@ -362,4 +362,15 @@ public class RegexpOnFilenameCheckTest
         check.setRegexp(null);
         check.setRegexp("");
     }
+
+
+
+    @Test
+    public void testOptionValues()
+    {
+        Assert.assertSame(RegexpOnFilenameOption.REQUIRED, RegexpOnFilenameOption.valueOf("REQUIRED"));
+        Assert.assertSame(RegexpOnFilenameOption.ILLEGAL, RegexpOnFilenameOption.valueOf("ILLEGAL"));
+        Assert.assertSame(RegexpOnFilenameOption.REQUIRED, RegexpOnFilenameOption.valueOfIgnoreCase("required"));
+        Assert.assertSame(RegexpOnFilenameOption.ILLEGAL, RegexpOnFilenameOption.valueOfIgnoreCase("illegal"));
+    }
 }
