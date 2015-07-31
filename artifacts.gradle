@@ -61,17 +61,35 @@ tasks.depConfigs.activeDepConfigs.each { final String depCfg ->
         archives jarTask;
     }
 
-    // Add JAR to list of artifacts to publish
-    if (isPublished) {
-        String pubName = 'checkstyleAddons';
-        if (!isDefaultDepConfig) {
-            pubName += '-' + depVersions.PublicationSuffix;
-        }
-        MavenPublication pub = publishing.publications.create(pubName, MavenPublication.class);
-        final String pubArtifactId = project.name + (isDefaultDepConfig ? '' : ('-' + depVersions.PublicationSuffix));
-        pub.setArtifactId(pubArtifactId);
-        pub.artifact(jarTask);
+    // 'jarSources' task
+    final String jarSourcesTaskName = 'jarSources' + (isDefaultDepConfig ? 'Default' : csVersComp);
+    final CreateJarSourcesTask jarSourcesTask = (CreateJarSourcesTask) project.tasks.create(
+        name: jarSourcesTaskName, type: CreateJarSourcesTask);
+    jarSourcesTask.configureFor(depCfg);
+    project.artifacts {
+        archives jarSourcesTask;
     }
+
+    // 'jarJavadoc' task
+    final String jarJavadocTaskName = 'jarJavadoc' + (isDefaultDepConfig ? 'Default' : csVersComp);
+    final CreateJarJavadocTask jarJavadocTask = (CreateJarJavadocTask) project.tasks.create(
+        name: jarJavadocTaskName, type: CreateJarJavadocTask);
+    jarJavadocTask.configureFor(depCfg);
+    project.artifacts {
+        archives jarJavadocTask;
+    }
+
+    // Add JARs to list of artifacts to publish
+    String pubName = 'checkstyleAddons';
+    if (!isDefaultDepConfig) {
+        pubName += '-' + depVersions.PublicationSuffix;
+    }
+    MavenPublication pub = publishing.publications.create(pubName, MavenPublication.class);
+    final String pubArtifactId = project.name + (isDefaultDepConfig ? '' : ('-' + depVersions.PublicationSuffix));
+    pub.setArtifactId(pubArtifactId);
+    pub.artifact(jarTask);
+    pub.artifact(jarSourcesTask);
+    pub.artifact(jarJavadocTask);
 
     // 'jarEclipse' task
     final String eclipseTaskName = 'jarEclipse' + (isDefaultDepConfig ? 'Default' : csVersComp);
@@ -100,6 +118,8 @@ tasks.depConfigs.activeDepConfigs.each { final String depCfg ->
     assembleTask.setDescription("${project.ext.longName}: Assembles the outputs of this project pertaining to " +
         "Checkstyle ${depVersions.Checkstyle}.");
     assembleTask.dependsOn(jarTask);
+    assembleTask.dependsOn(jarSourcesTask);
+    assembleTask.dependsOn(jarJavadocTask);
     assembleTask.dependsOn(jarEclipseTask);
     if (jarSqTask != null) {
         assembleTask.dependsOn(jarSqTask);
@@ -310,51 +330,138 @@ tasks.jar {
 
 
 
-task jarSources(type: Jar) {
-    description = project.ext.longName + ': Build the source JAR';
-    // sources JAR does not depend on the Checkstyle version
-
-    from sourceSets.main.allJava;
-    into('META-INF') {
-        from 'LICENSE';
+public class CreateJarSourcesTask extends Jar
+{
+    public CreateJarSourcesTask()
+    {
+        super();
+        setGroup(BasePlugin.BUILD_GROUP);
+        setDescription("${project.ext.longName}: Build the source JAR for publication '");
     }
 
-    classifier = 'sources';
-    doFirst {
-        manifest = tasks['jarDefault'].manifest;
-        manifest {
-            attributes 'Build-Timestamp': project.ext.buildTimestamp.toString();
+
+
+    /**
+     * Configure this task instance for a given dependency configuration.
+     * @param pDepConfig the name of the dependency configuration. May be <code>null</code> to indicate the default
+     *          dependency configuration
+     */
+    public void configureFor(final String pDepConfig)
+    {
+        // Dependency Configuration
+        final String depConfig = pDepConfig != null ? pDepConfig : project.ext.depConfigDefault;
+        final String checkstyleVersion = project.tasks.depConfigs.depVersions.get(depConfig).Checkstyle;
+        final String appendix = project.tasks.depConfigs.depVersions.get(depConfig).PublicationSuffix;
+        final boolean isDefaultConfig = pDepConfig == null || pDepConfig.equals(project.ext.depConfigDefault);
+
+        // set appendix for archive name
+        if (appendix != null) {
+            setAppendix(appendix);
+            setDescription(getDescription() + appendix + '\'');
+        }
+        else {
+            setDescription(getDescription() + 'Default\'');
+        }
+
+        // compressed Checkstyle version
+        String csVersComp = '';
+        if (!isDefaultConfig) {
+            csVersComp = checkstyleVersion.replaceAll('\\.', '');
+        }
+
+        // SourceSet that fits the dependency configuration
+        SourceSet mainSourceSet;
+        if (isDefaultConfig) {
+            mainSourceSet = project.sourceSets.main;
+        }
+        else {
+            mainSourceSet = (SourceSet) project.sourceSets['main' + checkstyleVersion];
+        }
+
+        // Configuration of JAR file contents
+        configure {
+            from mainSourceSet.allJava;
+            into('META-INF') {
+                from 'LICENSE';
+            }
+            classifier = 'sources';
+        }
+
+        // Manifest
+        doFirst {
+            Jar jarTask = (Jar) project.tasks['jar' + (isDefaultConfig ? 'Default' : csVersComp)];
+            manifest = jarTask.manifest;
+            manifest {
+                attributes 'Build-Timestamp': project.ext.buildTimestamp.toString();
+            }
         }
     }
 }
 
-MavenPublication pub = (MavenPublication) publishing.publications.findByName('checkstyleAddons');
-pub.artifact(jarSources);
-
-Task defaultAssembleTask = tasks[(String) tasks.depConfigs.specificName('assemble', project.ext.depConfigDefault)];
-defaultAssembleTask.dependsOn jarSources;
 
 
-
-task jarJavadoc(type: Jar, dependsOn: javadoc) {
-    description = project.ext.longName + ': Build the javadoc JAR';
-    // Javadoc JAR does not depend on the Checkstyle version
-
-    from javadoc.destinationDir;
-    into('META-INF') {
-        from 'LICENSE';
+public class CreateJarJavadocTask extends Jar
+{
+    public CreateJarJavadocTask()
+    {
+        super();
+        setGroup(BasePlugin.BUILD_GROUP);
+        setDescription("${project.ext.longName}: Build the javadoc JAR for publication '");
     }
 
-    classifier = 'javadoc';
-    doFirst {
-        manifest = tasks['jarDefault'].manifest;
-        manifest {
-            attributes 'Build-Timestamp': project.ext.buildTimestamp.toString();
+
+
+    /**
+     * Configure this task instance for a given dependency configuration.
+     * @param pDepConfig the name of the dependency configuration. May be <code>null</code> to indicate the default
+     *          dependency configuration
+     */
+    public void configureFor(final String pDepConfig)
+    {
+        // Dependency Configuration
+        final String depConfig = pDepConfig != null ? pDepConfig : project.ext.depConfigDefault;
+        final String checkstyleVersion = project.tasks.depConfigs.depVersions.get(depConfig).Checkstyle;
+        final String appendix = project.tasks.depConfigs.depVersions.get(depConfig).PublicationSuffix;
+        final boolean isDefaultConfig = pDepConfig == null || pDepConfig.equals(project.ext.depConfigDefault);
+
+        // set appendix for archive name
+        if (appendix != null) {
+            setAppendix(appendix);
+            setDescription(getDescription() + appendix + '\'');
+        }
+        else {
+            setDescription(getDescription() + 'Default\'');
+        }
+
+        // compressed Checkstyle version
+        String csVersComp = '';
+        if (!isDefaultConfig) {
+            csVersComp = checkstyleVersion.replaceAll('\\.', '');
+        }
+
+        // Dependency on javadoc generating task
+        Javadoc javadocTask = (Javadoc) project.tasks['javadoc' + csVersComp];
+        dependsOn(javadocTask);
+
+        // Configuration of JAR file contents
+        configure {
+            from javadocTask.destinationDir;
+            into('META-INF') {
+                from 'LICENSE';
+            }
+            classifier = 'javadoc';
+        }
+
+        // Manifest
+        doFirst {
+            Jar jarTask = (Jar) project.tasks['jar' + (isDefaultConfig ? 'Default' : csVersComp)];
+            manifest = jarTask.manifest;
+            manifest {
+                attributes 'Build-Timestamp': project.ext.buildTimestamp.toString();
+            }
         }
     }
 }
-pub.artifact(jarJavadoc);
-defaultAssembleTask.dependsOn jarJavadoc;
 
 
 
@@ -639,12 +746,4 @@ public class CreateJarSonarqubeTask extends Jar
             }
         }
     }
-}
-
-
-
-artifacts {
-    archives jarSources
-    archives jarJavadoc
-    // all the other artifacts are added dynamically
 }

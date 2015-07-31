@@ -53,6 +53,7 @@ ext {
     bundledConfigurations = ['runtime'];
     defaultPublication = 'checkstyleAddons';   // name of the default Gradle publication
     jdk6PropName = 'checkstyleaddons_jdk6_javac';
+    javadoc6PropName = 'checkstyleaddons_jdk6_javadoc';
     authorName = 'Thomas Jensen';
     longName = 'Checkstyle Addons';
     orgName = 'Checkstyle Addons';
@@ -443,6 +444,24 @@ tasks.depConfigs.activeDepConfigs.each { final String depCfg ->
     */
 
     [compileTask, testCompileTask].each { final JavaCompile pTask -> configureCompileTask(pTask, depVersions.Java); }
+
+    // 'javadoc' task
+    Javadoc javadocTask = (Javadoc) project.tasks.create(name: 'javadoc' + csVersComp, type: Javadoc);
+    javadocTask.setDescription("${project.ext.longName}: Generates Javadoc API documentation for the source " +
+        "code in '${mainSourceSet.name}'.");
+    javadocTask.setGroup(JavaBasePlugin.DOCUMENTATION_GROUP);
+    javadocTask.dependsOn(compileTask);
+    javadocTask.setSource(mainSourceSet.allJava);
+    javadocTask.setDestinationDir(new File((File) project.docsDir, 'javadoc' + csVersComp));
+    configureJavadocTask(javadocTask, mainSourceSet, depVersions.Java);
+    if ('1.6'.equals(depVersions.Java)) {
+        String javadoc6Exe = getJdk6Javadoc();
+        if (javadoc6Exe == null) {
+            throw new GradleException('ERROR: Property \'' + project.ext.javadoc6PropName +
+                '\' not defined in gradle.properties. It must point to a Java 6 javadoc executable.');
+        }
+        javadocTask.setExecutable(javadoc6Exe);
+    }
 }
 //println 'SourceSets: ' + (sourceSets.collect { it.name });
 
@@ -577,7 +596,14 @@ def String getJdk6Compiler()
     return result;
 }
 
-
+def String getJdk6Javadoc()
+{
+    String result = System.getenv((String) project.ext.javadoc6PropName);
+    if (project.hasProperty((String) project.ext.javadoc6PropName)) {
+        result = project.property((String) project.ext.javadoc6PropName);
+    }
+    return result;
+}
 
 def void configureCompileTask(final JavaCompile pTask, final String pJavaLevel)
 {
@@ -637,24 +663,28 @@ idea.module {
  * Javadoc generation
  */
 javadoc {
-    title = project.ext.longName + ' v' + project.version;
-    classpath = project.sourceSets.main.compileClasspath;
-    options.encoding = 'UTF-8';
-    options.docEncoding = 'UTF-8';
-    options.charSet = 'UTF-8';
-    options.author = true;
-    options.use = true;
-    options.windowTitle = project.ext.longName;
-    options.splitIndex = false;
-    options.outputLevel = null;   // specify neither -quiet nor -verbose
-    options.header = project.ext.longName;
-    if ('1.7'.equals(project.ext.versionDefaults.Java)) {
-        options.links('https://jsr-305.googlecode.com/svn/trunk/javadoc/',
+    configureJavadocTask(tasks.javadoc, project.sourceSets.main, project.ext.versionDefaults.Java);
+}
+def void configureJavadocTask(final Javadoc pTask, final SourceSet pMainSourceSet, final String pJavaLevel)
+{
+    pTask.title = project.ext.longName + ' v' + project.version;
+    pTask.classpath = pMainSourceSet.compileClasspath;
+    pTask.options.encoding = 'UTF-8';
+    pTask.options.docEncoding = 'UTF-8';
+    pTask.options.charSet = 'UTF-8';
+    pTask.options.author = true;
+    pTask.options.use = true;
+    pTask.options.windowTitle = project.ext.longName;
+    pTask.options.splitIndex = false;
+    pTask.options.outputLevel = null;   // specify neither -quiet nor -verbose
+    pTask.options.header = project.ext.longName;
+    if ('1.7'.equals(pJavaLevel)) {
+        pTask.options.links('https://jsr-305.googlecode.com/svn/trunk/javadoc/',
             'http://docs.oracle.com/javase/7/docs/api/',
             'http://javadocs.sonarsource.org/3.0/apidocs/',
             'http://checkstyle.sourceforge.net/apidocs/');
-    } else if ('1.6'.equals(project.ext.versionDefaults.Java)) {
-        options.links('https://jsr-305.googlecode.com/svn/trunk/javadoc/',
+    } else if ('1.6'.equals(pJavaLevel)) {
+        pTask.options.links('https://jsr-305.googlecode.com/svn/trunk/javadoc/',
             'http://docs.oracle.com/javase/6/docs/api/',
             'http://javadocs.sonarsource.org/3.0/apidocs/',
             'http://checkstyle.sourceforge.net/apidocs/');
@@ -662,13 +692,12 @@ javadoc {
 
     // javadoc does not inherit the proxy settings (https://issues.gradle.org/browse/GRADLE-1228)
     if (System.properties['http.proxyHost'] != null) {
-        options.jFlags('-DproxyHost=' + System.properties['http.proxyHost'],
-                '-DproxyPort=' + System.properties['http.proxyPort'],
-                '-DproxyUser=' + System.properties['http.proxyUser'],
-                '-DproxyPassword=' + System.properties['http.proxyPassword']);
+        pTask.options.jFlags('-DproxyHost=' + System.properties['http.proxyHost'],
+            '-DproxyPort=' + System.properties['http.proxyPort'],
+            '-DproxyUser=' + System.properties['http.proxyUser'],
+            '-DproxyPassword=' + System.properties['http.proxyPassword']);
     }
 }
-
 
 /*
  * Checkstyle configuration

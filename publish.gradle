@@ -234,7 +234,7 @@ bintray {
         Set<String> pubNames = tasks.depConfigs.publications.keySet();
         publications = pubNames.toArray(new String[pubNames.size()]);
         publish = true;
-        dryRun = true;   // comment out for actual release deployment
+        //dryRun = true;   // comment out for actual release deployment
         pkg {
             repo = 'checkstyle-addons'
             userOrg = 'checkstyle-addons';
