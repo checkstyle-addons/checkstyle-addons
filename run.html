@@ -2,7 +2,7 @@
 layout: markdown
 title: Download &amp; Run
 surrounding-div: csa-run
-maven-central-link: http://search.maven.org/#search%7Cgav%7C1%7Cg%3Acom.thomasjensen.checkstyle.addons%20AND%20a%3Acheckstyle-addons
+maven-central-link: http://search.maven.org/#search%7Cgav%7C1%7Cg%3Acom.thomasjensen.checkstyle.addons
 bintray-link: https://bintray.com/checkstyle-addons/checkstyle-addons/checkstyle-addons/view
 longContent: true
 ---
@@ -11,7 +11,9 @@ longContent: true
 
 Here's how to use {{ site.name }} with your standard software.
 
-{{ site.name }} is also distributed via [Maven Central]({{ page.maven-central-link }}) and [Bintray jcenter]({{ page.bintray-link }}), so major build tools can automatically access it.
+{{ site.name }} is distributed via [Maven Central]({{ page.maven-central-link }}) and [Bintray jcenter]({{ page.bintray-link }}), so major build tools can automatically access it.
+
+{{ site.name }} is compatible with all Checkstyle versions starting from 6.0. That is because Checkstyle 5.9 and earlier were based on Java&nbsp;5, which is no longer available on our continuous integration platform, Travis CI.
 
 {{ site.name }} uses [semantic versioning](http://semver.org/){:target="_blank"}, so you can always use the latest within a major version, but you should try things out before moving to a higher major version.
 
@@ -36,7 +38,9 @@ checkstyle {
 }
 {% endhighlight %}
 
-You could also use the version notation `version: '{{ site.latest_major }}.+'` in order to always get the latest compatible version.
+For the `checkstyle-addons` dependency, you may also use the version notation `version: '{{ site.latest_major }}.+'` in order to always get the latest compatible version.
+
+The example above has been tested with Checkstyle `toolVersion` set to 6.2 - {{ site.latest_checkstyle_tested }}. The older Checkstyle versions 6.0 - 6.1.1 are also supported, but if you set `toolVersion` to these, you must depend on `checkstyle-addons-java6` instead of `checkstyle-addons` (even if you use Java&nbsp;7 or higher).
 
 
 <!-- ======================================================================================= -->
@@ -62,7 +66,7 @@ You could also use the version notation `version: '{{ site.latest_major }}.+'` i
       <dependency>
         <groupId>com.puppycrawl.tools</groupId>
         <artifactId>checkstyle</artifactId>
-        <version>{{ site.latest_version_checkstyle }}</version>
+        <version>{{ site.latest_version_checkstyle }}</version>    <!-- important -->
       </dependency>
       <dependency>
         <groupId>com.thomasjensen.checkstyle.addons</groupId>
@@ -74,13 +78,15 @@ You could also use the version notation `version: '{{ site.latest_major }}.+'` i
 </project>
 {% endhighlight %}
 
+The example above has been tested with the Checkstyle dependency set to 6.2 - {{ site.latest_checkstyle_tested }}. The older Checkstyle versions 6.0 - 6.1.1 are also supported, but if you use these, you must depend on `checkstyle-addons-java6` instead of `checkstyle-addons` (even if you use Java&nbsp;7 or higher).
+
 
 <!-- ======================================================================================= -->
 <a name="run-ant" class="csa-offset-anchor"/>
 
 ## Ant
 
-In Ant, we must add {{ site.name }} to the classpath of the [Checkstyle Ant Task](http://checkstyle.sourceforge.net/anttask.html){:target="_blank"}. The Ant task is part of the standard Checkstyle distribution. We need **at least Checkstyle 6.2**, better yet, exactly version {{ site.latest_version_checkstyle }}. And of course the {{ site.name }} jar file:
+In Ant, we must add {{ site.name }} to the classpath of the [Checkstyle Ant Task](http://checkstyle.sourceforge.net/anttask.html){:target="_blank"}. The Ant task is part of the standard Checkstyle distribution. We need **at least Checkstyle 6.2** (currently tested up to {{ site.latest_checkstyle_tested }}). And of course the {{ site.name }} jar file:
 
 <p><a href="https://github.com/{{ site.github }}/releases/download/v{{ site.latest_version }}/checkstyle-addons-{{ site.latest_version }}.jar" class="btn btn-primary">Download JAR</a></p>
 
@@ -128,6 +134,10 @@ In IntelliJ IDEA or Android Studio, {{ site.name }} runs as a third-party addon 
 
 Checkstyle-IDEA does not offer a visual editor, so you'll have to activate the {{ site.name }} checks by modifying your *checkstyle.xml* directly.
 
+The {{ site.name }} version offered by the above download button is compatible with Checkstyle 6.2 - {{ site.latest_checkstyle_tested }} (which means Checkstyle-IDEA 4.14.0 and up). If you are using the older Checkstyle versions 6.0 - 6.1.1, you must use a special, compatible version of {{ site.name }} instead:
+
+<p><a href="https://github.com/{{ site.github }}/releases/download/v{{ site.latest_version }}/checkstyle-addons-java6-{{ site.latest_version }}.jar" class="btn btn-warning btn-sm">Download Legacy Plugin</a></p>
+
 
 <!-- ======================================================================================= -->
 <a name="run-eclipse" class="csa-offset-anchor"/>
@@ -152,7 +162,7 @@ In order to verify that {{ site.name }} was installed correctly, open the Checks
 
 ## SonarQube
 
-In [SonarQube](http://www.sonarqube.org/){:target="_blank"}, {{ site.name }} runs as an extension of the SonarQube Checkstyle Plugin. Make sure your SonarQube installation runs on the versions shown in the highlighted column:
+In [SonarQube](http://www.sonarqube.org/){:target="_blank"}, {{ site.name }} runs as an extension of the SonarQube Checkstyle Plugin. {{ site.name }} currently supports the SonarQube Checkstyle Plugin versions 2.2 (<span style="color: #ffbc68;">orange column</span>) and 2.3 (<span style="color: #75ccf7;">blue column</span>). Make sure your SonarQube installation is configured accordingly:
 
 <div class="csa-largeImageWrapper">
 <table class="table table-striped csa-version-table" style="width:auto;">
@@ -162,29 +172,21 @@ In [SonarQube](http://www.sonarqube.org/){:target="_blank"}, {{ site.name }} run
       <td>2.0</td>
       <td>2.1</td>
       <td>2.1.1</td>
-      <td>2.2</td>
-      <td class="info">2.3</td>
-    </tr>
-    <tr>
-      <td><a href="http://docs.sonarqube.org/display/PLUG/Java+Plugin" target="_blank">SonarQube Java Plugin</a></td>
-      <td>2.0+</td>
-      <td>2.2+</td>
-      <td>2.2+</td>
-      <td>2.2+</td>
-      <td class="info">2.2+</td>
+      <td class="orange"><b>2.2</b></td>
+      <td class="info"><b>2.3</b></td>
     </tr>
     <tr>
       <td><a href="http://docs.sonarqube.org/display/SONAR/Upgrading#Upgrading-ReleaseUpgradeNotes" target="_blank">SonarQube Platform</a></td>
       <td>3.6 - 4.1.2</td>
-      <td colspan="3" style="text-align:center;">4.2 - 4.4</td>
+      <td colspan="3" class="orange" style="text-align:center;">4.2 - 4.4</td>
       <td class="info">4.5.2+</td>
     </tr>
     <tr>
-      <td><a href="http://checkstyle.sourceforge.net/releasenotes.html" target="_blank">Checkstyle</a></td>
+      <td><a href="http://checkstyle.sourceforge.net/releasenotes.html" target="_blank">Checkstyle</a> (by plugin)</td>
       <td>5.6</td>
       <td>5.6</td>
       <td>5.6</td>
-      <td>6.1</td>
+      <td class="orange">6.1</td>
       <td class="info">6.4.1</td>
     </tr>
     <tr>
@@ -192,7 +194,7 @@ In [SonarQube](http://www.sonarqube.org/){:target="_blank"}, {{ site.name }} run
       <td>6+</td>
       <td>6+</td>
       <td>6+</td>
-      <td>6+</td>
+      <td class="orange">6+</td>
       <td class="info">7+</td>
     </tr>
     <tr>
@@ -200,7 +202,7 @@ In [SonarQube](http://www.sonarqube.org/){:target="_blank"}, {{ site.name }} run
       <td>&lt;= 7</td>
       <td>&lt;= 7</td>
       <td>&lt;= 7</td>
-      <td>&lt;= 8</td>
+      <td class="orange">&lt;= 8</td>
       <td class="info">&lt;= 8</td>
     </tr>
   </tbody>
@@ -209,9 +211,10 @@ In [SonarQube](http://www.sonarqube.org/){:target="_blank"}, {{ site.name }} run
 
 The Checkstyle version is directly determined by the version of the SonarQube Checkstyle plugin, so you don't need to check that explicitly. SonarQube 3.6 is the earliest version on which {{ site.name }} could possibly run, even if you built from source.
 
-The rules provided by {{ site.name }} are all tagged with `checkstyle-addons`, which is useful to filter them from the overall list of Checkstyle rules.
+The rules provided by {{ site.name }} are tagged with `checkstyle-addons`, which is useful to filter them from the overall list of Checkstyle rules.
 
-<p><a href="https://github.com/{{ site.github }}/releases/download/v{{ site.latest_version }}/sonar-checkstyleaddons-{{ site.latest_version }}.jar" class="btn btn-primary">Download SonarQube Plugin</a></p>
+<p><a href="https://github.com/{{ site.github }}/releases/download/v{{ site.latest_version }}/sonar-checkstyleaddons-{{ site.latest_version }}.jar" class="btn btn-primary">Download SonarQube Plugin for 2.3</a> &nbsp; &nbsp; &nbsp;
+<a href="https://github.com/{{ site.github }}/releases/download/v{{ site.latest_version }}/sonar-checkstyleaddons-{{ site.latest_version }}-csp2.2.jar" class="btn btn-warning btn-sm">Download SonarQube Plugin for 2.2</a></p>
 
 **Installation:** Drop the downloaded plugin into the *extensions/plugins* folder of your SonarQube installation (where all the other plugins are). Double-check the version of the SonarQube Checkstyle plugin according to the above table. Upgrade that if necessary. Restart SonarQube.
 
@@ -221,12 +224,13 @@ The rules provided by {{ site.name }} are all tagged with `checkstyle-addons`, w
 
 ## Command Line
 
-Checkstyle can also be run [from the command line](http://checkstyle.sourceforge.net/cmdline.html){:target="_blank"}. In that case, you can add {{ site.name }} to the classpath.
-Make sure to use at least Java&nbsp;7, and at least Checkstyle 6.2. The code you're analyzing can be anything up to Java&nbsp;8.
+Checkstyle can also be run [from the command line](http://checkstyle.sourceforge.net/cmdline.html){:target="_blank"}. {{ site.name }} is included by simply adding it to the classpath.
+If you are using at least Java&nbsp;7, and at least Checkstyle 6.2 (tested up to {{ site.latest_checkstyle_tested }}), you may use the regular JAR. If you are using Checkstyle 6.0 - 6.1.1, you must use the legacy JAR. The code you're analyzing can be anything up to Java&nbsp;8.
 
-<p><a href="https://github.com/{{ site.github }}/releases/download/v{{ site.latest_version }}/checkstyle-addons-{{ site.latest_version }}.jar" class="btn btn-primary">Download JAR</a></p>
+<p><a href="https://github.com/{{ site.github }}/releases/download/v{{ site.latest_version }}/checkstyle-addons-{{ site.latest_version }}.jar" class="btn btn-primary">Download regular JAR</a> &nbsp; &nbsp; &nbsp;
+<a href="https://github.com/{{ site.github }}/releases/download/v{{ site.latest_version }}/checkstyle-addons-java6-{{ site.latest_version }}.jar" class="btn btn-warning btn-sm">Download legacy JAR</a></p>
 
-Now you can run Checkstyle with {{ site.name }} like this:
+Now you can run Checkstyle with {{ site.name }} like this (example for regular JAR):
 
 ```
 java -cp checkstyle-addons-{{ site.latest_version }}.jar;checkstyle-{{ site.latest_version_checkstyle }}-all.jar com.puppycrawl.tools.checkstyle.Main -c your-checkstyle.xml src

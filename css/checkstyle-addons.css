@@ -240,6 +240,9 @@ table.csa-version-table td, table.csa-version-table th {
 table.csa-version-table tr td:last-child, table.csa-version-table tr th:last-child {
     border-right: 0;
 }
+table.csa-version-table td.orange {
+    background-color: #ffbc68;
+}
 
 .checkpage h2 {
     border-top: 1px solid #dddddd;
