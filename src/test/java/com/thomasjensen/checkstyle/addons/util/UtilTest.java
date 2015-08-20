@@ -15,16 +15,16 @@ package com.thomasjensen.checkstyle.addons.util;
  * program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+import com.puppycrawl.tools.checkstyle.api.DetailAST;
+import org.junit.Assert;
+import org.junit.Test;
+
 import java.io.Closeable;
 import java.io.File;
 import java.io.IOException;
 import java.util.Arrays;
 import java.util.HashSet;
 import java.util.Set;
-
-import com.puppycrawl.tools.checkstyle.api.DetailAST;
-import org.junit.Assert;
-import org.junit.Test;
 
 
 /**
@@ -86,6 +86,27 @@ public class UtilTest
         c = Util.canonize(f);
         Assert.assertTrue(c.isAbsolute());
         Assert.assertTrue(c.getPath().endsWith("." + File.separator + '\u0000'));
+    }
+
+
+
+    @Test
+    public void testCanonizeSlashes()
+    {
+        File f = new File(".");
+        File c = Util.canonize(f);
+        Assert.assertTrue(c.isAbsolute());
+        Assert.assertTrue(c.getPath().contains(File.separator));
+
+        final File parent = c.getParentFile();
+        final String thisOne = c.getName();
+        final String badSlash = File.separatorChar == '/' ? "\\" : "/";
+        final File badCombined = new File(parent.getPath() + badSlash + thisOne);
+        final File bc = Util.canonize(badCombined);
+
+        Assert.assertTrue(bc.getPath().contains(File.separator));
+        Assert.assertFalse(bc.getPath().contains(badSlash));
+        Assert.assertEquals(c, bc);
     }
 
 

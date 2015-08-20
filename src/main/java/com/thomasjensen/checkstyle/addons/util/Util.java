@@ -15,6 +15,12 @@ package com.thomasjensen.checkstyle.addons.util;
  * program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+import com.puppycrawl.tools.checkstyle.api.DetailAST;
+import com.puppycrawl.tools.checkstyle.api.TokenTypes;
+
+import javax.annotation.CheckForNull;
+import javax.annotation.Nonnull;
+import javax.annotation.Nullable;
 import java.io.Closeable;
 import java.io.File;
 import java.io.IOException;
@@ -22,12 +28,6 @@ import java.util.Collections;
 import java.util.HashSet;
 import java.util.Set;
 import java.util.regex.Pattern;
-import javax.annotation.CheckForNull;
-import javax.annotation.Nonnull;
-import javax.annotation.Nullable;
-
-import com.puppycrawl.tools.checkstyle.api.DetailAST;
-import com.puppycrawl.tools.checkstyle.api.TokenTypes;
 
 
 /**
@@ -151,7 +151,8 @@ public final class Util
 
 
     /**
-     * Calls getCanonicalFile() on the given File; if that doesn't work, call getAbsoluteFile() on it.
+     * Calls getCanonicalFile() on the given File; if that doesn't work, call getAbsoluteFile() on it. Thus, the
+     * resulting file is not guaranteed to exist. Separator characters are standardized to {@link File#separatorChar}.
      *
      * @param pFile a file
      * @return the canonical representation, or the absolute representation
@@ -159,14 +160,19 @@ public final class Util
     @Nonnull
     public static File canonize(@Nonnull final File pFile)
     {
-        File result = null;
+        String resultPath = null;
         try {
-            result = pFile.getCanonicalFile();
+            resultPath = pFile.getCanonicalPath();
         }
         catch (IOException e) {
-            result = pFile.getAbsoluteFile();
+            resultPath = pFile.getAbsolutePath();
         }
-        return result;
+
+        final char goodSlash = File.separatorChar;
+        final char badSlash = File.separatorChar == '/' ? '\\' : '/';
+        // The JDK also assumes there are only these two options.
+        resultPath = resultPath.replaceAll(String.valueOf(badSlash), String.valueOf(goodSlash));
+        return new File(resultPath);
     }
 
 
