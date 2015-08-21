@@ -30,18 +30,18 @@ The check works like this:
 <dt><span class="propname">regexp</span>
     <span class="proptype"><a href="http://checkstyle.sourceforge.net/property_types.html#regexp">regular expression</a></span></dt>
 <dd><span class="propdesc">The regular expression applied to the file name.</span>
-    <span class="propdefault"><tt>^(?:\s+.*|.*?\s+)$</tt></span></dd>
+    <span class="propdefault"><code>^(?:\s+.*|.*?\s+)$</code></span></dd>
 
 <dt><span class="propname">mode</span>
     <span class="proptype"><a href="{{ site.baseurl }}/{{ page.check_version }}/apidocs/index.html?com/thomasjensen/checkstyle/addons/checks/regexp/RegexpOnFilenameOption.html">Mode</a></span></dt>
-<dd><span class="propdesc">whether <code>regexp</code> finds required or illegal matches. <tt>required</tt> means that all selected files must match the expression. <tt>illegal</tt> means that they must not.</span>
-    <span class="propdefault"><tt>illegal</tt></span></dd>
+<dd><span class="propdesc">whether <code>regexp</code> finds required or illegal matches. <code>required</code> means that all selected files must match the expression. <code>illegal</code> means that they must not.</span>
+    <span class="propdefault"><code>illegal</code></span></dd>
 
 <dt><span class="propname">simple</span>
     <span class="proptype"><a href="http://checkstyle.sourceforge.net/property_types.html#boolean">Boolean</a></span></dt>
-<dd><span class="propdesc">If <tt>true</tt>, only the simple name of the file will be checked against the pattern specified by <tt>regexp</tt>; if <tt>false</tt>, the entire canonical path will be checked.
-    Note that this option applies only to the pattern specified by <tt>regexp</tt>; the <tt>selection</tt> property is <i>always</i> treated as if <tt>simple=false</tt>.</span>
-    <span class="propdefault"><tt>true</tt></span></dd>
+<dd><span class="propdesc">If <code>true</code>, only the simple name of the file will be checked against the pattern specified by <code>regexp</code>; if <code>false</code>, the entire canonical path will be checked.
+    Note that this option applies only to the pattern specified by <code>regexp</code>; the <code>selection</code> property is <i>always</i> treated as if <code>simple=false</code>.</span>
+    <span class="propdefault"><code>true</code></span></dd>
 </dl>
 
 Since this check is a [FileSetCheck](http://checkstyle.sourceforge.net/writingchecks.html#Writing_FileSetChecks), it also inherits the `fileExtensions` property, which may be configured independently of `selection`. In that case, both properties must match (e.g. `fileExtensions` *and* `selection`, or either of the two if one is missing).
