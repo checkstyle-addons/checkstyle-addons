@@ -242,7 +242,7 @@ bintray {
             desc = project.description;
             websiteUrl = project.ext.website;
             issueTrackerUrl = project.ext.issueTrackerUrl;
-            vcsUrl = 'https://github.com/checkstyle-addons/checkstyle-addons.git';
+            vcsUrl = "https://github.com/${project.ext.github}.git";
             licenses = ['GPL-3.0'];
             publicDownloadNumbers = true;
             version {
