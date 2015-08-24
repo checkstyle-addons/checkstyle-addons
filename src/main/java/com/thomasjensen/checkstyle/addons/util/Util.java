@@ -15,19 +15,20 @@ package com.thomasjensen.checkstyle.addons.util;
  * program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-import com.puppycrawl.tools.checkstyle.api.DetailAST;
-import com.puppycrawl.tools.checkstyle.api.TokenTypes;
-
-import javax.annotation.CheckForNull;
-import javax.annotation.Nonnull;
-import javax.annotation.Nullable;
 import java.io.Closeable;
 import java.io.File;
 import java.io.IOException;
 import java.util.Collections;
 import java.util.HashSet;
 import java.util.Set;
+import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+import javax.annotation.CheckForNull;
+import javax.annotation.Nonnull;
+import javax.annotation.Nullable;
+
+import com.puppycrawl.tools.checkstyle.api.DetailAST;
+import com.puppycrawl.tools.checkstyle.api.TokenTypes;
 
 
 /**
@@ -168,10 +169,10 @@ public final class Util
             resultPath = pFile.getAbsolutePath();
         }
 
-        final char goodSlash = File.separatorChar;
-        final char badSlash = File.separatorChar == '/' ? '\\' : '/';
+        final String goodSlash = File.separator;
+        final String badSlash = File.separatorChar == '/' ? "\\" : "/";
         // The JDK also assumes there are only these two options.
-        resultPath = resultPath.replaceAll(String.valueOf(badSlash), String.valueOf(goodSlash));
+        resultPath = resultPath.replaceAll(Pattern.quote(badSlash), Matcher.quoteReplacement(goodSlash));
         return new File(resultPath);
     }
 
