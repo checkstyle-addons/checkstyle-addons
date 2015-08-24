@@ -34,7 +34,7 @@ kramdown:
 exclude: ['README.md', 'LICENSE', '*.iml', 'build', 'gradle']
 
 # checkstyle-addons custom variables
-latest_version: '1.3.1'
+latest_version: '1.3.2'
 latest_major: '1'
 latest_version_checkstyle: '6.4.1'
 latest_checkstyle_tested: '6.9'
