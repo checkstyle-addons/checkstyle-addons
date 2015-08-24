@@ -247,6 +247,7 @@ bintray {
             publicDownloadNumbers = true;
             version {
                 name = project.version;  // Bintray logical version name
+                desc = project.description;
                 released = project.ext.buildTimestamp;
                 vcsTag = 'v' + project.version;
                 gpg {
