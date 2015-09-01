@@ -2,7 +2,6 @@
 layout: markdown
 title: Download &amp; Run
 surrounding-div: csa-run
-maven-central-link: http://search.maven.org/#search%7Cgav%7C1%7Cg%3Acom.thomasjensen.checkstyle.addons
 bintray-link: https://bintray.com/checkstyle-addons/checkstyle-addons/checkstyle-addons/view
 longContent: true
 ---
@@ -11,7 +10,7 @@ longContent: true
 
 Here's how to use {{ site.name }} with your standard software.
 
-{{ site.name }} is distributed via [Maven Central]({{ page.maven-central-link }}) and [Bintray jcenter]({{ page.bintray-link }}), so major build tools can automatically access it.
+{{ site.name }} is distributed via [Maven Central]({{ site.maven-central-link }}) and [Bintray jcenter]({{ page.bintray-link }}), so major build tools can automatically access it.
 
 {{ site.name }} is compatible with all Checkstyle versions starting from 6.0. That is because Checkstyle 5.9 and earlier were based on Java&nbsp;5, which is no longer available on our continuous integration platform, Travis CI.
 
@@ -23,7 +22,7 @@ Here's how to use {{ site.name }} with your standard software.
 
 ## Gradle
 
-{{ site.name }} is available on [Maven Central]({{ page.maven-central-link }}) and [jcenter]({{ page.bintray-link }}), so you can just use it in your Gradle build. In Gradle, {{ site.name }} runs as part of the [Gradle Checkstyle Plugin](https://gradle.org/docs/current/userguide/checkstyle_plugin.html){:target="_blank"}. The classpath is extended to include {{ site.name }}. Note that the Checkstyle tool version must be specified.
+{{ site.name }} is available on [Maven Central]({{ site.maven-central-link }}) and [jcenter]({{ page.bintray-link }}), so you can just use it in your Gradle build. In Gradle, {{ site.name }} runs as part of the [Gradle Checkstyle Plugin](https://gradle.org/docs/current/userguide/checkstyle_plugin.html){:target="_blank"}. The classpath is extended to include {{ site.name }}. Note that the Checkstyle tool version must be specified.
 
 {% highlight groovy %}
 plugins {
@@ -48,7 +47,7 @@ The example above has been tested with Checkstyle `toolVersion` set to 6.2 - {{ 
 
 ## Maven
 
-{{ site.name }} is available on [Maven Central]({{ page.maven-central-link }}), so you can just use it in your Maven build. In Maven, {{ site.name }} runs as part of the [Maven Checkstyle Plugin](https://maven.apache.org/plugins/maven-checkstyle-plugin/){:target="_blank"}. The classpath is extended to include {{ site.name }}. Note that the explicit dependency on Checkstyle itself must also be specified in order to set the correct Checkstyle version.
+{{ site.name }} is available on [Maven Central]({{ site.maven-central-link }}), so you can just use it in your Maven build. In Maven, {{ site.name }} runs as part of the [Maven Checkstyle Plugin](https://maven.apache.org/plugins/maven-checkstyle-plugin/){:target="_blank"}. The classpath is extended to include {{ site.name }}. Note that the explicit dependency on Checkstyle itself must also be specified in order to set the correct Checkstyle version.
 
 {% highlight xml %}
 <project>
