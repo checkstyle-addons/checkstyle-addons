@@ -8,6 +8,10 @@ longContent: true
 
 Here is a consolidated matrix of Checkstyle-related product versions that helps in selecting a working Checkstyle setup for your enterprise. Explanations and notes for each column may be found below, or by clicking on the column letter.
 
+<div class="alert alert-warning">
+<p><b>DRAFT</b> - This table is currently a draft, which means some information is still missing (mostly columns P and Q).</p>
+</div>
+
 <table class="table table-striped table-header-rotated-jb table-hover">
   <thead>
     <tr>
@@ -580,7 +584,13 @@ This column simply contains all Checkstyle versions that were released, starting
 
 ### C. Check behavior backward compatible?
 
-A check mark in this column indicates that a version upgrade of Checkstyle from the previous version does not require changing the Checkstyle configuration file. Only the differences to the immediately preceding version are considered. This information was primarily gathered from the [release notes](http://checkstyle.sourceforge.net/releasenotes.html), but additional analysis of the commit history on GitHub has turned up further breaking changes:
+A check mark in this column indicates that a version upgrade of Checkstyle from the previous version:
+
+- does not require changing the Checkstyle configuration file, and
+- does not generate different warnings than before if the same configuration is used (unless it was a bug in the previous version that got fixed).
+
+Only the differences to the immediately preceding version are considered.
+This information was primarily gathered from the [release notes](http://checkstyle.sourceforge.net/releasenotes.html), but additional analysis of the commit history on GitHub has turned up further breaking changes:
 
 <div class="checkpage"><dl>
 <dt class="title">Checkstyle</dt><dd class="title">– Breaking Change</dd>
