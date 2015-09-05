@@ -355,6 +355,13 @@ table.table-header-rotated-jb td.no:before {
 table.table-header-rotated-jb td.yes:before {
     content: '\a0\a0\a0✓\a0\a0\a0';  /* \a0 = &nbsp; */
 }
+table.table-header-rotated-jb td.upcoming {
+    padding-top: 6px;
+}
+table.table-header-rotated-jb td.upcoming > img {
+    width: 8px;
+    height: auto;
+}
 table.table-header-rotated-jb tbody > tr:hover {
     background-color: #def2fc;
 }
