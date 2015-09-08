@@ -33,7 +33,7 @@ dependencies {
 }
 checkstyle {
     configFile file('your-checkstyle.xml')
-    toolVersion '{{ site.latest_version_checkstyle }}'   // important
+    toolVersion '{{ site.latest_version_checkstyle }}'   // set Checkstyle version here
 }
 {% endhighlight %}
 
@@ -60,12 +60,12 @@ The example above has been tested with Checkstyle `toolVersion` set to 6.2 - {{ 
   <plugin>
     <groupId>org.apache.maven.plugins</groupId>
     <artifactId>maven-checkstyle-plugin</artifactId>
-    <version>2.15</version>
+    <version>2.16</version>
     <dependencies>
       <dependency>
         <groupId>com.puppycrawl.tools</groupId>
         <artifactId>checkstyle</artifactId>
-        <version>{{ site.latest_version_checkstyle }}</version>    <!-- important -->
+        <version>{{ site.latest_version_checkstyle }}</version>    <!-- set Checkstyle version here -->
       </dependency>
       <dependency>
         <groupId>com.thomasjensen.checkstyle.addons</groupId>
@@ -143,7 +143,7 @@ The {{ site.name }} version offered by the above download button is compatible w
 
 ## Eclipse
 
-In Eclipse, {{ site.name }} runs as an addon to [Eclipse-CS](http://eclipse-cs.sourceforge.net/){:target="_blank"}. So first make sure you've got Eclipse-CS [installed](http://eclipse-cs.sourceforge.net/#!/install){:target="_blank"} at **version 6.2 or higher**. Then:
+In Eclipse, {{ site.name }} runs as an addon to [Eclipse-CS](http://eclipse-cs.sourceforge.net/){:target="_blank"}. So first make sure you've got Eclipse-CS [installed](http://eclipse-cs.sourceforge.net/#!/install){:target="_blank"} at version 6.2.0 or higher. (Eclipse-CS 6.1.x is also supported with the legacy plugin, see below.) Then:
 
 <p><a href="https://github.com/{{ site.github }}/releases/download/v{{ site.latest_version }}/checkstyle-addons-eclipse-{{ site.latest_version }}.jar" class="btn btn-primary">Download Eclipse Plugin</a></p>
 
@@ -155,6 +155,9 @@ In order to verify that {{ site.name }} was installed correctly, open the Checks
 <img src="{{ site.baseurl }}/images/run-eclipse.png" alt="{{ site.name }} in Eclipse" width="549" height="368" />
 </div>
 
+The {{ site.name }} version offered by the above download button is compatible with Checkstyle 6.2 - {{ site.latest_checkstyle_tested }} (which means Eclipse-CS 6.2.0 and up). If you are using the older Checkstyle versions 6.0 - 6.1.1, you must use a special, compatible version of {{ site.name }} instead:
+
+<p><a href="https://github.com/{{ site.github }}/releases/download/v{{ site.latest_version }}/checkstyle-addons-java6-eclipse-{{ site.latest_version }}.jar" class="btn btn-warning btn-sm">Download Legacy Plugin</a></p>
 
 <!-- ======================================================================================= -->
 <a name="run-sonarqube" class="csa-offset-anchor"/>
@@ -198,11 +201,11 @@ In [SonarQube](http://www.sonarqube.org/){:target="_blank"}, {{ site.name }} run
     </tr>
     <tr>
       <td>Java (code analyzed)</td>
-      <td>&lt;= 7</td>
-      <td>&lt;= 7</td>
-      <td>&lt;= 7</td>
-      <td class="orange">&lt;= 8</td>
-      <td class="info">&lt;= 8</td>
+      <td>&le; 7</td>
+      <td>&le; 7</td>
+      <td>&le; 7</td>
+      <td class="orange">&le; 8</td>
+      <td class="info">&le; 8</td>
     </tr>
   </tbody>
 </table>
