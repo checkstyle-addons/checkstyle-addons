@@ -408,9 +408,8 @@ table.table-header-rotated-jb tr.javaLevel {
 /* vertical groups by topic */
 table.table-header-rotated-jb tr > td:nth-child(7),  table.table-header-rotated-jb tr.subheading > th:nth-child(7),  table.table-header-rotated-jb th.rotate-45:nth-child(7) > div,
 table.table-header-rotated-jb tr > td:nth-child(10), table.table-header-rotated-jb tr.subheading > th:nth-child(10), table.table-header-rotated-jb th.rotate-45:nth-child(10) > div,
-table.table-header-rotated-jb tr > td:nth-child(11), table.table-header-rotated-jb tr.subheading > th:nth-child(11), table.table-header-rotated-jb th.rotate-45:nth-child(11) > div,
 table.table-header-rotated-jb tr > td:nth-child(13), table.table-header-rotated-jb tr.subheading > th:nth-child(13), table.table-header-rotated-jb th.rotate-45:nth-child(13) > div,
-table.table-header-rotated-jb tr > td:nth-child(16), table.table-header-rotated-jb tr.subheading > th:nth-child(16), table.table-header-rotated-jb th.rotate-45:nth-child(16) > div {
+table.table-header-rotated-jb tr > td:nth-child(15), table.table-header-rotated-jb tr.subheading > th:nth-child(15), table.table-header-rotated-jb th.rotate-45:nth-child(15) > div {
     border-left: 2px solid #dddddd;
 }
 

@@ -8,30 +8,28 @@ longContent: true
 
 Here is a consolidated matrix of Checkstyle-related product versions that helps in selecting a working Checkstyle setup for your enterprise. Explanations and notes for each column may be found below, or by clicking on the column letter.
 
-<div class="alert alert-warning">
-<p><b>DRAFT</b> - This table is currently a draft, which means some information is still missing (mostly columns P and Q).</p>
-</div>
+*Last major update: 2015-09-15*
 
 <table class="table table-striped table-header-rotated-jb table-hover">
   <thead>
     <tr>
         <!--A--><th class="rotate-45"><div><span>Checkstyle Version</span></div></th>
-        <!--B--><th class="rotate-45"><div><span>Date Released</span></div></th>
-        <!--C--><th class="rotate-45"><div><span>Check&nbsp;behavior backward compatible?</span></div></th>
-        <!--D--><th class="rotate-45"><div><span>Public API backward compatible?</span></div></th>
+        <!--B--><th class="rotate-45"><div><span>Release Date</span></div></th>
+        <!--C--><th class="rotate-45"><div><span>Check behavior compatible?</span></div></th>
+        <!--D--><th class="rotate-45"><div><span>Public API compatible?</span></div></th>
         <!--E--><th class="rotate-45"><div><span>Java Version used to run Checkstyle</span></div></th>
         <!--F--><th class="rotate-45"><div><span>Java Version of the code being&nbsp;analyzed</span></div></th>
         <!--G--><th class="rotate-45"><div><span>Checkstyle-<br/>IDEA Plugin for IntelliJ</span></div></th>
-        <!--H--><th class="rotate-45"><div><span>JavaVersion used to run IntelliJ IDEA</span></div></th>
+        <!--H--><th class="rotate-45"><div><span>Java&nbsp;Version used to run IntelliJ IDEA</span></div></th>
         <!--I--><th class="rotate-45"><div><span>Eclipse-CS</span></div></th>
         <!--J--><th class="rotate-45"><div><span>Maven Checkstyle Plugin&nbsp;Default</span></div></th>
-        <!--K--><th class="rotate-45"><div><span>SevNTU Checkstyle</span></div></th>
-        <!--L--><th class="rotate-45"><div><span>{{ site.name }}</span></div></th>
-        <!--M--><th class="rotate-45"><div><span>SonarQube Checkstyle Plugin</span></div></th>
-        <!--N--><th class="rotate-45"><div><span>SonarQube platform</span></div></th>
-        <!--O--><th class="rotate-45"><div><span>SonarQube Java Plugin required</span></div></th>
-        <!--P--><th class="rotate-45"><div><span>Jenkins Plugin</span></div></th>
-        <!--Q--><th class="rotate-45"><div><span>Bamboo Plugin</span></div></th>
+        <!--K--><th class="rotate-45"><div><span>Gradle Version required</span></div></th>
+        <!--L--><th class="rotate-45"><div><span>Gradle Checkstyle Plugin&nbsp;Default</span></div></th>
+        <!--M--><th class="rotate-45"><div><span>{{ site.name }}</span></div></th>
+        <!--N--><th class="rotate-45"><div><span>SevNTU Checkstyle</span></div></th>
+        <!--O--><th class="rotate-45"><div><span>SonarQube Checkstyle Plugin</span></div></th>
+        <!--P--><th class="rotate-45"><div><span>SonarQube platform</span></div></th>
+        <!--Q--><th class="rotate-45"><div><span>SonarQube Java Plugin required</span></div></th>
     </tr>
     <tr class="subheading">
         <!--A--><th><a href="#a">A</a></th>
@@ -65,13 +63,13 @@ Here is a consolidated matrix of Checkstyle-related product versions that helps 
         <!--H--><td>&ge;&nbsp;8</td>
         <!--I--><td class="upcoming"><img src="{{ site.baseurl }}/images/hourglass.png" alt="(upcoming)"/></td>
         <!--J--><td>✓</td>
-        <!--K--><td>--</td>
-        <!--L--><td>&ge;&nbsp;1.3.0</td>
-        <!--M--><td>--</td>
+        <!--K--><td>&nbsp;&ge;&nbsp;2.7&nbsp;</td>
+        <!--L--><td>✓</td>
+        <!--M--><td>&ge;&nbsp;1.3.0</td>
         <!--N--><td>--</td>
         <!--O--><td>--</td>
-        <!--P--><td class="upcoming"><img src="{{ site.baseurl }}/images/hourglass.png" alt="(upcoming)"/></td>
-        <!--Q--><td class="upcoming"><img src="{{ site.baseurl }}/images/hourglass.png" alt="(upcoming)"/></td>
+        <!--P--><td>--</td>
+        <!--Q--><td>--</td>
     </tr>
     <tr>
         <!--A--><th class="row-header">6.10</th>
@@ -84,13 +82,13 @@ Here is a consolidated matrix of Checkstyle-related product versions that helps 
         <!--H--><td>--</td>
         <!--I--><td>--</td>
         <!--J--><td>--</td>
-        <!--K--><td>--</td>
-        <!--L--><td>&ge;&nbsp;1.3.0</td>
-        <!--M--><td>--</td>
+        <!--K--><td>&ge;&nbsp;2.7</td>
+        <!--L--><td>✓</td>
+        <!--M--><td>&ge;&nbsp;1.3.0</td>
         <!--N--><td>--</td>
         <!--O--><td>--</td>
-        <!--P--><td class="upcoming"><img src="{{ site.baseurl }}/images/hourglass.png" alt="(upcoming)"/></td>
-        <!--Q--><td class="upcoming"><img src="{{ site.baseurl }}/images/hourglass.png" alt="(upcoming)"/></td>
+        <!--P--><td>--</td>
+        <!--Q--><td>--</td>
     </tr>
     <tr>
         <!--A--><th class="row-header">6.9</th>
@@ -103,13 +101,13 @@ Here is a consolidated matrix of Checkstyle-related product versions that helps 
         <!--H--><td>&nbsp;&nbsp;&ge;&nbsp;8&nbsp;&nbsp;</td>
         <!--I--><td>6.9.0</td>
         <!--J--><td>✓</td>
-        <!--K--><td>--</td>
-        <!--L--><td>&ge;&nbsp;1.3.0</td>
-        <!--M--><td>--</td>
+        <!--K--><td>&ge;&nbsp;2.7</td>
+        <!--L--><td>&nbsp;&nbsp;&nbsp;✓&nbsp;&nbsp;&nbsp;</td>
+        <!--M--><td>&ge;&nbsp;1.3.0</td>
         <!--N--><td>--</td>
         <!--O--><td>--</td>
-        <!--P--><td class="upcoming"><img src="{{ site.baseurl }}/images/hourglass.png" alt="(upcoming)"/></td>
-        <!--Q--><td class="upcoming"><img src="{{ site.baseurl }}/images/hourglass.png" alt="(upcoming)"/></td>
+        <!--P--><td>--</td>
+        <!--Q--><td>--</td>
     </tr>
     <tr>
         <!--A--><th class="row-header">6.8.2</th>
@@ -122,13 +120,13 @@ Here is a consolidated matrix of Checkstyle-related product versions that helps 
         <!--H--><td>--</td>
         <!--I--><td>--</td>
         <!--J--><td>✓</td>
-        <!--K--><td>1.13.6</td>
-        <!--L--><td>&ge;&nbsp;1.3.0</td>
-        <!--M--><td>--</td>
-        <!--N--><td>--</td>
+        <!--K--><td>&ge;&nbsp;2.7</td>
+        <!--L--><td>✓</td>
+        <!--M--><td>&ge;&nbsp;1.3.0</td>
+        <!--N--><td>1.13.6</td>
         <!--O--><td>--</td>
-        <!--P--><td class="upcoming"><img src="{{ site.baseurl }}/images/hourglass.png" alt="(upcoming)"/></td>
-        <!--Q--><td class="upcoming"><img src="{{ site.baseurl }}/images/hourglass.png" alt="(upcoming)"/></td>
+        <!--P--><td>--</td>
+        <!--Q--><td>--</td>
     </tr>
     <tr>
         <!--A--><th class="row-header">6.8.1</th>
@@ -141,13 +139,13 @@ Here is a consolidated matrix of Checkstyle-related product versions that helps 
         <!--H--><td>&nbsp;&nbsp;&ge;&nbsp;8&nbsp;&nbsp;</td>
         <!--I--><td>6.8.0</td>
         <!--J--><td>✓</td>
-        <!--K--><td>1.13.6</td>
-        <!--L--><td>&ge;&nbsp;1.3.0</td>
-        <!--M--><td>--</td>
-        <!--N--><td>--</td>
+        <!--K--><td>&ge;&nbsp;2.7</td>
+        <!--L--><td>✓</td>
+        <!--M--><td>&ge;&nbsp;1.3.0</td>
+        <!--N--><td>1.13.6</td>
         <!--O--><td>--</td>
-        <!--P--><td class="upcoming"><img src="{{ site.baseurl }}/images/hourglass.png" alt="(upcoming)"/></td>
-        <!--Q--><td class="upcoming"><img src="{{ site.baseurl }}/images/hourglass.png" alt="(upcoming)"/></td>
+        <!--P--><td>--</td>
+        <!--Q--><td>--</td>
     </tr>
     <tr>
         <!--A--><th class="row-header">6.8</th>
@@ -160,13 +158,13 @@ Here is a consolidated matrix of Checkstyle-related product versions that helps 
         <!--H--><td>--</td>
         <!--I--><td>--</td>
         <!--J--><td>✓</td>
-        <!--K--><td>1.13.6</td>
-        <!--L--><td>&ge;&nbsp;1.3.0</td>
-        <!--M--><td>--</td>
-        <!--N--><td>--</td>
+        <!--K--><td>&ge;&nbsp;2.7</td>
+        <!--L--><td>✓</td>
+        <!--M--><td>&ge;&nbsp;1.3.0</td>
+        <!--N--><td>1.13.6</td>
         <!--O--><td>--</td>
-        <!--P--><td class="upcoming"><img src="{{ site.baseurl }}/images/hourglass.png" alt="(upcoming)"/></td>
-        <!--Q--><td class="upcoming"><img src="{{ site.baseurl }}/images/hourglass.png" alt="(upcoming)"/></td>
+        <!--P--><td>--</td>
+        <!--Q--><td>--</td>
     </tr>
     <tr>
         <!--A--><th class="row-header">6.7</th>
@@ -179,13 +177,13 @@ Here is a consolidated matrix of Checkstyle-related product versions that helps 
         <!--H--><td>&ge;&nbsp;8</td>
         <!--I--><td>--</td>
         <!--J--><td>✓</td>
-        <!--K--><td>1.13.6</td>
-        <!--L--><td>&ge;&nbsp;1.3.0</td>
-        <!--M--><td>--</td>
-        <!--N--><td>--</td>
+        <!--K--><td>1.0&nbsp;- 2.6</td>
+        <!--L--><td>✓</td>
+        <!--M--><td>&ge;&nbsp;1.3.0</td>
+        <!--N--><td>1.13.6</td>
         <!--O--><td>--</td>
-        <!--P--><td class="upcoming"><img src="{{ site.baseurl }}/images/hourglass.png" alt="(upcoming)"/></td>
-        <!--Q--><td class="upcoming"><img src="{{ site.baseurl }}/images/hourglass.png" alt="(upcoming)"/></td>
+        <!--P--><td>--</td>
+        <!--Q--><td>--</td>
     </tr>
     <tr>
         <!--A--><th class="row-header">6.6</th>
@@ -198,13 +196,13 @@ Here is a consolidated matrix of Checkstyle-related product versions that helps 
         <!--H--><td>&ge;&nbsp;8</td>
         <!--I--><td>--</td>
         <!--J--><td>✓</td>
-        <!--K--><td>1.13.0&nbsp;- 1.13.5</td>
-        <!--L--><td>&ge;&nbsp;1.3.0</td>
-        <!--M--><td>--</td>
-        <!--N--><td>--</td>
+        <!--K--><td>1.0&nbsp;- 2.6</td>
+        <!--L--><td>✓</td>
+        <!--M--><td>&ge;&nbsp;1.3.0</td>
+        <!--N--><td>1.13.0&nbsp;- 1.13.5</td>
         <!--O--><td>--</td>
-        <!--P--><td class="upcoming"><img src="{{ site.baseurl }}/images/hourglass.png" alt="(upcoming)"/></td>
-        <!--Q--><td class="upcoming"><img src="{{ site.baseurl }}/images/hourglass.png" alt="(upcoming)"/></td>
+        <!--P--><td>--</td>
+        <!--Q--><td>--</td>
     </tr>
     <tr>
         <!--A--><th class="row-header">6.5</th>
@@ -217,13 +215,13 @@ Here is a consolidated matrix of Checkstyle-related product versions that helps 
         <!--H--><td>&ge;&nbsp;8</td>
         <!--I--><td>6.5.x</td>
         <!--J--><td>✓</td>
-        <!--K--><td>1.13.0&nbsp;- 1.13.5</td>
-        <!--L--><td>&ge;&nbsp;1.3.0</td>
-        <!--M--><td>--</td>
-        <!--N--><td>--</td>
+        <!--K--><td>1.0&nbsp;- 2.6</td>
+        <!--L--><td>✓</td>
+        <!--M--><td>&ge;&nbsp;1.3.0</td>
+        <!--N--><td>1.13.0&nbsp;- 1.13.5</td>
         <!--O--><td>--</td>
-        <!--P--><td class="upcoming"><img src="{{ site.baseurl }}/images/hourglass.png" alt="(upcoming)"/></td>
-        <!--Q--><td class="upcoming"><img src="{{ site.baseurl }}/images/hourglass.png" alt="(upcoming)"/></td>
+        <!--P--><td>--</td>
+        <!--Q--><td>--</td>
     </tr>
     <tr>
         <!--A--><th class="row-header">6.4.1</th>
@@ -236,13 +234,13 @@ Here is a consolidated matrix of Checkstyle-related product versions that helps 
         <!--H--><td>--</td>
         <!--I--><td>6.4.x</td>
         <!--J--><td>✓</td>
-        <!--K--><td>--</td>
-        <!--L--><td>&ge;&nbsp;1.0.0</td>
-        <!--M--><td>2.3</td>
-        <!--N--><td>&ge;&nbsp;4.5.2</td>
-        <!--O--><td>&ge;&nbsp;2.1</td>
-        <!--P--><td class="upcoming"><img src="{{ site.baseurl }}/images/hourglass.png" alt="(upcoming)"/></td>
-        <!--Q--><td class="upcoming"><img src="{{ site.baseurl }}/images/hourglass.png" alt="(upcoming)"/></td>
+        <!--K--><td>1.0&nbsp;- 2.6</td>
+        <!--L--><td>✓</td>
+        <!--M--><td>&ge;&nbsp;1.0.0</td>
+        <!--N--><td>--</td>
+        <!--O--><td>2.3</td>
+        <!--P--><td>&ge;&nbsp;4.5.2</td>
+        <!--Q--><td>&ge;&nbsp;2.1</td>
     </tr>
     <tr>
         <!--A--><th class="row-header">6.4</th>
@@ -255,13 +253,13 @@ Here is a consolidated matrix of Checkstyle-related product versions that helps 
         <!--H--><td>--</td>
         <!--I--><td>--</td>
         <!--J--><td>✓</td>
-        <!--K--><td>--</td>
-        <!--L--><td>&ge;&nbsp;1.3.0</td>
-        <!--M--><td>--</td>
+        <!--K--><td>1.0&nbsp;- 2.6</td>
+        <!--L--><td>✓</td>
+        <!--M--><td>&ge;&nbsp;1.3.0</td>
         <!--N--><td>--</td>
         <!--O--><td>--</td>
-        <!--P--><td class="upcoming"><img src="{{ site.baseurl }}/images/hourglass.png" alt="(upcoming)"/></td>
-        <!--Q--><td class="upcoming"><img src="{{ site.baseurl }}/images/hourglass.png" alt="(upcoming)"/></td>
+        <!--P--><td>--</td>
+        <!--Q--><td>--</td>
     </tr>
     <tr>
         <!--A--><th class="row-header">6.3</th>
@@ -274,13 +272,13 @@ Here is a consolidated matrix of Checkstyle-related product versions that helps 
         <!--H--><td>--</td>
         <!--I--><td>--</td>
         <!--J--><td>✓</td>
-        <!--K--><td>--</td>
-        <!--L--><td>&ge;&nbsp;1.3.0</td>
-        <!--M--><td>--</td>
+        <!--K--><td>1.0&nbsp;- 2.6</td>
+        <!--L--><td>✓</td>
+        <!--M--><td>&ge;&nbsp;1.3.0</td>
         <!--N--><td>--</td>
         <!--O--><td>--</td>
-        <!--P--><td class="upcoming"><img src="{{ site.baseurl }}/images/hourglass.png" alt="(upcoming)"/></td>
-        <!--Q--><td class="upcoming"><img src="{{ site.baseurl }}/images/hourglass.png" alt="(upcoming)"/></td>
+        <!--P--><td>--</td>
+        <!--Q--><td>--</td>
     </tr>
     <tr>
         <!--A--><th class="row-header">6.2</th>
@@ -293,13 +291,13 @@ Here is a consolidated matrix of Checkstyle-related product versions that helps 
         <!--H--><td>--</td>
         <!--I--><td>6.2.x</td>
         <!--J--><td>2.16</td>
-        <!--K--><td>--</td>
-        <!--L--><td>&ge;&nbsp;1.3.0</td>
-        <!--M--><td>--</td>
+        <!--K--><td>1.0&nbsp;- 2.6</td>
+        <!--L--><td>✓</td>
+        <!--M--><td>&ge;&nbsp;1.3.0</td>
         <!--N--><td>--</td>
         <!--O--><td>--</td>
-        <!--P--><td class="upcoming"><img src="{{ site.baseurl }}/images/hourglass.png" alt="(upcoming)"/></td>
-        <!--Q--><td class="upcoming"><img src="{{ site.baseurl }}/images/hourglass.png" alt="(upcoming)"/></td>
+        <!--P--><td>--</td>
+        <!--Q--><td>--</td>
     </tr>
     <tr class="javaLevel">
         <!--A--><th class="row-header">6.1.1</th>
@@ -312,13 +310,13 @@ Here is a consolidated matrix of Checkstyle-related product versions that helps 
         <!--H--><td>&ge;&nbsp;6</td>
         <!--I--><td>6.1.1</td>
         <!--J--><td>2.15</td>
-        <!--K--><td>--</td>
-        <!--L--><td>&ge;&nbsp;1.3.1 <span class="csa-small">(java6)</span></td>
-        <!--M--><td>--</td>
+        <!--K--><td>1.0&nbsp;- 2.6</td>
+        <!--L--><td>✓</td>
+        <!--M--><td>&ge;&nbsp;1.3.1 <span class="csa-small">(java6)</span></td>
         <!--N--><td>--</td>
         <!--O--><td>--</td>
-        <!--P--><td class="upcoming"><img src="{{ site.baseurl }}/images/hourglass.png" alt="(upcoming)"/></td>
-        <!--Q--><td class="upcoming"><img src="{{ site.baseurl }}/images/hourglass.png" alt="(upcoming)"/></td>
+        <!--P--><td>--</td>
+        <!--Q--><td>--</td>
     </tr>
     <tr>
         <!--A--><th class="row-header">6.1</th>
@@ -331,13 +329,13 @@ Here is a consolidated matrix of Checkstyle-related product versions that helps 
         <!--H--><td>&ge;&nbsp;6</td>
         <!--I--><td>6.1.0</td>
         <!--J--><td>✓</td>
-        <!--K--><td>--</td>
-        <!--L--><td>&ge;&nbsp;1.3.1 <span class="csa-small">(java6)</span></td>
-        <!--M--><td>2.2</td>
-        <!--N--><td>4.2 - 4.4</td>
-        <!--O--><td>&ge;&nbsp;2.1</td>
-        <!--P--><td class="upcoming"><img src="{{ site.baseurl }}/images/hourglass.png" alt="(upcoming)"/></td>
-        <!--Q--><td class="upcoming"><img src="{{ site.baseurl }}/images/hourglass.png" alt="(upcoming)"/></td>
+        <!--K--><td>1.0&nbsp;- 2.6</td>
+        <!--L--><td>✓</td>
+        <!--M--><td>&ge;&nbsp;1.3.1 <span class="csa-small">(java6)</span></td>
+        <!--N--><td>--</td>
+        <!--O--><td>2.2</td>
+        <!--P--><td>4.2 - 4.4</td>
+        <!--Q--><td>&ge;&nbsp;2.1</td>
     </tr>
     <tr>
         <!--A--><th class="row-header">6.0</th>
@@ -350,13 +348,13 @@ Here is a consolidated matrix of Checkstyle-related product versions that helps 
         <!--H--><td>&ge;&nbsp;6</td>
         <!--I--><td>--</td>
         <!--J--><td>✓</td>
-        <!--K--><td>--</td>
-        <!--L--><td>&ge;&nbsp;1.3.1 <span class="csa-small">(java6)</span></td>
-        <!--M--><td>--</td>
+        <!--K--><td>1.0&nbsp;- 2.6</td>
+        <!--L--><td>✓</td>
+        <!--M--><td>&ge;&nbsp;1.3.1 <span class="csa-small">(java6)</span></td>
         <!--N--><td>--</td>
         <!--O--><td>--</td>
-        <!--P--><td class="upcoming"><img src="{{ site.baseurl }}/images/hourglass.png" alt="(upcoming)"/></td>
-        <!--Q--><td class="upcoming"><img src="{{ site.baseurl }}/images/hourglass.png" alt="(upcoming)"/></td>
+        <!--P--><td>--</td>
+        <!--Q--><td>--</td>
     </tr>
     <tr class="javaLevel">
         <!--A--><th class="row-header">5.9</th>
@@ -369,13 +367,13 @@ Here is a consolidated matrix of Checkstyle-related product versions that helps 
         <!--H--><td>&ge;&nbsp;6</td>
         <!--I--><td>5.9.x</td>
         <!--J--><td>✓</td>
-        <!--K--><td>--</td>
-        <!--L--><td>--</td>
+        <!--K--><td>1.0&nbsp;- 2.6</td>
+        <!--L--><td>2.4&nbsp;- 2.7</td>
         <!--M--><td>--</td>
         <!--N--><td>--</td>
         <!--O--><td>--</td>
-        <!--P--><td class="upcoming"><img src="{{ site.baseurl }}/images/hourglass.png" alt="(upcoming)"/></td>
-        <!--Q--><td class="upcoming"><img src="{{ site.baseurl }}/images/hourglass.png" alt="(upcoming)"/></td>
+        <!--P--><td>--</td>
+        <!--Q--><td>--</td>
     </tr>
     <tr>
         <!--A--><th class="row-header">5.8</th>
@@ -388,13 +386,13 @@ Here is a consolidated matrix of Checkstyle-related product versions that helps 
         <!--H--><td>&ge;&nbsp;6</td>
         <!--I--><td>5.8.x</td>
         <!--J--><td>2.14</td>
-        <!--K--><td>1.8.0&nbsp;- 1.12.0</td>
-        <!--L--><td>--</td>
+        <!--K--><td>1.0&nbsp;-&nbsp;2.6</td>
+        <!--L--><td>✓</td>
         <!--M--><td>--</td>
-        <!--N--><td>--</td>
+        <!--N--><td>1.8.0&nbsp;- 1.12.0</td>
         <!--O--><td>--</td>
-        <!--P--><td class="upcoming"><img src="{{ site.baseurl }}/images/hourglass.png" alt="(upcoming)"/></td>
-        <!--Q--><td class="upcoming"><img src="{{ site.baseurl }}/images/hourglass.png" alt="(upcoming)"/></td>
+        <!--P--><td>--</td>
+        <!--P--><td>--</td>
     </tr>
     <tr>
         <!--A--><th class="row-header">5.7</th>
@@ -407,13 +405,13 @@ Here is a consolidated matrix of Checkstyle-related product versions that helps 
         <!--H--><td>&ge;&nbsp;6</td>
         <!--I--><td>5.7.x</td>
         <!--J--><td>2.12&nbsp;- 2.13</td>
-        <!--K--><td>1.8.0&nbsp;- 1.12.0</td>
-        <!--L--><td>--</td>
+        <!--K--><td>1.0&nbsp;- 2.6</td>
+        <!--L--><td>2.0&nbsp;- 2.3</td>
         <!--M--><td>--</td>
-        <!--N--><td>--</td>
+        <!--N--><td>1.8.0&nbsp;- 1.12.0</td>
         <!--O--><td>--</td>
-        <!--P--><td class="upcoming"><img src="{{ site.baseurl }}/images/hourglass.png" alt="(upcoming)"/></td>
-        <!--Q--><td class="upcoming"><img src="{{ site.baseurl }}/images/hourglass.png" alt="(upcoming)"/></td>
+        <!--P--><td>--</td>
+        <!--Q--><td>--</td>
     </tr>
     <tr>
         <!--A--><th class="row-header">5.6</th>
@@ -426,13 +424,13 @@ Here is a consolidated matrix of Checkstyle-related product versions that helps 
         <!--H--><td>&ge;&nbsp;6<br/>&ge;&nbsp;5</td>
         <!--I--><td>5.6.x</td>
         <!--J--><td>2.10&nbsp;- 2.11</td>
-        <!--K--><td>1.6.0&nbsp;- 1.12.0</td>
-        <!--L--><td>--</td>
-        <!--M--><td>2.1.1<br/>2.0</td>
-        <!--N--><td>4.2&nbsp;-&nbsp;4.4<br/>3.6&nbsp;-&nbsp;4.1.2</td>
-        <!--O--><td>&ge;&nbsp;2.1</td>
-        <!--P--><td class="upcoming"><img src="{{ site.baseurl }}/images/hourglass.png" alt="(upcoming)"/></td>
-        <!--Q--><td class="upcoming"><img src="{{ site.baseurl }}/images/hourglass.png" alt="(upcoming)"/></td>
+        <!--K--><td>1.0&nbsp;- 2.6</td>
+        <!--L--><td>1.4&nbsp;- 1.12</td>
+        <!--M--><td>--</td>
+        <!--N--><td>1.6.0&nbsp;- 1.12.0</td>
+        <!--O--><td>2.1.1<br/>2.0</td>
+        <!--P--><td>4.2&nbsp;-&nbsp;4.4<br/>3.6-4.1.2</td>
+        <!--Q--><td>&ge;&nbsp;2.1</td>
     </tr>
     <tr>
         <!--A--><th class="row-header">5.5</th>
@@ -445,13 +443,13 @@ Here is a consolidated matrix of Checkstyle-related product versions that helps 
         <!--H--><td>&ge;&nbsp;5</td>
         <!--I--><td>5.5.x</td>
         <!--J--><td>2.9.x</td>
-        <!--K--><td>1.5.0&nbsp;- 1.12.0</td>
-        <!--L--><td>--</td>
+        <!--K--><td>1.0&nbsp;- 2.6</td>
+        <!--L--><td>1.0&nbsp;- 1.3</td>
         <!--M--><td>--</td>
-        <!--N--><td>--</td>
+        <!--N--><td>1.5.0&nbsp;- 1.12.0</td>
         <!--O--><td>--</td>
-        <!--P--><td class="upcoming"><img src="{{ site.baseurl }}/images/hourglass.png" alt="(upcoming)"/></td>
-        <!--Q--><td class="upcoming"><img src="{{ site.baseurl }}/images/hourglass.png" alt="(upcoming)"/></td>
+        <!--P--><td>--</td>
+        <!--Q--><td>--</td>
     </tr>
     <tr>
         <!--A--><th class="row-header">5.4</th>
@@ -464,13 +462,13 @@ Here is a consolidated matrix of Checkstyle-related product versions that helps 
         <!--H--><td>&ge;&nbsp;5</td>
         <!--I--><td>5.4.x</td>
         <!--J--><td>2.7&nbsp;- 2.8</td>
-        <!--K--><td>1.8.0&nbsp;- 1.11.0</td>
-        <!--L--><td>--</td>
+        <!--K--><td>1.0&nbsp;- 2.6</td>
+        <!--L--><td>✓</td>
         <!--M--><td>--</td>
-        <!--N--><td>--</td>
+        <!--N--><td>1.8.0&nbsp;- 1.11.0</td>
         <!--O--><td>--</td>
-        <!--P--><td class="upcoming"><img src="{{ site.baseurl }}/images/hourglass.png" alt="(upcoming)"/></td>
-        <!--Q--><td class="upcoming"><img src="{{ site.baseurl }}/images/hourglass.png" alt="(upcoming)"/></td>
+        <!--P--><td>--</td>
+        <!--Q--><td>--</td>
     </tr>
     <tr>
         <!--A--><th class="row-header">5.3</th>
@@ -483,13 +481,13 @@ Here is a consolidated matrix of Checkstyle-related product versions that helps 
         <!--H--><td>&ge;&nbsp;5</td>
         <!--I--><td>5.3.x</td>
         <!--J--><td>✓</td>
-        <!--K--><td>1.8.0&nbsp;- 1.11.0</td>
-        <!--L--><td>--</td>
+        <!--K--><td>1.0&nbsp;- 2.6</td>
+        <!--L--><td>✓ (0.9)</td>
         <!--M--><td>--</td>
-        <!--N--><td>--</td>
+        <!--N--><td>1.8.0&nbsp;- 1.11.0</td>
         <!--O--><td>--</td>
-        <!--P--><td class="upcoming"><img src="{{ site.baseurl }}/images/hourglass.png" alt="(upcoming)"/></td>
-        <!--Q--><td class="upcoming"><img src="{{ site.baseurl }}/images/hourglass.png" alt="(upcoming)"/></td>
+        <!--P--><td>--</td>
+        <!--Q--><td>--</td>
     </tr>
     <tr>
         <!--A--><th class="row-header">5.2</th>
@@ -502,13 +500,13 @@ Here is a consolidated matrix of Checkstyle-related product versions that helps 
         <!--H--><td>--</td>
         <!--I--><td>5.2.x</td>
         <!--J--><td>✓</td>
-        <!--K--><td>1.8.0&nbsp;- 1.11.0</td>
-        <!--L--><td>--</td>
+        <!--K--><td>1.0&nbsp;- 2.6</td>
+        <!--L--><td>✓</td>
         <!--M--><td>--</td>
-        <!--N--><td>--</td>
+        <!--N--><td>1.8.0&nbsp;- 1.11.0</td>
         <!--O--><td>--</td>
-        <!--P--><td class="upcoming"><img src="{{ site.baseurl }}/images/hourglass.png" alt="(upcoming)"/></td>
-        <!--Q--><td class="upcoming"><img src="{{ site.baseurl }}/images/hourglass.png" alt="(upcoming)"/></td>
+        <!--P--><td>--</td>
+        <!--Q--><td>--</td>
     </tr>
     <tr>
         <!--A--><th class="row-header">5.1</th>
@@ -520,14 +518,14 @@ Here is a consolidated matrix of Checkstyle-related product versions that helps 
         <!--G--><td>3.1.2</td>
         <!--H--><td>&ge;&nbsp;5</td>
         <!--I--><td>5.1.x</td>
-        <!--J--><td>✓</td>
-        <!--K--><td class="upcoming"><img src="{{ site.baseurl }}/images/hourglass.png" alt="(upcoming)"/></td>
-        <!--L--><td>--</td>
+        <!--J--><td>(✓)</td>
+        <!--K--><td>(1.0&nbsp;- 2.6)</td>
+        <!--L--><td>(✓)</td>
         <!--M--><td>--</td>
-        <!--N--><td>--</td>
+        <!--N--><td class="upcoming"><img src="{{ site.baseurl }}/images/hourglass.png" alt="(upcoming)"/></td>
         <!--O--><td>--</td>
-        <!--P--><td class="upcoming"><img src="{{ site.baseurl }}/images/hourglass.png" alt="(upcoming)"/></td>
-        <!--Q--><td class="upcoming"><img src="{{ site.baseurl }}/images/hourglass.png" alt="(upcoming)"/></td>
+        <!--P--><td>--</td>
+        <!--Q--><td>--</td>
     </tr>
     <tr>
         <!--A--><th class="row-header">5.0</th>
@@ -539,33 +537,33 @@ Here is a consolidated matrix of Checkstyle-related product versions that helps 
         <!--G--><td>3.0.13</td>
         <!--H--><td>&ge;&nbsp;5</td>
         <!--I--><td>5.0.x</td>
-        <!--J--><td>2.4&nbsp;- 2.6</td>
-        <!--K--><td class="upcoming"><img src="{{ site.baseurl }}/images/hourglass.png" alt="(upcoming)"/></td>
-        <!--L--><td>--</td>
+        <!--J--><td>(2.4&nbsp;- 2.6)</td>
+        <!--K--><td>(1.0&nbsp;- 2.6)</td>
+        <!--L--><td>(0.8)</td>
         <!--M--><td>--</td>
-        <!--N--><td>--</td>
+        <!--N--><td class="upcoming"><img src="{{ site.baseurl }}/images/hourglass.png" alt="(upcoming)"/></td>
         <!--O--><td>--</td>
-        <!--P--><td class="upcoming"><img src="{{ site.baseurl }}/images/hourglass.png" alt="(upcoming)"/></td>
-        <!--Q--><td class="upcoming"><img src="{{ site.baseurl }}/images/hourglass.png" alt="(upcoming)"/></td>
+        <!--P--><td>--</td>
+        <!--Q--><td>--</td>
     </tr>
     <tr class="subheading_bottom">
-      <!--A--><td title="Checkstyle version"                     ><a href="#a">A</a></td>
+      <!--A--><td title="Checkstyle version"                      ><a href="#a">A</a></td>
       <!--B--><td class="nolink">B</td>
-      <!--C--><td title="Check behavior backward compatible?"    ><a href="#c">C</a></td>
-      <!--D--><td title="Backwards compatible API?"              ><a href="#d">D</a></td>
-      <!--E--><td title="Java level for Checkstyle"              ><a href="#e">E</a></td>
-      <!--F--><td title="Java level of code analyzed"            ><a href="#f">F</a></td>
-      <!--G--><td title="Checkstyle-IDEA version"                ><a href="#g">G</a></td>
-      <!--H--><td title="Java level for Checkstyle-IDEA"         ><a href="#h">H</a></td>
-      <!--I--><td title="Eclipse-CS version"                     ><a href="#i">I</a></td>
-      <!--J--><td title="Maven Checkstyle Plugin default version"><a href="#j">J</a></td>
-      <!--K--><td title="SevNTU Checkstyle version"              ><a href="#k">K</a></td>
-      <!--L--><td title="{{ site.name }} version"                ><a href="#l">L</a></td>
-      <!--M--><td title="SonarQube Checkstyle plugin version"    ><a href="#m">M</a></td>
-      <!--N--><td title="SonarQube platform version"             ><a href="#n">N</a></td>
-      <!--O--><td title="SonarQube Java plugin required"         ><a href="#o">O</a></td>
-      <!--P--><td title="Jenkins Checkstyle plugin version"      ><a href="#p">P</a></td>
-      <!--Q--><td title="Bamboo Checkstyle plugin version"       ><a href="#q">Q</a></td>
+      <!--C--><td title="Check behavior backward compatible?"     ><a href="#c">C</a></td>
+      <!--D--><td title="Backwards compatible API?"               ><a href="#d">D</a></td>
+      <!--E--><td title="Java level for Checkstyle"               ><a href="#e">E</a></td>
+      <!--F--><td title="Java level of code analyzed"             ><a href="#f">F</a></td>
+      <!--G--><td title="Checkstyle-IDEA version"                 ><a href="#g">G</a></td>
+      <!--H--><td title="Java level for Checkstyle-IDEA"          ><a href="#h">H</a></td>
+      <!--I--><td title="Eclipse-CS version"                      ><a href="#i">I</a></td>
+      <!--J--><td title="Maven Checkstyle Plugin default version" ><a href="#j">J</a></td>
+      <!--K--><td title="Gradle version required"                 ><a href="#k">K</a></td>
+      <!--L--><td title="Gradle Checkstyle Plugin default version"><a href="#l">L</a></td>
+      <!--M--><td title="{{ site.name }} version"                 ><a href="#m">M</a></td>
+      <!--N--><td title="SevNTU Checkstyle version"               ><a href="#n">N</a></td>
+      <!--O--><td title="SonarQube Checkstyle plugin version"     ><a href="#o">O</a></td>
+      <!--P--><td title="SonarQube platform version"              ><a href="#p">P</a></td>
+      <!--Q--><td title="SonarQube Java plugin required"          ><a href="#q">Q</a></td>
     </tr>
   </tbody>
 </table>
@@ -650,57 +648,73 @@ Checkstyle-IDEA sometimes requires a more recent Java version than Checkstyle it
 
 ### J. Maven Checkstyle Plugin
 
-For the [Maven Checkstyle Plugin](https://maven.apache.org/plugins/maven-checkstyle-plugin/), its POM files where analyzed as found on [Maven Central](http://search.maven.org/#search%7Cgav%7C1%7Cg%3A%22org.apache.maven.plugins%22%20AND%20a%3A%22maven-checkstyle-plugin%22). The version numbers in the table are given to show the *default* Checkstyle version used by the particular version of the Maven Checkstyle plugin. However, Maven allows [specifying the actual Checkstyle version](https://maven.apache.org/plugins/maven-checkstyle-plugin/examples/upgrading-checkstyle.html) at runtime, provided you choose the base version of the plugin to match your Java version (for example, use 2.15 if on Java&nbsp;6). In 2015, the Checkstyle team has started checking compatibility with the Maven Checkstyle Plugin in their build process, so it generally works well. A checkmark (✓) indicates that the Checkstyle version is available, but not configured by default.
+For the [Maven Checkstyle Plugin](https://maven.apache.org/plugins/maven-checkstyle-plugin/), its POM files where analyzed as found on [Maven Central](http://search.maven.org/#search%7Cgav%7C1%7Cg%3A%22org.apache.maven.plugins%22%20AND%20a%3A%22maven-checkstyle-plugin%22). This column can have one of the following entries:
+
+<div class="checkpage"><dl>
+<dt class="title">Entry</dt><dd class="title">– Description</dd>
+<dt>✓</dt><dd>– This version of Checkstyle can be used, but must be <a
+href="https://maven.apache.org/plugins/maven-checkstyle-plugin/examples/upgrading-checkstyle.html">configured explicitly</a>.
+Be sure to choose the base version of the plugin to match your Java version (for example, use 2.15 if on Java 6).
+In 2015, the Checkstyle team has started checking compatibility with the Maven Checkstyle Plugin in their build process, so it generally works well.</dd>
+<dt>2.15</dt><dd>– The version number of the Maven Checkstyle plugin which is configured to use this version of Checkstyle by default.
+This implies a checkmark (✓).</dd>
+<dt>(✓) <span style="font-weight: normal;">or</span> (2.4)</dt><dd>– This version of Checkstyle can be used, but it is not available on Maven Central, so you would have to
+provide it via your own infrastructure.</dd>
+<dt>--</dt><dd>– This version of Checkstyle cannot be used with Maven.</dd>
+</dl></div>
+
 TODO We may have to improve on this data by actually trying the different combinations of Maven Plugin and Checkstyle versions, because breaking changes are introduced and may forbid specific combinations.
 
 <a name="k" class="csa-offset-anchor"/>
 
-### K. SevNTU Checkstyle
+### K. Gradle
+
+In [Gradle](https://gradle.org/) 1.0, the Gradle Checkstyle plugin was created by extracting it out of the Code Quality plugin which existed in Gradle&nbsp;0.9. At the same time, the `toolVersion` property was introduced to the Gradle Checkstyle plugin, which allows choosing the Checkstyle version to run. Previous versions of Gradle used hardcoded Checkstyle versions, which is why they are not included in our matrix.
+Up to a breaking change in Checkstyle 6.8 (Checkstyle issue [#1108](https://github.com/checkstyle/checkstyle/issues/1108)), Gradle was compatible with all versions of Checkstyle that are available on Maven Central or Bintray jcenter. Checkstyle 5.2 is the oldest version available there, so it is also the oldest you can use with Gradle, unless you are willing to provide it via your own infrastructure. Because of this, the corresponding entries are set in parentheses.
+This data was gathered by GitHub source code analysis.
+
+<a name="l" class="csa-offset-anchor"/>
+
+### L. Gradle Checkstyle Plugin
+
+This column shows which versions of Checkstyle are used as the default version by the [Gradle Checkstyle Plugin](https://docs.gradle.org/current/userguide/checkstyle_plugin.html). This information was gained by analyzing the [source code of the plugin](https://github.com/gradle/gradle/tree/REL_2.7/subprojects/code-quality/src/main/groovy/org/gradle/api/plugins/quality) on GitHub. The default version gets used when `toolVersion` is not set. A checkmark (✓) indicates that the Checkstyle version is available via `toolVersion`, but not by default. The bottom line is that one should *always* set `toolVersion`.
+Entries are set in parentheses when either the Checkstyle version is less than 5.2 (because then it is not available on Maven Central or Bintray jcenter), or the Gradle version is less than 1.0 (because then no Checkstyle plugin exists).
+
+<a name="m" class="csa-offset-anchor"/>
+
+### M. {{ site.name }}
+
+{{ site.name }} features a build process that actually tries running the compiled checks against every single Checkstyle runtime ([example log file](https://travis-ci.org/{{ site.github }}/jobs/78284770#L353)). Since we have very [high test coverage](https://coveralls.io/builds/3457153), the fact that all unit tests complete successfully against a Checkstyle runtime is significant. {{ site.name }} also includes a reflection-based component that smoothes over the API differences between Checkstyle versions, so that we have full compatibility with every recent Checkstyle version.
+
+<a name="n" class="csa-offset-anchor"/>
+
+### N. SevNTU Checkstyle
 
 For [SevNTU Checkstyle](https://github.com/sevntu-checkstyle/sevntu.checkstyle), source versions are tagged on GitHub for versions 1.8.0 and upwards, so source archives are easily available for downloading. For versions down to 1.5.x, POM files could still be found with the [binaries](https://github.com/sevntu-checkstyle/sevntu.checkstyle/tree/gh-pages/maven2/com/github/sevntu/checkstyle/sevntu-checks) which give information on the Checkstyle version for which that version of SevNTU Checkstyle was built. For versions 1.8.0 and upwards, SevNTU Checkstyle is compiled and the unit tests are executed against the different Checkstyle runtimes. When all tests pass without errors, the versions are considered compatible. Versions declared in the POM files are *always* considered compatible (and proved to be so in the tests conducted). Compilation and tests for SevNTU Checkstyle versions 1.13.0 and upwards where performed with Java&nbsp;7, all previous versions where compiled and tested with Java&nbsp;6.
 Compatibility was analyzed based on the assumption that the full SevNTU Checkstyle feature set is required to work. In many cases, only a handful of tests were failing, so it may still be an option to use SevNTU Checkstyle with an incompatible version of Checkstyle, if the subset of SevNTU checks you are using work.
 Also, you may be able to set up the SevNTU checks in a separate job with a configuration file of its own. That second job would use a version of Checkstyle that is compatible with SevNTU Checkstyle (for example, v6.6).
 
-<a name="l" class="csa-offset-anchor"/>
+<a name="o" class="csa-offset-anchor"/>
 
-### L. {{ site.name }}
-
-{{ site.name }} features a build process that actually tries running the compiled checks against every single Checkstyle runtime ([example log file](https://travis-ci.org/{{ site.github }}/jobs/78284770#L353)). Since we have very [high test coverage](https://coveralls.io/builds/3457153), the fact that all unit tests complete successfully against a Checkstyle runtime is significant. {{ site.name }} also includes a reflection-based component that smoothes over the API differences between Checkstyle versions, so that we have full compatibility with every recent Checkstyle version.
-
-<a name="m" class="csa-offset-anchor"/>
-
-### M. SonarQube Checkstyle Plugin
+### O. SonarQube Checkstyle Plugin
 
 The [SonarQube Checkstyle Plugin](http://docs.sonarqube.org/display/PLUG/Checkstyle+Plugin) lists the Checkstyle versions it uses on its website. The given version of Checkstyle is bundled with the plugin and cannot be changed. The plugin has a dependency on the SonarQube platform and the SonarQube Java plugin. Updates to this plugin are quite rare, so only a small number of Checkstyle versions are supported by SonarQube.
 
-<a name="n" class="csa-offset-anchor"/>
+<a name="p" class="csa-offset-anchor"/>
 
-### N. SonarQube Platform
+### P. SonarQube Platform
 
 This column shows the version of the SonarQube platform (a.k.a. the SonarQube version) required to run the SonarQube Checkstyle plugin at the given version.
 
-<a name="o" class="csa-offset-anchor"/>
+<a name="q" class="csa-offset-anchor"/>
 
-### O. SonarQube Java Plugin
+### Q. SonarQube Java Plugin
 
 This column shows the version of the [SonarQube Java Plugin](http://docs.sonarqube.org/display/PLUG/Java+Plugin) required to run the SonarQube Checkstyle plugin at the given version. This was obtained by looking at the manifest.mf entry in the plugin's JAR file.
 
-<a name="p" class="csa-offset-anchor"/>
 
-### P. Jenkins Checkstyle Plugin
-
-TODO
-Jenkins does not run Checkstyle, but parses the XML report generated by Checkstyle. Still, it needs to understand what it sees
-
-<a name="q" class="csa-offset-anchor"/>
-
-### Q. Bamboo Checkstyle Plugin
+### Jenkins / Bamboo
 
 TODO
-
-
-
-### Gradle
-
-The [Gradle Checkstyle Plugin](https://docs.gradle.org/current/userguide/checkstyle_plugin.html) is not listed in the table, because it is not constrained to fixed Checkstyle versions. Instead, users are encouraged to always specify the `toolVersion` property to choose their Checkstyle version. The default Checkstyle version in Gradle 2.7 is Checkstyle 5.9, so don't forget `toolVersion`.
-TODO Maybe we should add a column for Gradle after all, for example Checkstyle 6.8+ requires at least Gradle 2.7 (Checkstyle Issue [#1108](https://github.com/checkstyle/checkstyle/issues/1108))
+Jenkins does not run Checkstyle, but parses the XML report generated by Checkstyle. Still, it needs to understand what it sees.
+It seems that the format of the XML report created by Checkstyle has been quite stable over time.
