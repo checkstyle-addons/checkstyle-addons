@@ -1,6 +1,6 @@
 # Gradle build directory
 .gradle/
-build/*
+build/
 buildSrc/.gradle/
 buildSrc/build/
 
