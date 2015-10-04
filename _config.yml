@@ -37,5 +37,5 @@ exclude: ['README.md', 'LICENSE', '*.iml', 'build', 'gradle']
 latest_version: '1.3.2'
 latest_major: '1'
 latest_version_checkstyle: '6.4.1'
-latest_checkstyle_tested: '6.10.1'
+latest_checkstyle_tested: '6.11.1'
 maven-central-link: http://search.maven.org/#search%7Cgav%7C1%7Cg%3Acom.thomasjensen.checkstyle.addons
