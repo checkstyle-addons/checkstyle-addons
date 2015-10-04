@@ -191,13 +191,6 @@
             <property name="scope" value="protected"/>
         </module>
         <module name="JavadocStyle">
-            <property name="severity" value="info"/>
-            <property name="checkEmptyJavadoc" value="false"/>
-            <property name="checkFirstSentence" value="true"/>
-            <property name="checkHtml" value="false"/>
-            <property name="tokens" value="INTERFACE_DEF,CLASS_DEF,METHOD_DEF,CTOR_DEF"/>
-        </module>
-        <module name="JavadocStyle">
             <property name="checkEmptyJavadoc" value="true"/>
             <property name="checkFirstSentence" value="false"/>
             <property name="checkHtml" value="true"/>
@@ -296,7 +289,10 @@
         <module name="PackageDeclaration"/>
         <module name="ParameterAssignment"/>
         <module name="RedundantImport"/>
-        <module name="RedundantModifier"/>
+        <module name="RedundantModifier">
+            <property name="tokens"
+                    value="METHOD_DEF, VARIABLE_DEF, ANNOTATION_FIELD_DEF, INTERFACE_DEF, CLASS_DEF, ENUM_DEF"/>
+        </module>
         <module name="SimplifyBooleanExpression"/>
         <module name="SimplifyBooleanReturn"/>
         <module name="StringLiteralEquality"/>

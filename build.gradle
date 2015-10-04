@@ -706,7 +706,7 @@ checkstyle {
     configFile file('project/checkstyle.xml');
     configProperties 'projectDir': project.projectDir;
     sourceSets = [project.sourceSets.main, project.sourceSets.test];
-    toolVersion '6.4.1';  // depends on our checkstyle.xml; has nothing to do with the version used for building
+    toolVersion '6.10.1';  // depends on our checkstyle.xml; has nothing to do with the version used for building
     showViolations = true;
     ignoreFailures = false;
 }
