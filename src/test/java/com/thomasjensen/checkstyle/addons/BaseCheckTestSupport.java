@@ -13,6 +13,7 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Locale;
 import java.util.Properties;
+import java.util.regex.Pattern;
 
 import com.google.common.collect.Lists;
 import com.puppycrawl.tools.checkstyle.Checker;
@@ -40,7 +41,8 @@ public abstract class BaseCheckTestSupport
     protected static class BriefLogger
         extends DefaultLogger
     {
-        public BriefLogger(final OutputStream pOut) throws UnsupportedEncodingException
+        public BriefLogger(final OutputStream pOut)
+            throws UnsupportedEncodingException
         {
             super(pOut, true);
         }
@@ -75,8 +77,6 @@ public abstract class BaseCheckTestSupport
     protected final ByteArrayOutputStream mBAOS = new ByteArrayOutputStream();
 
     protected final PrintStream mStream = new PrintStream(mBAOS);
-
-    protected final Properties mProps = new Properties();
 
 
 
@@ -137,15 +137,6 @@ public abstract class BaseCheckTestSupport
 
 
     @SuppressWarnings("PMD.AvoidThrowingRawExceptionTypes")
-    protected void verify(final Checker pChecker, final String pFileName, final String[] pExpected)
-        throws Exception
-    {
-        verify(pChecker, pFileName, pFileName, pExpected);
-    }
-
-
-
-    @SuppressWarnings("PMD.AvoidThrowingRawExceptionTypes")
     protected void verify(final Checker pChecker, final String pProcessedFilename, final String pMessageFileName,
         final String[] pExpected)
         throws Exception
@@ -171,7 +162,8 @@ public abstract class BaseCheckTestSupport
 
         for (int i = 0; i < pExpected.length; i++) {
             final String expected = pMessageFileName + ":" + pExpected[i];
-            final String actual = lnr.readLine();
+            String actual = lnr.readLine();
+            actual = actual.replaceFirst(Pattern.quote("error: "), "");    // fix message format changed in 6.11
             Assert.assertEquals("error message " + i, expected, actual);
         }
 
