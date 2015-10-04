@@ -26,7 +26,7 @@ buildscript {
 plugins {
     id 'java';
     id 'jacoco';
-    id 'com.github.kt3k.coveralls' version '2.3.1';
+    id 'com.github.kt3k.coveralls' version '2.4.0';
     id 'checkstyle';
     id 'idea';
     id 'maven-publish';
@@ -40,9 +40,11 @@ repositories {
     mavenCentral()
 }
 
-
-
-import org.ajoberstar.grgit.Grgit
+import com.thomasjensen.checkstyle.addons.build.ConfigNames;
+import com.thomasjensen.checkstyle.addons.build.NameFactory;
+import com.thomasjensen.checkstyle.addons.build.SourceSetNames;
+import com.thomasjensen.checkstyle.addons.build.TaskNames;
+import org.ajoberstar.grgit.Grgit;
 
 group = 'com.thomasjensen.checkstyle.addons';
 version = readVersionProps();
@@ -68,7 +70,6 @@ ext {
     gitRepo = Grgit.open(project.file('.'));
     gitHash = gitRepo.head().id;
 }
-
 
 
 /*
@@ -126,7 +127,6 @@ class DependencyConfigsTask extends DefaultTask
         }
         props.put('Published', Boolean.valueOf(pPublished));
         props.put('Name', nameFromFile(pDepConfig));
-        props.put('CsVersComp', props.getProperty('Checkstyle').replaceAll('\\.',''));
         props.put('Default', Boolean.valueOf(pProject.ext.depConfigDefault.equals(props.getProperty('Name'))));
 
         return Collections.unmodifiableMap(new HashMap<>(props));
@@ -189,95 +189,6 @@ class DependencyConfigsTask extends DefaultTask
         }
         return Collections.unmodifiableMap(result);
     }
-
-
-
-    /**
-     * Convert the given standard, or general, object name into the name of the object which works specifically with one
-     * Checkstyle version. Objects can be tasks, configurations, or soure sets.
-     * @param pGeneralName the general object name, for example <tt>assemble</tt>
-     * @param pDepConfig the name of the dependency configuration to use, for example <tt>cs6.8.1</tt>
-     * @return the specific object name, for example <tt>assemble681</tt>
-     * @throws IllegalArgumentException the specified general name or dependency configuration were unknown
-     */
-    public String specificName(final String pGeneralName, final String pDepConfig)
-    {
-        final Map<String, String> theVersions = depVersions.get(pDepConfig);
-        if (theVersions == null || pGeneralName == null) {
-            throw new IllegalArgumentException('unknown depConfig or general name');
-        }
-
-        String result = null;
-        switch(pGeneralName) {
-            case 'assemble':
-                result = 'assemble' + theVersions.CsVersComp;
-                break;
-            case 'main':
-                result = 'main' + theVersions.Checkstyle;  // sic
-                break;
-            case 'test':
-                result = 'test' + theVersions.Checkstyle;  // sic
-                break;
-            case 'compileJava':
-                result = 'compileMain' + theVersions.CsVersComp + 'Java';
-                break;
-            case 'compileTestJava':
-                result = 'compileTest' + theVersions.CsVersComp + 'Java';
-                break;
-            case 'generatePomProperties':
-                result = 'generatePomProperties' + theVersions.CsVersComp;
-                break;
-            case 'generatePom':
-                result = 'generatePom' + theVersions.CsVersComp;
-                break;
-            case 'jar':
-                result = 'jar' + theVersions.CsVersComp;
-                break;
-            case 'jarEclipse':
-                result = 'jarEclipse' + theVersions.CsVersComp;
-                break;
-            case 'jarSonarqube':
-                result = 'jarSonarqube' + theVersions.CsVersComp;
-                break;
-            case 'classes':
-                result = 'main' + theVersions.CsVersComp + 'Classes';
-                break;
-            case 'testClasses':
-                result = 'test' + theVersions.CsVersComp + 'Classes';
-                break;
-            case 'provided':
-                result = 'provided' + theVersions.CsVersComp;
-                break;
-            case 'mainCompile':
-                result = 'main' + theVersions.CsVersComp + 'Compile';
-                break;
-            case 'mainRuntime':
-                result = 'main' + theVersions.CsVersComp + 'Runtime';
-                break;
-            case 'testCompile':
-                result = 'test' + theVersions.CsVersComp + 'Compile';
-                break;
-            case 'testRuntime':
-                result = 'test' + theVersions.CsVersComp + 'Runtime';
-                break;
-            default:
-                throw new IllegalArgumentException('unknown general name');
-        }
-        return result;
-    }
-
-
-    public String xcheckName(final String pDepConfigToCheck, final String pDepConfig4Cs)
-    {
-        final Map<String, String> theVersions1 = depVersions.get(pDepConfigToCheck);
-        final Map<String, String> theVersions2 = depVersions.get(pDepConfig4Cs);
-        if (theVersions1 == null || theVersions2 == null) {
-            throw new IllegalArgumentException('unknown depConfig');
-        }
-        final String dc1 = theVersions1.CsVersComp;
-        final String dc2 = theVersions2.CsVersComp;
-        return 'xtest' + dc1 + 'against' + dc2;
-    }
 }
 task depConfigs(type: DependencyConfigsTask) {
     description = project.ext.longName + ': Read active dependency configurations from ' + depConfigDir;
@@ -288,6 +199,9 @@ task depConfigs(type: DependencyConfigsTask) {
 
     println "Dependency configurations found: ${activeDepConfigs}; default: ${project.ext.depConfigDefault}";
 }
+
+project.ext.nameFactory = new NameFactory(project,
+    ((DependencyConfigsTask) tasks.depConfigs).depVersions.get(depConfigDefault).Checkstyle);
 
 
 
@@ -300,9 +214,9 @@ tasks.depConfigs.activeDepConfigs.each { final String depCfg ->
         return;   // no extra stuff for the default config - important to make IDE configuration work
     }
 
-    final DependencyConfigsTask dcn = (DependencyConfigsTask) tasks.depConfigs;
-    final Map<String, String> depVersions = dcn.depVersions.get(depCfg);
-    final String csVersComp = depVersions.CsVersComp;
+    final Map<String, String> depVersions = ((DependencyConfigsTask) tasks.depConfigs).depVersions.get(depCfg);
+    final String csVersion = depVersions.Checkstyle;
+    final NameFactory nameFactory = project.ext.nameFactory;
     final boolean hasSonarQube = !"NOT_SUPPORTED".equals(depVersions.SonarQube);
     final boolean isPublished = depVersions.Published;
     final File depCfgFile = tasks.depConfigs.allDepConfigs.filter { final File f ->
@@ -310,7 +224,7 @@ tasks.depConfigs.activeDepConfigs.each { final String depCfg ->
     }.getSingleFile();
 
     // 'main' sourceSet
-    SourceSet mainSourceSet = project.sourceSets.create(dcn.specificName('main', depCfg));
+    SourceSet mainSourceSet = project.sourceSets.create(nameFactory.getName(SourceSetNames.main, csVersion));
     mainSourceSet.java {
         srcDirs  = ['src/main/java'];
         if (!hasSonarQube) {
@@ -322,7 +236,7 @@ tasks.depConfigs.activeDepConfigs.each { final String depCfg ->
     }
 
     // 'test' sourceSet
-    SourceSet testSourceSet = project.sourceSets.create(dcn.specificName('test', depCfg));
+    SourceSet testSourceSet = project.sourceSets.create(nameFactory.getName(SourceSetNames.test, csVersion));
     testSourceSet.java {
         srcDirs  = ['src/test/java'];
         if (!hasSonarQube) {
@@ -360,24 +274,24 @@ tasks.depConfigs.activeDepConfigs.each { final String depCfg ->
     println "--";
 */
     // 'provided' configuration
-    Configuration providedConf = project.configurations.create(dcn.specificName('provided', depCfg));
+    Configuration providedConf = project.configurations.create(nameFactory.getName(ConfigNames.provided, csVersion));
     providedConf.setDescription("Provided classpath for source sets '${mainSourceSet.name}' and '${testSourceSet.name}'");
 
     // 'compile' configuration
-    Configuration compileConf = project.configurations[dcn.specificName('mainCompile', depCfg)];
+    Configuration compileConf = nameFactory.getConfiguration(ConfigNames.mainCompile, csVersion);
     compileConf.setDescription("Compile classpath for source set '${mainSourceSet.name}'");
 
     // 'runtime' configuration
-    Configuration runtimeConf = project.configurations[dcn.specificName('mainRuntime', depCfg)];
+    Configuration runtimeConf = nameFactory.getConfiguration(ConfigNames.mainRuntime, csVersion);
     runtimeConf.setDescription("Runtime classpath for source set '${mainSourceSet.name}'");
 
     // 'testCompile' configuration
-    Configuration testCompileConf = project.configurations[dcn.specificName('testCompile', depCfg)];
+    Configuration testCompileConf = nameFactory.getConfiguration(ConfigNames.testCompile, csVersion);
     testCompileConf.setDescription("Compile classpath for source set '${testSourceSet.name}'");
     testCompileConf.extendsFrom(compileConf);
 
     // 'testRuntime' configuration (description text only)
-    Configuration testRuntimeConf = project.configurations[dcn.specificName('testRuntime', depCfg)];
+    Configuration testRuntimeConf = nameFactory.getConfiguration(ConfigNames.testRuntime, csVersion);
     testRuntimeConf.setDescription("Runtime classpath for source set '${testSourceSet.name}'");
 
     // Dependencies
@@ -388,13 +302,13 @@ tasks.depConfigs.activeDepConfigs.each { final String depCfg ->
     testSourceSet.runtimeClasspath += providedConf;
 
     // 'compileJava' task
-    Task compileTask = project.tasks[dcn.specificName('compileJava', depCfg)];
+    Task compileTask = nameFactory.getTask(TaskNames.compileJava, csVersion);
     compileTask.setDescription("${project.ext.longName}: ${compileTask.description} (Java level: ${depVersions.Java})");
     compileTask.setGroup(BasePlugin.BUILD_GROUP);
     compileTask.inputs.file(depCfgFile);
 
     // 'compileTestJava' task
-    Task testCompileTask = project.tasks[dcn.specificName('compileTestJava', depCfg)];
+    Task testCompileTask = nameFactory.getTask(TaskNames.compileTestJava, csVersion);
     testCompileTask.setDescription("${project.ext.longName}: ${testCompileTask.description} "
         + "(Java level: ${depVersions.Java})");
     testCompileTask.setGroup(BasePlugin.BUILD_GROUP);
@@ -402,24 +316,24 @@ tasks.depConfigs.activeDepConfigs.each { final String depCfg ->
     testCompileTask.inputs.file(depCfgFile);
 
     // 'testClasses' task
-    Task testClassesTask = project.tasks[dcn.specificName('testClasses', depCfg)];
+    Task testClassesTask = nameFactory.getTask(TaskNames.testClasses, csVersion);
     testClassesTask.setDescription("${project.ext.longName}: ${testClassesTask.description}");
-    testClassesTask.dependsOn project.tasks['main' + csVersComp + 'Classes'];
+    testClassesTask.dependsOn nameFactory.getTask(TaskNames.mainClasses, csVersion);
 
     if (!isPublished) {
         return;  // no need for additional tasks if we don't publish for this Checkstyle version
     }
 
     // 'test' task
-    Task testTask = project.tasks.create(name: 'test' + csVersComp, type: Test);
+    Task testTask = project.tasks.create(name: nameFactory.getName(TaskNames.test, csVersion), type: Test);
     testTask.setDescription("${project.ext.longName}: Runs the unit tests in ${testSourceSet.name}.");
     testTask.setGroup(LifecycleBasePlugin.VERIFICATION_GROUP);
     testTask.taskDependencies.each { TaskDependency tDep ->
-        tDep.values = [project.tasks['main' + csVersComp + 'Classes'], project.tasks['test' + csVersComp + 'Classes']];
+        tDep.values = [nameFactory.getTask(TaskNames.mainClasses, csVersion), nameFactory.getTask(TaskNames.testClasses, csVersion)];
     }
     project.tasks.check.dependsOn testTask;
     testTask.testClassesDir = testSourceSet.output.classesDir;
-    testTask.reports.html.setDestination(new File((File) project.reportsDir, 'tests' + csVersComp));
+    testTask.reports.html.setDestination(new File((File) project.reportsDir, testTask.name));
     testTask.reports.getJunitXml().enabled = false;
     testTask.classpath.getFrom().clear();
     testTask.classpath += files(testSourceSet.output.classesDir);
@@ -446,13 +360,13 @@ tasks.depConfigs.activeDepConfigs.each { final String depCfg ->
     [compileTask, testCompileTask].each { final JavaCompile pTask -> configureCompileTask(pTask, depVersions.Java); }
 
     // 'javadoc' task
-    Javadoc javadocTask = (Javadoc) project.tasks.create(name: 'javadoc' + csVersComp, type: Javadoc);
+    Javadoc javadocTask = (Javadoc) project.tasks.create(name: nameFactory.getName(TaskNames.javadoc, csVersion), type: Javadoc);
     javadocTask.setDescription("${project.ext.longName}: Generates Javadoc API documentation for the source " +
         "code in '${mainSourceSet.name}'.");
     javadocTask.setGroup(JavaBasePlugin.DOCUMENTATION_GROUP);
     javadocTask.dependsOn(compileTask);
     javadocTask.setSource(mainSourceSet.allJava);
-    javadocTask.setDestinationDir(new File((File) project.docsDir, 'javadoc' + csVersComp));
+    javadocTask.setDestinationDir(new File((File) project.docsDir, javadocTask.name));
     configureJavadocTask(javadocTask, mainSourceSet, depVersions.Java);
     if ('1.6'.equals(depVersions.Java)) {
         String javadoc6Exe = getJdk6Javadoc();
@@ -509,10 +423,11 @@ addDependencies(project.ext.versionDefaults,
  * find out which versions are compatible.
  */
 tasks.depConfigs.activeDepConfigs.each { final String depCfgToCheck ->
+
     final DependencyConfigsTask dcn = (DependencyConfigsTask) tasks.depConfigs;
     final Map<String, String> depVersionsToCheck = dcn.depVersions.get(depCfgToCheck);
-    final String csVersCompToCheck = depVersionsToCheck.CsVersComp;
-    final boolean checkingDefault = depCfgToCheck.equals(project.ext.depConfigDefault);
+    final String csVersionToCheck = depVersionsToCheck.Checkstyle;
+    final NameFactory nameFactory = project.ext.nameFactory;
     if (!depVersionsToCheck.Published || depVersionsToCheck.TestAgainst.size() == 0) {
         return;
     }
@@ -522,26 +437,23 @@ tasks.depConfigs.activeDepConfigs.each { final String depCfgToCheck ->
             return;
         }
 
-        final Map<String, String> depVersions4Cs = dcn.depVersions.get(depCfg4Cs);
-        final String csVersComp4Cs = depVersions4Cs.CsVersComp;
+        final String csVersionRuntime = (dcn.depVersions.get(depCfg4Cs)).Checkstyle;
 
-        Task xtestTask = project.tasks.create(name: dcn.xcheckName(depCfgToCheck, depCfg4Cs), type: Test);
+        Task xtestTask = project.tasks.create(
+            name: nameFactory.getNameXCheck(csVersionToCheck, csVersionRuntime), type: Test);
         xtestTask.setDescription("${project.ext.longName}: Runs the unit tests for Checkstyle " +
-            "${depVersionsToCheck.Checkstyle} against Checkstyle ${depVersions4Cs.Checkstyle}.");
+            "${csVersionToCheck} against Checkstyle ${csVersionRuntime}.");
         xtestTask.setGroup(LifecycleBasePlugin.VERIFICATION_GROUP);
         xtestTask.taskDependencies.each { TaskDependency tDep ->
-            tDep.values = [project.tasks[checkingDefault ? 'classes' : dcn.specificName('classes', depCfgToCheck)],
-                   project.tasks[checkingDefault ? 'testClasses' : dcn.specificName('testClasses', depCfgToCheck)]];
+            tDep.values = [nameFactory.getTask(TaskNames.mainClasses, csVersionToCheck),
+                   nameFactory.getTask(TaskNames.testClasses, csVersionToCheck)];
         }
 
-        SourceSet mainSourceSet = (SourceSet) project.sourceSets[
-            checkingDefault ? 'main' : dcn.specificName('main', depCfgToCheck)];
-        SourceSet testSourceSet = (SourceSet) project.sourceSets[
-            checkingDefault ? 'test' : dcn.specificName('test', depCfgToCheck)];
-        Configuration providedConf = project.configurations[
-            checkingDefault ? 'provided' : dcn.specificName('provided', depCfgToCheck)];
-        Configuration testRuntimeConf = project.configurations[depCfg4Cs.equals(project.ext.depConfigDefault) ?
-            'testRuntime' : dcn.specificName('testRuntime', depCfg4Cs)];
+        SourceSet mainSourceSet = nameFactory.getSourceSet(SourceSetNames.main, csVersionToCheck);
+        SourceSet testSourceSet = nameFactory.getSourceSet(SourceSetNames.test, csVersionToCheck);
+        Configuration providedConf = nameFactory.getConfiguration(ConfigNames.provided, csVersionToCheck);
+        Configuration testRuntimeConf = nameFactory.getConfiguration(ConfigNames.testRuntime, csVersionRuntime);
+
         xtestTask.testClassesDir = testSourceSet.output.classesDir;
         xtestTask.reports.getHtml().enabled = false;
         xtestTask.reports.getJunitXml().enabled = false;
@@ -614,7 +526,7 @@ def void configureCompileTask(final JavaCompile pTask, final String pJavaLevel)
 
     // The warning "Supported source version 'RELEASE_6' from annotation processor 'org.antlr.v4.runtime.misc.
     // NullUsageProcessor' less than -source '1.7'" is okay and may be ignored. It goes away when Checkstyle
-    // updates to ANTLR 4.5: https://github.com/antlr/antlr4/issues/487 (which it did in version 6.5)
+    // updates to ANTLR 4.5: https://github.com/antlr/antlr4/issues/487 (which they did in version 6.5)
 
     if ('1.6'.equals(pJavaLevel)) {
         pTask.options.fork = true;

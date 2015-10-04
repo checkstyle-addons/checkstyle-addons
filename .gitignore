@@ -1,6 +1,8 @@
 # Gradle build directory
 .gradle/
-build/
+build/*
+buildSrc/.gradle/
+buildSrc/build/
 
 # IntelliJ IDEA control files
 *.iws

@@ -14,6 +14,10 @@
  * program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+import com.thomasjensen.checkstyle.addons.build.ConfigNames;
+import com.thomasjensen.checkstyle.addons.build.NameFactory;
+import com.thomasjensen.checkstyle.addons.build.SourceSetNames;
+import com.thomasjensen.checkstyle.addons.build.TaskNames;
 import org.apache.tools.ant.filters.ReplaceTokens;
 import org.gradle.internal.jvm.Jvm;
 
@@ -27,7 +31,8 @@ import java.text.SimpleDateFormat;
 tasks.depConfigs.activeDepConfigs.each { final String depCfg ->
 
     final Map<String, String> depVersions = tasks.depConfigs.depVersions.get(depCfg);
-    final String csVersComp = depVersions.CsVersComp;
+    final String csVersion= depVersions.Checkstyle;
+    final NameFactory nameFactory = project.ext.nameFactory;
     final boolean isDefaultDepConfig = depVersions.Default;
     final boolean hasSonarQube = !"NOT_SUPPORTED".equals(depVersions.SonarQube);
     final boolean isPublished = depVersions.Published;
@@ -37,7 +42,7 @@ tasks.depConfigs.activeDepConfigs.each { final String depCfg ->
     }
 
     // 'generatePomProperties' task
-    final String pomPropsTaskName = 'generatePomProperties' + (isDefaultDepConfig ? '' : csVersComp);
+    final String pomPropsTaskName = nameFactory.getName(TaskNames.generatePomProperties, csVersion);
     final GeneratePomPropsTask pomPropsTask = (GeneratePomPropsTask) project.tasks.create(
         name: pomPropsTaskName, type: GeneratePomPropsTask);
     pomPropsTask.setAppendix(depVersions.PublicationSuffix);
@@ -45,16 +50,17 @@ tasks.depConfigs.activeDepConfigs.each { final String depCfg ->
     // 'generatePom' task
     if (!isDefaultDepConfig) {
         Class<?> generatePomTaskClass = project.tasks['generatePom'].getClass();
-        Task generatePomTask = project.tasks.create(name: 'generatePom' + csVersComp, type: generatePomTaskClass);
+        Task generatePomTask = project.tasks.create(
+            name: nameFactory.getName(TaskNames.generatePom, csVersion), type: generatePomTaskClass);
         String appendix = depVersions.PublicationSuffix;
         generatePomTask.setDescription("${project.ext.longName}: Generates the Maven POM file for publication " +
             "'checkstyleAddons' (appendix: " + appendix + ').');
         generatePomTask.setAppendix(appendix);
-        generatePomTask.addBundledConfigs(project.configurations['main' + csVersComp + 'Runtime']);
+        generatePomTask.addBundledConfigs(nameFactory.getConfiguration(ConfigNames.mainRuntime, csVersion));
     }
 
     // 'jar' task
-    final String jarTaskName = 'jar' + (isDefaultDepConfig ? 'Default' : csVersComp);
+    final String jarTaskName = nameFactory.getName(TaskNames.jar, csVersion);
     final CreateJarTask jarTask = (CreateJarTask) project.tasks.create(name: jarTaskName, type: CreateJarTask);
     jarTask.configureFor(depCfg);
     project.artifacts {
@@ -62,7 +68,7 @@ tasks.depConfigs.activeDepConfigs.each { final String depCfg ->
     }
 
     // 'jarSources' task
-    final String jarSourcesTaskName = 'jarSources' + (isDefaultDepConfig ? 'Default' : csVersComp);
+    final String jarSourcesTaskName = nameFactory.getName(TaskNames.jarSources, csVersion);
     final CreateJarSourcesTask jarSourcesTask = (CreateJarSourcesTask) project.tasks.create(
         name: jarSourcesTaskName, type: CreateJarSourcesTask);
     jarSourcesTask.configureFor(depCfg);
@@ -71,7 +77,7 @@ tasks.depConfigs.activeDepConfigs.each { final String depCfg ->
     }
 
     // 'jarJavadoc' task
-    final String jarJavadocTaskName = 'jarJavadoc' + (isDefaultDepConfig ? 'Default' : csVersComp);
+    final String jarJavadocTaskName = nameFactory.getName(TaskNames.jarJavadoc, csVersion);
     final CreateJarJavadocTask jarJavadocTask = (CreateJarJavadocTask) project.tasks.create(
         name: jarJavadocTaskName, type: CreateJarJavadocTask);
     jarJavadocTask.configureFor(depCfg);
@@ -92,9 +98,9 @@ tasks.depConfigs.activeDepConfigs.each { final String depCfg ->
     pub.artifact(jarJavadocTask);
 
     // 'jarEclipse' task
-    final String eclipseTaskName = 'jarEclipse' + (isDefaultDepConfig ? 'Default' : csVersComp);
-    final CreateJarEclipseTask jarEclipseTask = (CreateJarEclipseTask) project.tasks.create(name: eclipseTaskName,
-        type: CreateJarEclipseTask);
+    final String eclipseTaskName = nameFactory.getName(TaskNames.jarEclipse, csVersion);
+    final CreateJarEclipseTask jarEclipseTask = (CreateJarEclipseTask) project.tasks.create(
+        name: eclipseTaskName, type: CreateJarEclipseTask);
     jarEclipseTask.configureFor(depCfg);
     project.artifacts {
         archives jarEclipseTask;
@@ -103,7 +109,7 @@ tasks.depConfigs.activeDepConfigs.each { final String depCfg ->
     // 'jarSonarqube' task
     CreateJarSonarqubeTask jarSqTask = null;
     if (hasSonarQube) {
-        final String sqTaskName = 'jarSonarqube' + (isDefaultDepConfig ? 'Default' : csVersComp);
+        final String sqTaskName = nameFactory.getName(TaskNames.jarSonarqube, csVersion);
         jarSqTask = (CreateJarSonarqubeTask) project.tasks.create(name: sqTaskName, type: CreateJarSonarqubeTask);
         jarSqTask.configureFor(depCfg);
         project.artifacts {
@@ -113,7 +119,7 @@ tasks.depConfigs.activeDepConfigs.each { final String depCfg ->
 
     // 'assemble' task for Checkstyle-version-specific artifacts
     // Dependencies on 'jarJavadoc' and 'jarSources' are set later when the tasks are created
-    final Task assembleTask = project.tasks.create(name: 'assemble' + csVersComp);
+    final Task assembleTask = project.tasks.create(name: nameFactory.getName(TaskNames.assemble, csVersion));
     assembleTask.setGroup(BasePlugin.BUILD_GROUP);
     assembleTask.setDescription("${project.ext.longName}: Assembles the outputs of this project pertaining to " +
         "Checkstyle ${depVersions.Checkstyle}.");
@@ -221,51 +227,32 @@ public class CreateJarTask extends Jar
      */
     public void configureFor(final String pDepConfig)
     {
-        // Dependency Configuration
+        final NameFactory nameFactory = project.ext.nameFactory;
         final String depConfig = pDepConfig != null ? pDepConfig : project.ext.depConfigDefault;
         final String checkstyleVersion = project.tasks.depConfigs.depVersions.get(depConfig).Checkstyle;
         final String appendix = project.tasks.depConfigs.depVersions.get(depConfig).PublicationSuffix;
-        final boolean isDefaultConfig = pDepConfig == null || pDepConfig.equals(project.ext.depConfigDefault);
 
         // set appendix for archive name
         if (appendix != null) {
             setAppendix(appendix);
         }
 
-        // compressed Checkstyle version
-        String csVersComp = '';
-        if (!isDefaultConfig) {
-            csVersComp = checkstyleVersion.replaceAll('\\.', '');
-        }
-
         // Dependency on pom.properties generating task
-        dependsOn('generatePomProperties' + csVersComp);
-        final File pomPropsUsed = project.tasks['generatePomProperties' + csVersComp].pluginPomProps;
+        dependsOn(nameFactory.getName(TaskNames.generatePomProperties, checkstyleVersion));
+        final File pomPropsUsed = nameFactory.getTask(TaskNames.generatePomProperties, checkstyleVersion).pluginPomProps;
         inputs.file(pomPropsUsed);
 
         // Dependency on pom.xml generating task
-        dependsOn('generatePom' + csVersComp);
-        final File pomUsed = project.tasks['generatePom' + csVersComp].pomFile;
+        dependsOn(nameFactory.getName(TaskNames.generatePom, checkstyleVersion));
+        final File pomUsed = nameFactory.getTask(TaskNames.generatePom, checkstyleVersion).pomFile;
         inputs.file(pomUsed);
 
         // Dependency on 'classes' task (compile and resources)
-        if (isDefaultConfig) {
-            dependsOn('classes');
-        }
-        else {
-            dependsOn('main' + csVersComp + 'Classes');
-        }
+        dependsOn(nameFactory.getName(TaskNames.mainClasses, checkstyleVersion));
 
         // SourceSet that fits the dependency configuration
-        SourceSet mainSourceSet;
-        if (isDefaultConfig) {
-            mainSourceSet = project.sourceSets.main;
-            setDescription(getDescription() + 'main\'.');
-        }
-        else {
-            mainSourceSet = (SourceSet) project.sourceSets['main' + checkstyleVersion];
-            setDescription(getDescription() + ('main' + checkstyleVersion) + '\'.');
-        }
+        SourceSet mainSourceSet = nameFactory.getSourceSet(SourceSetNames.main, checkstyleVersion);
+        setDescription(getDescription() + mainSourceSet.name + '\'.');
 
         // Configuration of JAR file contents
         configure {
@@ -348,11 +335,10 @@ public class CreateJarSourcesTask extends Jar
      */
     public void configureFor(final String pDepConfig)
     {
-        // Dependency Configuration
+        final NameFactory nameFactory = project.ext.nameFactory;
         final String depConfig = pDepConfig != null ? pDepConfig : project.ext.depConfigDefault;
         final String checkstyleVersion = project.tasks.depConfigs.depVersions.get(depConfig).Checkstyle;
         final String appendix = project.tasks.depConfigs.depVersions.get(depConfig).PublicationSuffix;
-        final boolean isDefaultConfig = pDepConfig == null || pDepConfig.equals(project.ext.depConfigDefault);
 
         // set appendix for archive name
         if (appendix != null) {
@@ -363,20 +349,8 @@ public class CreateJarSourcesTask extends Jar
             setDescription(getDescription() + 'Default\'');
         }
 
-        // compressed Checkstyle version
-        String csVersComp = '';
-        if (!isDefaultConfig) {
-            csVersComp = checkstyleVersion.replaceAll('\\.', '');
-        }
-
         // SourceSet that fits the dependency configuration
-        SourceSet mainSourceSet;
-        if (isDefaultConfig) {
-            mainSourceSet = project.sourceSets.main;
-        }
-        else {
-            mainSourceSet = (SourceSet) project.sourceSets['main' + checkstyleVersion];
-        }
+        SourceSet mainSourceSet = nameFactory.getSourceSet(SourceSetNames.main, checkstyleVersion);
 
         // Configuration of JAR file contents
         configure {
@@ -389,7 +363,7 @@ public class CreateJarSourcesTask extends Jar
 
         // Manifest
         doFirst {
-            Jar jarTask = (Jar) project.tasks['jar' + (isDefaultConfig ? 'Default' : csVersComp)];
+            Jar jarTask = (Jar) nameFactory.getTask(TaskNames.jar, checkstyleVersion);
             manifest = jarTask.manifest;
             manifest {
                 attributes 'Build-Timestamp': project.ext.buildTimestamp.toString();
@@ -418,11 +392,10 @@ public class CreateJarJavadocTask extends Jar
      */
     public void configureFor(final String pDepConfig)
     {
-        // Dependency Configuration
+        final NameFactory nameFactory = project.ext.nameFactory;
         final String depConfig = pDepConfig != null ? pDepConfig : project.ext.depConfigDefault;
         final String checkstyleVersion = project.tasks.depConfigs.depVersions.get(depConfig).Checkstyle;
         final String appendix = project.tasks.depConfigs.depVersions.get(depConfig).PublicationSuffix;
-        final boolean isDefaultConfig = pDepConfig == null || pDepConfig.equals(project.ext.depConfigDefault);
 
         // set appendix for archive name
         if (appendix != null) {
@@ -433,14 +406,8 @@ public class CreateJarJavadocTask extends Jar
             setDescription(getDescription() + 'Default\'');
         }
 
-        // compressed Checkstyle version
-        String csVersComp = '';
-        if (!isDefaultConfig) {
-            csVersComp = checkstyleVersion.replaceAll('\\.', '');
-        }
-
         // Dependency on javadoc generating task
-        Javadoc javadocTask = (Javadoc) project.tasks['javadoc' + csVersComp];
+        Javadoc javadocTask = (Javadoc) nameFactory.getTask(TaskNames.javadoc, checkstyleVersion);
         dependsOn(javadocTask);
 
         // Configuration of JAR file contents
@@ -454,7 +421,7 @@ public class CreateJarJavadocTask extends Jar
 
         // Manifest
         doFirst {
-            Jar jarTask = (Jar) project.tasks['jar' + (isDefaultConfig ? 'Default' : csVersComp)];
+            Jar jarTask = (Jar) nameFactory.getTask(TaskNames.jar, checkstyleVersion);
             manifest = jarTask.manifest;
             manifest {
                 attributes 'Build-Timestamp': project.ext.buildTimestamp.toString();
@@ -528,12 +495,11 @@ public class CreateJarEclipseTask extends Jar
 
     public void configureFor(final String pDepConfig)
     {
-        // Dependency Configuration
+        final NameFactory nameFactory = project.ext.nameFactory;
         final String depConfig = pDepConfig != null ? pDepConfig : project.ext.depConfigDefault;
         final String checkstyleVersion = project.tasks.depConfigs.depVersions.get(depConfig).Checkstyle;
         final String myJavaLevel = project.tasks.depConfigs.depVersions.get(depConfig).Java;
         final String pubSuffix = project.tasks.depConfigs.depVersions.get(depConfig).PublicationSuffix;
-        final boolean isDefaultConfig = pDepConfig == null || pDepConfig.equals(project.ext.depConfigDefault);
 
         setDescription("${project.ext.longName}: Assembles the Eclipse-CS plugin for Checkstyle ${checkstyleVersion}");
 
@@ -542,28 +508,11 @@ public class CreateJarEclipseTask extends Jar
             setAppendix(pubSuffix + '-' + getAppendix());
         }
 
-        // compressed Checkstyle version
-        String csVersComp = '';
-        if (!isDefaultConfig) {
-            csVersComp = checkstyleVersion.replaceAll('\\.', '');
-        }
-
         // Dependency on 'classes' task (compile and resources)
-        if (isDefaultConfig) {
-            dependsOn('classes');
-        }
-        else {
-            dependsOn('main' + csVersComp + 'Classes');
-        }
+        dependsOn(nameFactory.getName(TaskNames.mainClasses, checkstyleVersion));
 
         // SourceSet that fits the dependency configuration
-        SourceSet mainSourceSet;
-        if (isDefaultConfig) {
-            mainSourceSet = project.sourceSets.main;
-        }
-        else {
-            mainSourceSet = (SourceSet) project.sourceSets['main' + checkstyleVersion];
-        }
+        SourceSet mainSourceSet = nameFactory.getSourceSet(SourceSetNames.main, checkstyleVersion);
 
         // Inputs for up-to-date checking
         inputs.property('groupId', project.group);
@@ -641,7 +590,7 @@ public class CreateJarSonarqubeTask extends Jar
 
     public void configureFor(final String pDepConfig)
     {
-        // Dependency Configuration
+        final NameFactory nameFactory = project.ext.nameFactory;
         final String depConfig = pDepConfig != null ? pDepConfig : project.ext.depConfigDefault;
         final Map<String, String> theVersions = project.tasks.depConfigs.depVersions.get(depConfig);
         final String checkstyleVersion = theVersions.Checkstyle;
@@ -666,26 +615,14 @@ public class CreateJarSonarqubeTask extends Jar
         setArchiveName("sonar-${inputs.properties.sqPluginKey}-${inputs.properties.version}" +
             (isDefaultConfig ? '' : "-csp${theVersions.SQCheckstylePlugin}") + '.jar');
 
-        // compressed Checkstyle version
-        String csVersComp = '';
-        if (!isDefaultConfig) {
-            csVersComp = checkstyleVersion.replaceAll('\\.', '');
-        }
-
         // Dependency on 'jar' task and archive
-        final String jarTaskName = 'jar' + (isDefaultConfig ? 'Default' : csVersComp);
+        final String jarTaskName = nameFactory.getName(TaskNames.jar, checkstyleVersion);
         dependsOn(jarTaskName);
         final File jarFile = (File) project.tasks[jarTaskName].getProperties().get('archivePath');
         inputs.file jarFile;
 
         // SourceSet that fits the dependency configuration
-        SourceSet mainSourceSet;
-        if (isDefaultConfig) {
-            mainSourceSet = project.sourceSets.main;
-        }
-        else {
-            mainSourceSet = (SourceSet) project.sourceSets['main' + checkstyleVersion];
-        }
+        final SourceSet mainSourceSet = nameFactory.getSourceSet(SourceSetNames.main, checkstyleVersion);
 
         // Configuration of JAR file contents
         configure {
