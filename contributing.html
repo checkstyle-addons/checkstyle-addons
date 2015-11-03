@@ -48,8 +48,8 @@ In order to build {{ site.name }} yourself, follow these steps:
    - [Java 7 SDK](http://www.oracle.com/technetwork/java/javase/downloads/jdk7-downloads-1880260.html){:target="_blank"}, which must be used to run the build process
    - [Java 6 SDK](http://www.oracle.com/technetwork/java/javase/downloads/java-archive-downloads-javase6-419409.html){:target="_blank"} - Both Java 6 and 7 are required to build {{ site.name }}. This is because {{ site.name }} is compatible with Java&nbsp;6 based, older versions of Checkstyle.
  1. Make sure that your environment variable `JAVA_HOME` points to the Java&nbsp;7 SDK, for example `C:\PROGRA~1\Java\jdk1.7.0_80` (Windows).
- 1. `JAVA_HOME/bin` should be on the `PATH`
- 1. If you don't have a Gradle User Home yet, set it up by creating an empty directory called `.gradle` somewhere, for example `d:\.gradle` (Windows) or `~/.gradle` (Unix). Create an environment variable `GRADLE_USER_HOME` which points to this directory. This directory may grow quite large over time, because Gradle uses it to cache all downloaded stuff.
+ 1. `JAVA_HOME/bin` should be first on the `PATH`
+ 1. If you don't have a Gradle User Home yet, set it up by creating an empty directory called `.gradle` somewhere, for example `d:\.gradle` (Windows) or `~/.gradle` (Unix). Create an environment variable `GRADLE_USER_HOME` which points to this directory. This directory may grow quite large over time, because Gradle uses it to cache all downloaded stuff. Mine is 3&nbsp;GB.
  1. Create an empty text file in `GRADLE_USER_HOME` called `gradle.properties`. Inside, add the following lines:
 
         org.gradle.daemon=true
