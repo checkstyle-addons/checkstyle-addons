@@ -40,18 +40,20 @@ repositories {
     mavenCentral()
 }
 
+import com.thomasjensen.checkstyle.addons.build.BuildUtil;
 import com.thomasjensen.checkstyle.addons.build.ConfigNames;
+import com.thomasjensen.checkstyle.addons.build.DependencyConfig;
+import com.thomasjensen.checkstyle.addons.build.DependencyConfigs;
 import com.thomasjensen.checkstyle.addons.build.NameFactory;
 import com.thomasjensen.checkstyle.addons.build.SourceSetNames;
 import com.thomasjensen.checkstyle.addons.build.TaskNames;
 import org.ajoberstar.grgit.Grgit;
 
+
 group = 'com.thomasjensen.checkstyle.addons';
 version = readVersionProps();
 description = 'Additional Checkstyle Checks';
 ext {
-    depConfigDefault = 'cs6.4.1';   // MUST be one that supports SonarQube (for IDE compilation) + PUBLISHED
-    // versionDefaults defined by DependencyConfigsTask
     bundledConfigurations = ['runtime'];
     defaultPublication = 'checkstyleAddons';   // name of the default Gradle publication
     jdk6PropName = 'checkstyleaddons_jdk6_javac';
@@ -69,159 +71,28 @@ ext {
     website = 'http://checkstyle-addons.thomasjensen.com/';
     gitRepo = Grgit.open(project.file('.'));
     gitHash = gitRepo.head().id;
+    depConfigs = new DependencyConfigs(project);
+    // versionDefaults set by DependencyConfigs
+    nameFactory = new NameFactory(project, project.ext.versionDefaults.checkstyleBaseVersion);
 }
-
-
-/*
- * Read all dependency configurations from 'project/dependencyConfigs' and make them available
- */
-class DependencyConfigsTask extends DefaultTask
-{
-    private static final String PUB_INDICATOR = '.pub';
-
-    protected final File depConfigDir = new File((File) project.projectDir, 'project/dependencyConfigs');
-
-    public final FileCollection allDepConfigs = project.files {
-        depConfigDir.listFiles(new FilenameFilter() {
-            @Override
-            boolean accept(final File pDir, final String pName) {
-                return pName.endsWith('.properties');
-            }
-        });
-    };
-
-    /** map from dependency configuration names to their corresponding dependency versions */
-    public final SortedMap<String, Map<String, String>> depVersions = readAllDependencyVersions(project, allDepConfigs);
-
-    /** map from publication name to dependency versions for the corresponding dependency configuration */
-    public final Map<String, Map<String, String>> publications = getPublicationList(project, depVersions);
-
-    public final Set<String> activeDepConfigs = depVersions.keySet();
-
-
-    private static Map<String, String> readDependencyVersions(final Project pProject, final File pDepConfig,
-        final boolean pPublished)  // TODO should be Map<String, Object>
-    {
-        def props = new Properties();
-        pDepConfig.withInputStream {
-            InputStream stream -> props.load(stream);
-        }
-
-        if (props.getProperty('Description') != null) {
-            props.remove('Description');
-        }
-        if (pPublished) {
-            int expectedNumber = 9;
-            if (props.getProperty('PublicationSuffix') != null) {
-                expectedNumber++;
-            }
-            String testAgainstStr = props.getProperty('TestAgainst');
-            if (testAgainstStr == null || props.size() != expectedNumber) {
-                throw new GradleException('Broken dependency configuration: ' + pDepConfig.getName());
-            }
-            props.put('TestAgainst',
-                Collections.unmodifiableSortedSet(new TreeSet<String>(Arrays.asList(testAgainstStr.split(',\\s*')))));
-        }
-        else {
-            assert props.size() == 8;
-        }
-        props.put('Published', Boolean.valueOf(pPublished));
-        props.put('Name', nameFromFile(pDepConfig));
-        props.put('Default', Boolean.valueOf(pProject.ext.depConfigDefault.equals(props.getProperty('Name'))));
-
-        return Collections.unmodifiableMap(new HashMap<>(props));
-    }
-
-
-    private static String nameFromFile(final File pDepConfigFile)
-    {
-        String result = null;
-        int dotPos = pDepConfigFile.getName().lastIndexOf('.'.getAt(0));
-        if (dotPos > 0) {
-            if (pDepConfigFile.getName().substring(0, dotPos).endsWith(PUB_INDICATOR)) {
-                dotPos -= PUB_INDICATOR.length();
-            }
-            result = pDepConfigFile.getName().substring(0, dotPos);
-        }
-        if (result == null || result.length() == 0) {
-            throw new GradleException('Invalid dependency configuration file name: ' + pDepConfigFile.getName());
-        }
-        return result;
-    }
-
-
-    private static SortedMap<String, Map<String, String>> readAllDependencyVersions(final Project pProject,
-        final FileCollection pAllDepConfigs)
-    {
-        SortedMap<String, Map<String, String>> result = new TreeMap<>();
-        for (final File depCfg : pAllDepConfigs) {
-            final String depConfName = nameFromFile(depCfg);
-            final boolean published = depCfg.getName().substring(depConfName.length()).startsWith(PUB_INDICATOR);
-            final Map<String, String> dvs = readDependencyVersions(pProject, depCfg, published);
-            final String myJavaLevel = dvs.Java;
-            if (!'1.6'.equals(myJavaLevel) || pProject.getJdk6Compiler() != null) {
-                result.put(depConfName, dvs);
-            } else {
-                pProject.logger.warn('WARNING: Skipping dependency configuration \'' + depConfName +
-                    '\' because of missing JDK6 compiler configuration.');
-                pProject.logger.warn('Property \'' + pProject.ext.jdk6PropName + '\' not defined in gradle.' +
-                    'properties. It must point to a Java 6 compiler executable.');
-            }
-        }
-        return Collections.unmodifiableSortedMap(result);
-    }
-
-
-    private static Map<String, Map<String, String>> getPublicationList(final Project pProject,
-        final SortedMap<String, Map<String, String>> pDepVersions)
-    {
-        final Map<String, Map<String, String>> result = new HashMap<>();
-        for (final Map.Entry<String, Map<String, String>> entry : pDepVersions) {
-            final String depConfName = entry.getKey();
-            final Map<String, String> dvs = entry.getValue();
-            if (dvs.Published) {
-                String pubName = pProject.ext.defaultPublication;
-                if (!pProject.ext.depConfigDefault.equals(depConfName)) {
-                    pubName += '-' + dvs.PublicationSuffix;
-                }
-                result.put(pubName, dvs);
-            }
-        }
-        return Collections.unmodifiableMap(result);
-    }
-}
-task depConfigs(type: DependencyConfigsTask) {
-    description = project.ext.longName + ': Read active dependency configurations from ' + depConfigDir;
-
-    inputs.files allDepConfigs;
-
-    project.ext.versionDefaults = depVersions.get(depConfigDefault);
-
-    println "Dependency configurations found: ${activeDepConfigs}; default: ${project.ext.depConfigDefault}";
-}
-
-project.ext.nameFactory = new NameFactory(project,
-    ((DependencyConfigsTask) tasks.depConfigs).depVersions.get(depConfigDefault).Checkstyle);
 
 
 
 /*
  * Set up build for each dependency configuration
  */
-tasks.depConfigs.activeDepConfigs.each { final String depCfg ->
+project.ext.depConfigs.activeDepConfigs.each { final String csVersion ->
 
-    if (depConfigDefault.equals(depCfg)) {
+    final DependencyConfigs dcn = project.ext.depConfigs;
+    if (dcn.isDefault(csVersion)) {
         return;   // no extra stuff for the default config - important to make IDE configuration work
     }
 
-    final Map<String, String> depVersions = ((DependencyConfigsTask) tasks.depConfigs).depVersions.get(depCfg);
-    final String csVersion = depVersions.Checkstyle;
+    final JavaVersion javaLevel = dcn.getDepConfig(csVersion).javaLevel;
     final NameFactory nameFactory = project.ext.nameFactory;
-    final boolean hasSonarQube = !"NOT_SUPPORTED".equals(depVersions.SonarQube);
-    final boolean isPublished = depVersions.Published;
-    final File depCfgFile = tasks.depConfigs.allDepConfigs.filter { final File f ->
-        f.getName().startsWith(depCfg + '.p');
-    }.getSingleFile();
+    final boolean hasSonarQube = dcn.supportsSonarQube(csVersion);
+    final boolean isPublished = dcn.isPublished(csVersion);
+    final File depCfgFile = dcn.getDepConfig(csVersion).getConfigFile();
 
     // 'main' sourceSet
     SourceSet mainSourceSet = project.sourceSets.create(nameFactory.getName(SourceSetNames.main, csVersion));
@@ -295,7 +166,7 @@ tasks.depConfigs.activeDepConfigs.each { final String depCfg ->
     testRuntimeConf.setDescription("Runtime classpath for source set '${testSourceSet.name}'");
 
     // Dependencies
-    addDependencies(depVersions, compileConf, testCompileConf, providedConf);
+    addDependencies(dcn.getDepConfig(csVersion), compileConf, testCompileConf, providedConf);
     mainSourceSet.compileClasspath += providedConf;
     mainSourceSet.runtimeClasspath += providedConf;
     testSourceSet.compileClasspath += providedConf;
@@ -303,14 +174,14 @@ tasks.depConfigs.activeDepConfigs.each { final String depCfg ->
 
     // 'compileJava' task
     Task compileTask = nameFactory.getTask(TaskNames.compileJava, csVersion);
-    compileTask.setDescription("${project.ext.longName}: ${compileTask.description} (Java level: ${depVersions.Java})");
+    compileTask.setDescription("${project.ext.longName}: ${compileTask.description} (Java level: ${javaLevel})");
     compileTask.setGroup(BasePlugin.BUILD_GROUP);
     compileTask.inputs.file(depCfgFile);
 
     // 'compileTestJava' task
     Task testCompileTask = nameFactory.getTask(TaskNames.compileTestJava, csVersion);
     testCompileTask.setDescription("${project.ext.longName}: ${testCompileTask.description} "
-        + "(Java level: ${depVersions.Java})");
+        + "(Java level: ${javaLevel})");
     testCompileTask.setGroup(BasePlugin.BUILD_GROUP);
     testCompileTask.dependsOn compileTask;
     testCompileTask.inputs.file(depCfgFile);
@@ -357,7 +228,7 @@ tasks.depConfigs.activeDepConfigs.each { final String depCfg ->
     testTask.classpath.each { println "classpath = " + it; }
     */
 
-    [compileTask, testCompileTask].each { final JavaCompile pTask -> configureCompileTask(pTask, depVersions.Java); }
+    [compileTask, testCompileTask].each { final JavaCompile pTask -> configureCompileTask(pTask, javaLevel); }
 
     // 'javadoc' task
     Javadoc javadocTask = (Javadoc) project.tasks.create(name: nameFactory.getName(TaskNames.javadoc, csVersion), type: Javadoc);
@@ -367,9 +238,9 @@ tasks.depConfigs.activeDepConfigs.each { final String depCfg ->
     javadocTask.dependsOn(compileTask);
     javadocTask.setSource(mainSourceSet.allJava);
     javadocTask.setDestinationDir(new File((File) project.docsDir, javadocTask.name));
-    configureJavadocTask(javadocTask, mainSourceSet, depVersions.Java);
-    if ('1.6'.equals(depVersions.Java)) {
-        String javadoc6Exe = getJdk6Javadoc();
+    configureJavadocTask(javadocTask, mainSourceSet, javaLevel);
+    if (JavaVersion.VERSION_1_6.equals(javaLevel)) {
+        String javadoc6Exe = BuildUtil.getJdk6Javadoc(project);
         if (javadoc6Exe == null) {
             throw new GradleException('ERROR: Property \'' + project.ext.javadoc6PropName +
                 '\' not defined in gradle.properties. It must point to a Java 6 javadoc executable.');
@@ -384,27 +255,29 @@ tasks.depConfigs.activeDepConfigs.each { final String depCfg ->
 /*
  * Dependencies
  */
-def void addDependencies(final Map<String, String> pDepVersions, final Configuration pCompileConf,
+def void addDependencies(final DependencyConfig pDepConfig, final Configuration pCompileConf,
     final Configuration pTestCompileConf, final Configuration pProvidedConf)
 {
-    final boolean hasSonarQube = !"NOT_SUPPORTED".equals(pDepVersions.SonarQube);
-
     // provided
-    Dependency fb1 = project.dependencies.create('com.google.code.findbugs:annotations:' + pDepVersions.FindBugs);
-    Dependency fb2 = project.dependencies.create('com.google.code.findbugs:jsr305:' + pDepVersions.FindBugs);
+    Dependency fb1 = project.dependencies.create(
+        'com.google.code.findbugs:annotations:' + pDepConfig.getFindBugsVersion());
+    Dependency fb2 = project.dependencies.create(
+        'com.google.code.findbugs:jsr305:' + pDepConfig.getFindBugsVersion());
     pProvidedConf.dependencies.add(fb1);
     pProvidedConf.dependencies.add(fb2);
-    if (hasSonarQube) {
-        Dependency sq = project.dependencies.create('org.codehaus.sonar:sonar-plugin-api:' + pDepVersions.SonarQube);
+
+    if (pDepConfig.isSonarQubeSupported()) {
+        Dependency sq = project.dependencies.create(
+            'org.codehaus.sonar:sonar-plugin-api:' + pDepConfig.getSonarQubeApiVersion());
         pProvidedConf.dependencies.add(sq);
-        if (!'NOT_SUPPORTED'.equals(pDepVersions.SQslf4jNop)) {
-            Dependency slf4jNop = project.dependencies.create('org.slf4j:slf4j-nop:' + pDepVersions.SQslf4jNop);
-            pProvidedConf.dependencies.add(slf4jNop);
-        }
+        Dependency slf4jNop = project.dependencies.create(
+            'org.slf4j:slf4j-nop:' + pDepConfig.getSonarQubeSlf4jNopVersion());
+        pProvidedConf.dependencies.add(slf4jNop);
     }
 
     // compile
-    Dependency csDep = project.dependencies.create('com.puppycrawl.tools:checkstyle:' + pDepVersions.Checkstyle);
+    Dependency csDep = project.dependencies.create(
+        'com.puppycrawl.tools:checkstyle:' + pDepConfig.getCheckstyleBaseVersion());
     pCompileConf.dependencies.add(csDep);
 
     // testCompile
@@ -422,22 +295,19 @@ addDependencies(project.ext.versionDefaults,
  * unit tests compiled against every Checkstyle version against all the other Checkstyle libraries. In this way, we
  * find out which versions are compatible.
  */
-tasks.depConfigs.activeDepConfigs.each { final String depCfgToCheck ->
+project.ext.depConfigs.activeDepConfigs.each { final String csVersionToCheck ->
 
-    final DependencyConfigsTask dcn = (DependencyConfigsTask) tasks.depConfigs;
-    final Map<String, String> depVersionsToCheck = dcn.depVersions.get(depCfgToCheck);
-    final String csVersionToCheck = depVersionsToCheck.Checkstyle;
+    final DependencyConfig depConfigToCheck = project.ext.depConfigs.getDepConfig(csVersionToCheck);
     final NameFactory nameFactory = project.ext.nameFactory;
-    if (!depVersionsToCheck.Published || depVersionsToCheck.TestAgainst.size() == 0) {
+    final Set<String> compatibleVersions = depConfigToCheck.compatibleCheckstyleVersions;
+    if (!depConfigToCheck.isPublished() || compatibleVersions == null || compatibleVersions.size() == 0) {
         return;
     }
 
-    depVersionsToCheck.TestAgainst.each { final String depCfg4Cs ->
-        if (depCfgToCheck.equals(depCfg4Cs)) {
+    compatibleVersions.each { final String csVersionRuntime ->
+        if (csVersionToCheck.equals(csVersionRuntime)) {
             return;
         }
-
-        final String csVersionRuntime = (dcn.depVersions.get(depCfg4Cs)).Checkstyle;
 
         Task xtestTask = project.tasks.create(
             name: nameFactory.getNameXCheck(csVersionToCheck, csVersionRuntime), type: Test);
@@ -499,25 +369,7 @@ project.tasks.withType(Checkstyle) { Task task ->
 
 
 
-def String getJdk6Compiler()
-{
-    String result = System.getenv((String) project.ext.jdk6PropName);
-    if (project.hasProperty((String) project.ext.jdk6PropName)) {
-        result = project.property((String) project.ext.jdk6PropName);
-    }
-    return result;
-}
-
-def String getJdk6Javadoc()
-{
-    String result = System.getenv((String) project.ext.javadoc6PropName);
-    if (project.hasProperty((String) project.ext.javadoc6PropName)) {
-        result = project.property((String) project.ext.javadoc6PropName);
-    }
-    return result;
-}
-
-def void configureCompileTask(final JavaCompile pTask, final String pJavaLevel)
+def void configureCompileTask(final JavaCompile pTask, final JavaVersion pJavaLevel)
 {
     pTask.sourceCompatibility = pJavaLevel;
     pTask.targetCompatibility = pJavaLevel;
@@ -528,9 +380,9 @@ def void configureCompileTask(final JavaCompile pTask, final String pJavaLevel)
     // NullUsageProcessor' less than -source '1.7'" is okay and may be ignored. It goes away when Checkstyle
     // updates to ANTLR 4.5: https://github.com/antlr/antlr4/issues/487 (which they did in version 6.5)
 
-    if ('1.6'.equals(pJavaLevel)) {
+    if (JavaVersion.VERSION_1_6.equals(pJavaLevel)) {
         pTask.options.fork = true;
-        def javac6 = getJdk6Compiler();
+        def javac6 = BuildUtil.getJdk6Compiler(project);
         if (javac6 == null) {
             throw new GradleException('ERROR: Property \'' + project.ext.jdk6PropName +
                 '\' not defined in gradle.properties. It must point to a Java 6 compiler executable.');
@@ -542,7 +394,7 @@ def void configureCompileTask(final JavaCompile pTask, final String pJavaLevel)
 
 
 [tasks.compileJava, tasks.compileTestJava].each { final JavaCompile pTask ->
-    configureCompileTask(pTask, (String) versionDefaults.Java);
+    configureCompileTask(pTask, versionDefaults.javaLevel);
 }
 
 sourceSets.main.compileClasspath += configurations.provided;
@@ -556,7 +408,7 @@ sourceSets.test.runtimeClasspath += configurations.provided;
  * Configure IntelliJ IDEA
  */
 idea.project {
-    languageLevel = project.ext.versionDefaults.Java;
+    languageLevel = project.ext.versionDefaults.javaLevel;
     // TODO set file encoding to UTF-8
     // example: http://mrhaki.blogspot.de/2012/09/gradle-goodness-customize-idea-project.html
 }
@@ -575,9 +427,9 @@ idea.module {
  * Javadoc generation
  */
 javadoc {
-    configureJavadocTask(tasks.javadoc, project.sourceSets.main, project.ext.versionDefaults.Java);
+    configureJavadocTask(tasks.javadoc, project.sourceSets.main, project.ext.versionDefaults.javaLevel);
 }
-def void configureJavadocTask(final Javadoc pTask, final SourceSet pMainSourceSet, final String pJavaLevel)
+def void configureJavadocTask(final Javadoc pTask, final SourceSet pMainSourceSet, final JavaVersion pJavaLevel)
 {
     pTask.title = project.ext.longName + ' v' + project.version;
     pTask.classpath = pMainSourceSet.compileClasspath;
@@ -590,12 +442,12 @@ def void configureJavadocTask(final Javadoc pTask, final SourceSet pMainSourceSe
     pTask.options.splitIndex = false;
     pTask.options.outputLevel = null;   // specify neither -quiet nor -verbose
     pTask.options.header = project.ext.longName;
-    if ('1.7'.equals(pJavaLevel)) {
+    if (JavaVersion.VERSION_1_7.equals(pJavaLevel)) {
         pTask.options.links('https://jsr-305.googlecode.com/svn/trunk/javadoc/',
             'http://docs.oracle.com/javase/7/docs/api/',
             'http://javadocs.sonarsource.org/3.0/apidocs/',
             'http://checkstyle.sourceforge.net/apidocs/');
-    } else if ('1.6'.equals(pJavaLevel)) {
+    } else if (JavaVersion.VERSION_1_6.equals(pJavaLevel)) {
         pTask.options.links('https://jsr-305.googlecode.com/svn/trunk/javadoc/',
             'http://docs.oracle.com/javase/6/docs/api/',
             'http://javadocs.sonarsource.org/3.0/apidocs/',

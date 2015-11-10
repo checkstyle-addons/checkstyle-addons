@@ -14,9 +14,9 @@
  * program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-import java.nio.file.Files
-import java.nio.file.Paths
-import java.nio.file.StandardCopyOption
+import java.nio.file.Files;
+import java.nio.file.Paths;
+import java.nio.file.StandardCopyOption;
 
 import org.apache.tools.ant.filters.ReplaceTokens;
 

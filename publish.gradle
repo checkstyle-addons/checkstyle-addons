@@ -14,6 +14,7 @@
  * program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+import com.thomasjensen.checkstyle.addons.build.DependencyConfig;
 import com.thomasjensen.checkstyle.addons.build.TaskNames;
 import groovy.xml.MarkupBuilder;
 
@@ -188,15 +189,16 @@ task generatePom(type: GeneratePomFile) {
 
 
 tasks.all { final Task pTask ->
-    for (final Map.Entry<String, Map<String, String>> entry : tasks.depConfigs.publications) {
+    for (final Map.Entry<String, DependencyConfig> entry : project.ext.depConfigs.publications) {
         final String pubNameCap = entry.getKey().capitalize();
-        final Map<String, String> dvs = entry.getValue();
+        final DependencyConfig depConfig = entry.getValue();
 
         // local publication depends on the pom.xml
         if (pTask.name.endsWith('PublicationToMavenLocal')) {
             final String taskName = "publish${pubNameCap}PublicationToMavenLocal";
             if (taskName.equals(pTask.name)) {
-                pTask.dependsOn project.ext.nameFactory.getTask(TaskNames.generatePom, dvs.Checkstyle);
+                pTask.dependsOn project.ext.nameFactory.getTask(TaskNames.generatePom,
+                    depConfig.getCheckstyleBaseVersion());
             }
         }
 
@@ -206,7 +208,8 @@ tasks.all { final Task pTask ->
             if (taskName.equals(pTask.name)) {
                 pTask.enabled = false;  // we do this manually
                 pTask.destination = new File(project.buildDir, 'tmp/' +
-                    project.ext.nameFactory.getName(TaskNames.generatePom, dvs.Checkstyle) + '/pom.xml');
+                    project.ext.nameFactory.getName(TaskNames.generatePom,
+                        depConfig.getCheckstyleBaseVersion()) + '/pom.xml');
             }
         }
     }
@@ -232,7 +235,7 @@ bintray {
         user = project.property('bintray.user');
         key = project.property('bintray.apikey');
 
-        Set<String> pubNames = tasks.depConfigs.publications.keySet();
+        Set<String> pubNames = project.ext.depConfigs.publications.keySet();
         publications = pubNames.toArray(new String[pubNames.size()]);
         publish = true;
         dryRun = true;   // comment out for actual release deployment

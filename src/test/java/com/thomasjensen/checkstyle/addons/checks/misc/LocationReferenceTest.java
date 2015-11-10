@@ -23,7 +23,7 @@ import org.junit.Test;
 /**
  * Unit tests for {@link LocationReferenceCheck}.
  *
- * @author Thomas Jensen, GfK
+ * @author Thomas Jensen
  */
 public class LocationReferenceTest
     extends BaseCheckTestSupport
