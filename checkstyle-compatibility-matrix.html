@@ -8,7 +8,7 @@ longContent: true
 
 Here is a consolidated matrix of Checkstyle-related product versions that helps in selecting a working Checkstyle setup for your enterprise. Explanations and notes for each column may be found below, or by clicking on the column letter.
 
-*Last major update: 2015-11-03*
+*Last major update: 2015-11-14*
 
 <table class="table table-striped table-header-rotated-jb table-hover">
   <thead>
@@ -53,23 +53,42 @@ Here is a consolidated matrix of Checkstyle-related product versions that helps 
   </thead>
   <tbody>
     <tr>
-        <!--A--><th class="row-header">6.12</th>
-        <!--B--><td>2015-11-01</td>
-        <!--C--><td class="upcoming"><img src="{{ site.baseurl }}/images/hourglass.png" alt="(upcoming)"/></td>
-        <!--D--><td class="upcoming"><img src="{{ site.baseurl }}/images/hourglass.png" alt="(upcoming)"/></td>
+        <!--A--><th class="row-header">6.12.1</th>
+        <!--B--><td>2015-11-05</td>
+        <!--C--><td>--</td>
+        <!--D--><td>✓</td>
         <!--E--><td>&nbsp;&nbsp;&ge;&nbsp;7&nbsp;&nbsp;</td>
         <!--F--><td>&nbsp;&nbsp;&le;&nbsp;8&nbsp;&nbsp;</td>
-        <!--G--><td class="upcoming"><img src="{{ site.baseurl }}/images/hourglass.png" alt="(upcoming)"/></td>
+        <!--G--><td>4.21.0</td>
         <!--H--><td>&ge;&nbsp;8</td>
         <!--I--><td class="upcoming"><img src="{{ site.baseurl }}/images/hourglass.png" alt="(upcoming)"/></td>
         <!--J--><td>✓</td>
         <!--K--><td>&nbsp;&ge;&nbsp;2.7&nbsp;</td>
         <!--L--><td>✓</td>
         <!--M--><td>&ge;&nbsp;1.3.0</td>
-        <!--N--><td>1.15.0&nbsp;- 1.16.0</td>
-        <!--O--><td class="upcoming"><img src="{{ site.baseurl }}/images/hourglass.png" alt="(upcoming)"/></td>
-        <!--P--><td class="upcoming"><img src="{{ site.baseurl }}/images/hourglass.png" alt="(upcoming)"/></td>
-        <!--Q--><td class="upcoming"><img src="{{ site.baseurl }}/images/hourglass.png" alt="(upcoming)"/></td>
+        <!--N--><td>1.15.0&nbsp;- 1.17.0</td>
+        <!--O--><td>2.4</td>
+        <!--P--><td>&ge;&nbsp;4.5.2</td>
+        <!--Q--><td>&ge;&nbsp;2.1</td>
+    </tr>
+    <tr>
+        <!--A--><th class="row-header">6.12</th>
+        <!--B--><td>2015-11-01</td>
+        <!--C--><td>--</td>
+        <!--D--><td>--</td>
+        <!--E--><td>&nbsp;&nbsp;&ge;&nbsp;7&nbsp;&nbsp;</td>
+        <!--F--><td>&nbsp;&nbsp;&le;&nbsp;8&nbsp;&nbsp;</td>
+        <!--G--><td>--</td>
+        <!--H--><td>--</td>
+        <!--I--><td>--</td>
+        <!--J--><td>✓</td>
+        <!--K--><td>&nbsp;&ge;&nbsp;2.7&nbsp;</td>
+        <!--L--><td>✓</td>
+        <!--M--><td>&ge;&nbsp;1.3.0</td>
+        <!--N--><td>1.15.0&nbsp;- 1.17.0</td>
+        <!--O--><td>--</td>
+        <!--P--><td>--</td>
+        <!--Q--><td>--</td>
     </tr>
     <tr>
         <!--A--><th class="row-header">6.11.2</th>
@@ -85,7 +104,7 @@ Here is a consolidated matrix of Checkstyle-related product versions that helps 
         <!--K--><td>&nbsp;&ge;&nbsp;2.7&nbsp;</td>
         <!--L--><td>✓</td>
         <!--M--><td>&ge;&nbsp;1.3.0</td>
-        <!--N--><td>1.15.0&nbsp;- 1.16.0</td>
+        <!--N--><td>1.15.0&nbsp;- 1.17.0</td>
         <!--O--><td>--</td>
         <!--P--><td>--</td>
         <!--Q--><td>--</td>
@@ -104,7 +123,7 @@ Here is a consolidated matrix of Checkstyle-related product versions that helps 
         <!--K--><td>&nbsp;&ge;&nbsp;2.7&nbsp;</td>
         <!--L--><td>✓</td>
         <!--M--><td>&ge;&nbsp;1.3.0</td>
-        <!--N--><td>1.15.0&nbsp;- 1.16.0</td>
+        <!--N--><td>1.15.0&nbsp;- 1.17.0</td>
         <!--O--><td>--</td>
         <!--P--><td>--</td>
         <!--Q--><td>--</td>
@@ -123,7 +142,7 @@ Here is a consolidated matrix of Checkstyle-related product versions that helps 
         <!--K--><td>&nbsp;&ge;&nbsp;2.7&nbsp;</td>
         <!--L--><td>✓</td>
         <!--M--><td>&ge;&nbsp;1.3.0</td>
-        <!--N--><td>1.15.0&nbsp;- 1.16.0</td>
+        <!--N--><td>1.15.0&nbsp;- 1.17.0</td>
         <!--O--><td>--</td>
         <!--P--><td>--</td>
         <!--Q--><td>--</td>
@@ -660,14 +679,16 @@ This column simply contains all Checkstyle versions that were released, starting
 
 A check mark in this column indicates that a version upgrade of Checkstyle from the previous version:
 
-- does not require changing the Checkstyle configuration file, and
-- does not generate different warnings than before if the same configuration is used (unless it was a bug in the previous version that got fixed).
+- does not require changing the Checkstyle configuration file to continue functioning, and
+- does not generate different warnings than before if the same configuration is used.
 
 Only the differences to the immediately preceding version are considered.
 This information was primarily gathered from the [release notes](http://checkstyle.sourceforge.net/releasenotes.html), but additional analysis of the commit history on GitHub has turned up further breaking changes:
 
 <div class="checkpage"><dl>
 <dt class="title">Checkstyle</dt><dd class="title">– Breaking Change</dd>
+<dt>6.12.1</dt><dd>– default value of property <code>processJavadoc</code> changed in <i>UnusedImports</i> check (commit <a href="https://github.com/checkstyle/checkstyle/commit/afbb944fe23b1be090ed69bfb97641be9dc2842c">#afbb944</a>, mentioned in release notes as "bug fix")</dd>
+<dt>6.12</dt><dd>– <code>package</code> declarations are no longer covered by <i>LineLength</i> check (commit <a href="https://github.com/checkstyle/checkstyle/commit/9a39d19a31f06c8614d33fcc9c3f7654ec9cdd9f">#9a39d19</a>, mentioned in release notes as "bug fix")</dd>
 <dt>6.4.1</dt><dd>– property <code>immutableClassNames</code> renamed to <code>immutableClassCanonicalNames</code> in <i>VisibilityModifier</i> check (commit <a href="https://github.com/checkstyle/checkstyle/commit/de4485a22bfe8eafc3c2e273fd328a0221d0ff9e">#de4485a</a>, mentioned in release notes as "bug fix")</dd>
 <dt>6.3</dt><dd>– Issue <a href="https://github.com/checkstyle/checkstyle/issues/585">#585</a> mentioned as the only breaking change in the release notes is not in fact breaking anything, but the <i>IllegalType</i> check got its default illegal types changed (commit <a href="https://github.com/checkstyle/checkstyle/commit/677acc1e8491acffd24c859e553b06362da0d471">#677acc1</a>)</dd>
 <dt>5.8</dt><dd>– <i>TypeName</i> check now covers enums and annotations (commits <a href="https://github.com/checkstyle/checkstyle/commit/686d009cf4d21d0ace52b9e7dccc848e8b9ce91a">#686d009</a> and <a href="https://github.com/checkstyle/checkstyle/commit/f3d433723bebb55e09eba1562b6c75407f6fe46f">#f3d4337</a>, mentioned in release notes as "new feature" and "bug fix")</dd>
@@ -683,6 +704,7 @@ A check mark in this column indicates that a version upgrade of Checkstyle from 
 
 <div class="checkpage"><dl>
 <dt class="title">Checkstyle</dt><dd class="title">– Breaking Change</dd>
+<dt>6.12</dt><dd>– public method renamed in utils/CheckUtils (commit <a href="https://github.com/checkstyle/checkstyle/commit/e2b4e687d7b8f9d6d5e1346d874b90e4567aff81">#e2b4e68</a>)</dd>
 <dt>6.9</dt><dd>– public methods removed from api/JavadocTagInfo (commit <a href="https://github.com/checkstyle/checkstyle/commit/534536aa623b2f723daf95d9e43d31f1b2734906">#534536a</a>)</dd>
 <dt>6.6</dt><dd>– public method <code>getFilename()</code> renamed to <code>getFileName()</code> in api/FileContents (commit <a href="https://github.com/checkstyle/checkstyle/commit/7dd24c8c35572b5db3e5c905d440e813cfe2538c">#7dd24c8</a>)</dd>
 <dt>5.7</dt><dd>– signature of public method <code>fireErrors()</code> changed in api/MessageDispatcher (commit <a href="https://github.com/checkstyle/checkstyle/commit/1d614c3a7ecf8a3ede4df8a50da46e71792d0025">#1d614c3</a>)</dd>
