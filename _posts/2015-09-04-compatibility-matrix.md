@@ -6,4 +6,4 @@ release: false
 emphasis: true
 ---
 
-We have compiled a draft of the the [Checkstyle version compatibility matrix]({{ site.baseurl }}/checkstyle-compatibility-matrix.html), a table of Checkstyle-related product versions to show which versions of stuff are compatible with any given version of Checkstyle.
+We have compiled a [compatibility matrix]({{ site.baseurl }}/checkstyle-compatibility-matrix.html) of the Checkstyle ecosystem, a table of Checkstyle-related product versions to show which versions of stuff are compatible with any given version of Checkstyle.
