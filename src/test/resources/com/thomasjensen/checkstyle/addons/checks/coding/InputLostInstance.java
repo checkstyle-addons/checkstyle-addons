@@ -10,7 +10,7 @@ public class InputLostInstance
     private Object field = new IllegalArgumentException();
 
     static {
-        new Integer(42);
+        new Integer(42);  // report this
     }
 
     private static class Inner {
