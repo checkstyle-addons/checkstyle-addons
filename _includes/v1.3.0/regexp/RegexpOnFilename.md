@@ -9,7 +9,6 @@ This is useful for situations such as:
   - File names contain only legal characters
   - Files of certain types are created in the right places, e.g. Java files under *src/&#42;/java*
   - Prevent certain files or types of files altogether, by "banning" their names
-  - Ensure that required files are present in certain locations
 
 By default, this check flags leading and trailing spaces in file names.
 
