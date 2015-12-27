@@ -14,35 +14,34 @@ The *RequiredFile* check helps make sure that certain files exist in specified p
 <dt><span class="propname">baseDir</span>
     <span class="proptype"><a href="http://checkstyle.sourceforge.net/property_types.html#string">String</a></span></dt>
 <dd><span class="propdesc">Base directory to assume for the check execution, usually the project root</span>
-    <span class="propdefault"><code>.</code></span></dd>
+    <span class="propdefault"><code>.</code> (the project root)</span></dd>
 
 <dt><span class="propname">directories</span>
     <span class="proptype"><a href="http://checkstyle.sourceforge.net/property_types.html#stringSet">StringSet</a></span></dt>
-<dd><span class="propdesc">Comma-separated list of method calls that should be covered by this check. Each element of
-        the list must be the full method call as it occurs in the source file, ignoring whitespace and parentheses.
-        For example, <code>LogManager.getLogger</code>. This property or <code>variableNames</code> must be set for
-        this check to do anything.</span>
+<dd><span class="propdesc">Comma-separated list of directories in which the <code>file</code> is required to be
+        present. It is possible to use file globs here, in which case existing directories are checked against the
+        glob expression. If there is a match, the <code>file</code> is required to be present. All directories in
+        this list are interpreted as relative to the <code>baseDir</code>.</span>
     <span class="propdefault">none (check is disabled)</span></dd>
 
 <dt><span class="propname">ignoreEmptyDirs</span>
     <span class="proptype"><a href="http://checkstyle.sourceforge.net/property_types.html#boolean">Boolean</a></span></dt>
-<dd><span class="propdesc">If <code>true</code>, directories which match the glob specified by the
-        <code>directories</code> property are still ignored if empty; if <code>false</code>, empty directories are
-        not ignored. "Empty" means that the directory does not contain any files; it may however contain other
-        directories.</span>
+<dd><span class="propdesc">If <code>true</code>, <code>directories</code> are ignored if they contain no files;
+        if <code>false</code>, directories are never ignored. "Empty" means that the directory does not contain
+        any files; it may however contain other directories.</span>
     <span class="propdefault"><code>false</code></span></dd>
 
 <dt><span class="propname">caseSensitive</span>
     <span class="proptype"><a href="http://checkstyle.sourceforge.net/property_types.html#boolean">Boolean</a></span></dt>
-<dd><span class="propdesc">If <code>true</code>, the property keys are treated as case sensitive; if <code>false</code>,
-        case is ignored.</span>
+<dd><span class="propdesc">If <code>true</code>, the <code>file</code> must be present with the exact spelling
+        given, including upper and lowercase; if <code>false</code>, case is ignored.</span>
     <span class="propdefault"><code>true</code></span></dd>
 </dl>
 
 
 ### Examples
 
-The following example checks that the current method name is passed as the first argument to certain log methods, or given as a String literal in initializations of variables named `method`:
+The following example checks that a *README.md* file is present in the project root:
 
 {% highlight xml %}
 <module name="RequiredFile">
@@ -52,7 +51,7 @@ The following example checks that the current method name is passed as the first
 </module>
 {% endhighlight %}
 
-In the next example, the `getLogger` method takes the current class as its first argument. The class shall be specified as a simple class object (e.g. `MyClass.class`). Just `getClass()` would not work. Calls where the argument is not a class object are ignored. Note the optional custom message, which allows tailoring the violation text to the particular use case:
+In the next example, a *logo.png* file is required in all *img* folders two level below any *web* folders:
 
 {% highlight xml %}
 <module name="RequiredFile">
@@ -76,8 +75,8 @@ This check can also serve as a replacement of JavadocPackage with better configu
 
 ### Related Checks
 
-JavadocPackage
-RegexpOnFilename
+If you only want to check for *package-info.java* files, [JavadocPackage](http://checkstyle.sourceforge.net/config_javadoc.html#JavadocPackage) may be enough. This check has better configurability though.
+Anything to do with already existing files is probably covered by [RegexpOnFilename]({{ site.baseurl }}/latest/checks/regexp.html#RegexpOnFilename).
 
 ### Parent Module
 

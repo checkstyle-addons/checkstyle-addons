@@ -20,6 +20,10 @@ import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
+import java.util.SortedSet;
+import java.util.TreeSet;
+
+import javax.annotation.Nonnull;
 
 import com.puppycrawl.tools.checkstyle.api.AbstractFileSetCheck;
 import com.thomasjensen.checkstyle.addons.util.Util;
@@ -33,7 +37,7 @@ import com.thomasjensen.checkstyle.addons.util.Util;
 public class RequiredFileCheck
     extends AbstractFileSetCheck
 {
-    private Set<String> dirs = new HashSet<String>();
+    private Set<File> dirs = new HashSet<File>();
 
     /*
      * --------------- Check properties: ---------------------------------------------------------------------------
@@ -60,16 +64,25 @@ public class RequiredFileCheck
             dirs.clear();
         }
         else {
-            dirs = readAllDirs();
+            dirs = readAllDirs(baseDir);
         }
     }
 
 
 
-    private Set<String> readAllDirs()
+    SortedSet<File> readAllDirs(@Nonnull final File pBaseDir)
     {
-        // TODO read all matching dirs beneath baseDir
-        return null;
+        final SortedSet<File> result = new TreeSet<File>();
+        final File[] files = pBaseDir.listFiles();
+        if (files != null) {
+            for (final File f : files) {
+                if (f.isDirectory() && f.canRead()) {
+                    result.add(new File(f.getPath().substring(baseDir.getPath().length() + 1)));
+                    result.addAll(readAllDirs(f));
+                }
+            }
+        }
+        return result;
     }
 
 
