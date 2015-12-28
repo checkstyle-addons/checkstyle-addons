@@ -15,14 +15,14 @@ package com.thomasjensen.checkstyle.addons.checks.misc;
  * program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+import java.io.File;
+import java.io.IOException;
+
 import com.puppycrawl.tools.checkstyle.DefaultConfiguration;
 import com.thomasjensen.checkstyle.addons.BaseCheckTestSupport;
 import com.thomasjensen.checkstyle.addons.checks.BinaryName;
 import org.junit.Assert;
 import org.junit.Test;
-
-import java.io.File;
-import java.io.IOException;
 
 
 /**
@@ -33,6 +33,13 @@ import java.io.IOException;
 public class PropertyCatalogTest
     extends BaseCheckTestSupport
 {
+    public PropertyCatalogTest()
+    {
+        setCheckShortname(PropertyCatalogCheck.class);
+    }
+
+
+
     @Test
     public void testPropertyFileTemplate()
         throws IOException
@@ -63,7 +70,7 @@ public class PropertyCatalogTest
 
     @Test
     public void testPropertyFileTemplateBasedir()
-            throws IOException
+        throws IOException
     {
         PropertyCatalogCheck check = new PropertyCatalogCheck(getPath("misc/InputPropertyCatalog1.java"));
         check.setBaseDir("src");
@@ -71,17 +78,17 @@ public class PropertyCatalogTest
 
         String s = check.buildPropertyFilePath(new BinaryName("com.foo", "Bar", "Inner"));
         Assert.assertEquals("|com.foo.Bar$Inner|com/foo/Bar/Inner|com.foo.Bar|com/foo/Bar|../../..|com/foo|Bar|Inner|"
-                        + "test|resources|com|", s);
+            + "test|resources|com|", s);
 
         check.setBaseDir("src/test");   // forward slash
         s = check.buildPropertyFilePath(new BinaryName("com.foo", "Bar", "Inner"));
         Assert.assertEquals("|com.foo.Bar$Inner|com/foo/Bar/Inner|com.foo.Bar|com/foo/Bar|../../..|com/foo|Bar|Inner|"
-                + "resources|com|thomasjensen|", s);
+            + "resources|com|thomasjensen|", s);
 
         check.setBaseDir("src\\test");   // backslash
         s = check.buildPropertyFilePath(new BinaryName("com.foo", "Bar", "Inner"));
         Assert.assertEquals("|com.foo.Bar$Inner|com/foo/Bar/Inner|com.foo.Bar|com/foo/Bar|../../..|com/foo|Bar|Inner|"
-                + "resources|com|thomasjensen|", s);
+            + "resources|com|thomasjensen|", s);
     }
 
 

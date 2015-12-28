@@ -43,6 +43,13 @@ public class RegexpOnFilenameCheckTest
 
 
 
+    public RegexpOnFilenameCheckTest()
+    {
+        setCheckShortname(RegexpOnFilenameCheck.class);
+    }
+
+
+
     @Before
     public void setUp()
     {
@@ -299,8 +306,7 @@ public class RegexpOnFilenameCheckTest
         try {
             tempFile = File.createTempFile("addons-test-", "txt ");
             final String[] expected =
-                {"0: Filename '" + tempFile.getName() + "' contains illegal pattern '" + "^(?:\\s+.*|.*?\\s+)$"
-                    + "'."};
+                {"0: Filename '" + tempFile.getName() + "' contains illegal pattern '" + "^(?:\\s+.*|.*?\\s+)$" + "'."};
             verify(mCheckConfig, tempFile.getAbsolutePath(), expected);
         }
         finally {
@@ -320,8 +326,7 @@ public class RegexpOnFilenameCheckTest
         try {
             tempFile = File.createTempFile(" addons-test-", "txt");
             final String[] expected =
-                {"0: Filename '" + tempFile.getName() + "' contains illegal pattern '" + "^(?:\\s+.*|.*?\\s+)$"
-                    + "'."};
+                {"0: Filename '" + tempFile.getName() + "' contains illegal pattern '" + "^(?:\\s+.*|.*?\\s+)$" + "'."};
             verify(mCheckConfig, tempFile.getAbsolutePath(), expected);
         }
         finally {

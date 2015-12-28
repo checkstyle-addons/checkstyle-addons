@@ -35,6 +35,13 @@ public class IllegalMethodCallCheckTest
 
 
 
+    public IllegalMethodCallCheckTest()
+    {
+        setCheckShortname(IllegalMethodCallCheck.class);
+    }
+
+
+
     @BeforeClass
     public static void setUp()
         throws IOException

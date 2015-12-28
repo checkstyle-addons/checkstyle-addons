@@ -39,7 +39,7 @@
 
     <suppress files="[\\/]Base(?:FileSet)?CheckTestSupport\.java" checks="Header" />
     <suppress files="[\\/]BaseCheckTestSupport\.java" checks="AbstractClassName" />
-    <suppress files="[\\/]BaseCheckTestSupport\.java" checks="LineLength" lines="25-30"/>
+    <suppress files="[\\/]BaseCheckTestSupport\.java" checks="LineLength" lines="32-34"/>
 
 </suppressions>
 

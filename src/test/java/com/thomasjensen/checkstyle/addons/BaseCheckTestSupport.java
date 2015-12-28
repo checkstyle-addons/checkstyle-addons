@@ -15,6 +15,8 @@ import java.util.Locale;
 import java.util.Properties;
 import java.util.regex.Pattern;
 
+import javax.annotation.Nonnull;
+
 import com.google.common.collect.Lists;
 import com.puppycrawl.tools.checkstyle.Checker;
 import com.puppycrawl.tools.checkstyle.DefaultConfiguration;
@@ -77,6 +79,19 @@ public abstract class BaseCheckTestSupport
     protected final ByteArrayOutputStream mBAOS = new ByteArrayOutputStream();
 
     protected final PrintStream mStream = new PrintStream(mBAOS);
+
+    private String checkShortname = null;
+
+
+
+    protected final void setCheckShortname(@Nonnull final Class<?> pCheck)
+    {
+        String result = pCheck.getSimpleName();
+        if (result.endsWith("Check")) {
+            result = result.substring(0, result.length() - "Check".length());
+        }
+        checkShortname = result;
+    }
 
 
 
@@ -164,6 +179,14 @@ public abstract class BaseCheckTestSupport
             final String expected = pMessageFileName + ":" + pExpected[i];
             String actual = lnr.readLine();
             actual = actual.replaceFirst(Pattern.quote("error: "), "");    // fix message format changed in 6.11
+
+            // fix message format changed in 6.14 (Checkstyle Issue #2666)
+            actual = actual.replaceFirst(Pattern.quote("[ERROR] "), "");
+            final String moduleHint = " [" + checkShortname + "]";
+            if (actual.endsWith(moduleHint)) {
+                actual = actual.substring(0, actual.length() - moduleHint.length());
+            }
+
             Assert.assertEquals("error message " + i, expected, actual);
         }
 

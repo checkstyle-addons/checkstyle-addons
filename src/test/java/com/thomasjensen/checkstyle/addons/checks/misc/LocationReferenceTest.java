@@ -28,6 +28,13 @@ import org.junit.Test;
 public class LocationReferenceTest
     extends BaseCheckTestSupport
 {
+    public LocationReferenceTest()
+    {
+        setCheckShortname(LocationReferenceCheck.class);
+    }
+
+
+
     @Test
     public void testMethodName()
         throws Exception

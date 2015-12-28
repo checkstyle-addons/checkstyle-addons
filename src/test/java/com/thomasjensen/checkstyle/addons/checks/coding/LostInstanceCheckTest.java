@@ -28,6 +28,13 @@ import org.junit.Test;
 public class LostInstanceCheckTest
     extends BaseCheckTestSupport
 {
+    public LostInstanceCheckTest()
+    {
+        setCheckShortname(LostInstanceCheck.class);
+    }
+
+
+
     @Test
     public void testDefault()
         throws Exception
