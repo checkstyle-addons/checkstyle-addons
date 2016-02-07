@@ -27,12 +27,12 @@ import com.puppycrawl.tools.checkstyle.api.AbstractFileSetCheck;
 /**
  * This check applies a given regular expression to the names of files.
  *
- * <p><a href="http://checkstyle-addons.thomasjensen.com/latest/checks/regexp.html#RegexpOnFilename"
+ * <p><a href="http://checkstyle-addons.thomasjensen.com/latest/checks/regexp.html#RegexpOnFilenameOrg"
  * target="_blank">Documentation</a></p>
  *
  * @author Thomas Jensen
  */
-public class RegexpOnFilenameCheck
+public class RegexpOnFilenameOrgCheck
     extends AbstractFileSetCheck
 {
     /**
@@ -42,7 +42,7 @@ public class RegexpOnFilenameCheck
     private Pattern selection;
 
     /** mode of operation (required or illegal) */
-    private RegexpOnFilenameOption mode = RegexpOnFilenameOption.ILLEGAL;
+    private RegexpOnFilenameOrgOption mode = RegexpOnFilenameOrgOption.ILLEGAL;
 
     /**
      * if <code>true</code>, only the simple name of the file will be checked against the regexp;<br/> if
@@ -74,7 +74,7 @@ public class RegexpOnFilenameCheck
 
     public void setMode(final String pMode)
     {
-        mode = RegexpOnFilenameOption.valueOfIgnoreCase(pMode);
+        mode = RegexpOnFilenameOrgOption.valueOfIgnoreCase(pMode);
     }
 
 
@@ -116,7 +116,7 @@ public class RegexpOnFilenameCheck
             if (simple) {
                 filePath = pFile.getName();
             }
-            ok = regexp.matcher(filePath).find() ^ (mode == RegexpOnFilenameOption.ILLEGAL);
+            ok = regexp.matcher(filePath).find() ^ (mode == RegexpOnFilenameOrgOption.ILLEGAL);
         }
 
         if (!ok) {

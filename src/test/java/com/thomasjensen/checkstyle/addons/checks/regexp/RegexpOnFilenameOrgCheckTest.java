@@ -28,11 +28,11 @@ import org.junit.Test;
 
 
 /**
- * Unit test of {@link RegexpOnFilenameCheck}.
+ * Unit test of {@link RegexpOnFilenameOrgCheck}.
  *
  * @author Thomas Jensen
  */
-public class RegexpOnFilenameCheckTest
+public class RegexpOnFilenameOrgCheckTest
     extends BaseFileSetCheckTestSupport
 {
     private static final String REAL_EXT = "txt";
@@ -43,9 +43,9 @@ public class RegexpOnFilenameCheckTest
 
 
 
-    public RegexpOnFilenameCheckTest()
+    public RegexpOnFilenameOrgCheckTest()
     {
-        setCheckShortname(RegexpOnFilenameCheck.class);
+        setCheckShortname(RegexpOnFilenameOrgCheck.class);
     }
 
 
@@ -53,7 +53,7 @@ public class RegexpOnFilenameCheckTest
     @Before
     public void setUp()
     {
-        mCheckConfig = createCheckConfig(RegexpOnFilenameCheck.class);
+        mCheckConfig = createCheckConfig(RegexpOnFilenameOrgCheck.class);
     }
 
 
@@ -361,7 +361,7 @@ public class RegexpOnFilenameCheckTest
     public void testNullEmptyRegexParams_Ok()
         throws Exception
     {
-        RegexpOnFilenameCheck check = new RegexpOnFilenameCheck();
+        RegexpOnFilenameOrgCheck check = new RegexpOnFilenameOrgCheck();
         check.setSelection(null);
         check.setSelection("");
         check.setRegexp(null);
@@ -373,9 +373,9 @@ public class RegexpOnFilenameCheckTest
     @Test
     public void testOptionValues()
     {
-        Assert.assertSame(RegexpOnFilenameOption.REQUIRED, RegexpOnFilenameOption.valueOf("REQUIRED"));
-        Assert.assertSame(RegexpOnFilenameOption.ILLEGAL, RegexpOnFilenameOption.valueOf("ILLEGAL"));
-        Assert.assertSame(RegexpOnFilenameOption.REQUIRED, RegexpOnFilenameOption.valueOfIgnoreCase("required"));
-        Assert.assertSame(RegexpOnFilenameOption.ILLEGAL, RegexpOnFilenameOption.valueOfIgnoreCase("illegal"));
+        Assert.assertSame(RegexpOnFilenameOrgOption.REQUIRED, RegexpOnFilenameOrgOption.valueOf("REQUIRED"));
+        Assert.assertSame(RegexpOnFilenameOrgOption.ILLEGAL, RegexpOnFilenameOrgOption.valueOf("ILLEGAL"));
+        Assert.assertSame(RegexpOnFilenameOrgOption.REQUIRED, RegexpOnFilenameOrgOption.valueOfIgnoreCase("required"));
+        Assert.assertSame(RegexpOnFilenameOrgOption.ILLEGAL, RegexpOnFilenameOrgOption.valueOfIgnoreCase("illegal"));
     }
 }

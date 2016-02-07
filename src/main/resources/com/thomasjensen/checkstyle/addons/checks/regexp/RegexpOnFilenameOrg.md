@@ -1,9 +1,19 @@
-## RegexpOnFilename
+## RegexpOnFilenameOrg
 
 This check applies a regular expression to the names of files.
 Depending on the configuration, a warning is logged if a required match is not found, or if an illegal match is found.
 
-This is useful for situations such as:
+<div class="alert alert-info">
+  <p>The Checkstyle team liked this check so much that they added it to the core Checkstyle product. We feel
+  honored! Sadly, even though {{ site.name }} is admittedly their inspiration, and we published 10 months ahead of
+  them, the fact goes unmentioned.
+  <img class="emoji" width="20" height="20" align="absmiddle"
+       src="https://assets.github.com/images/icons/emoji/unicode/1f44e.png" alt=":-1:" title=":-1:"><br/>
+  In order to avoid name collisions with our original, we had to rename this check from <i>RegexpOnFilename</i> to
+  <i>RegexpOnFilenameOrg</i>.</p>
+</div>
+
+This check is useful for situations such as:
 
   - Checking that resources in certain directories follow a naming convention
   - File names contain only legal characters
@@ -32,7 +42,7 @@ The check works like this:
     <span class="propdefault"><code>^(?:\s+.*|.*?\s+)$</code></span></dd>
 
 <dt><span class="propname">mode</span>
-    <span class="proptype"><a href="{{ site.baseurl }}/{{ page.check_version }}/apidocs/index.html?com/thomasjensen/checkstyle/addons/checks/regexp/RegexpOnFilenameOption.html">Mode</a></span></dt>
+    <span class="proptype"><a href="{{ site.baseurl }}/{{ page.check_version }}/apidocs/index.html?com/thomasjensen/checkstyle/addons/checks/regexp/RegexpOnFilenameOrgOption.html">Mode</a></span></dt>
 <dd><span class="propdesc">whether <code>regexp</code> finds required or illegal matches. <code>required</code> means that all selected files must match the expression. <code>illegal</code> means that they must not.</span>
     <span class="propdefault"><code>illegal</code></span></dd>
 
@@ -55,7 +65,7 @@ In addition to the properties, optionally adding a `message` element may benefit
 By default, the check detects leading and trailing spaces in file names. It is recommended to still add a custom message as shown, but that's optional.
 
 {% highlight xml %}
-<module name="RegexpOnFilename">
+<module name="RegexpOnFilenameOrg">
   <message key="regexp.filepath.illegal" value="Filename ''{0}'' contains leading or trailing spaces."/>
 </module>
 {% endhighlight %}
@@ -63,7 +73,7 @@ By default, the check detects leading and trailing spaces in file names. It is r
 To configure the check to ensure that Java files reside in Java source folders, not resource folders:
 
 {% highlight xml %}
-<module name="RegexpOnFilename">
+<module name="RegexpOnFilenameOrg">
   <property name="selection" value="\.java$"/>
   <property name="regexp" value="[\\/]src[\\/](?:test|main)[\\/]java[\\/]"/>
   <property name="mode" value="required"/>
@@ -76,7 +86,7 @@ To configure the check to ensure that Java files reside in Java source folders, 
 This check is also useful to enforce arbitrary naming conventions. In the following example, we require all HTML files in a folder *html/view* to start with the prefix `view_`:
 
 {% highlight xml %}
-<module name="RegexpOnFilename">
+<module name="RegexpOnFilenameOrg">
   <property name="selection" value="[\\/]src[\\/]main[\\/]resources[\\/]html[\\/]views[\\/].+?\.html$"/>
   <property name="regexp" value="^view_.*"/>
   <property name="mode" value="required"/>
@@ -87,7 +97,7 @@ This check is also useful to enforce arbitrary naming conventions. In the follow
 To configure the check to ban GIF files in favor of PNG:
 
 {% highlight xml %}
-<module name="RegexpOnFilename">
+<module name="RegexpOnFilenameOrg">
   <property name="selection" value="(?i)\.gif$"/>
   <property name="regexp" value="."/>
   <message key="regexp.filepath.illegal" value="''{0}'' must be in PNG format, not GIF."/>

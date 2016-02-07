@@ -21,11 +21,11 @@ import com.thomasjensen.checkstyle.addons.util.Util;
 
 
 /**
- * Represents the possible modes of operation for the {@link RegexpOnFilenameCheck}.
+ * Represents the possible modes of operation for the {@link RegexpOnFilenameOrgCheck}.
  *
  * @author Thomas Jensen
  */
-public enum RegexpOnFilenameOption
+public enum RegexpOnFilenameOrgOption
 {
     /**
      * In REQUIRED mode, the regular expression must match the filename, and a violation is logged if the regexp does
@@ -50,8 +50,8 @@ public enum RegexpOnFilenameOption
      * @throws IllegalArgumentException the given String value does not match a valid enum value
      */
     @Nonnull
-    public static RegexpOnFilenameOption valueOfIgnoreCase(@Nonnull final String pValue)
+    public static RegexpOnFilenameOrgOption valueOfIgnoreCase(@Nonnull final String pValue)
     {
-        return Util.valueOfIgnoreCase(pValue, RegexpOnFilenameOption.class);
+        return Util.valueOfIgnoreCase(pValue, RegexpOnFilenameOrgOption.class);
     }
 }

@@ -146,17 +146,17 @@
     </rule>
 
     <!-- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -->
-    <!-- RegexpOnFilename                                                                      -->
+    <!-- RegexpOnFilenameOrg                                                                   -->
     <!-- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -->
     <rule>
-        <key>com.thomasjensen.checkstyle.addons.checks.regexp.RegexpOnFilenameCheck</key>
-        <name>Regexp On Filename</name>
+        <key>com.thomasjensen.checkstyle.addons.checks.regexp.RegexpOnFilenameOrgCheck</key>
+        <name>Regexp On Filename (Original)</name>
         <category name="regexp"/>
         <tag>checkstyle-addons</tag>
         <description><![CDATA[<p>Checks the names of files against a regular expression.</p>
-            <p><a href="http://checkstyle-addons.thomasjensen.com/v@version@/checks/regexp.html#RegexpOnFilename"
+            <p><a href="http://checkstyle-addons.thomasjensen.com/v@version@/checks/regexp.html#RegexpOnFilenameOrg"
                target="_blank">Full Documentation</a></p>]]></description>
-        <configKey>Checker/RegexpOnFilename</configKey>
+        <configKey>Checker/RegexpOnFilenameOrg</configKey>
         <cardinality>MULTIPLE</cardinality>
         <param key="selection" type="REGULAR_EXPRESSION">
             <description>Only files which match this expression will be checked. Leave blank for unrestricted.</description>
