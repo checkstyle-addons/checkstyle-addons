@@ -440,7 +440,6 @@ def void configureJavadocTask(final Javadoc pTask, final SourceSet pMainSourceSe
     pTask.options.use = true;
     pTask.options.windowTitle = project.ext.longName;
     pTask.options.splitIndex = false;
-    pTask.options.outputLevel = null;   // specify neither -quiet nor -verbose
     pTask.options.header = project.ext.longName;
     if (JavaVersion.VERSION_1_7.equals(pJavaLevel)) {
         pTask.options.links('https://jsr-305.googlecode.com/svn/trunk/javadoc/',
