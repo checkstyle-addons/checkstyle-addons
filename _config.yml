@@ -26,16 +26,11 @@ gaaccount: 'UA-23698164-6'
 permalink: /:year/:month/:title
 #paginate: 10
 
-highlighter: pygments
-markdown: kramdown
-kramdown:
-  input: GFM
-
 exclude: ['README.md', 'LICENSE', '*.iml', 'build', 'gradle']
 
 # checkstyle-addons custom variables
-latest_version: '1.3.2'
-latest_major: '1'
+latest_version: '2.0.0'
+latest_major: '2'
 latest_version_checkstyle: '6.4.1'
-latest_checkstyle_tested: '6.14'
+latest_checkstyle_tested: '6.15'
 maven-central-link: http://search.maven.org/#search%7Cgav%7C1%7Cg%3Acom.thomasjensen.checkstyle.addons
