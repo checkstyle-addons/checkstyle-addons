@@ -45,25 +45,34 @@ public class PropertyCatalogTest
         throws IOException
     {
         PropertyCatalogCheck check = new PropertyCatalogCheck(getPath("misc/InputPropertyCatalog1.java"));
-        check.setPropertyFile("|{0}|{1}|{2}|{3}|{4}|{5}|{6}|{7}|{8}|{9}|{10}|");
+        check.setPropertyFile("|{0}|{1}|{2}|{3}|{4}|{5}|{6}|{7}|{8}|{9}|{10}|{11}|");
 
-        String s = check.buildPropertyFilePath(new BinaryName("com.foo", "Bar", "Inner"));
+        String s = check.buildPropertyFilePath(new BinaryName("com.foo", "Bar", "Inner"), 0, true);
         Assert.assertEquals("|com.foo.Bar$Inner|com/foo/Bar/Inner|com.foo.Bar|com/foo/Bar|../../..|com/foo|Bar|Inner|"
-                + "src|test|resources|",
-            s);
+            + "src|test|resources||", s);
 
-        s = check.buildPropertyFilePath(new BinaryName("com.foo", "Bar", "Inner1", "Inner2"));
+        s = check.buildPropertyFilePath(new BinaryName("com.foo", "Bar", "Inner1", "Inner2"), 1, true);
         Assert.assertEquals(
             "|com.foo.Bar$Inner1$Inner2|com/foo/Bar/Inner1/Inner2|com.foo.Bar|com/foo/Bar|../../..|com/foo|Bar|Inner2|"
-                + "src|test|resources|",
-            s);
+                + "src|test|resources|src/|", s);
 
-        s = check.buildPropertyFilePath(new BinaryName("com.foo", "Bar"));
+        s = check.buildPropertyFilePath(new BinaryName("com.foo", "Bar"), 2, true);
         Assert.assertEquals("|com.foo.Bar|com/foo/Bar|com.foo.Bar|com/foo/Bar|../../..|com/foo|Bar|null|"
-            + "src|test|resources|", s);
+            + "src|test|resources|src/test/|", s);
 
-        s = check.buildPropertyFilePath(new BinaryName(null, "Bar"));
-        Assert.assertEquals("|Bar|Bar|Bar|Bar|..||Bar|null|src|test|resources|", s);
+        s = check.buildPropertyFilePath(new BinaryName(null, "Bar"), 3, true);
+        Assert.assertEquals("|Bar|Bar|Bar|Bar|..||Bar|null|src|test|resources|src/test/resources/|", s);
+    }
+
+
+
+    @Test(expected = ArrayIndexOutOfBoundsException.class)
+    public void testPropertyFileTemplateTooManyDirs()
+        throws IOException
+    {
+        PropertyCatalogCheck check = new PropertyCatalogCheck(getPath("misc/InputPropertyCatalog1.java"));
+        check.buildPropertyFilePath(new BinaryName(null, "Foo"), PropertyCatalogCheck.NUM_SUBDIRS + 1, true);
+        Assert.fail("Expected exception was not thrown");
     }
 
 
@@ -74,21 +83,21 @@ public class PropertyCatalogTest
     {
         PropertyCatalogCheck check = new PropertyCatalogCheck(getPath("misc/InputPropertyCatalog1.java"));
         check.setBaseDir("src");
-        check.setPropertyFile("|{0}|{1}|{2}|{3}|{4}|{5}|{6}|{7}|{8}|{9}|{10}|");
+        check.setPropertyFile("|{0}|{1}|{2}|{3}|{4}|{5}|{6}|{7}|{8}|{9}|{10}|{11}|");
 
-        String s = check.buildPropertyFilePath(new BinaryName("com.foo", "Bar", "Inner"));
+        String s = check.buildPropertyFilePath(new BinaryName("com.foo", "Bar", "Inner"), 0, true);
         Assert.assertEquals("|com.foo.Bar$Inner|com/foo/Bar/Inner|com.foo.Bar|com/foo/Bar|../../..|com/foo|Bar|Inner|"
-            + "test|resources|com|", s);
+            + "test|resources|com||", s);
 
         check.setBaseDir("src/test");   // forward slash
-        s = check.buildPropertyFilePath(new BinaryName("com.foo", "Bar", "Inner"));
+        s = check.buildPropertyFilePath(new BinaryName("com.foo", "Bar", "Inner"), 0, true);
         Assert.assertEquals("|com.foo.Bar$Inner|com/foo/Bar/Inner|com.foo.Bar|com/foo/Bar|../../..|com/foo|Bar|Inner|"
-            + "resources|com|thomasjensen|", s);
+            + "resources|com|thomasjensen||", s);
 
         check.setBaseDir("src\\test");   // backslash
-        s = check.buildPropertyFilePath(new BinaryName("com.foo", "Bar", "Inner"));
+        s = check.buildPropertyFilePath(new BinaryName("com.foo", "Bar", "Inner"), 0, true);
         Assert.assertEquals("|com.foo.Bar$Inner|com/foo/Bar/Inner|com.foo.Bar|com/foo/Bar|../../..|com/foo|Bar|Inner|"
-            + "resources|com|thomasjensen|", s);
+            + "resources|com|thomasjensen||", s);
     }
 
 
@@ -100,9 +109,44 @@ public class PropertyCatalogTest
         PropertyCatalogCheck check = new PropertyCatalogCheck(getPath("misc/InputPropertyCatalog1.java"));
         check.setPropertyFile("{8}");
 
-        String s = check.buildPropertyFilePath(new BinaryName("com.foo", "Bar", "Inner"));
+        String s = check.buildPropertyFilePath(new BinaryName("com.foo", "Bar", "Inner"), 1, true);
         Assert.assertNotNull(s);
         Assert.assertTrue(s.length() > 0);
+    }
+
+
+
+    @Test
+    public void testPropertyFileTemplateParentDynamic()
+        throws Exception
+    {
+        final DefaultConfiguration checkConfig = createCheckConfig(PropertyCatalogCheck.class);
+        checkConfig.addAttribute("selection", "foo\\.InputPropertyCatalog1");
+        checkConfig.addAttribute("propertyFile",
+            new File("{11}resources/com/thomasjensen/checkstyle/addons/checks/misc/{6}.properties").getCanonicalPath());
+        // If {11} should be resolved as "src/test/", the file is found and we get no error.
+
+        verify(checkConfig, getPath("misc/InputPropertyCatalog1.java"), new String[0]);
+    }
+
+
+
+    @Test
+    public void testPropertyFileTemplateParentDynamicNonExistent()
+        throws Exception
+    {
+        final DefaultConfiguration checkConfig = createCheckConfig(PropertyCatalogCheck.class);
+        checkConfig.addAttribute("selection", "foo\\.InputPropertyCatalog1");
+        checkConfig.addAttribute("propertyFile",
+            new File("{11}resources/nonexistent/{6}.properties").getCanonicalPath());
+
+        final String[] expected = {//
+            "4:20: Could not load property file for catalog 'com.foo.InputPropertyCatalog1': " + new File(
+                "{11}resources" + File.separator + "nonexistent" + File.separator + "InputPropertyCatalog1.properties")
+                .getCanonicalPath() + ", where '{11}' was successively replaced with all leading fragments of "
+                + "'src/test/resources/', including the empty String", //
+        };
+        verify(checkConfig, getPath("misc/InputPropertyCatalog1.java"), expected);
     }
 
 
@@ -288,8 +332,8 @@ public class PropertyCatalogTest
         checkConfig.addAttribute("propertyFile", getPath("misc/InputPropertyCatalog1-missing1.properties"));
 
         final String[] expected = {//
-            "8:16: Catalog entry 'KEY2' refers to missing property '1' in file: " + new File(getPath(
-                "misc/InputPropertyCatalog1-missing1.properties")).getCanonicalPath(), //
+            "8:16: Catalog entry 'KEY2' refers to missing property '1' in file: " + new File(
+                getPath("misc/InputPropertyCatalog1-missing1.properties")).getCanonicalPath(), //
         };
         verify(checkConfig, getPath("misc/InputPropertyCatalog6.java"), expected);
     }

@@ -17,7 +17,6 @@ package com.thomasjensen.checkstyle.addons.build;
 
 import java.io.Closeable;
 import java.io.IOException;
-import java.util.Map;
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 

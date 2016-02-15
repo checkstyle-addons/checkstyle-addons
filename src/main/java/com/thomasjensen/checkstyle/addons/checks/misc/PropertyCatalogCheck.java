@@ -68,6 +68,9 @@ public class PropertyCatalogCheck
      */
     private final Deque<Set<CatalogEntry>> catalogEntries = new LinkedList<Set<CatalogEntry>>();
 
+    /** Maximum number of directory levels that may exist between the base directory and an individual module root */
+    static final int NUM_SUBDIRS = 3;
+
     /*
      * --------------- Check properties: ---------------------------------------------------------------------------
      */
@@ -156,16 +159,46 @@ public class PropertyCatalogCheck
             return;
         }
 
-        final File propFile = normalize(buildPropertyFilePath(pBinaryClassName));
-        final Map<String, String> props = loadPropertyFile(propFile);
+        Map<String, String> props = null;
+        final File propFile = findPropertyFile(pBinaryClassName);
+        if (propFile != null) {
+            props = loadPropertyFile(propFile);
+        }
+
         if (props == null) {
             String absolutePath = propFile.getAbsolutePath();
             DetailAST classIdent = pAst.findFirstToken(TokenTypes.IDENT);
-            log(classIdent, "propertycatalog.file.notfound", pBinaryClassName, absolutePath);
+            if (propertyFileTemplate.contains("{11}")) {
+                String pathUsed = normalize(buildPropertyFilePath(pBinaryClassName, 0, false)).getAbsolutePath();
+                StringBuilder sb = new StringBuilder();
+                for (final String s : getFirstSubdirs(NUM_SUBDIRS)) {
+                    sb.append(s);
+                    sb.append('/');
+                }
+                log(classIdent, "propertycatalog.file.notfound.dynamic", pBinaryClassName, pathUsed, sb.toString());
+            }
+            else {
+                log(classIdent, "propertycatalog.file.notfound", pBinaryClassName, absolutePath);
+            }
             return;
         }
 
         checkCatalog(pAst, collectedEntries, props, propFile);
+    }
+
+
+
+    @CheckForNull
+    private File findPropertyFile(@Nonnull final BinaryName pBinaryClassName)
+    {
+        File result = null;
+        for (int i = 0; i <= NUM_SUBDIRS; i++) {
+            result = normalize(buildPropertyFilePath(pBinaryClassName, i, true));
+            if (result.canRead()) {
+                break;
+            }
+        }
+        return result;
     }
 
 
@@ -239,7 +272,8 @@ public class PropertyCatalogCheck
 
 
     @Nonnull
-    String buildPropertyFilePath(@Nonnull final BinaryName pBinaryClassName)
+    String buildPropertyFilePath(@Nonnull final BinaryName pBinaryClassName, final int pSubDirLevel,
+        final boolean pReplace11)
     {
         final String bcn = pBinaryClassName.toString();
 
@@ -250,14 +284,21 @@ public class PropertyCatalogCheck
         final String outerSimpleName = pBinaryClassName.getOuterSimpleName();
         final String innerSimpleName = pBinaryClassName.getInnerSimpleName();
 
-        String pg = pBinaryClassName.getPackage();
+        final String pg = pBinaryClassName.getPackage();
         final String pkgPath = pg != null ? pg.replace('.', '/') : "";
 
-        final int numSubdirs = 3;
-        String[] subdir = getFirstSubdirs(numSubdirs);
+        final StringBuilder ph11 = new StringBuilder();
+        final String[] subdirs = getFirstSubdirs(NUM_SUBDIRS);
+        if (pReplace11) {
+            for (int i = 0; i < pSubDirLevel; i++) {
+                ph11.append(subdirs[i]);
+                ph11.append('/');   // always slash, not backslash
+            }
+        }
 
         return MessageFormat.format(propertyFileTemplate, pBinaryClassName, completePath, outerFqcn, outerFqcnPath,
-            outerFqcnBackrefs, pkgPath, outerSimpleName, innerSimpleName, subdir[0], subdir[1], subdir[2]);
+            outerFqcnBackrefs, pkgPath, outerSimpleName, innerSimpleName, subdirs[0], subdirs[1], subdirs[2],
+            pReplace11 ? ph11.toString() : "{11}");
     }
 
 

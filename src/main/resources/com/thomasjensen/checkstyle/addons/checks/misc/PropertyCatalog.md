@@ -5,7 +5,7 @@ The *PropertyCatalog* check helps to keep a property file in sync with a piece o
   - an enum, where each enum constant requires an entry in the property file, or
   - a class or even an interface with constants, where each constant requires an entry in the property file.
 
-The property catalog and the properties file are expected to be connected to each other either by a configurable naming convention.
+The property catalog and the properties file are expected to be connected to each other by a configurable naming convention.
 
 ### Example
 
@@ -137,6 +137,8 @@ This check find duplicate keys in the Java code, but not in the property file. U
         <dd>simple name of the next subdirectory on the path to the message catalog (<code>subdir2</code>)</dd>
         <dt><code>{10}</code></dt>
         <dd>simple name of the third subdirectory on the path to the message catalog (<code>subdir3</code>)</dd>
+        <dt><code>{11}</code></dt>
+        <dd>This placeholder is special because it is dynamic. It is replaced by the empty String, <code>{8}/</code>, <code>{8}/{9}/</code>, and <code>{8}/{9}/{10}/</code> (in that order). Once the property file is found, the location is used. If not, the next variation is checked. This is useful when the same Checkstyle configuration is used for multiple projects with different structures.</dd>
     </dl>
     <span class="propdefault">(not set)</span></dd>
 
