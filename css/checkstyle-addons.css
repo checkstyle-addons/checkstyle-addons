@@ -23,6 +23,11 @@ code {
     background-color: #f5f5f5;
 }
 
+.csa-content, .checkpage {
+    max-width: 1024px;
+    margin: 0 auto;
+}
+
 .csa-main-title {
     margin-top: 15px;
     margin-bottom: 2em;
@@ -120,7 +125,8 @@ a.navbar-brand {
 
 
 h1 {
-    font-size: 34px;
+    font-size: 38px;
+    margin-bottom: 24px;
 }
 h2 {
     margin-top: 32px;

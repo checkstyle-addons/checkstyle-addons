@@ -1,5 +1,6 @@
 {% include header.html %}
 
+<div class="csa-content">
 <div class="article">
     <h1>{{ page.date | date: "%b %-d, %Y" }} - {{ page.title }}{% if page.release == true %} released{% endif %}</h1>
     <div class="post-content">
@@ -17,5 +18,6 @@
   <li><a href="{{ site.baseurl}}/whatsnew.html">All Posts</a></li>
   <li class="next{% if page.next %} {% else %} disabled{% endif %}"><a href="{{ site.baseurl}}{{ page.next.url }}">Newer &rarr;</a></li>
 </ul>
+</div>
 
 {% include footer.html %}
