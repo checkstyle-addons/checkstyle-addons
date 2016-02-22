@@ -166,19 +166,25 @@ public class PropertyCatalogCheck
         }
 
         if (props == null) {
-            String absolutePath = propFile.getAbsolutePath();
-            DetailAST classIdent = pAst.findFirstToken(TokenTypes.IDENT);
+            final DetailAST classIdent = pAst.findFirstToken(TokenTypes.IDENT);
+            String absPath = propFile.getAbsolutePath();
+            String dynamicDirsAll = null;
+
             if (propertyFileTemplate.contains("{11}")) {
-                String pathUsed = normalize(buildPropertyFilePath(pBinaryClassName, 0, false)).getAbsolutePath();
+                absPath = normalize(buildPropertyFilePath(pBinaryClassName, 0, false)).getAbsolutePath();
                 StringBuilder sb = new StringBuilder();
                 for (final String s : getFirstSubdirs(NUM_SUBDIRS)) {
                     sb.append(s);
                     sb.append('/');
                 }
-                log(classIdent, "propertycatalog.file.notfound.dynamic", pBinaryClassName, pathUsed, sb.toString());
+                dynamicDirsAll = sb.toString();
+            }
+
+            if (dynamicDirsAll != null && !"null/null/null/".equals(dynamicDirsAll)) {
+                log(classIdent, "propertycatalog.file.notfound.dynamic", pBinaryClassName, absPath, dynamicDirsAll);
             }
             else {
-                log(classIdent, "propertycatalog.file.notfound", pBinaryClassName, absolutePath);
+                log(classIdent, "propertycatalog.file.notfound", pBinaryClassName, absPath);
             }
             return;
         }
