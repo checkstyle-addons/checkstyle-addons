@@ -176,4 +176,23 @@
         </param>
     </rule>
 
+    <!-- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -->
+    <!-- RegexpOnString                                                                        -->
+    <!-- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -->
+    <rule>
+        <key>com.thomasjensen.checkstyle.addons.checks.regexp.RegexpOnStringCheck</key>
+        <name>Regexp On String</name>
+        <category name="regexp"/>
+        <tag>checkstyle-addons</tag>
+        <description><![CDATA[<p>Checks String literals against a regular expression. Matching Strings are flagged.</p>
+            <p><a href="http://checkstyle-addons.thomasjensen.com/v@version@/checks/regexp.html#RegexpOnString"
+               target="_blank">Full Documentation</a></p>]]></description>
+        <configKey>Checker/TreeWalker/RegexpOnString</configKey>
+        <cardinality>MULTIPLE</cardinality>
+        <param key="regexp" type="REGULAR_EXPRESSION">
+            <description>The regular expression used to find Strings to flag.</description>
+            <defaultValue>^(?!x)x</defaultValue>
+        </param>
+    </rule>
+
 </rules>

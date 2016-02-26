@@ -48,5 +48,19 @@
         <message-key key="regexp.filepath.required"/>
     </rule-metadata>
 
+    <!-- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -->
+    <!-- RegexpOnString                                                                        -->
+    <!-- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -->
+    <rule-metadata name="%RegexpOnString.name" internal-name="RegexpOnString" parent="Checker">
+        <alternative-name internal-name="com.thomasjensen.checkstyle.addons.checks.regexp.RegexpOnStringCheck"/>
+        <description>%RegexpOnString.desc</description>
+
+        <property-metadata name="regexp" datatype="Regex" default-value="^(?!x)x">
+            <description>%RegexpOnString.regexp</description>
+        </property-metadata>
+
+        <message-key key="regexp.string"/>
+    </rule-metadata>
+
 </rule-group-metadata>
 </checkstyle-metadata>
