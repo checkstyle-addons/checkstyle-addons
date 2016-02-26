@@ -125,7 +125,8 @@
             - ``{7}`` - simple name of the inner class, for example ``Inner``
             - ``{8}`` - simple name of the first subdirectory below the current working directory on the path to the message catalog, for example ``subdir1``
             - ``{9}`` - simple name of the next subdirectory on the path to the message catalog, for example ``subdir2``
-            - ``{10}`` - simple name of the third subdirectory on the path to the message catalog, for example ``subdir3``</description>
+            - ``{10}`` - simple name of the third subdirectory on the path to the message catalog, for example ``subdir3``
+            - ``{11}`` - This placeholder is special because it is dynamic. It is replaced by the empty String, ``{8}/``, ``{8}/{9}/``, and ``{8}/{9}/{10}/`` (in that order). Once the property file is found, the location is used. If not, the next variation is checked. This is useful when the same Checkstyle configuration is used for multiple projects with different structures.</description>
         </param>
         <param key="propertyFileEncoding" type="STRING">
             <description>Character encoding of the property files. Only relevant if non-ASCII characters appear in the property keys.</description>
