@@ -11,7 +11,7 @@ This is useful in order to ensure that Strings do not contain illegal content su
 <dt><span class="propname">regexp</span>
     <span class="proptype"><a href="http://checkstyle.sourceforge.net/property_types.html#regexp">regular expression</a></span></dt>
 <dd><span class="propdesc">The regular expression applied to each String literal found in a source file.</span>
-    <span class="propdefault"><code>^(?!x)x</code></span> (check disabled)</dd>
+    <span class="propdefault"><code>^(?!x)x</code> (check disabled)</span></dd>
 </dl>
 
 
