@@ -203,7 +203,7 @@ public final class Util
 
     /**
      * Find the left-most token in the given AST. The left-most token is the token with the smallest column number. Only
-     * token which are located on the same line as the given AST are considered.
+     * tokens which are located on the same line as the given AST are considered.
      *
      * @param pAst the root of a subtree. This token is also considered for the result.
      * @return the left-most token
