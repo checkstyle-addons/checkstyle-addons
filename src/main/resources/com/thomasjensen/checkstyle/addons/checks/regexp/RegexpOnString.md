@@ -31,6 +31,15 @@ To check for some hard-coded host names, including an optional custom message te
 </module>
 {% endhighlight %}
 
+The following configuration finds hard-coded IPv4 addresses:
+
+{% highlight xml %}
+<module name="RegexpOnString">
+  <property name="regexp" value="\b\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3}\b"/>
+  <message key="regexp.string" value="String &quot;{0}&quot; appears to contain a hard-coded IP address."/>
+</module>
+{% endhighlight %}
+
 
 ### Parent Module
 
