@@ -117,7 +117,7 @@ Entries are set in parentheses when either the Checkstyle version is less than 5
 
 ### M. {{ site.name }}
 
-{{ site.name }} features a build process that actually tries running the compiled checks against every single Checkstyle runtime ([example log file](https://travis-ci.org/{{ site.github }}/jobs/78284770#L353)). Since we have very [high test coverage](https://coveralls.io/builds/3457153), the fact that all unit tests complete successfully against a Checkstyle runtime is significant. {{ site.name }} also includes a reflection-based component that smoothes over the API differences between Checkstyle versions, so that we have full compatibility with every recent Checkstyle version.
+{{ site.name }} features a build process that actually tries running the compiled checks against every single Checkstyle runtime ([example log file](https://travis-ci.org/{{ site.github }}/jobs/78284770#L353)). Since we have very [high test coverage](https://coveralls.io/builds/3457153), the fact that all unit tests complete successfully against a Checkstyle runtime is significant. {{ site.name }} also includes a reflection-based component that smoothes over the API differences between Checkstyle versions, so that we have full compatibility with almost every recent Checkstyle version.
 
 <a name="n" class="csa-offset-anchor"/>
 
