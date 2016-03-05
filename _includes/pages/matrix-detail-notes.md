@@ -6,7 +6,15 @@ The following sections give information on how the data for each column was obta
 
 ### A. Checkstyle Version
 
-This column simply contains all Checkstyle versions that were released, starting from version 5.0. Version 5.0 was the first Checkstyle version to require Java 5. Since this document was started in 2015, older Java levels seem to be of historical rather than practical interest.
+This column simply contains all Checkstyle versions that were released, starting from version 5.0. Version 5.0 was the
+first Checkstyle version to require Java 5. Since this document was started in 2015, older Java levels seem to be of
+historical rather than practical interest.\\
+The versions shown in parentheses are considered "broken" because of serious compatibility problems (Checkstyle issues
+[#505](https://github.com/checkstyle/checkstyle/issues/505) and
+[#2997](https://github.com/checkstyle/checkstyle/issues/2997)). These issues mean that custom checks that were not
+explicitly built against that version of Checkstyle will likely fail to work. ({{ site.name }} works for 6.0,
+6.1, and 6.1.1 because it's `java6` variant is explicitly built against 6.1.1 and the error is consistent across these
+three versions.)
 
 <a name="c" class="csa-offset-anchor"/>
 
@@ -18,24 +26,44 @@ A check mark in this column indicates that a version upgrade of Checkstyle from 
 - does not generate different warnings than before if the same configuration is used.
 
 Only the differences to the immediately preceding version are considered.
-This information was primarily gathered from the [release notes](http://checkstyle.sourceforge.net/releasenotes.html), but additional analysis of the commit history on GitHub has turned up further breaking changes:
+This information was primarily gathered from the [release notes](http://checkstyle.sourceforge.net/releasenotes.html),
+but additional analysis of the commit history on GitHub has turned up further breaking changes:
 
 <div class="checkpage"><dl>
 <dt class="title">Checkstyle</dt><dd class="title">– Breaking Change</dd>
-<dt>6.12.1</dt><dd>– default value of property <code>processJavadoc</code> changed in <i>UnusedImports</i> check (commit <a href="https://github.com/checkstyle/checkstyle/commit/afbb944fe23b1be090ed69bfb97641be9dc2842c">#afbb944</a>, mentioned in release notes as "bug fix")</dd>
-<dt>6.12</dt><dd>– <code>package</code> declarations are no longer covered by <i>LineLength</i> check (commit <a href="https://github.com/checkstyle/checkstyle/commit/9a39d19a31f06c8614d33fcc9c3f7654ec9cdd9f">#9a39d19</a>, mentioned in release notes as "bug fix")</dd>
-<dt>6.4.1</dt><dd>– property <code>immutableClassNames</code> renamed to <code>immutableClassCanonicalNames</code> in <i>VisibilityModifier</i> check (commit <a href="https://github.com/checkstyle/checkstyle/commit/de4485a22bfe8eafc3c2e273fd328a0221d0ff9e">#de4485a</a>, mentioned in release notes as "bug fix")</dd>
-<dt>6.3</dt><dd>– Issue <a href="https://github.com/checkstyle/checkstyle/issues/585">#585</a> mentioned as the only breaking change in the release notes is not in fact breaking anything, but the <i>IllegalType</i> check got its default illegal types changed (commit <a href="https://github.com/checkstyle/checkstyle/commit/677acc1e8491acffd24c859e553b06362da0d471">#677acc1</a>)</dd>
-<dt>5.8</dt><dd>– <i>TypeName</i> check now covers enums and annotations (commits <a href="https://github.com/checkstyle/checkstyle/commit/686d009cf4d21d0ace52b9e7dccc848e8b9ce91a">#686d009</a> and <a href="https://github.com/checkstyle/checkstyle/commit/f3d433723bebb55e09eba1562b6c75407f6fe46f">#f3d4337</a>, mentioned in release notes as "new feature" and "bug fix")</dd>
+<dt>6.12.1</dt><dd>– default value of property <code>processJavadoc</code> changed in <i>UnusedImports</i> check
+(commit <a href="https://github.com/checkstyle/checkstyle/commit/afbb944fe23b1be090ed69bfb97641be9dc2842c">#afbb944</a>,
+mentioned in release notes as "bug fix")</dd>
+<dt>6.12</dt><dd>– <code>package</code> declarations are no longer covered by <i>LineLength</i> check (commit
+<a href="https://github.com/checkstyle/checkstyle/commit/9a39d19a31f06c8614d33fcc9c3f7654ec9cdd9f">#9a39d19</a>,
+mentioned in release notes as "bug fix")</dd>
+<dt>6.4.1</dt><dd>– property <code>immutableClassNames</code> renamed to <code>immutableClassCanonicalNames</code> in
+<i>VisibilityModifier</i> check (commit
+<a href="https://github.com/checkstyle/checkstyle/commit/de4485a22bfe8eafc3c2e273fd328a0221d0ff9e">#de4485a</a>,
+mentioned in release notes as "bug fix")</dd>
+<dt>6.3</dt><dd>– Issue <a href="https://github.com/checkstyle/checkstyle/issues/585">#585</a> mentioned as the only
+breaking change in the release notes is not in fact breaking anything, but the <i>IllegalType</i> check got its default
+illegal types changed (commit
+<a href="https://github.com/checkstyle/checkstyle/commit/677acc1e8491acffd24c859e553b06362da0d471">#677acc1</a>)</dd>
+<dt>5.8</dt><dd>– <i>TypeName</i> check now covers enums and annotations (commits
+<a href="https://github.com/checkstyle/checkstyle/commit/686d009cf4d21d0ace52b9e7dccc848e8b9ce91a">#686d009</a> and
+<a href="https://github.com/checkstyle/checkstyle/commit/f3d433723bebb55e09eba1562b6c75407f6fe46f">#f3d4337</a>,
+mentioned in release notes as "new feature" and "bug fix")</dd>
 </dl></div>
 
-This is not a complete list of breaking changes - only the first breaking change was confirmed, but more may exist. The breaking change may not affect your configuration, if you don't use the changed check.
+This is not a complete list of breaking changes - only the first breaking change was confirmed, but more may exist. The
+breaking change may not affect your configuration, if you don't use the changed check.
 
 <a name="d" class="csa-offset-anchor"/>
 
 ### D. Public API backward compatible?
 
-A check mark in this column indicates that a version upgrade of Checkstyle from the previous version does not require changes to a custom check, as long as that custom check uses only the public API. Cases where the custom check is implemented by subclassing a built-in check were not considered. Only the differences to the immediately preceding version are considered. This information was primarily gathered from the [release notes](http://checkstyle.sourceforge.net/releasenotes.html), but additional analysis of the commit history on GitHub has turned up further breaking changes:
+A check mark in this column indicates that a version upgrade of Checkstyle from the previous version does not require
+changes to a custom check, as long as that custom check uses only the public API. Cases where the custom check is
+implemented by subclassing a built-in check were not considered. Only the differences to the immediately preceding
+version are considered. This information was primarily gathered from the
+[release notes](http://checkstyle.sourceforge.net/releasenotes.html), but additional analysis of the commit history on
+GitHub has turned up further breaking changes:
 
 <div class="checkpage"><dl>
 <dt class="title">Checkstyle</dt><dd class="title">– Breaking Change</dd>
@@ -102,15 +130,21 @@ TODO We may have to improve on this data by actually trying the different combin
 
 ### K. Gradle
 
-In [Gradle](https://gradle.org/) 1.0, the Gradle Checkstyle plugin was created by extracting it out of the Code Quality plugin which existed in Gradle&nbsp;0.9. At the same time, the `toolVersion` property was introduced to the Gradle Checkstyle plugin, which allows choosing the Checkstyle version to run. Previous versions of Gradle used hardcoded Checkstyle versions, which is why they are not included in our matrix.
-Up to a breaking change in Checkstyle 6.8 (Checkstyle issue [#1108](https://github.com/checkstyle/checkstyle/issues/1108)), Gradle was compatible with all versions of Checkstyle that are available on Maven Central or Bintray jcenter. Checkstyle 5.2 is the oldest version available there, so it is also the oldest you can use with Gradle, unless you are willing to provide it via your own infrastructure. Because of this, the corresponding entries are set in parentheses.
+In [Gradle](https://gradle.org/) 1.0, the Gradle Checkstyle plugin was created by extracting it out of the Code Quality
+plugin which existed in Gradle&nbsp;0.9. At the same time, the `toolVersion` property was introduced to the Gradle
+Checkstyle plugin, which allows choosing the Checkstyle version to run. Previous versions of Gradle used hardcoded
+Checkstyle versions, which is why they are not included in our matrix.\\
+Up to a breaking change in Checkstyle 6.8 (Checkstyle issue [#1108](https://github.com/checkstyle/checkstyle/issues/1108)),
+Gradle was compatible with all versions of Checkstyle that are available on Maven Central or Bintray jcenter.
+Checkstyle 5.2 is the oldest version available there, so it is also the oldest you can use with Gradle, unless you
+are willing to provide it via your own infrastructure. Because of this, the corresponding entries are set in parentheses.\\
 This data was gathered by GitHub source code analysis.
 
 <a name="l" class="csa-offset-anchor"/>
 
 ### L. Gradle Checkstyle Plugin
 
-This column shows which versions of Checkstyle are used as the default version by the [Gradle Checkstyle Plugin](https://docs.gradle.org/current/userguide/checkstyle_plugin.html). This information was gained by analyzing the [source code of the plugin](https://github.com/gradle/gradle/tree/REL_2.7/subprojects/code-quality/src/main/groovy/org/gradle/api/plugins/quality) on GitHub. The default version gets used when `toolVersion` is not set. A checkmark (✓) indicates that the Checkstyle version is available via `toolVersion`, but not by default. The bottom line is that one should *always* set `toolVersion`.
+This column shows which versions of Checkstyle are used as the default version by the [Gradle Checkstyle Plugin](https://docs.gradle.org/current/userguide/checkstyle_plugin.html). This information was gained by analyzing the [source code of the plugin](https://github.com/gradle/gradle/tree/REL_2.7/subprojects/code-quality/src/main/groovy/org/gradle/api/plugins/quality) on GitHub. The default version gets used when `toolVersion` is not set. A checkmark (✓) indicates that the Checkstyle version is available via `toolVersion`, but not by default. The bottom line is that one should *always* set `toolVersion`.\\
 Entries are set in parentheses when either the Checkstyle version is less than 5.2 (because then it is not available on Maven Central or Bintray jcenter), or the Gradle version is less than 1.0 (because then no Gradle Checkstyle plugin exists).
 
 <a name="m" class="csa-offset-anchor"/>
@@ -123,8 +157,8 @@ Entries are set in parentheses when either the Checkstyle version is less than 5
 
 ### N. SevNTU Checkstyle
 
-For [SevNTU Checkstyle](https://github.com/sevntu-checkstyle/sevntu.checkstyle), source versions are tagged on GitHub for versions 1.8.0 and upwards, so source archives are easily available for downloading. For versions down to 1.5.x, POM files could still be found with the [binaries](https://github.com/sevntu-checkstyle/sevntu.checkstyle/tree/gh-pages/maven2/com/github/sevntu/checkstyle/sevntu-checks) which give information on the Checkstyle version for which that version of SevNTU Checkstyle was built. For versions 1.8.0 and upwards, SevNTU Checkstyle is compiled and the unit tests are executed against the different Checkstyle runtimes. When all tests pass without errors, the versions are considered compatible. Versions declared in the POM files are *always* considered compatible (and proved to be so in the tests conducted). Compilation and tests for SevNTU Checkstyle versions 1.13.0 and upwards were performed with Java&nbsp;7, all previous versions were compiled and tested with Java&nbsp;6.
-Compatibility was analyzed based on the assumption that the full SevNTU Checkstyle feature set is required to work. In many cases, only a handful of tests were failing, so it may still be an option to use SevNTU Checkstyle with an incompatible version of Checkstyle, if the subset of SevNTU checks you are using work.
+For [SevNTU Checkstyle](https://github.com/sevntu-checkstyle/sevntu.checkstyle), source versions are tagged on GitHub for versions 1.8.0 and upwards, so source archives are easily available for downloading. For versions down to 1.5.x, POM files could still be found with the [binaries](https://github.com/sevntu-checkstyle/sevntu.checkstyle/tree/gh-pages/maven2/com/github/sevntu/checkstyle/sevntu-checks) which give information on the Checkstyle version for which that version of SevNTU Checkstyle was built. For versions 1.8.0 and upwards, SevNTU Checkstyle is compiled and the unit tests are executed against the different Checkstyle runtimes. When all tests pass without errors, the versions are considered compatible. Versions declared in the POM files are *always* considered compatible (and proved to be so in the tests conducted). Compilation and tests for SevNTU Checkstyle versions 1.13.0 and upwards were performed with Java&nbsp;7, all previous versions were compiled and tested with Java&nbsp;6.\\
+Compatibility was analyzed based on the assumption that the full SevNTU Checkstyle feature set is required to work. In many cases, only a handful of tests were failing, so it may still be an option to use SevNTU Checkstyle with an incompatible version of Checkstyle, if the subset of SevNTU checks you are using work.\\
 Also, you may be able to set up the SevNTU checks in a separate job with a configuration file of its own. That second job would use a version of Checkstyle that is compatible with SevNTU Checkstyle (for example, v6.6).
 
 <a name="o" class="csa-offset-anchor"/>

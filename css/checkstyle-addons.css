@@ -368,6 +368,17 @@ table.table-header-rotated-jb td.upcoming > img {
     width: 8px;
     height: auto;
 }
+
+table.table-header-rotated-jb th.broken {
+    font-weight: normal;
+}
+table.table-header-rotated-jb th.broken:before{
+    content: "(";
+}
+table.table-header-rotated-jb th.broken:after{
+    content: ")";
+}
+
 table.table-header-rotated-jb tbody > tr:hover {
     background-color: #def2fc;
 }
