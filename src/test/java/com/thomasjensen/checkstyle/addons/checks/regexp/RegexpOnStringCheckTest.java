@@ -36,24 +36,23 @@ public class RegexpOnStringCheckTest
 
 
     @Test
-    public void testMethodName()
+    public void testSingleLiteralSubstring()
         throws Exception
     {
         final DefaultConfiguration checkConfig = createCheckConfig(RegexpOnStringCheck.class);
         checkConfig.addAttribute("regexp", "oo");
 
         final String[] expected = {//
-            "10:25: String literal \"foo\" matches illegal pattern 'oo'.", //
-            "12:38: String literal \"foo\" matches illegal pattern 'oo'.", //
-            "14:28: String literal \"foo\" matches illegal pattern 'oo'.", //
-            "16:42: String literal \"foo\" matches illegal pattern 'oo'.", //
-            "20:13: String literal \"foo\" matches illegal pattern 'oo'.", //
-            "21:20: String literal \"foo\" matches illegal pattern 'oo'.", //
-            "27:23: String literal \"foo\" matches illegal pattern 'oo'.", //
-            "30:20: String literal \"foo\" matches illegal pattern 'oo'.", //
-            "31:17: String literal \"foo\" matches illegal pattern 'oo'.", //
-            "36:38: String literal \"foo\" matches illegal pattern 'oo'.", //
-            "40:20: String literal \"foo\" matches illegal pattern 'oo'.", //
+            "10:25: String \"foo\" matches illegal pattern 'oo'.", //
+            "12:38: String \"foo\" matches illegal pattern 'oo'.", //
+            "14:28: String \"foo\" matches illegal pattern 'oo'.", //
+            "16:42: String \"foo\" matches illegal pattern 'oo'.", //
+            "20:13: String \"foo\" matches illegal pattern 'oo'.", //
+            "21:20: String \"foo\" matches illegal pattern 'oo'.", //
+            "27:23: String \"foo\" matches illegal pattern 'oo'.", //
+            "30:20: String \"foobar\" matches illegal pattern 'oo'.", //
+            "36:38: String \"foo\" matches illegal pattern 'oo'.", //
+            "40:20: String \"foo\" matches illegal pattern 'oo'.", //
         };
         verify(checkConfig, getPath("regexp/InputRegexpOnString.java"), expected);
     }
@@ -68,7 +67,22 @@ public class RegexpOnStringCheckTest
         checkConfig.addAttribute("regexp", "^literal1$");
 
         final String[] expected = {//
-            "14:35: String literal \"literal1\" matches illegal pattern '^literal1$'.", //
+            "14:35: String \"literal1\" matches illegal pattern '^literal1$'.", //
+        };
+        verify(checkConfig, getPath("regexp/InputRegexpOnString.java"), expected);
+    }
+
+
+
+    @Test
+    public void testCompleteLiteralSegmented()
+        throws Exception
+    {
+        final DefaultConfiguration checkConfig = createCheckConfig(RegexpOnStringCheck.class);
+        checkConfig.addAttribute("regexp", "^literal3$");
+
+        final String[] expected = {//
+            "79:26: String \"literal3\" matches illegal pattern '^literal3$'.", //
         };
         verify(checkConfig, getPath("regexp/InputRegexpOnString.java"), expected);
     }
@@ -83,7 +97,78 @@ public class RegexpOnStringCheckTest
         checkConfig.addAttribute("regexp", "^$");
 
         final String[] expected = {//
-            "45:28: String literal \"\" matches illegal pattern '^$'.", //
+            "46:28: String \"\" matches illegal pattern '^$'.", //
+        };
+        verify(checkConfig, getPath("regexp/InputRegexpOnString.java"), expected);
+    }
+
+
+
+    @Test
+    public void testConcat()
+        throws Exception
+    {
+        final DefaultConfiguration checkConfig = createCheckConfig(RegexpOnStringCheck.class);
+        checkConfig.addAttribute("regexp", "abcde");
+
+        final String[] expected = {//
+            "41:21: String \"abcdefghi\" matches illegal pattern 'abcde'.", //
+            "50:23: String \"abcdefghi\" matches illegal pattern 'abcde'.", //
+            "53:20: String \"abcdefghi\" matches illegal pattern 'abcde'.", //
+            "60:25: String \"abcdef\" matches illegal pattern 'abcde'.", //
+            "62:38: String \"abcdefghi\" matches illegal pattern 'abcde'.", //
+            "64:28: String \"abcdefghi\" matches illegal pattern 'abcde'.", //
+            "66:42: String \"abcdef\" matches illegal pattern 'abcde'.", //
+        };
+        verify(checkConfig, getPath("regexp/InputRegexpOnString.java"), expected);
+    }
+
+
+
+    @Test
+    public void testOverlap()
+        throws Exception
+    {
+        final DefaultConfiguration checkConfig = createCheckConfig(RegexpOnStringCheck.class);
+        checkConfig.addAttribute("regexp", "zzz");
+
+        final String[] expected = {//
+            "69:11: String \"aaazzz\" matches illegal pattern 'zzz'.", //
+        };
+        verify(checkConfig, getPath("regexp/InputRegexpOnString.java"), expected);
+    }
+
+
+
+    @Test
+    public void testConcat2()
+        throws Exception
+    {
+        final DefaultConfiguration checkConfig = createCheckConfig(RegexpOnStringCheck.class);
+        checkConfig.addAttribute("regexp", "defghi");
+
+        final String[] expected = {//
+            "41:21: String \"abcdefghi\" matches illegal pattern 'defghi'.", //
+            "50:23: String \"abcdefghi\" matches illegal pattern 'defghi'.", //
+            "53:20: String \"abcdefghi\" matches illegal pattern 'defghi'.", //
+            "62:38: String \"abcdefghi\" matches illegal pattern 'defghi'.", //
+            "64:28: String \"abcdefghi\" matches illegal pattern 'defghi'.", //
+        };
+        verify(checkConfig, getPath("regexp/InputRegexpOnString.java"), expected);
+    }
+
+
+
+    @Test
+    public void testVeryLongString()
+        throws Exception
+    {
+        final DefaultConfiguration checkConfig = createCheckConfig(RegexpOnStringCheck.class);
+        checkConfig.addAttribute("regexp", "eee");
+
+        final String[] expected = {//
+            "75:11: String \"aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa...\" "
+                + "matches illegal pattern 'eee'.", //
         };
         verify(checkConfig, getPath("regexp/InputRegexpOnString.java"), expected);
     }

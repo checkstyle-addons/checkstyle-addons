@@ -4,6 +4,8 @@ This check applies a regular expression to String literals found in the source.
 
 This is useful in order to ensure that Strings do not contain illegal content such as hard-coded host names, IP addresses, known user names, or improperly encoded characters.
 
+This check covers single String literals that appear anywhere in the source, and it also covers expressions which consist only of String literals concatenated with `+` (as those are going to be made into single String literals by the compiler).
+
 
 ### Properties
 

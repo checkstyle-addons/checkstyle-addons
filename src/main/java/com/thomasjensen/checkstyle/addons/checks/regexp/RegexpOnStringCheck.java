@@ -18,6 +18,7 @@ package com.thomasjensen.checkstyle.addons.checks.regexp;
 import java.util.Collections;
 import java.util.Set;
 import java.util.regex.Pattern;
+import javax.annotation.CheckForNull;
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 
@@ -29,9 +30,8 @@ import com.thomasjensen.checkstyle.addons.util.Util;
 
 
 /**
- * This check applies a regular expression to String literals found in the source.
- *
- * <p><a href="http://checkstyle-addons.thomasjensen.com/latest/checks/regexp.html#RegexpOnString"
+ * This check applies a regular expression to String literals found in the source. <p><a
+ * href="http://checkstyle-addons.thomasjensen.com/latest/checks/regexp.html#RegexpOnString"
  * target="_blank">Documentation</a></p>
  *
  * @author Thomas Jensen
@@ -39,7 +39,9 @@ import com.thomasjensen.checkstyle.addons.util.Util;
 public class RegexpOnStringCheck
     extends AbstractAddonsCheck
 {
-    private static final Set<Integer> TOKEN_TYPES = Collections.singleton(Integer.valueOf(TokenTypes.STRING_LITERAL));
+    private static final Set<Integer> TOKEN_TYPES = Collections.singleton(Integer.valueOf(TokenTypes.EXPR));
+
+    private static final int MAX_OUPUT_STRING_LEN = 64;
 
     /** the given regexp */
     private Pattern regexp = Util.NEVER_MATCH;
@@ -57,10 +59,90 @@ public class RegexpOnStringCheck
     @Override
     protected void visitToken(@Nullable final BinaryName pBinaryClassName, @Nonnull final DetailAST pAst)
     {
-        final String s = pAst.getText().substring(1, pAst.getText().length() - 1);
-        if (regexp.matcher(s).find()) {
-            log(pAst, "regexp.string", s, regexp);
+        final DetailAST ast = pAst.getNumberOfChildren() == 1 ? pAst.getFirstChild() : null;
+        if (ast != null && isStringExpression(ast)) {
+            final String text = getConcatenation(ast);
+            if (matchesWithoutQuotes(text)) {
+                DetailAST hilite = findLiteralToHighlight(ast, true);
+                if (hilite == null) {
+                    hilite = findLiteralToHighlight(ast, false);
+                }
+                log(hilite, "regexp.string", clipText(text), regexp);
+            }
         }
+    }
+
+
+
+    private String clipText(@Nonnull final String pText)
+    {
+        final String snipMark = "...";
+        if (pText.length() - 2 > MAX_OUPUT_STRING_LEN) {  // pText includes quotes
+            return pText.substring(0, MAX_OUPUT_STRING_LEN + 1 - snipMark.length()) + snipMark + "\"";
+        }
+        return pText;
+    }
+
+
+
+    private boolean matchesWithoutQuotes(@Nonnull final String pText)
+    {
+        return regexp.matcher(pText.substring(1, pText.length() - 1)).find();
+    }
+
+
+
+    private boolean isStringExpression(@Nonnull final DetailAST pAst)
+    {
+        if (pAst.getType() == TokenTypes.STRING_LITERAL) {
+            return true;
+        }
+        if (pAst.getType() == TokenTypes.PLUS) {
+            return isStringExpression(pAst.getFirstChild()) && isStringExpression(pAst.getLastChild());
+        }
+        return false;
+    }
+
+
+
+    @CheckForNull
+    private String getConcatenation(@Nonnull final DetailAST pAst)
+    {
+        String result = null;
+        if (pAst.getType() == TokenTypes.PLUS) {
+            String left = getConcatenation(pAst.getFirstChild());
+            String right = getConcatenation(pAst.getLastChild());
+            if (left != null && right != null) {
+                result = left.substring(0, left.length() - 1) + right.substring(1);    // without middle quotes
+            }
+        }
+        else if (pAst.getType() == TokenTypes.STRING_LITERAL) {
+            result = pAst.getText();
+        }
+        return result;
+    }
+
+
+
+    @CheckForNull
+    private DetailAST findLiteralToHighlight(@Nonnull final DetailAST pAst, final boolean pUseMatcher)
+    {
+        DetailAST result = null;
+        if (pAst.getType() == TokenTypes.STRING_LITERAL) {
+            if (!pUseMatcher || matchesWithoutQuotes(pAst.getText())) {
+                result = pAst;
+            }
+            else {
+                result = null;
+            }
+        }
+        else { // PLUS
+            result = findLiteralToHighlight(pAst.getFirstChild(), pUseMatcher);
+            if (result == null) {
+                result = findLiteralToHighlight(pAst.getLastChild(), pUseMatcher);
+            }
+        }
+        return result;
     }
 
 
