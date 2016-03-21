@@ -128,16 +128,9 @@ public class RegexpOnStringCheck
     {
         DetailAST result = null;
         for (DetailAST a = pAst.getFirstChild(); a != null; a = a.getNextSibling()) {
-            if (result != null) {
-                if (a.getType() != TokenTypes.RPAREN) {
-                    result = null;
-                    break;
-                }
-            }
-            else {
-                if (a.getType() != TokenTypes.LPAREN && a.getType() != TokenTypes.RPAREN) {
-                    result = a;
-                }
+            if (a.getType() != TokenTypes.LPAREN && a.getType() != TokenTypes.RPAREN) {
+                result = a;
+                break;
             }
         }
         return result;
@@ -160,6 +153,9 @@ public class RegexpOnStringCheck
     {
         if (pAst.getType() == TokenTypes.STRING_LITERAL) {
             return true;
+        }
+        if (pAst.getType() == TokenTypes.EXPR) {
+            return false;
         }
         for (DetailAST a = pAst.getFirstChild(); a != null; a = a.getNextSibling()) {
             if (containsStringLiteral(a)) {
