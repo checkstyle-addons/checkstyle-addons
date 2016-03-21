@@ -15,7 +15,9 @@ package com.thomasjensen.checkstyle.addons.checks.regexp;
  * program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+import java.util.ArrayList;
 import java.util.Collections;
+import java.util.List;
 import java.util.Set;
 import java.util.regex.Pattern;
 import javax.annotation.CheckForNull;
@@ -48,6 +50,47 @@ public class RegexpOnStringCheck
 
 
 
+    /** An occurrence of a String found in a Java source file, together with its first AST. */
+    private static class FoundString
+    {
+        private final StringBuilder sb;
+
+        private final DetailAST ast;
+
+
+
+        public FoundString(@Nonnull final String pString, @Nonnull final DetailAST pAst)
+        {
+            sb = new StringBuilder(pString);
+            ast = pAst;
+        }
+
+
+
+        public void addString(@Nonnull final String pString)
+        {
+            sb.append(pString);
+        }
+
+
+
+        @Nonnull
+        public String getString()
+        {
+            return sb.toString();
+        }
+
+
+
+        @Nonnull
+        public DetailAST getAst()
+        {
+            return ast;
+        }
+    }
+
+
+
     @Override
     public Set<Integer> getRelevantTokens()
     {
@@ -59,17 +102,45 @@ public class RegexpOnStringCheck
     @Override
     protected void visitToken(@Nullable final BinaryName pBinaryClassName, @Nonnull final DetailAST pAst)
     {
-        final DetailAST ast = pAst.getNumberOfChildren() == 1 ? pAst.getFirstChild() : null;
-        if (ast != null && isStringExpression(ast)) {
-            final String text = getConcatenation(ast);
-            if (matchesWithoutQuotes(text)) {
-                DetailAST hilite = findLiteralToHighlight(ast, true);
-                if (hilite == null) {
-                    hilite = findLiteralToHighlight(ast, false);
+        final DetailAST ast = getExprAst(pAst);
+        if (ast != null && containsStringLiteral(ast)) {
+            final List<FoundString> foundStrings = findAllStrings(ast);
+            for (final FoundString foundString : foundStrings) {
+                final String text = foundString.getString();
+                if (regexp.matcher(text).find()) {
+                    log(foundString.getAst(), "regexp.string", clipText(text), regexp);
                 }
-                log(hilite, "regexp.string", clipText(text), regexp);
             }
         }
+    }
+
+
+
+    /**
+     * Find the "meaningful" child of an EXPR AST. This is usually the only child present, but it may be surrounded by
+     * parentheses.
+     *
+     * @param pAst an EXPR AST
+     * @return the meaningful child of the EXPR, or <code>null</code> if such could not be determined
+     */
+    @CheckForNull
+    private DetailAST getExprAst(@Nonnull final DetailAST pAst)
+    {
+        DetailAST result = null;
+        for (DetailAST a = pAst.getFirstChild(); a != null; a = a.getNextSibling()) {
+            if (result != null) {
+                if (a.getType() != TokenTypes.RPAREN) {
+                    result = null;
+                    break;
+                }
+            }
+            else {
+                if (a.getType() != TokenTypes.LPAREN && a.getType() != TokenTypes.RPAREN) {
+                    result = a;
+                }
+            }
+        }
+        return result;
     }
 
 
@@ -77,70 +148,97 @@ public class RegexpOnStringCheck
     private String clipText(@Nonnull final String pText)
     {
         final String snipMark = "...";
-        if (pText.length() - 2 > MAX_OUPUT_STRING_LEN) {  // pText includes quotes
-            return pText.substring(0, MAX_OUPUT_STRING_LEN + 1 - snipMark.length()) + snipMark + "\"";
+        if (pText.length() > MAX_OUPUT_STRING_LEN) {
+            return pText.substring(0, MAX_OUPUT_STRING_LEN - snipMark.length()) + snipMark;
         }
         return pText;
     }
 
 
 
-    private boolean matchesWithoutQuotes(@Nonnull final String pText)
-    {
-        return regexp.matcher(pText.substring(1, pText.length() - 1)).find();
-    }
-
-
-
-    private boolean isStringExpression(@Nonnull final DetailAST pAst)
+    private boolean containsStringLiteral(@Nonnull final DetailAST pAst)
     {
         if (pAst.getType() == TokenTypes.STRING_LITERAL) {
             return true;
         }
-        if (pAst.getType() == TokenTypes.PLUS) {
-            return isStringExpression(pAst.getFirstChild()) && isStringExpression(pAst.getLastChild());
+        for (DetailAST a = pAst.getFirstChild(); a != null; a = a.getNextSibling()) {
+            if (containsStringLiteral(a)) {
+                return true;
+            }
         }
         return false;
     }
 
 
 
-    @CheckForNull
-    private String getConcatenation(@Nonnull final DetailAST pAst)
+    private void flatten(@Nonnull final DetailAST pAst, @Nonnull final List<DetailAST> pFlattenedList)
     {
-        String result = null;
         if (pAst.getType() == TokenTypes.PLUS) {
-            String left = getConcatenation(pAst.getFirstChild());
-            String right = getConcatenation(pAst.getLastChild());
-            if (left != null && right != null) {
-                result = left.substring(0, left.length() - 1) + right.substring(1);    // without middle quotes
+            boolean first = true;
+            for (DetailAST a = pAst.getFirstChild(); a != null; a = a.getNextSibling()) {
+                if (a.getType() != TokenTypes.LPAREN && a.getType() != TokenTypes.RPAREN) {
+                    flatten(a, pFlattenedList);
+                    if (first) {
+                        pFlattenedList.add(pAst);
+                        first = false;
+                    }
+                }
             }
         }
-        else if (pAst.getType() == TokenTypes.STRING_LITERAL) {
-            result = pAst.getText();
+        else if (pAst.getType() == TokenTypes.EXPR) {
+            return;
         }
-        return result;
+        else {
+            if (pAst.getNumberOfChildren() > 0) {
+                for (DetailAST a = pAst.getFirstChild(); a != null; a = a.getNextSibling()) {
+                    flatten(a, pFlattenedList);
+                    if (a != pAst.getLastChild()) {
+                        pFlattenedList.add(pAst);    // we don't care this gets added too often
+                    }
+                }
+            }
+            else {
+                pFlattenedList.add(pAst);
+            }
+        }
     }
 
 
 
-    @CheckForNull
-    private DetailAST findLiteralToHighlight(@Nonnull final DetailAST pAst, final boolean pUseMatcher)
+    @Nonnull
+    private String removeQuotes(@Nonnull final String pString)
     {
-        DetailAST result = null;
-        if (pAst.getType() == TokenTypes.STRING_LITERAL) {
-            if (!pUseMatcher || matchesWithoutQuotes(pAst.getText())) {
-                result = pAst;
+        return pString.substring(1, pString.length() - 1);
+    }
+
+
+
+    @Nonnull
+    private List<FoundString> findAllStrings(@Nonnull final DetailAST pAst)
+    {
+        final List<DetailAST> flattened = new ArrayList<DetailAST>();
+        flatten(pAst, flattened);
+
+        final List<FoundString> result = new ArrayList<FoundString>();
+        FoundString current = null;
+        for (final DetailAST a : flattened) {
+            if (a.getType() == TokenTypes.STRING_LITERAL) {
+                if (current != null) {
+                    current.addString(removeQuotes(a.getText()));
+                }
+                else {
+                    current = new FoundString(removeQuotes(a.getText()), a);
+                }
             }
-            else {
-                result = null;
+            else if (a.getType() != TokenTypes.PLUS) {
+                if (current != null) {
+                    result.add(current);
+                    current = null;
+                }
             }
         }
-        else { // PLUS
-            result = findLiteralToHighlight(pAst.getFirstChild(), pUseMatcher);
-            if (result == null) {
-                result = findLiteralToHighlight(pAst.getLastChild(), pUseMatcher);
-            }
+        if (current != null) {
+            result.add(current);
         }
         return result;
     }

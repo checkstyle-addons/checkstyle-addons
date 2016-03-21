@@ -28,7 +28,7 @@ public final class InputRegexpOnString
     private void method(final String pStr1)
     {
         String s = "foo" + "bar";
-        s = 3 + "foo";  // NOT flagged because of mixed AST
+        s = 3 + "foo";
     }
 
 
@@ -51,8 +51,8 @@ public final class InputRegexpOnString
     private void method2(final String pStr1)
     {
         String s = "abc" + "def" + "ghi";
-        s = 3 + "abc" + "def";  // NOT flagged because of mixed AST
-        t = "abc" + "def" + 3;  // NOT flagged because of mixed AST
+        s = 3 + "abc" + "def";
+        t = "abc" + "def" + 3;
     }
 
 
@@ -77,4 +77,22 @@ public final class InputRegexpOnString
         + "gggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggg";
 
     private String s10 = "liter" + "al3";
+
+    private String s11 = S2 + "bar";   // constant not evaluated
+
+    private String s12 = ("foo".length - (4 - 3)) + "abc" + "def";
+
+    private String s12 = "abc" + ( "def" );
+
+    private String s13 = "ab" + ("cd") + "ef";
+
+    private String s14 = (("ab")) + "cd" + "ef";
+
+    private String s15 = "ab" + ("cd" + "ef");
+
+    private String s16 = ("ab" + "cd") + "ef";
+
+    private Sring method3(final String pStr1) { return null; }
+
+    private String s16 = method3("abc") + "def";
 }

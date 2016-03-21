@@ -51,8 +51,10 @@ public class RegexpOnStringCheckTest
             "21:20: String \"foo\" matches illegal pattern 'oo'.", //
             "27:23: String \"foo\" matches illegal pattern 'oo'.", //
             "30:20: String \"foobar\" matches illegal pattern 'oo'.", //
+            "31:17: String \"foo\" matches illegal pattern 'oo'.", //
             "36:38: String \"foo\" matches illegal pattern 'oo'.", //
             "40:20: String \"foo\" matches illegal pattern 'oo'.", //
+            "83:27: String \"foo\" matches illegal pattern 'oo'.", //
         };
         verify(checkConfig, getPath("regexp/InputRegexpOnString.java"), expected);
     }
@@ -115,10 +117,18 @@ public class RegexpOnStringCheckTest
             "41:21: String \"abcdefghi\" matches illegal pattern 'abcde'.", //
             "50:23: String \"abcdefghi\" matches illegal pattern 'abcde'.", //
             "53:20: String \"abcdefghi\" matches illegal pattern 'abcde'.", //
+            "54:17: String \"abcdef\" matches illegal pattern 'abcde'.", //
+            "55:13: String \"abcdef\" matches illegal pattern 'abcde'.", //
             "60:25: String \"abcdef\" matches illegal pattern 'abcde'.", //
             "62:38: String \"abcdefghi\" matches illegal pattern 'abcde'.", //
             "64:28: String \"abcdefghi\" matches illegal pattern 'abcde'.", //
             "66:42: String \"abcdef\" matches illegal pattern 'abcde'.", //
+            "83:53: String \"abcdef\" matches illegal pattern 'abcde'.", //
+            "85:26: String \"abcdef\" matches illegal pattern 'abcde'.", //
+            "87:26: String \"abcdef\" matches illegal pattern 'abcde'.", //
+            "89:28: String \"abcdef\" matches illegal pattern 'abcde'.", //
+            "91:26: String \"abcdef\" matches illegal pattern 'abcde'.", //
+            "93:27: String \"abcdef\" matches illegal pattern 'abcde'.", //
         };
         verify(checkConfig, getPath("regexp/InputRegexpOnString.java"), expected);
     }
@@ -133,7 +143,7 @@ public class RegexpOnStringCheckTest
         checkConfig.addAttribute("regexp", "zzz");
 
         final String[] expected = {//
-            "69:11: String \"aaazzz\" matches illegal pattern 'zzz'.", //
+            "68:25: String \"aaazzz\" matches illegal pattern 'zzz'.", //
         };
         verify(checkConfig, getPath("regexp/InputRegexpOnString.java"), expected);
     }
@@ -167,7 +177,7 @@ public class RegexpOnStringCheckTest
         checkConfig.addAttribute("regexp", "eee");
 
         final String[] expected = {//
-            "75:11: String \"aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa...\" "
+            "71:33: String \"aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa...\" "
                 + "matches illegal pattern 'eee'.", //
         };
         verify(checkConfig, getPath("regexp/InputRegexpOnString.java"), expected);
