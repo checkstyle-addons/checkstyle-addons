@@ -1,4 +1,4 @@
-/* top right bottom left;    vert horz */
+/* top right bottom left;    vert horz;    top horz bottom */
 
 @import url(http://fonts.googleapis.com/css?family=Open+Sans);
 
@@ -13,7 +13,7 @@ ul, ol {
 
 body {
     font-size: 16px;
-    padding: 60px 16px;
+    padding: 60px 16px 52px;
 }
 body.longContent {
     padding-bottom: 0;
@@ -73,21 +73,29 @@ code {
 }
 .footer {
     padding: 4px 16px;
-    text-align: left;
+    text-align: center;
     width: 100%;
     position: fixed;
     bottom: 0;
     left: 0;
+}
+.footer p {
+    margin: 0;
 }
 .footer-moving {
     position: static;
     bottom: auto;
     left: auto;
     width: auto;
-    padding-bottom: 0;
-    margin-top: 32px;
+    margin-top: 24px;
     margin-left: -16px;
     margin-right: -16px;
+}
+.footer-part {
+    display: inline;
+}
+.footer-sep {
+    padding: 0 0.5em;
 }
 @media (max-width: 512px) {
     body {
@@ -97,7 +105,7 @@ code {
         padding-left: 2.5rem;
     }
     .footer {
-        padding: 4px 0 0;
+        padding: 4px 0;
         text-align: center;
         width: auto;
         position: static;
@@ -106,8 +114,13 @@ code {
         margin-left: -5px;
         margin-right: -5px;
     }
-    .footer p {
-        margin-bottom: 0;
+}
+@media (max-width: 790px) {
+    .footer-part {
+        display: block;
+    }
+    .footer-sep {
+        display: none;
     }
 }
 
@@ -488,7 +501,6 @@ table.table-header-rotated-jb tr > th:first-child > div {
 }
 
 .footer {
-    height: 50px;
     background-color: #eeeeee;
     background-image: linear-gradient(#e4e4e4, #eee 50%, #fff);
     background-repeat: no-repeat;
