@@ -27,6 +27,13 @@ task siteCopyJavadoc(type: Copy, dependsOn: javadoc) {
     destinationDir = new File(project.buildDir, 'site');
     into("v${project.version}/apidocs") {
         from fileTree(dir: javadoc.destinationDir);
+        filter { String line ->
+            line.contains("${project.ext.website}latest/checks/") ? line.replace("${project.ext.website}latest/checks/",
+                "${project.ext.website}v${project.version}/checks/") : line;
+        }
+    }
+    into("v${project.version}/apidocs/resources") {
+        from fileTree(dir: new File(javadoc.destinationDir, 'resources'));
     }
     into('latest/apidocs') {
         from fileTree(dir: javadoc.destinationDir);
