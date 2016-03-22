@@ -66,7 +66,15 @@
 
         <div class="collapse navbar-collapse" id="bs-example-navbar-collapse-1">
           <ul class="nav navbar-nav">
-            <li><a href="{{ site.baseurl }}/whatsnew.html">What's New</a></li>
+            <li><a href="{{ site.baseurl }}/run.html">Get&nbsp;Started</a></li>
+            <li class="dropdown">
+              <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-expanded="false">Blog <span class="caret"></span></a>
+              <ul class="dropdown-menu" role="menu">
+                <li><a href="{{ site.baseurl }}/whatsnew.html">What's New</a></li>
+                <li><a href="{{ site.baseurl }}/releases.html">Release History</a></li>
+                <li><a href="{{ site.baseurl }}/checkstyle-compatibility-matrix.html">Compatibility Matrix</a></li>
+              </ul>
+            </li>
             <li class="dropdown">
               <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-expanded="false">Checks <span class="caret"></span></a>
               <ul class="dropdown-menu" role="menu">
@@ -75,11 +83,8 @@
                 <li><a href="{{ site.baseurl }}/latest/checks/coding.html">Coding</a></li>
                 <li><a href="{{ site.baseurl }}/latest/checks/misc.html">Miscellaneous</a></li>
                 <li><a href="{{ site.baseurl }}/latest/checks/regexp.html">Regexp</a></li>
-                <li class="divider"></li>
-                <li><a href="{{ site.baseurl }}/releases.html">(older&nbsp;releases)</a></li>
               </ul>
             </li>
-            <li><a href="{{ site.baseurl }}/run.html">Get&nbsp;Started</a></li>
             <li><a href="{{ site.baseurl }}/contributing.html">Contribute</a></li>
           </ul>
           <ul class="nav navbar-nav navbar-right">
