@@ -29,7 +29,7 @@ To check for some hard-coded host names, including an optional custom message te
 {% highlight xml %}
 <module name="RegexpOnString">
   <property name="regexp" value="(?:localhost|\.mydomain\.com)"/>
-  <message key="regexp.string" value="String &quot;{0}&quot; appears to contain a hard-coded hostname."/>
+  <message key="regexp.string" value="String {0} appears to contain a hard-coded hostname."/>
 </module>
 {% endhighlight %}
 
@@ -38,7 +38,7 @@ The following configuration finds hard-coded IPv4 addresses:
 {% highlight xml %}
 <module name="RegexpOnString">
   <property name="regexp" value="\b\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3}\b"/>
-  <message key="regexp.string" value="String &quot;{0}&quot; appears to contain a hard-coded IP address."/>
+  <message key="regexp.string" value="String {0} appears to contain a hard-coded IP address."/>
 </module>
 {% endhighlight %}
 
