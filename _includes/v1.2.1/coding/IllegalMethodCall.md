@@ -12,12 +12,12 @@ This check must be configured explicitly for certain method names; it does nothi
 
 <dl>
 <dt><span class="propname">illegalMethodNames</span>
-    <span class="proptype"><a href="http://checkstyle.sourceforge.net/property_types.html#stringSet">StringSet</a></span></dt>
+    <span class="proptype"><a href="{{ site.link_cs_type_stringset }}">StringSet</a></span></dt>
 <dd><span class="propdesc">Comma-separated list of plain method names, no parameters, no parentheses</span>
     <span class="propdefault">none</span></dd>
 
 <dt><span class="propname">excludedQualifiers</span>
-    <span class="proptype"><a href="http://checkstyle.sourceforge.net/property_types.html#stringSet">StringSet</a></span></dt>
+    <span class="proptype"><a href="{{ site.link_cs_type_stringset }}">StringSet</a></span></dt>
 <dd><span class="propdesc">Comma-separated list of method call qualifiers which indicate that a call should be excluded.
         For example, if the call was <code>JAXBContext.newInstance();</code>, then <code>JAXBContext</code>
         is the qualifier (the part of the full identifier that comes before the dot). In other words, method calls
@@ -55,4 +55,4 @@ Example using a custom message:
 
 ### Parent Module
 
-[TreeWalker](http://checkstyle.sourceforge.net/config.html#TreeWalker)
+[TreeWalker]({{ site.link_cs_treewalker }})

@@ -9,7 +9,7 @@ This is useful in order to ensure that Strings do not contain illegal content su
 
 <dl>
 <dt><span class="propname">regexp</span>
-    <span class="proptype"><a href="http://checkstyle.sourceforge.net/property_types.html#regexp">regular expression</a></span></dt>
+    <span class="proptype"><a href="{{ site.link_cs_type_regexp }}">regular expression</a></span></dt>
 <dd><span class="propdesc">The regular expression applied to each String literal found in a source file.</span>
     <span class="propdefault"><code>^(?!x)x</code> (check disabled)</span></dd>
 </dl>
@@ -34,4 +34,4 @@ To check for some hard-coded host names, including an optional custom message te
 
 ### Parent Module
 
-[TreeWalker](http://checkstyle.sourceforge.net/config.html#TreeWalker)
+[TreeWalker]({{ site.link_cs_treewalker }})

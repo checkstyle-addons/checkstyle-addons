@@ -2,7 +2,6 @@
 layout: markdown
 title: Getting Started
 surrounding-div: csa-run
-bintray-link: https://bintray.com/checkstyle-addons/checkstyle-addons/checkstyle-addons/view
 longContent: true
 ---
 
@@ -10,7 +9,7 @@ longContent: true
 
 Here's how to use {{ site.name }} with your standard software.
 
-{{ site.name }} is distributed via [Maven Central]({{ site.maven-central-link }}) and [Bintray jcenter]({{ page.bintray-link }}), so major build tools can automatically access it.
+{{ site.name }} is distributed via [Maven Central]({{ site.link_mavencentral }}) and [Bintray jcenter]({{ site.link_bintray }}), so major build tools can automatically access it.
 
 {{ site.name }} is compatible with all Checkstyle versions starting from 6.0. That is because Checkstyle 5.9 and earlier were based on Java&nbsp;5, which is no longer available on our continuous integration platform, Travis CI.
 
@@ -22,7 +21,7 @@ Here's how to use {{ site.name }} with your standard software.
 
 ## Gradle
 
-{{ site.name }} is available on [Maven Central]({{ site.maven-central-link }}) and [jcenter]({{ page.bintray-link }}), so you can just use it in your Gradle build. In Gradle, {{ site.name }} runs as part of the [Gradle Checkstyle Plugin](https://gradle.org/docs/current/userguide/checkstyle_plugin.html){:target="_blank"}. The classpath is extended to include {{ site.name }}. Note that the Checkstyle tool version must be specified.
+{{ site.name }} is available on [Maven Central]({{ site.link_mavencentral }}) and [jcenter]({{ site.link_bintray }}), so you can just use it in your Gradle build. In Gradle, {{ site.name }} runs as part of the [Gradle Checkstyle Plugin](https://gradle.org/docs/current/userguide/checkstyle_plugin.html){:target="_blank"}. The classpath is extended to include {{ site.name }}. Note that the Checkstyle tool version must be specified.
 
 {% highlight groovy %}
 plugins {
@@ -47,7 +46,7 @@ The example above has been tested with Checkstyle `toolVersion` set to 6.2 - {{ 
 
 ## Maven
 
-{{ site.name }} is available on [Maven Central]({{ site.maven-central-link }}), so you can just use it in your Maven build. In Maven, {{ site.name }} runs as part of the [Maven Checkstyle Plugin](https://maven.apache.org/plugins/maven-checkstyle-plugin/){:target="_blank"}. The classpath is extended to include {{ site.name }}. Note that the explicit dependency on Checkstyle itself must also be specified in order to set the correct Checkstyle version.
+{{ site.name }} is available on [Maven Central]({{ site.link_mavencentral }}), so you can just use it in your Maven build. In Maven, {{ site.name }} runs as part of the [Maven Checkstyle Plugin](https://maven.apache.org/plugins/maven-checkstyle-plugin/){:target="_blank"}. The classpath is extended to include {{ site.name }}. Note that the explicit dependency on Checkstyle itself must also be specified in order to set the correct Checkstyle version.
 
 {% highlight xml %}
 <project>
@@ -85,7 +84,7 @@ The example above has been tested with the Checkstyle dependency set to 6.2 - {{
 
 ## Ant
 
-In Ant, we must add {{ site.name }} to the classpath of the [Checkstyle Ant Task](http://checkstyle.sourceforge.net/anttask.html){:target="_blank"}. The Ant task is part of the standard Checkstyle distribution. We need **at least Checkstyle 6.2** (currently tested up to {{ site.latest_checkstyle_tested }}). And of course the {{ site.name }} jar file:
+In Ant, we must add {{ site.name }} to the classpath of the [Checkstyle Ant Task]({{ site.link_cs_anttask }}){:target="_blank"}. The Ant task is part of the standard Checkstyle distribution. We need **at least Checkstyle 6.2** (currently tested up to {{ site.latest_checkstyle_tested }}). And of course the {{ site.name }} jar file:
 
 <p><a href="https://github.com/{{ site.github }}/releases/download/v{{ site.latest_version }}/checkstyle-addons-{{ site.latest_version }}.jar" class="btn btn-primary">Download JAR</a></p>
 
@@ -111,7 +110,7 @@ The *checkstyletask.properties* is read from checkstyle-{{ site.latest_version_c
 </checkstyle>
 {% endhighlight %}
 
-For more information on Checkstyle Ant task configuration, please refer to its [website](http://checkstyle.sourceforge.net/anttask.html){:target="_blank"}.
+For more information on Checkstyle Ant task configuration, please refer to its [website]({{ site.link_cs_anttask }}){:target="_blank"}.
 
 If you use Ivy for dependency management in Ant, you can take advantage of the fact that {{ site.name }} is on Maven Central.
 
@@ -186,7 +185,7 @@ In [SonarQube](http://www.sonarqube.org/){:target="_blank"}, {{ site.name }} run
       <td class="info">4.5.2+</td>
     </tr>
     <tr>
-      <td><a href="http://checkstyle.sourceforge.net/releasenotes.html" target="_blank">Checkstyle</a> (by plugin)</td>
+      <td><a href="{{ site.link_cs_releasenotes }}" target="_blank">Checkstyle</a> (by plugin)</td>
       <td>5.6</td>
       <td>5.6</td>
       <td>5.6</td>

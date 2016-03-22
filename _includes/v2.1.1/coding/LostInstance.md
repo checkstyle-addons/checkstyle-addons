@@ -37,4 +37,4 @@ Configure the check like this:
 
 ### Parent Module
 
-[TreeWalker](http://checkstyle.sourceforge.net/config.html#TreeWalker)
+[TreeWalker]({{ site.link_cs_treewalker }})

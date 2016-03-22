@@ -7,7 +7,7 @@ The *LocationReference* check helps in cases where the name of the current metho
 
 <dl>
 <dt><span class="propname">methodCalls</span>
-    <span class="proptype"><a href="http://checkstyle.sourceforge.net/property_types.html#stringSet">StringSet</a></span></dt>
+    <span class="proptype"><a href="{{ site.link_cs_type_stringset }}">StringSet</a></span></dt>
 <dd><span class="propdesc">Comma-separated list of method calls that should be covered by this check. Each element of
         the list must be the full method call as it occurs in the source file, ignoring whitespace and parentheses.
         For example, <code>LogManager.getLogger</code>. This property or <code>variableNames</code> must be set for
@@ -15,7 +15,7 @@ The *LocationReference* check helps in cases where the name of the current metho
     <span class="propdefault">none (check is disabled)</span></dd>
 
 <dt><span class="propname">variableNames</span>
-    <span class="proptype"><a href="http://checkstyle.sourceforge.net/property_types.html#stringSet">StringSet</a></span></dt>
+    <span class="proptype"><a href="{{ site.link_cs_type_stringset }}">StringSet</a></span></dt>
 <dd><span class="propdesc">Comma-separated list of variable names whose declarations should be covered by this check.
         Each element of the list is a variable name as it occurs in the source file, For example,
         <code>method</code>. If a variable of one of the names specified by this property is declared anywhere,
@@ -31,7 +31,7 @@ The *LocationReference* check helps in cases where the name of the current metho
     <span class="propdefault"><code>method</code></span></dd>
 
 <dt><span class="propname">argumentPosition</span>
-    <span class="proptype"><a href="http://checkstyle.sourceforge.net/property_types.html#integer">Integer</a></span></dt>
+    <span class="proptype"><a href="{{ site.link_cs_type_integer }}">Integer</a></span></dt>
 <dd><span class="propdesc">The position of the location reference as an index of the list of arguments of a method
         call, starting at zero. Negative values count from the end of the list, <code>-1</code> being the last argument
         in the list.</span>
@@ -64,4 +64,4 @@ In the next example, the `getLogger` method takes the current class as its first
 
 ### Parent Module
 
-[TreeWalker](http://checkstyle.sourceforge.net/config.html#TreeWalker)
+[TreeWalker]({{ site.link_cs_treewalker }})

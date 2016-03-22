@@ -26,7 +26,7 @@ A check mark in this column indicates that a version upgrade of Checkstyle from 
 - does not generate different warnings than before if the same configuration is used.
 
 Only the differences to the immediately preceding version are considered.
-This information was primarily gathered from the [release notes](http://checkstyle.sourceforge.net/releasenotes.html),
+This information was primarily gathered from the [release notes]({{ site.link_cs_releasenotes }}),
 but additional analysis of the commit history on GitHub has turned up further breaking changes:
 
 <div class="checkpage"><dl>
@@ -62,7 +62,7 @@ A check mark in this column indicates that a version upgrade of Checkstyle from 
 changes to a custom check, as long as that custom check uses only the public API. Cases where the custom check is
 implemented by subclassing a built-in check were not considered. Only the differences to the immediately preceding
 version are considered. This information was primarily gathered from the
-[release notes](http://checkstyle.sourceforge.net/releasenotes.html), but additional analysis of the commit history on
+[release notes]({{ site.link_cs_releasenotes }}), but additional analysis of the commit history on
 GitHub has turned up further breaking changes:
 
 <div class="checkpage"><dl>
@@ -79,7 +79,7 @@ This is not the complete list of undocumented breaking changes - only the first 
 
 ### E. Java Version used to run Checkstyle
 
-This is the Java version required by Checkstyle, i.e. the version of the JVM in which the Checkstyle process is running. It has nothing to do with the Java version of the code being analyzed. Java versions are backwards compatible, so only a minimum version is shown. The required Java version is clearly stated in the Checkstyle [release notes](http://checkstyle.sourceforge.net/releasenotes.html). Where that did not suffice, the class files of the binary distributions were used to obtain the minimum Java version.
+This is the Java version required by Checkstyle, i.e. the version of the JVM in which the Checkstyle process is running. It has nothing to do with the Java version of the code being analyzed. Java versions are backwards compatible, so only a minimum version is shown. The required Java version is clearly stated in the Checkstyle [release notes]({{ site.link_cs_releasenotes }}). Where that did not suffice, the class files of the binary distributions were used to obtain the minimum Java version.
 
 <a name="f" class="csa-offset-anchor"/>
 

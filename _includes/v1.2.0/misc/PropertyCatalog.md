@@ -74,14 +74,14 @@ The check roughly works like this:
 
 If the property catalog is a class or interface, the values of the defined constants are the property keys. If the property catalog is an enum, you can choose whether the enum constant itself shall be the key, or the first parameter passed to the enum constant's constructor (via `enumArgument`). In a class, private constants are never considered.
 
-This check find duplicate keys in the Java code, but not in the property file. Use [UniqueProperties](http://checkstyle.sourceforge.net/config_misc.html#UniqueProperties) for that. It also does not help keep the translations of your property files in sync (e.g. file.properties, file_de.properties, file_fr.properties, etc.). Use [Translation](http://checkstyle.sourceforge.net/config_misc.html#Translation) for that, and configure this check only for one of the property files.
+This check find duplicate keys in the Java code, but not in the property file. Use [UniqueProperties]({{ site.link_cs_check_uniqueprops }}) for that. It also does not help keep the translations of your property files in sync (e.g. file.properties, file_de.properties, file_fr.properties, etc.). Use [Translation]({{ site.link_cs_check_translation }}) for that, and configure this check only for one of the property files.
 
 
 ### Properties
 
 <dl>
 <dt><span class="propname">selection</span>
-    <span class="proptype"><a href="http://checkstyle.sourceforge.net/property_types.html#regexp">regular
+    <span class="proptype"><a href="{{ site.link_cs_type_regexp }}">regular
         expression</a></span></dt>
 <dd><span class="propdesc">Select the Java files that are property catalogs. Each of these files must have a
         corresponding property file. The regular expression must match somewhere in the <i>binary name</i> of the
@@ -91,7 +91,7 @@ This check find duplicate keys in the Java code, but not in the property file. U
     <span class="propdefault"><code>^(?!x)x</code> (check is disabled)</span></dd>
 
 <dt><span class="propname">excludedFields</span>
-    <span class="proptype"><a href="http://checkstyle.sourceforge.net/property_types.html#regexp">regular
+    <span class="proptype"><a href="{{ site.link_cs_type_regexp }}">regular
         expression</a></span></dt>
 <dd><span class="propdesc">Regex that matches excluded fields which should not be considered part of the property
         catalog. Choose the regex so that it matches the entire field name. Keep in mind that
@@ -100,14 +100,14 @@ This check find duplicate keys in the Java code, but not in the property file. U
     <span class="propdefault"><code>serialVersionUID</code></span></dd>
 
 <dt><span class="propname">enumArgument</span>
-    <span class="proptype"><a href="http://checkstyle.sourceforge.net/property_types.html#boolean">Boolean</a></span></dt>
+    <span class="proptype"><a href="{{ site.link_cs_type_boolean }}">Boolean</a></span></dt>
 <dd><span class="propdesc">Determines whether the property key shall be the enum constant itself (<code>false</code>), or
         the first argument of the enum constant's constructor (<code>true</code>). When the property catalog is not an
         enum, then this property is ignored.</span>
     <span class="propdefault"><code>false</code></span></dd>
 
 <dt><span class="propname">propertyFile</span>
-    <span class="proptype"><a href="http://checkstyle.sourceforge.net/property_types.html#string">String</a></span></dt>
+    <span class="proptype"><a href="{{ site.link_cs_type_string }}">String</a></span></dt>
 <dd><span class="propdesc">Template for the property file path. In this template, the following placeholders may be
     used (examples are for <code>com.foo.Bar$Inner</code>):</span>
     <dl class="inner"><dt><code>{0}</code></dt>
@@ -130,22 +130,22 @@ This check find duplicate keys in the Java code, but not in the property file. U
     <span class="propdefault">(not set)</span></dd>
 
 <dt><span class="propname">propertyFileEncoding</span>
-    <span class="proptype"><a href="http://checkstyle.sourceforge.net/property_types.html#string">String</a></span></dt>
+    <span class="proptype"><a href="{{ site.link_cs_type_string }}">String</a></span></dt>
 <dd><span class="propdesc">Character encoding of the property file</span>
     <span class="propdefault"><code>UTF-8</code></span></dd>
 
 <dt><span class="propname">reportDuplicates</span>
-    <span class="proptype"><a href="http://checkstyle.sourceforge.net/property_types.html#boolean">Boolean</a></span></dt>
+    <span class="proptype"><a href="{{ site.link_cs_type_boolean }}">Boolean</a></span></dt>
 <dd><span class="propdesc">Report if two code references point to the same property?</span>
     <span class="propdefault"><code>true</code></span></dd>
 
 <dt><span class="propname">reportOrphans</span>
-    <span class="proptype"><a href="http://checkstyle.sourceforge.net/property_types.html#boolean">Boolean</a></span></dt>
+    <span class="proptype"><a href="{{ site.link_cs_type_boolean }}">Boolean</a></span></dt>
 <dd><span class="propdesc">Report if property entries are not referenced in the code?</span>
     <span class="propdefault"><code>true</code></span></dd>
 
 <dt><span class="propname">caseSensitive</span>
-    <span class="proptype"><a href="http://checkstyle.sourceforge.net/property_types.html#boolean">Boolean</a></span></dt>
+    <span class="proptype"><a href="{{ site.link_cs_type_boolean }}">Boolean</a></span></dt>
 <dd><span class="propdesc">If <code>true</code>, the property keys are treated as case sensitive; if <code>false</code>,
         case is ignored.</span>
     <span class="propdefault"><code>true</code></span></dd>
@@ -163,7 +163,7 @@ In the following example, it is assumed that you have a naming convention which 
 </module>
 {% endhighlight %}
 
-The above example is for [Eclipse](http://eclipse-cs.sourceforge.net/#!/properties), where `${workspace_loc}` may be used to refer to the file system location of the current workspace. For SonarQube, you may use relative file paths. For the other environments, you may define a custom [module property](http://checkstyle.sourceforge.net/config.html#Properties), which you dynamically set to the project directory. Example for Gradle (here, `projectDir` was used instead of `workspace_loc`):
+The above example is for [Eclipse](http://eclipse-cs.sourceforge.net/#!/properties), where `${workspace_loc}` may be used to refer to the file system location of the current workspace. For SonarQube, you may use relative file paths. For the other environments, you may define a custom [module property]({{ site.link_cs_properties }}), which you dynamically set to the project directory. Example for Gradle (here, `projectDir` was used instead of `workspace_loc`):
 
 {% highlight groovy %}
 checkstyle {
@@ -174,4 +174,4 @@ checkstyle {
 
 ### Parent Module
 
-[TreeWalker](http://checkstyle.sourceforge.net/config.html#TreeWalker)
+[TreeWalker]({{ site.link_cs_treewalker }})

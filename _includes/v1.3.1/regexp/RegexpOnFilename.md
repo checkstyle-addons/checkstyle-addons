@@ -22,12 +22,12 @@ The check works like this:
 
 <dl>
 <dt><span class="propname">selection</span>
-    <span class="proptype"><a href="http://checkstyle.sourceforge.net/property_types.html#regexp">regular expression</a></span></dt>
+    <span class="proptype"><a href="{{ site.link_cs_type_regexp }}">regular expression</a></span></dt>
 <dd><span class="propdesc">Limits the check to files whose canonical path name contains the given pattern. The canonical path is the simplest possible absolute path, including the file name (no <code>..</code> elements etc.).</span>
     <span class="propdefault">unrestricted</span></dd>
 
 <dt><span class="propname">regexp</span>
-    <span class="proptype"><a href="http://checkstyle.sourceforge.net/property_types.html#regexp">regular expression</a></span></dt>
+    <span class="proptype"><a href="{{ site.link_cs_type_regexp }}">regular expression</a></span></dt>
 <dd><span class="propdesc">The regular expression applied to the file name.</span>
     <span class="propdefault"><tt>^(?:\s+.*|.*?\s+)$</tt></span></dd>
 
@@ -37,13 +37,13 @@ The check works like this:
     <span class="propdefault"><tt>illegal</tt></span></dd>
 
 <dt><span class="propname">simple</span>
-    <span class="proptype"><a href="http://checkstyle.sourceforge.net/property_types.html#boolean">Boolean</a></span></dt>
+    <span class="proptype"><a href="{{ site.link_cs_type_boolean }}">Boolean</a></span></dt>
 <dd><span class="propdesc">If <tt>true</tt>, only the simple name of the file will be checked against the pattern specified by <tt>regexp</tt>; if <tt>false</tt>, the entire canonical path will be checked.
     Note that this option applies only to the pattern specified by <tt>regexp</tt>; the <tt>selection</tt> property is <i>always</i> treated as if <tt>simple=false</tt>.</span>
     <span class="propdefault"><tt>true</tt></span></dd>
 </dl>
 
-Since this check is a [FileSetCheck](http://checkstyle.sourceforge.net/writingchecks.html#Writing_FileSetChecks), it also inherits the `fileExtensions` property, which may be configured independently of `selection`. In that case, both properties must match (e.g. `fileExtensions` *and* `selection`, or either of the two if one is missing).
+Since this check is a [FileSetCheck]({{ site.link_cs_filesetcheck }}), it also inherits the `fileExtensions` property, which may be configured independently of `selection`. In that case, both properties must match (e.g. `fileExtensions` *and* `selection`, or either of the two if one is missing).
 
 #### Custom Messages
 
@@ -103,4 +103,4 @@ The `(?i)` at the start of the `selection` expression turns on case insensitivit
   <p>Important: This check goes directly under <b>Checker</b>, not under <b>TreeWalker</b>.</p>
 </div>
 
-[Checker](http://checkstyle.sourceforge.net/config.html#Checker)
+[Checker]({{ site.link_cs_checker }})

@@ -6,5 +6,5 @@ release: false
 emphasis: true
 ---
 
-{{ site.name }} is now available via [Maven Central]({{ site.maven-central-link }}).
+{{ site.name }} is now available via [Maven Central]({{ site.link_mavencentral }}).
 This makes it accessible out-of-the-box by most major build tools. [Check it out!]({{ site.baseurl }}/run.html) :+1:

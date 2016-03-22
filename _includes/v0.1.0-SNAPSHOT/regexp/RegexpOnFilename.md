@@ -14,7 +14,7 @@ By default, this check flags leading and trailing spaces in file names.
 
 The check works like this:
 
-  1. If file extensions are configured, it is checked if the file extension applies. As with all [FileSetChecks](http://checkstyle.sourceforge.net/writingchecks.html#Writing_FileSetChecks), this check only ever does anything if the file extension matches. Leave out the property to match all file extensions.
+  1. If file extensions are configured, it is checked if the file extension applies. As with all [FileSetChecks]({{ site.link_cs_filesetcheck }}), this check only ever does anything if the file extension matches. Leave out the property to match all file extensions.
   2. If configured, the regular expression given in the `selection` property is applied to the canonical file name. Only files that match this expression are checked. Leave out the property to match all files.
   3. The given `regexp` is matched against the file name. What part of the file name it is applied to, and how the result is interpreted is governed by the check properties.
 
@@ -23,17 +23,17 @@ The check works like this:
 
 <dl>
 <dt><span class="propname">fileExtensions</span>
-    <span class="proptype"><a href="http://checkstyle.sourceforge.net/property_types.html#stringSet">StringSet</a></span></dt>
+    <span class="proptype"><a href="{{ site.link_cs_type_stringset }}">StringSet</a></span></dt>
 <dd><span class="propdesc">Comma-separated list of file extensions. Leading dots are optional. Spaces after the commas are allowed. Only files with one of these extensions are checked against the regular expression.</span>
     <span class="propdefault">unrestricted</span></dd>
 
 <dt><span class="propname">selection</span>
-    <span class="proptype"><a href="http://checkstyle.sourceforge.net/property_types.html#regexp">regular expression</a></span></dt>
+    <span class="proptype"><a href="{{ site.link_cs_type_regexp }}">regular expression</a></span></dt>
 <dd><span class="propdesc">Limits the check to files whose canonical path name contains the given pattern. The canonical path is the simplest possible absolute path, including the file name (no <code>..</code> elements etc.).</span>
     <span class="propdefault">unrestricted</span></dd>
 
 <dt><span class="propname">regexp</span>
-    <span class="proptype"><a href="http://checkstyle.sourceforge.net/property_types.html#regexp">regular expression</a></span></dt>
+    <span class="proptype"><a href="{{ site.link_cs_type_regexp }}">regular expression</a></span></dt>
 <dd><span class="propdesc">The regular expression applied to the file name.</span>
     <span class="propdefault"><tt>^(?:\s+.*|.*?\s+)$</tt></span></dd>
 
@@ -43,7 +43,7 @@ The check works like this:
     <span class="propdefault"><tt>illegal</tt></span></dd>
 
 <dt><span class="propname">simple</span>
-    <span class="proptype"><a href="http://checkstyle.sourceforge.net/property_types.html#boolean">Boolean</a></span></dt>
+    <span class="proptype"><a href="{{ site.link_cs_type_boolean }}">Boolean</a></span></dt>
 <dd><span class="propdesc">If <code>true</code>, only the simple name of the file will be checked against the pattern specified by <tt>regexp</tt>; if <code>false</code>, the entire canonical path will be checked.
     Note that this option applies only to the pattern specified by <tt>regexp</tt>; the <tt>selection</tt> property is <i>always</i> treated as if <tt>simple=false</tt>.</span>
     <span class="propdefault"><tt>true</tt></span></dd>
@@ -100,4 +100,4 @@ To configure the check to ban GIF files in favor of PNG:
 
 ### Parent Module
 
-[Checker](http://checkstyle.sourceforge.net/config.html#Checker)
+[Checker]({{ site.link_cs_checker }})
