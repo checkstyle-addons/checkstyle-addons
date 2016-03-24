@@ -1,0 +1,14 @@
+{
+    "settings": {
+    },
+    "structure": {
+        "src/main/resources": {
+            "whitelist": true,
+            "allow": [
+                {
+                    "spec": "META-INF"
+                }
+            ]
+        }
+    }
+}

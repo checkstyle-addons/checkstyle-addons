@@ -41,6 +41,9 @@ public enum TaskNames
     /** <code>generatePom</code> / <code>generatePom{0}</code> */
     generatePom(false, "generatePom{0}"),
 
+    /** <code>fatjar</code> / <code>fatjar{0}</code> */
+    fatJar(true, "fatjar{0}"),
+
     /** <code>jar</code> / <code>jar{0}</code> */
     jar(true, "jar{0}"),
 

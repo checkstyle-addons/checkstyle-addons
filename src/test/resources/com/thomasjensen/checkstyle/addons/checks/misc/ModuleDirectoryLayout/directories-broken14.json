@@ -1,0 +1,16 @@
+{
+    "settings": {},
+    "structure": {
+        "src/main/resources": {
+            "deny": [
+                {
+                    "type": "FromPath",
+                    "spec": "src/main/resources"
+                }, {
+                    "type": "SimpleFolder",
+                    "spec": "WEB-INF"
+                }
+            ]
+        }
+    }
+}

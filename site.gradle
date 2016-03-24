@@ -91,7 +91,7 @@ task site (dependsOn: [processResources, siteCopyAllChecks, siteCopyJavadoc]) {
             catDocs.add(f.absoluteFile);
         }
 
-        for (Map.Entry<String, List<File>> cat : rawDocs) {
+        for (java.util.Map.Entry<String, List<File>> cat : rawDocs) {
             File mdDir = new File(includesVersionDir, cat.key);
             mdDir.mkdir();
 

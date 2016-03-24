@@ -15,16 +15,16 @@ package com.thomasjensen.checkstyle.addons.util;
  * program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-import com.puppycrawl.tools.checkstyle.api.DetailAST;
-import org.junit.Assert;
-import org.junit.Test;
-
 import java.io.Closeable;
 import java.io.File;
 import java.io.IOException;
 import java.util.Arrays;
 import java.util.HashSet;
 import java.util.Set;
+
+import com.puppycrawl.tools.checkstyle.api.DetailAST;
+import org.junit.Assert;
+import org.junit.Test;
 
 
 /**
@@ -135,5 +135,22 @@ public class UtilTest
         union = Util.union(null, null);
         Assert.assertNotNull(union);
         Assert.assertTrue(union.isEmpty());
+    }
+
+
+
+    @Test
+    public void teststringEquals()
+    {
+        Assert.assertTrue(Util.stringEquals(null, null, true));
+        Assert.assertTrue(Util.stringEquals(null, null, false));
+        Assert.assertFalse(Util.stringEquals("foo", null, true));
+        Assert.assertFalse(Util.stringEquals("foo", null, false));
+        Assert.assertFalse(Util.stringEquals(null, "foo", true));
+        Assert.assertFalse(Util.stringEquals(null, "foo", false));
+        Assert.assertFalse(Util.stringEquals("bar", "foo", true));
+        Assert.assertFalse(Util.stringEquals("bar", "foo", false));
+        Assert.assertFalse(Util.stringEquals("FOO", "foo", true));
+        Assert.assertTrue(Util.stringEquals("FOO", "foo", false));
     }
 }

@@ -1,0 +1,10 @@
+{
+    "settings": {
+        "formatVersion": 1,
+        "moduleRegex": "^.+?[\\\\/]module\\d+",
+        "allowNestedSrcFolder": false
+    },
+    "structure": {
+        "src/test/resources": {}
+    }
+}

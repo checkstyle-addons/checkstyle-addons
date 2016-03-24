@@ -1,0 +1,23 @@
+{
+    "settings": {},
+    "structure": {
+        "src/main/resources": {
+            "whitelist": false,
+            "allow": [
+                {
+                    "type": "TopLevelFolder",
+                    "spec": "META-INF"
+                }
+            ],
+            "deny": [
+                {
+                    "type": "FromPath",
+                    "spec": "src/main/unknown"
+                }, {
+                    "type": "SimpleFolder",
+                    "spec": "WEB-INF"
+                }
+            ]
+        }
+    }
+}

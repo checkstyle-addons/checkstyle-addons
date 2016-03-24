@@ -1,0 +1,11 @@
+{
+    "settings": {
+        "formatVersion": 42,
+        "moduleRegex": "",
+        "allowNestedSrcFolder": false
+    },
+    "structure": {
+        "src/main/resources": {
+        }
+    }
+}

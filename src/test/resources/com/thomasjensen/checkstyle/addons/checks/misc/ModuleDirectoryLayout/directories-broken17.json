@@ -1,0 +1,25 @@
+{
+    "settings": {},
+    "structure": {
+        "src/main/java": {
+        },
+        "src/main/resources": {
+            "whitelist": false,
+            "allow": [
+                {
+                    "type": "FromPath",
+                    "spec": "src/main/java"
+                }, {
+                    "type": "TopLevelFolder",
+                    "spec": "META-INF"
+                }
+            ],
+            "deny": [
+                {
+                    "type": "SimpleFolder",
+                    "spec": "WEB-INF"
+                }
+            ]
+        }
+    }
+}

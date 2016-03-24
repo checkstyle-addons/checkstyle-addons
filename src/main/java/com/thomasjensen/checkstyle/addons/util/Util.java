@@ -15,9 +15,13 @@ package com.thomasjensen.checkstyle.addons.util;
  * program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+import java.io.BufferedInputStream;
+import java.io.ByteArrayOutputStream;
 import java.io.Closeable;
 import java.io.File;
 import java.io.IOException;
+import java.io.InputStream;
+import java.nio.charset.Charset;
 import java.util.Collections;
 import java.util.HashSet;
 import java.util.Set;
@@ -40,6 +44,12 @@ public final class Util
 {
     /** A pattern that never matches (and does so efficiently) */
     public static final Pattern NEVER_MATCH = Pattern.compile("^(?!x)x");
+
+    /** Constant for UTF-8 charset; can be replaced with StandardCharsets.UTF_8 after moving to Java 7 */
+    public static final Charset UTF8 = Charset.forName("UTF-8");
+
+    /** Size of the file I/O buffer in bytes */
+    private static final int IO_BUFFER_SIZE_BYTES = 8000;
 
 
 
@@ -152,6 +162,38 @@ public final class Util
 
 
     /**
+     * Read all bytes from an InputStream into a byte array. Can be replaced with <code>Files.readAllBytes()</code> once
+     * the code is migrated to Java 7.
+     *
+     * @param pInputStream the input stream
+     * @return the complete contents read from the input stream
+     *
+     * @throws IOException I/O error
+     */
+    public static byte[] readBytes(@Nonnull final InputStream pInputStream)
+        throws IOException
+    {
+        ByteArrayOutputStream baos = null;
+        BufferedInputStream bis = null;
+        try {
+            baos = new ByteArrayOutputStream(IO_BUFFER_SIZE_BYTES);
+            bis = new BufferedInputStream(pInputStream, IO_BUFFER_SIZE_BYTES);
+            byte[] buffer = new byte[IO_BUFFER_SIZE_BYTES];
+            for (int bytesRead = bis.read(buffer); bytesRead > 0; bytesRead = bis.read(buffer)) {
+                baos.write(buffer, 0, bytesRead);
+            }
+        }
+        finally {
+            closeQuietly(bis);
+            closeQuietly(baos);
+        }
+
+        return baos.toByteArray();
+    }
+
+
+
+    /**
      * Calls getCanonicalFile() on the given File; if that doesn't work, call getAbsoluteFile() on it. Thus, the
      * resulting file is not guaranteed to exist. Separator characters are standardized to {@link File#separatorChar}.
      *
@@ -168,12 +210,78 @@ public final class Util
         catch (IOException e) {
             resultPath = pFile.getAbsolutePath();
         }
+        return new File(standardizeSlashes(resultPath));
+    }
 
+
+
+    /**
+     * Standardizes all slashes and backslashes in the given String to {@link File#separatorChar}.
+     *
+     * @param pPath a String
+     * @return a new String which is <code>pPath</code> with standardized path separator characters
+     */
+    @Nonnull
+    public static String standardizeSlashes(@Nonnull final String pPath)
+    {
         final String goodSlash = File.separator;
         final String badSlash = File.separatorChar == '/' ? "\\" : "/";
         // The JDK also assumes there are only these two options.
-        resultPath = resultPath.replaceAll(Pattern.quote(badSlash), Matcher.quoteReplacement(goodSlash));
-        return new File(resultPath);
+        String result = pPath.replaceAll(Pattern.quote(badSlash), Matcher.quoteReplacement(goodSlash));
+        return result;
+    }
+
+
+
+    /**
+     * Search for a String in a collection.
+     *
+     * @param pIterable the list of String to be searched
+     * @param pSearched the String to search for
+     * @param pCaseSensitive if comparisons should be case sensitive
+     * @return <code>true</code> if found, <code>false</code> otherwise
+     */
+    public static boolean containsString(@Nullable final Iterable<String> pIterable, @Nullable final String pSearched,
+        final boolean pCaseSensitive)
+    {
+        boolean result = false;
+        if (pSearched != null && pIterable != null) {
+            for (String s : pIterable) {
+                if (stringEquals(pSearched, s, pCaseSensitive)) {
+                    result = true;
+                    break;
+                }
+            }
+        }
+        return result;
+    }
+
+
+
+    /**
+     * Determine the equality of two Strings, optionally ignoring case.
+     *
+     * @param pStr1 the first String
+     * @param pStr2 the second String
+     * @param pCaseSensitive if the comparison should be case sensitive
+     * @return <code>true</code> if the String are equal, <code>false</code> otherwise
+     */
+    public static boolean stringEquals(@Nullable final String pStr1, @Nullable final String pStr2,
+        final boolean pCaseSensitive)
+    {
+        boolean result = false;
+        if (pStr1 == null && pStr2 == null) {
+            result = true;
+        }
+        else if (pStr1 != null) {
+            if (pCaseSensitive) {
+                result = pStr1.equals(pStr2);
+            }
+            else {
+                result = pStr1.equalsIgnoreCase(pStr2);
+            }
+        }
+        return result;
     }
 
 

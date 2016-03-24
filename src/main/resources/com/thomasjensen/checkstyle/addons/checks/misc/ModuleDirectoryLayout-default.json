@@ -1,0 +1,115 @@
+{
+    "settings": {
+        "formatVersion": 1,
+        "moduleRegex": "",
+        "allowNestedSrcFolder": false
+    },
+    "structure": {
+        "src/main/java": {
+            "whitelist": true,
+            "allow": [
+                {
+                    "type": "FileExtensions",
+                    "spec": "java"
+                }, {
+                    "type": "SimpleFolder",
+                    "spec": "doc-files"
+                }, {
+                    "type": "SimpleName",
+                    "spec": "overview.html"
+                }, {
+                    "type": "SimpleName",
+                    "spec": "package.html"
+                }
+            ],
+            "deny": [
+                {
+                    "type": "SimpleFolder",
+                    "spec": "META-INF"
+                }, {
+                    "type": "SimpleFolder",
+                    "spec": "WEB-INF"
+                }
+            ]
+        },
+        "src/main/resources": {
+            "whitelist": false,
+            "allow": [
+                {
+                    "type": "TopLevelFolder",
+                    "spec": "META-INF"
+                }
+            ],
+            "deny": [
+                {
+                    "type": "FromPath",
+                    "spec": "src/main/java"
+                }, {
+                    "type": "SimpleFolder",
+                    "spec": "WEB-INF"
+                }
+            ]
+        },
+        "src/main/filters": {},
+        "src/main/webapp": {
+            "whitelist": false,
+            "allow": [
+                {
+                    "type": "TopLevelFolder",
+                    "spec": "WEB-INF"
+                }
+            ],
+            "deny": [
+                {
+                    "type": "FromPath",
+                    "spec": "src/main/java"
+                }
+            ]
+        },
+        "src/test/java": {
+            "whitelist": true,
+            "allow": [
+                {
+                    "type": "FileExtensions",
+                    "spec": "java"
+                }, {
+                    "type": "SimpleFolder",
+                    "spec": "doc-files"
+                }, {
+                    "type": "SimpleName",
+                    "spec": "overview.html"
+                }, {
+                    "type": "SimpleName",
+                    "spec": "package.html"
+                }
+            ],
+            "deny": [
+                {
+                    "type": "SimpleFolder",
+                    "spec": "META-INF"
+                }, {
+                    "type": "SimpleFolder",
+                    "spec": "WEB-INF"
+                }
+            ]
+        },
+        "src/test/resources": {
+            "deny": [
+                {
+                    "type": "FromPath",
+                    "spec": "src/main/java"
+                }, {
+                    "type": "SimpleFolder",
+                    "spec": "META-INF"
+                }, {
+                    "type": "SimpleFolder",
+                    "spec": "WEB-INF"
+                }
+            ]
+        },
+        "src/test/filters": {},
+        "src/it": {},
+        "src/assembly": {},
+        "src/site": {}
+    }
+}

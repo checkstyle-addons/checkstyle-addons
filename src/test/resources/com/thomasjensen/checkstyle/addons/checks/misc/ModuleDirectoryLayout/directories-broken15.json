@@ -1,0 +1,13 @@
+{
+    "settings": {},
+    "structure": {
+        "src/main/resources": {
+            "allow": [
+                {
+                    "type": "SpecificPathRegex",
+                    "spec": "broken["
+                }
+            ]
+        }
+    }
+}

@@ -14,6 +14,17 @@
  * program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+buildscript {
+    repositories {
+        mavenLocal()
+        jcenter()
+    }
+    dependencies {
+        classpath 'com.github.jengelman.gradle.plugins:shadow:1.2.3';
+    }
+}
+
+import com.github.jengelman.gradle.plugins.shadow.tasks.ShadowJar;
 import com.thomasjensen.checkstyle.addons.build.ConfigNames;
 import com.thomasjensen.checkstyle.addons.build.DependencyConfig;
 import com.thomasjensen.checkstyle.addons.build.NameFactory;
@@ -26,7 +37,6 @@ import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
-
 
 
 project.ext.depConfigs.activeDepConfigs.each { final String csVersion ->
@@ -64,6 +74,15 @@ project.ext.depConfigs.activeDepConfigs.each { final String csVersion ->
     jarTask.configureFor(csVersion);
     project.artifacts {
         archives jarTask;
+    }
+
+    // 'fatjar' task
+    final String fatjarTaskName = nameFactory.getName(TaskNames.fatJar, csVersion);
+    final CreateFatJarTask fatjarTask = (CreateFatJarTask) project.tasks.create(
+        name: fatjarTaskName, type: CreateFatJarTask);
+    fatjarTask.configureFor(csVersion);
+    project.artifacts {
+        archives fatjarTask;
     }
 
     // 'jarSources' task
@@ -123,6 +142,7 @@ project.ext.depConfigs.activeDepConfigs.each { final String csVersion ->
     assembleTask.setDescription("${project.ext.longName}: Assembles the outputs of this project pertaining to " +
         "Checkstyle ${csVersion}.");
     assembleTask.dependsOn(jarTask);
+    assembleTask.dependsOn(fatjarTask);
     assembleTask.dependsOn(jarSourcesTask);
     assembleTask.dependsOn(jarJavadocTask);
     assembleTask.dependsOn(jarEclipseTask);
@@ -309,6 +329,74 @@ public class CreateJarTask extends Jar
 
 tasks.jar {
     enabled = false;
+}
+
+
+
+public class CreateFatJarTask extends ShadowJar
+{
+    public CreateFatJarTask()
+    {
+        super();
+        setDescription("${project.ext.longName}: Create a combined JAR of project and runtime dependencies of '");
+    }
+
+
+    protected static Set<String> getNonCheckstyleDeps(final Configuration pConfiguration)
+    {
+        Set<String> result = new HashSet<>();
+        for (ResolvedDependency dep : pConfiguration.getResolvedConfiguration().getFirstLevelModuleDependencies()) {
+            if (!CreateJarEclipseTask.isCheckstyle(dep)) {
+                result.add(dep.name);
+                dep.getChildren().each { result.add(it.name); }
+            }
+        }
+        return result;
+    }
+
+
+    /**
+     * Configure this task instance for a given dependency configuration.
+     * @param pCheckstyleVersion the Checkstyle version for which to configure
+     */
+    public void configureFor(final String pCheckstyleVersion)
+    {
+        final NameFactory nameFactory = project.ext.nameFactory;
+        final boolean isDefaultPublication = project.ext.depConfigs.isDefault(pCheckstyleVersion);
+
+        // set appendix for archive name
+        final String appendix = project.ext.depConfigs.getDepConfig(pCheckstyleVersion).getPublicationSuffix();
+        if (!isDefaultPublication) {
+            setAppendix(appendix);
+        }
+        setClassifier('all');
+
+        // dependency on the corresponding (thin) Jar task
+        final Jar thinJarTask = (Jar) nameFactory.getTask(TaskNames.jar, pCheckstyleVersion);
+        dependsOn(thinJarTask);
+
+        setDescription(getDescription() + nameFactory.getName(SourceSetNames.main, pCheckstyleVersion) + '\'.');
+
+        getManifest().inheritFrom thinJarTask.manifest;
+
+        configure {
+            from(thinJarTask.getArchivePath());
+            Configuration cfg = project.configurations.getByName(nameFactory.getSourceSet(SourceSetNames.main,
+                pCheckstyleVersion).getRuntimeConfigurationName());
+            configurations = [cfg];
+            exclude('META-INF/INDEX.LIST', 'META-INF/*.SF', 'META-INF/*.DSA', 'META-INF/*.RSA', 'META-INF/maven/**/*',
+                'pom.xml');
+            Set<String> deps = getNonCheckstyleDeps(cfg);
+            if (deps.size() > 0) {
+                append('META-INF/LICENSE');  // append all licenses found in dependent Jars into one
+                dependencies {
+                    for (String dep : deps) {
+                        include(dependency(dep));
+                    }
+                }
+            }
+        }
+    }
 }
 
 

@@ -53,6 +53,27 @@
     </rule-metadata>
 
     <!-- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -->
+    <!-- ModuleDirectoryLayout                                                                 -->
+    <!-- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -->
+    <rule-metadata name="%ModuleDirectoryLayout.name" internal-name="ModuleDirectoryLayout" parent="Checker">
+        <alternative-name internal-name="com.thomasjensen.checkstyle.addons.checks.misc.ModuleDirectoryLayoutCheck" />
+        <description>%ModuleDirectoryLayout.desc</description>
+
+        <property-metadata name="baseDir" datatype="String" default-value=".">
+            <description>%ModuleDirectoryLayout.baseDir</description>
+        </property-metadata>
+        <property-metadata name="configFile" datatype="String">
+            <description>%ModuleDirectoryLayout.configFile</description>
+        </property-metadata>
+
+        <message-key key="moduledirectorylayout.invalid.module" />
+        <message-key key="moduledirectorylayout.invalid.mdlpath" />
+        <message-key key="moduledirectorylayout.nestedsrcfolder" />
+        <message-key key="moduledirectorylayout.illegalcontent" />
+        <message-key key="moduledirectorylayout.notinthismodule" />
+    </rule-metadata>
+
+    <!-- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -->
     <!-- PropertyCatalog                                                                       -->
     <!-- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -->
     <rule-metadata name="%PropertyCatalog.name" internal-name="PropertyCatalog" parent="TreeWalker">

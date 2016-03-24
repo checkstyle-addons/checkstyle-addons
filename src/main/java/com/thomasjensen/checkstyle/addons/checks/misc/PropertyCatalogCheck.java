@@ -94,7 +94,7 @@ public class PropertyCatalogCheck
     private String propertyFileTemplate = "";
 
     /** Character encoding of the property file */
-    private Charset propertyFileEncoding = Charset.forName("UTF-8");
+    private Charset propertyFileEncoding = Util.UTF8;
 
     /** Report if two code references point to the same property? */
     private boolean reportDuplicates = true;

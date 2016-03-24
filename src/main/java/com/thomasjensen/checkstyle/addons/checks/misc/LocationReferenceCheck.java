@@ -113,9 +113,7 @@ public class LocationReferenceCheck
 
             case FullClass:
                 expected = getCurrentBinaryName().toString();
-                if (expected != null) {
-                    expected = expected.replace('$', '.');
-                }
+                expected = expected.replace('$', '.');
                 break;
 
             default:

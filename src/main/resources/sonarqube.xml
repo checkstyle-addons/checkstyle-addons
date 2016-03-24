@@ -85,6 +85,28 @@
     </rule>
 
     <!-- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -->
+    <!-- ModuleDirectoryLayout                                                                 -->
+    <!-- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -->
+    <rule>
+        <key>com.thomasjensen.checkstyle.addons.checks.misc.ModuleDirectoryLayoutCheck</key>
+        <name>Module directory layout not followed</name>
+        <category name="misc" />
+        <tag>checkstyle-addons</tag>
+        <description><![CDATA[<p>This check helps ensure that the source folder structure in a module follows a
+            configurable convention.</p>
+            <p><a href="http://checkstyle-addons.thomasjensen.com/v@version@/checks/misc.html#ModuleDirectoryLayout"
+               target="_blank">Full Documentation</a></p>]]></description>
+        <configKey>Checker/ModuleDirectoryLayout</configKey>
+        <param key="baseDir" type="STRING">
+            <description>Base directory to assume for the check execution, usually the project root</description>
+            <defaultValue>.</defaultValue>
+        </param>
+        <param key="configFile" type="STRING">
+            <description>Location of configuration file in JSON format</description>
+        </param>
+    </rule>
+
+    <!-- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -->
     <!-- PropertyCatalog                                                                       -->
     <!-- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -->
     <rule>

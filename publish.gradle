@@ -189,7 +189,7 @@ task generatePom(type: GeneratePomFile) {
 
 
 tasks.all { final Task pTask ->
-    for (final Map.Entry<String, DependencyConfig> entry : project.ext.depConfigs.publications) {
+    for (final java.util.Map.Entry<String, DependencyConfig> entry : project.ext.depConfigs.publications) {
         final String pubNameCap = entry.getKey().capitalize();
         final DependencyConfig depConfig = entry.getValue();
 

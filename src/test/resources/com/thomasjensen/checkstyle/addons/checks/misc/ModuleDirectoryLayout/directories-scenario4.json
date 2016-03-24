@@ -1,0 +1,21 @@
+{
+    "settings": {
+        "formatVersion": 1,
+        "moduleRegex": "",
+        "allowNestedSrcFolder": false
+    },
+    "structure": {
+        "src/main/resources": {
+            "whitelist": true,
+            "allow": [
+                {
+                    "type": "TopLevelFolder",
+                    "spec": "META-INF"
+                }, {
+                    "type": "TopLevelFolder",
+                    "spec": "a"
+                }
+            ]
+        }
+    }
+}

@@ -16,10 +16,7 @@
 buildscript {
     repositories {
         mavenLocal()
-        mavenCentral()
-    }
-    dependencies {
-        classpath 'org.ajoberstar:gradle-git:1.2.0';
+        jcenter()
     }
 }
 
@@ -32,7 +29,8 @@ plugins {
     id 'idea';
     id 'maven-publish';
     id 'com.jfrog.bintray' version '1.2';
-    //id 'com.github.johnrengelman.shadow' version '1.2.1';
+    id 'org.ajoberstar.grgit' version '1.4.2';
+    //id 'com.github.johnrengelman.shadow' version '1.2.3';
 }
 
 repositories {
@@ -274,6 +272,9 @@ def void addDependencies(final DependencyConfig pDepConfig, final Configuration 
     Dependency csDep = project.dependencies.create(
         'com.puppycrawl.tools:checkstyle:' + pDepConfig.getCheckstyleBaseVersion());
     pCompileConf.dependencies.add(csDep);
+    Dependency jacksonDep = project.dependencies.create(
+        'com.fasterxml.jackson.core:jackson-databind:2.7.3');
+    pCompileConf.dependencies.add(jacksonDep);
 
     // testCompile
     Dependency junitDep = project.dependencies.create('junit:junit:4.11');
@@ -414,7 +415,7 @@ findbugs {
     includeFilter = file("${project.projectDir}/project/findbugs.xml");
     excludeFilter = file("${project.projectDir}/project/findbugs-excludes.xml");
 }
-project.tasks.withType(FindBugs) {Task task ->
+project.tasks.withType(FindBugs) { final Task task ->
     if (!"findbugsMain".equals(task.name) && !"findbugsTest".equals(task.name)) {
         project.tasks.remove(task);
     }
@@ -460,11 +461,13 @@ def void configureJavadocTask(final Javadoc pTask, final SourceSet pMainSourceSe
     if (JavaVersion.VERSION_1_7.equals(pJavaLevel)) {
         pTask.options.links('https://jsr-305.googlecode.com/svn/trunk/javadoc/',
             'http://docs.oracle.com/javase/7/docs/api/',
+            'http://jcip.net/annotations/doc/',
             'http://javadocs.sonarsource.org/3.0/apidocs/',
             'http://checkstyle.sourceforge.net/apidocs/');
     } else if (JavaVersion.VERSION_1_6.equals(pJavaLevel)) {
         pTask.options.links('https://jsr-305.googlecode.com/svn/trunk/javadoc/',
             'http://docs.oracle.com/javase/6/docs/api/',
+            'http://jcip.net/annotations/doc/',
             'http://javadocs.sonarsource.org/3.0/apidocs/',
             'http://checkstyle.sourceforge.net/apidocs/');
     }
@@ -503,7 +506,8 @@ realTest.classpath += files((File) project.sourceSets.test.output.resourcesDir);
 realTest.classpath += files((File) project.sourceSets.main.output.classesDir);
 realTest.classpath += files((File) project.sourceSets.main.output.resourcesDir);
 realTest.classpath += files((Set<File>) project.configurations['testRuntime'].getFiles());
-String[] excludedClasses = ['**/com/thomasjensen/checkstyle/addons/util/CheckstyleApiFixer*'];
+String[] excludedClasses = ['**/com/thomasjensen/checkstyle/addons/util/CheckstyleApiFixer*',
+                            '**/com/thomasjensen/checkstyle/addons/checks/misc/MdlJsonConfigValidator*'];
 test {
     jacoco {
         append = false;
