@@ -165,7 +165,7 @@ Also, you may be able to set up the SevNTU checks in a separate job with a confi
 
 ### O. SonarQube Checkstyle Plugin
 
-The [SonarQube Checkstyle Plugin](http://docs.sonarqube.org/display/PLUG/Checkstyle+Plugin) lists the Checkstyle versions it uses on its website. The given version of Checkstyle is bundled with the plugin and cannot be changed. The plugin has a dependency on the SonarQube platform and the SonarQube Java plugin. Updates to this plugin are quite rare, so only a small number of Checkstyle versions are supported by SonarQube.
+The [SonarQube Checkstyle Plugin](https://github.com/SonarQubeCommunity/sonar-checkstyle) lists the Checkstyle versions it uses on its website. The given version of Checkstyle is bundled with the plugin and cannot be changed. The plugin has a dependency on the SonarQube platform and the SonarQube Java plugin. Updates to this plugin are quite rare, so only a small number of Checkstyle versions are supported by SonarQube.
 
 <a name="p" class="csa-offset-anchor"/>
 
