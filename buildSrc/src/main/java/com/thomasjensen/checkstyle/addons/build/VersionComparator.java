@@ -32,6 +32,8 @@ import javax.annotation.Nullable;
 public final class VersionComparator
     implements Comparator<String>, Serializable
 {
+    private static final long serialVersionUID = 0L;
+
     private static final Pattern PATTERN = Pattern.compile("(\\d+)\\.(\\d+)(?:\\.(\\d+))?");
 
 

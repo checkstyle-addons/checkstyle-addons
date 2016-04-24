@@ -18,7 +18,6 @@ package com.thomasjensen.checkstyle.addons.build;
 import java.io.BufferedInputStream;
 import java.io.File;
 import java.io.FileInputStream;
-import java.io.FilenameFilter;
 import java.io.IOException;
 import java.util.Arrays;
 import java.util.Collections;
@@ -107,14 +106,7 @@ public class DependencyConfigs
 
     private FileCollection readListOfDepConfigs(@Nonnull final File pDepConfigDir)
     {
-        File[] listOfFiles = pDepConfigDir.listFiles(new FilenameFilter()
-        {
-            @Override
-            public boolean accept(@Nonnull final File pDir, @Nonnull final String pName)
-            {
-                return pName.endsWith(".properties");
-            }
-        });
+        File[] listOfFiles = pDepConfigDir.listFiles(new PropertyFileFilter());
         return new SimpleFileCollection(listOfFiles);
     }
 
@@ -180,7 +172,7 @@ public class DependencyConfigs
             final DependencyConfig publishedDepConfig = readPublishedDependencyConfig(depCfgFile);
 
             final JavaVersion myJavaLevel = publishedDepConfig.getJavaLevel();
-            if (!JavaVersion.VERSION_1_6.equals(myJavaLevel) || BuildUtil.getJdk6Compiler(project) != null) {
+            if (JavaVersion.VERSION_1_6 != myJavaLevel || BuildUtil.getJdk6Compiler(project) != null) {
                 result.put(publishedDepConfig.getCheckstyleBaseVersion(), publishedDepConfig);
             }
             else {

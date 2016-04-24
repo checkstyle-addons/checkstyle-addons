@@ -35,6 +35,7 @@ import com.puppycrawl.tools.checkstyle.api.DetailAST;
 import com.puppycrawl.tools.checkstyle.api.TokenTypes;
 import com.thomasjensen.checkstyle.addons.util.CheckstyleApiFixer;
 import com.thomasjensen.checkstyle.addons.util.Util;
+import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 
 
 /**
@@ -42,6 +43,7 @@ import com.thomasjensen.checkstyle.addons.util.Util;
  *
  * @author Thomas Jensen
  */
+@SuppressFBWarnings("ACEM_ABSTRACT_CLASS_EMPTY_METHODS")
 public abstract class AbstractAddonsCheck
     extends Check
 {

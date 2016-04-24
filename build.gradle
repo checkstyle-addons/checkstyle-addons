@@ -28,6 +28,7 @@ plugins {
     id 'jacoco';
     id 'com.github.kt3k.coveralls' version '2.4.0';
     id 'checkstyle';
+    id 'findbugs';
     id 'idea';
     id 'maven-publish';
     id 'com.jfrog.bintray' version '1.2';
@@ -40,14 +41,8 @@ repositories {
     mavenCentral()
 }
 
-import com.thomasjensen.checkstyle.addons.build.BuildUtil;
-import com.thomasjensen.checkstyle.addons.build.ConfigNames;
-import com.thomasjensen.checkstyle.addons.build.DependencyConfig;
-import com.thomasjensen.checkstyle.addons.build.DependencyConfigs;
-import com.thomasjensen.checkstyle.addons.build.NameFactory;
-import com.thomasjensen.checkstyle.addons.build.SourceSetNames;
-import com.thomasjensen.checkstyle.addons.build.TaskNames;
-import org.ajoberstar.grgit.Grgit;
+import com.thomasjensen.checkstyle.addons.build.*
+import org.ajoberstar.grgit.Grgit
 
 
 group = 'com.thomasjensen.checkstyle.addons';
@@ -403,6 +398,28 @@ sourceSets.test.compileClasspath += configurations.provided;
 sourceSets.test.runtimeClasspath += configurations.provided;
 
 
+/*
+ * FindBugs configuration
+ */
+dependencies {
+    findbugs group: 'com.google.code.findbugs', name: 'findbugs', version: '3.0.1';
+    findbugs group: 'com.mebigfatguy.fb-contrib', name: 'fb-contrib', version: '6.6.1';
+}
+findbugs {
+    toolVersion = "3.0.1";
+    sourceSets = [project.sourceSets.main, project.sourceSets.test];
+    effort = "max";
+    reportLevel = "low";
+    ignoreFailures = true; // TODO false
+    includeFilter = file("${project.projectDir}/project/findbugs.xml");
+    excludeFilter = file("${project.projectDir}/project/findbugs-excludes.xml");
+}
+project.tasks.withType(FindBugs) {Task task ->
+    if (!"findbugsMain".equals(task.name) && !"findbugsTest".equals(task.name)) {
+        project.tasks.remove(task);
+    }
+}
+
 
 /*
  * Configure IntelliJ IDEA
@@ -420,7 +437,6 @@ idea.module {
     excludeDirs += file('_support');
     scopes.PROVIDED.plus += [configurations.provided];
 }
-
 
 
 /*
@@ -461,6 +477,8 @@ def void configureJavadocTask(final Javadoc pTask, final SourceSet pMainSourceSe
             '-DproxyPassword=' + System.properties['http.proxyPassword']);
     }
 }
+
+
 
 /*
  * Checkstyle configuration

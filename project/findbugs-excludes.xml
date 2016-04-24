@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="UTF-8"?><!--
+    Checkstyle-Addons - Additional Checkstyle checks
+    Copyright (C) 2015 Thomas Jensen
+
+    This program is free software: you can redistribute it and/or modify it under the
+    terms of the GNU General Public License, version 3, as published by the Free
+    Software Foundation.
+
+    This program is distributed in the hope that it will be useful, but WITHOUT ANY
+    WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A
+    PARTICULAR PURPOSE. See the GNU General Public License for more details.
+
+    You should have received a copy of the GNU General Public License along with this
+    program.  If not, see http://www.gnu.org/licenses/.
+ -->
+
+<FindBugsFilter>
+
+    <Match>
+        <!-- Test classes are subject to a relaxed ruleset only. -->
+        <Or>
+            <Class name="~com\.thomasjensen\.checkstyle\.addons\..+?Test(\$.*)?$" />
+        </Or>
+        <Bug pattern="CLI_CONSTANT_LIST_INDEX, SIC_INNER_SHOULD_BE_STATIC_ANON, REC_CATCH_EXCEPTION, MS_EXPOSE_REP,
+            ST_WRITE_TO_STATIC_FROM_INSTANCE_METHOD, FCBL_FIELD_COULD_BE_LOCAL, RV_RETURN_VALUE_IGNORED_BAD_PRACTICE,
+            DM_NUMBER_CTOR, DM_FP_NUMBER_CTOR, DM_STRING_CTOR, DMI_RANDOM_USED_ONLY_ONCE, MDM_RANDOM_SEED,
+            SACM_STATIC_ARRAY_CREATED_IN_METHOD, WOC_WRITE_ONLY_COLLECTION_LOCAL, PMB_POSSIBLE_MEMORY_BLOAT,
+            NAB_NEEDLESS_BOOLEAN_CONSTANT_CONVERSION, SBSC_USE_STRINGBUFFER_CONCATENATION,
+            BX_UNBOXING_IMMEDIATELY_REBOXED, NP_NONNULL_PARAM_VIOLATION, SACM_STATIC_ARRAY_CREATED_IN_METHOD" />
+    </Match>
+
+</FindBugsFilter>
