@@ -83,7 +83,7 @@ objects of the map may be empty, but they may also contain any of the following 
  - `deny`: List of conditions for forbidden content of the MDL path
 
 The `allow` and `deny` lists contain elements of the following form: `{ "type": "FileExtensions", "spec": "java" }`. The `type` element may be one of the constants from
-[MdlContentSpecType]({{ site.baseurl }}/{{ page.check_version }}/apidocs/index.html?com/thomasjensen/checkstyle/addons/checks/misc/MdlContentSpecType.java). Note that
+[MdlContentSpecType]({{ site.baseurl }}/{{ page.check_version }}/apidocs/index.html?com/thomasjensen/checkstyle/addons/checks/misc/MdlContentSpecType.html). Note that
 the `FromPath` type may only occur in `deny` lists.
 
 
@@ -94,7 +94,7 @@ constraints, a small verification program is supplied. Download a copy of
 [checkstyle-addons-{{ page.check_version | remove_first:'v' }}-all.jar](https://github.com/{{ site.github }}/releases/tag/{{ page.check_version }}),
 then run the validator from the command line:
 
-    java -cp checkstyle-addons-x.x.x-all.jar com.thomasjensen.checkstyle.addons.checks.misc.MdlJsonConfigValidator path/to/my/directories.json
+    java -cp checkstyle-addons-{{ page.check_version | remove_first:'v' }}-all.jar com.thomasjensen.checkstyle.addons.checks.misc.MdlJsonConfigValidator path/to/my/directories.json
 
 
 ### Examples
