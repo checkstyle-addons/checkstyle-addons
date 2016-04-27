@@ -73,7 +73,7 @@ public abstract class AbstractMethodCallCheck
      * @param pMethodName the simple name of the called method
      * @return indication of whether the call is relevant (<code>true</code>) or not (<code>false</code>)
      */
-    protected abstract boolean isRelevantCall(@Nonnull final String pQualifier, @Nonnull final String pMethodName);
+    protected abstract boolean isRelevantCall(@Nullable final String pQualifier, @Nonnull final String pMethodName);
 
 
 

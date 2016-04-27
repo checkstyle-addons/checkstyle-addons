@@ -19,6 +19,7 @@ import java.util.Collections;
 import java.util.HashSet;
 import java.util.Set;
 import javax.annotation.Nonnull;
+import javax.annotation.Nullable;
 
 import com.puppycrawl.tools.checkstyle.api.DetailAST;
 import com.puppycrawl.tools.checkstyle.api.TokenTypes;
@@ -52,7 +53,7 @@ public class IllegalMethodCallCheck
 
 
     @Override
-    protected boolean isRelevantCall(@Nonnull final String pQualifier, @Nonnull final String pMethodName)
+    protected boolean isRelevantCall(@Nullable final String pQualifier, @Nonnull final String pMethodName)
     {
         return illegalMethodNames.contains(pMethodName) && !excludedQualifiers.contains(pQualifier);
     }

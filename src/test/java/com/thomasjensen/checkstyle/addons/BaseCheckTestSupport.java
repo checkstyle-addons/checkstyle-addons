@@ -12,9 +12,7 @@ import java.io.UnsupportedEncodingException;
 import java.util.Collections;
 import java.util.List;
 import java.util.Locale;
-import java.util.Properties;
 import java.util.regex.Pattern;
-
 import javax.annotation.Nonnull;
 
 import com.google.common.collect.Lists;
@@ -24,12 +22,14 @@ import com.puppycrawl.tools.checkstyle.DefaultLogger;
 import com.puppycrawl.tools.checkstyle.TreeWalker;
 import com.puppycrawl.tools.checkstyle.api.AuditEvent;
 import com.puppycrawl.tools.checkstyle.api.Configuration;
+import com.thomasjensen.checkstyle.addons.util.Util;
 import org.junit.Assert;
 
 // @formatter:off
 /**
  * This class was copied from the Checkstyle project. The original source is <a
- * href="https://github.com/checkstyle/checkstyle/blob/checkstyle-5.8/src/test/java/com/puppycrawl/tools/checkstyle/BaseCheckTestSupport.java"
+ * href="https://github.com/checkstyle/checkstyle/blob/checkstyle-5
+ * .8/src/test/java/com/puppycrawl/tools/checkstyle/BaseCheckTestSupport.java"
  * target="_blank">on GitHub</a>. <p/>Credit goes to Oliver Burn, Ivan Sopov, et al.
  * <p/>
  * Used under the terms of the GNU LESSER GENERAL PUBLIC LICENSE, Version 2.1.
@@ -78,9 +78,21 @@ public abstract class BaseCheckTestSupport
 
     protected final ByteArrayOutputStream mBAOS = new ByteArrayOutputStream();
 
-    protected final PrintStream mStream = new PrintStream(mBAOS);
+    protected PrintStream mStream;
 
     private String checkShortname = null;
+
+
+
+    protected BaseCheckTestSupport()
+    {
+        try {
+            mStream = new PrintStream(mBAOS, false, Util.UTF8.name());
+        }
+        catch (UnsupportedEncodingException e) {
+            // cannot happen because we use an existing Charset object
+        }
+    }
 
 
 
@@ -173,43 +185,25 @@ public abstract class BaseCheckTestSupport
 
         // process each of the lines
         final ByteArrayInputStream bais = new ByteArrayInputStream(mBAOS.toByteArray());
-        final LineNumberReader lnr = new LineNumberReader(new InputStreamReader(bais));
+        final LineNumberReader lnr = new LineNumberReader(new InputStreamReader(bais, Util.UTF8));
 
         for (int i = 0; i < pExpected.length; i++) {
             final String expected = pMessageFileName + ":" + pExpected[i];
             String actual = lnr.readLine();
-            actual = actual.replaceFirst(Pattern.quote("error: "), "");    // fix message format changed in 6.11
+            if (actual != null) {
+                actual = actual.replaceFirst(Pattern.quote("error: "), "");    // fix message format changed in 6.11
 
-            // fix message format changed in 6.14 (Checkstyle Issue #2666)
-            actual = actual.replaceFirst(Pattern.quote("[ERROR] "), "");
-            final String moduleHint = " [" + checkShortname + "]";
-            if (actual.endsWith(moduleHint)) {
-                actual = actual.substring(0, actual.length() - moduleHint.length());
+                // fix message format changed in 6.14 (Checkstyle Issue #2666)
+                actual = actual.replaceFirst(Pattern.quote("[ERROR] "), "");
+                final String moduleHint = " [" + checkShortname + "]";
+                if (actual.endsWith(moduleHint)) {
+                    actual = actual.substring(0, actual.length() - moduleHint.length());
+                }
             }
-
             Assert.assertEquals("error message " + i, expected, actual);
         }
 
         Assert.assertEquals("unexpected output: " + lnr.readLine(), pExpected.length, errs);
         pChecker.destroy();
-    }
-
-
-
-    /**
-     * Gets the check message 'as is' from appropriate 'messages.properties' file.
-     *
-     * @param pMessageKey the key of message in 'messages.properties' file.
-     */
-    public String getCheckMessage(final String pMessageKey)
-    {
-        Properties pr = new Properties();
-        try {
-            pr.load(getClass().getResourceAsStream("messages.properties"));
-        }
-        catch (IOException e) {
-            return null;
-        }
-        return pr.getProperty(pMessageKey);
     }
 }

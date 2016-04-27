@@ -42,6 +42,7 @@ import com.puppycrawl.tools.checkstyle.api.TokenTypes;
 import com.thomasjensen.checkstyle.addons.checks.AbstractAddonsCheck;
 import com.thomasjensen.checkstyle.addons.checks.BinaryName;
 import com.thomasjensen.checkstyle.addons.util.Util;
+import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 
 
 /**
@@ -167,7 +168,7 @@ public class PropertyCatalogCheck
 
         if (props == null) {
             final DetailAST classIdent = pAst.findFirstToken(TokenTypes.IDENT);
-            String absPath = propFile.getAbsolutePath();
+            String absPath = propFile != null ? propFile.getAbsolutePath() : null;
             String dynamicDirsAll = null;
 
             if (propertyFileTemplate.contains("{11}")) {
@@ -278,6 +279,7 @@ public class PropertyCatalogCheck
 
 
     @Nonnull
+    @SuppressFBWarnings("CLI_CONSTANT_LIST_INDEX")
     String buildPropertyFilePath(@Nonnull final BinaryName pBinaryClassName, final int pSubDirLevel,
         final boolean pReplace11)
     {

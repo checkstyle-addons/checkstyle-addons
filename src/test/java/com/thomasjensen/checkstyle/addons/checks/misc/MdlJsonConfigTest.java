@@ -29,7 +29,7 @@ import org.junit.Test;
  *
  * @author Thomas Jensen
  */
-public class MdlJsonConfigTest
+public final class MdlJsonConfigTest
 {
     @Test
     public void deserializeExampleConfig()

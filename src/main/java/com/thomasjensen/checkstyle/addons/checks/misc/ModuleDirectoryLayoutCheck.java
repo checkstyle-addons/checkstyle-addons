@@ -72,7 +72,7 @@ public class ModuleDirectoryLayoutCheck
         super();
         InputStream is = null;
         try {
-            is = getClass().getResourceAsStream(DEFAULT_CONFIG_FILENAME);
+            is = ModuleDirectoryLayoutCheck.class.getResourceAsStream(DEFAULT_CONFIG_FILENAME);
             activateConfigFile(is, DEFAULT_CONFIG_FILENAME);
         }
         finally {

@@ -27,6 +27,7 @@ import com.puppycrawl.tools.checkstyle.DefaultConfiguration;
 import com.puppycrawl.tools.checkstyle.api.CheckstyleException;
 import com.thomasjensen.checkstyle.addons.BaseFileSetCheckTestSupport;
 import com.thomasjensen.checkstyle.addons.util.Util;
+import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
@@ -60,6 +61,7 @@ public class ModuleDirectoryLayoutTest
 
 
     @Test
+    @SuppressFBWarnings(value = "DMI_HARDCODED_ABSOLUTE_FILENAME", justification = "These are fictional absolute paths")
     public void testDecomposePath1()
         throws IOException
     {
@@ -90,6 +92,7 @@ public class ModuleDirectoryLayoutTest
 
 
     @Test
+    @SuppressFBWarnings(value = "DMI_HARDCODED_ABSOLUTE_FILENAME", justification = "These are fictional absolute paths")
     public void testDecomposePathNoExtension()
         throws IOException
     {
@@ -117,6 +120,7 @@ public class ModuleDirectoryLayoutTest
 
 
     @Test
+    @SuppressFBWarnings(value = "DMI_HARDCODED_ABSOLUTE_FILENAME", justification = "These are fictional absolute paths")
     public void testDecomposePathExtensionLeadingDot()
         throws IOException
     {
@@ -146,6 +150,7 @@ public class ModuleDirectoryLayoutTest
 
 
     @Test
+    @SuppressFBWarnings(value = "DMI_HARDCODED_ABSOLUTE_FILENAME", justification = "These are fictional absolute paths")
     public void testDecomposePathExtensionLeadingDoubleDot()
         throws IOException
     {
@@ -175,6 +180,7 @@ public class ModuleDirectoryLayoutTest
 
 
     @Test
+    @SuppressFBWarnings(value = "DMI_HARDCODED_ABSOLUTE_FILENAME", justification = "These are fictional absolute paths")
     public void testDecomposePathExtensionEmbeddedDoubleDot()
         throws IOException
     {
@@ -206,6 +212,7 @@ public class ModuleDirectoryLayoutTest
 
 
     @Test
+    @SuppressFBWarnings(value = "DMI_HARDCODED_ABSOLUTE_FILENAME", justification = "These are fictional absolute paths")
     public void testDecomposePathWrongBasedir()
         throws IOException
     {
@@ -222,6 +229,7 @@ public class ModuleDirectoryLayoutTest
 
 
     @Test
+    @SuppressFBWarnings(value = "DMI_HARDCODED_ABSOLUTE_FILENAME", justification = "These are fictional absolute paths")
     public void testDecomposePathFileInModuleRoot()
         throws IOException
     {
