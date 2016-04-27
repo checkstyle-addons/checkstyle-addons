@@ -453,7 +453,7 @@ def void configureJavadocTask(final Javadoc pTask, final SourceSet pMainSourceSe
     pTask.options.encoding = 'UTF-8';
     pTask.options.docEncoding = 'UTF-8';
     pTask.options.charSet = 'UTF-8';
-    pTask.options.author = true;
+    pTask.options.author = false;
     pTask.options.use = true;
     pTask.options.windowTitle = project.ext.longName;
     pTask.options.splitIndex = false;
