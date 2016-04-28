@@ -39,14 +39,8 @@ repositories {
     mavenCentral()
 }
 
-import com.thomasjensen.checkstyle.addons.build.BuildUtil;
-import com.thomasjensen.checkstyle.addons.build.ConfigNames;
-import com.thomasjensen.checkstyle.addons.build.DependencyConfig;
-import com.thomasjensen.checkstyle.addons.build.DependencyConfigs;
-import com.thomasjensen.checkstyle.addons.build.NameFactory;
-import com.thomasjensen.checkstyle.addons.build.SourceSetNames;
-import com.thomasjensen.checkstyle.addons.build.TaskNames;
-import org.ajoberstar.grgit.Grgit;
+import com.thomasjensen.checkstyle.addons.build.*
+import org.ajoberstar.grgit.Grgit
 
 
 group = 'com.thomasjensen.checkstyle.addons';
@@ -465,13 +459,13 @@ def void configureJavadocTask(final Javadoc pTask, final SourceSet pMainSourceSe
     pTask.options.splitIndex = false;
     pTask.options.header = project.ext.longName;
     if (JavaVersion.VERSION_1_7.equals(pJavaLevel)) {
-        pTask.options.links('https://jsr-305.googlecode.com/svn/trunk/javadoc/',
+        pTask.options.links('http://checkstyle-addons.github.io/jsr305-javadoc/3.0.1/',
             'http://docs.oracle.com/javase/7/docs/api/',
             'http://jcip.net/annotations/doc/',
             'http://javadocs.sonarsource.org/3.0/apidocs/',
             'http://checkstyle.sourceforge.net/apidocs/');
     } else if (JavaVersion.VERSION_1_6.equals(pJavaLevel)) {
-        pTask.options.links('https://jsr-305.googlecode.com/svn/trunk/javadoc/',
+        pTask.options.links('http://checkstyle-addons.github.io/jsr305-javadoc/3.0.1/',
             'http://docs.oracle.com/javase/6/docs/api/',
             'http://jcip.net/annotations/doc/',
             'http://javadocs.sonarsource.org/3.0/apidocs/',
