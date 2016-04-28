@@ -468,6 +468,20 @@ public class ModuleDirectoryLayoutTest
 
 
 
+
+    @Test
+    public void testGoodContent2b()
+        throws Exception
+    {
+        mCheckConfig.addAttribute("baseDir", getPath("misc/ModuleDirectoryLayout/default"));
+        mCheckConfig.addAttribute("configFile", getPath("misc/ModuleDirectoryLayout/directories-scenario6.json"));
+
+        final String filepath = getPath("misc/ModuleDirectoryLayout/default/src/main/resources/a/file.txt");
+        verify(mCheckConfig, filepath, new String[0]);
+    }
+
+
+
     @Test
     public void testGoodContent3()
         throws Exception

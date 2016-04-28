@@ -63,6 +63,34 @@ public class ModuleDirectoryLayoutCheck
 
 
 
+    /** SpecLists can be allow or deny lists. */
+    private enum SpecListType
+    {
+        Allow(true),
+
+        Deny(false);
+
+        //
+
+        private final boolean caseSensitive;
+
+
+
+        private SpecListType(final boolean pCaseSensitive)
+        {
+            caseSensitive = pCaseSensitive;
+        }
+
+
+
+        public boolean isCaseSensitive()
+        {
+            return caseSensitive;
+        }
+    }
+
+
+
     /**
      * Constructor. Activates the default config file, which may be overridden by the <code>configFile</code> check
      * property.
@@ -115,18 +143,18 @@ public class ModuleDirectoryLayoutCheck
     private boolean isAllowListPostProcessingOk(@Nullable final List<MdlJsonConfig.SpecElement> pAllowList,
         @Nonnull final DecomposedPath pDecomposedPath)
     {
-        boolean result = true;
+        boolean ok = true;
         if (pAllowList != null && pAllowList.size() > 0) {
             for (final MdlJsonConfig.SpecElement se : pAllowList) {
                 if (se.getType() == MdlContentSpecType.TopLevelFolder) {
-                    result = checkTopLevelFolder(se.getSpec(), pDecomposedPath.getSpecificFolders(), true);
-                    if (result) {
+                    ok = isTopLevelFolderNestingOk(se.getSpec(), pDecomposedPath.getSpecificFolders());
+                    if (!ok) {
                         break;
                     }
                 }
             }
         }
-        return result;
+        return ok;
     }
 
 
@@ -134,15 +162,26 @@ public class ModuleDirectoryLayoutCheck
     private boolean checkTopLevelFolder(@Nonnull final String pTopLevelFolder,
         @Nonnull final List<String> pSpecificFolders, final boolean pCaseSensitive)
     {
-        boolean result = false;
+        boolean ok = true;
         if (pSpecificFolders.size() > 0) {
-            result = Util.stringEquals(pSpecificFolders.get(0), pTopLevelFolder, pCaseSensitive);
-            if (pSpecificFolders.size() > 1) {
-                result = result && !Util.containsString(pSpecificFolders.subList(1, pSpecificFolders.size()),
-                    pTopLevelFolder, false); // never case sensitive
-            }
+            ok = Util.stringEquals(pSpecificFolders.get(0), pTopLevelFolder, pCaseSensitive)
+                && isTopLevelFolderNestingOk(pTopLevelFolder, pSpecificFolders);
         }
-        return result;
+
+        return ok;
+    }
+
+
+
+    private boolean isTopLevelFolderNestingOk(@Nonnull final String pTopLevelFolder,
+        @Nonnull final List<String> pSpecificFolders)
+    {
+        boolean ok = true;
+        if (pSpecificFolders.size() > 1) {
+            ok = !Util.containsString(pSpecificFolders.subList(1, pSpecificFolders.size()), pTopLevelFolder,
+                false); // never case sensitive
+        }
+        return ok;
     }
 
 
@@ -153,12 +192,10 @@ public class ModuleDirectoryLayoutCheck
         boolean allowed = true;
         boolean denied = false;
         if (pMdlSpec.isWhitelist() && pMdlSpec.getAllow() != null && !pMdlSpec.getAllow().isEmpty()) {
-            // allow lists are case sensitive
-            allowed = processSpecList(pMdlSpec.getAllow(), pDecomposedPath, true);
+            allowed = processSpecList(pMdlSpec.getAllow(), pDecomposedPath, SpecListType.Allow);
         }
         if (pMdlSpec.getDeny() != null && !pMdlSpec.getDeny().isEmpty()) {
-            // deny lists are case insensitive
-            denied = processSpecList(pMdlSpec.getDeny(), pDecomposedPath, false);
+            denied = processSpecList(pMdlSpec.getDeny(), pDecomposedPath, SpecListType.Deny);
         }
         return allowed && !denied;
     }
@@ -175,9 +212,9 @@ public class ModuleDirectoryLayoutCheck
 
 
     private boolean processSpecList(@Nullable final List<MdlJsonConfig.SpecElement> pSpecList,
-        @Nonnull final DecomposedPath pDecomposedPath, final boolean pCaseSensitive)
+        @Nonnull final DecomposedPath pDecomposedPath, @Nonnull final SpecListType pListType)
     {
-        boolean result = false;
+        boolean match = false;
         if (pSpecList != null) {
             for (final MdlJsonConfig.SpecElement se : pSpecList) {
                 switch (se.getType()) {
@@ -185,46 +222,50 @@ public class ModuleDirectoryLayoutCheck
                     case FileExtensions:
                         for (final String allowedExtension : se.getSpec().split("\\s*,\\s*")) {
                             if (Util.containsString(pDecomposedPath.getFileExtensions(), allowedExtension,
-                                pCaseSensitive)) {
-                                result = true;
+                                pListType.isCaseSensitive())) {
+                                match = true;
                                 break;
                             }
                         }
                         break;
 
-                    case SimpleFolder:
-                        result = Util.containsString(pDecomposedPath.getSpecificFolders(), se.getSpec(),
-                            pCaseSensitive);
-                        break;
-
                     case TopLevelFolder:
-                        result = checkTopLevelFolder(se.getSpec(), pDecomposedPath.getSpecificFolders(),
-                            pCaseSensitive);
+                        if (pListType == SpecListType.Allow) {
+                            match = checkTopLevelFolder(se.getSpec(), pDecomposedPath.getSpecificFolders(),
+                                pListType.isCaseSensitive());
+                            break;
+                        }
+                        // fall through
+
+                    case SimpleFolder:
+                        match = Util.containsString(pDecomposedPath.getSpecificFolders(), se.getSpec(),
+                            pListType.isCaseSensitive());
                         break;
 
                     case SimpleName:
-                        result = Util.stringEquals(pDecomposedPath.getSimpleFilename(), se.getSpec(), pCaseSensitive);
+                        match = Util.stringEquals(pDecomposedPath.getSimpleFilename(), se.getSpec(),
+                            pListType.isCaseSensitive());
                         break;
 
                     case SpecificPathRegex:
-                        result = Pattern.compile(se.getSpec()).matcher(pDecomposedPath.getSpecificPath()).find();
+                        match = Pattern.compile(se.getSpec()).matcher(pDecomposedPath.getSpecificPath()).find();
                         break;
 
                     case FromPath:
                         // only possible in deny lists
-                        result = processSpecList(mdlConfig.getStructure().get(se.getSpec()).getAllow(), pDecomposedPath,
-                            pCaseSensitive);
+                        match = processSpecList(mdlConfig.getStructure().get(se.getSpec()).getAllow(), pDecomposedPath,
+                            pListType);
                         break;
 
                     default:
                         throw new IllegalStateException("Unexpected enum constant: " + se.getType());
                 }
-                if (result) {
+                if (match) {
                     break;
                 }
             }
         }
-        return result;
+        return match;
     }
 
 
