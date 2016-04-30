@@ -84,9 +84,11 @@ The example above has been tested with the Checkstyle dependency set to 6.2 - {{
 
 ## Ant
 
-In Ant, we must add {{ site.name }} to the classpath of the [Checkstyle Ant Task]({{ site.link_cs_anttask }}){:target="_blank"}. The Ant task is part of the standard Checkstyle distribution. We need **at least Checkstyle 6.2** (currently tested up to {{ site.latest_checkstyle_tested }}). And of course the {{ site.name }} jar file:
+In Ant, we must add {{ site.name }} to the classpath of the [Checkstyle Ant Task]({{ site.link_cs_anttask }}){:target="_blank"}. The Ant task is part of the standard Checkstyle distribution. We need **at least Checkstyle 6.2** (currently tested up to {{ site.latest_checkstyle_tested }}), and the {{ site.name }} FatJAR:
 
-<p><a href="https://github.com/{{ site.github }}/releases/download/v{{ site.latest_version }}/checkstyle-addons-{{ site.latest_version }}.jar" class="btn btn-primary">Download JAR</a></p>
+<p><a href="https://github.com/{{ site.github }}/releases/download/v{{ site.latest_version }}/checkstyle-addons-{{ site.latest_version }}-all.jar" class="btn btn-primary">Download FatJAR</a></p>
+
+The FatJAR (some people say "UberJAR") is simply a JAR which includes {{ site.name }} along with all its dependencies except Checkstyle itself.
 
 Then, in our Ant *build.xml*, we declare the Checkstyle task as follows:
 
@@ -94,7 +96,7 @@ Then, in our Ant *build.xml*, we declare the Checkstyle task as follows:
 <taskdef resource="checkstyletask.properties">
     <classpath>
         <pathelement location="lib/checkstyle-{{ site.latest_version_checkstyle }}-all.jar"/>
-        <pathelement location="lib/checkstyle-addons-{{ site.latest_version }}.jar"/>
+        <pathelement location="lib/checkstyle-addons-{{ site.latest_version }}-all.jar"/>
     </classpath>
 </taskdef>
 {% endhighlight %}
@@ -122,19 +124,19 @@ If you use Ivy for dependency management in Ant, you can take advantage of the f
 
 In IntelliJ IDEA or Android Studio, {{ site.name }} runs as a third-party addon to the [Checkstyle-IDEA plugin](https://plugins.jetbrains.com/plugin/1065){:target="_blank"}. So first make sure you've got Checkstyle-IDEA. If not, install via *File &rarr; Settings... &rarr; Plugins &rarr; Browse Repostories*.
 
-<p><a href="https://github.com/{{ site.github }}/releases/download/v{{ site.latest_version }}/checkstyle-addons-{{ site.latest_version }}.jar" class="btn btn-primary">Download Plugin</a></p>
+<p><a href="https://github.com/{{ site.github }}/releases/download/v{{ site.latest_version }}/checkstyle-addons-{{ site.latest_version }}-all.jar" class="btn btn-primary">Download Plugin</a></p>
 
- After that, you can add {{ site.name }} to the third-party checks:
+After that, you can add {{ site.name }} to the third-party checks:
 
 <div class="csa-largeImageWrapper">
-<img src="{{ site.baseurl }}/images/run-intellij.png" alt="{{ site.name }} in IntelliJ IDEA" width="740" height="501" />
+<img src="{{ site.baseurl }}/images/run-intellij.png" alt="{{ site.name }} in IntelliJ IDEA" width="729" height="490" />
 </div>
 
 Checkstyle-IDEA does not offer a visual editor, so you'll have to activate the {{ site.name }} checks by modifying your *checkstyle.xml* directly.
 
 The {{ site.name }} version offered by the above download button is compatible with Checkstyle 6.2 - {{ site.latest_checkstyle_tested }} (which means Checkstyle-IDEA 4.14.0 and up). If you are using the older Checkstyle versions 6.0 - 6.1.1, you must use a special, compatible version of {{ site.name }} instead:
 
-<p><a href="https://github.com/{{ site.github }}/releases/download/v{{ site.latest_version }}/checkstyle-addons-java6-{{ site.latest_version }}.jar" class="btn btn-warning btn-sm">Download Legacy Plugin</a></p>
+<p><a href="https://github.com/{{ site.github }}/releases/download/v{{ site.latest_version }}/checkstyle-addons-java6-{{ site.latest_version }}-all.jar" class="btn btn-warning btn-sm">Download Legacy Plugin</a></p>
 
 
 <!-- ======================================================================================= -->
@@ -230,16 +232,16 @@ The SonarQube rules provided by {{ site.name }} are tagged with `checkstyle-addo
 
 ## Command Line
 
-Checkstyle can also be run [from the command line](http://checkstyle.sourceforge.net/cmdline.html){:target="_blank"}. {{ site.name }} is included by simply adding it to the classpath.
+Checkstyle can also be run [from the command line](http://checkstyle.sourceforge.net/cmdline.html){:target="_blank"}. {{ site.name }} is included by simply adding its FatJAR to the classpath.
 If you are using at least Java&nbsp;7, and at least Checkstyle 6.2 (tested up to {{ site.latest_checkstyle_tested }}), you may use the regular JAR. If you are using Checkstyle 6.0 - 6.1.1, you must use the legacy JAR. The code you're analyzing can be anything up to Java&nbsp;8.
 
-<p><a href="https://github.com/{{ site.github }}/releases/download/v{{ site.latest_version }}/checkstyle-addons-{{ site.latest_version }}.jar" class="btn btn-primary">Download regular JAR</a> &nbsp; &nbsp; &nbsp;
-<a href="https://github.com/{{ site.github }}/releases/download/v{{ site.latest_version }}/checkstyle-addons-java6-{{ site.latest_version }}.jar" class="btn btn-warning btn-sm">Download legacy JAR</a></p>
+<p><a href="https://github.com/{{ site.github }}/releases/download/v{{ site.latest_version }}/checkstyle-addons-{{ site.latest_version }}-all.jar" class="btn btn-primary">Download regular JAR</a> &nbsp; &nbsp; &nbsp;
+<a href="https://github.com/{{ site.github }}/releases/download/v{{ site.latest_version }}/checkstyle-addons-java6-{{ site.latest_version }}-all.jar" class="btn btn-warning btn-sm">Download legacy JAR</a></p>
 
 Now you can run Checkstyle with {{ site.name }} like this (example for regular JAR):
 
 ```
-java -cp checkstyle-addons-{{ site.latest_version }}.jar;checkstyle-{{ site.latest_version_checkstyle }}-all.jar com.puppycrawl.tools.checkstyle.Main -c your-checkstyle.xml src
+java -cp checkstyle-addons-{{ site.latest_version }}-all.jar;checkstyle-{{ site.latest_version_checkstyle }}-all.jar com.puppycrawl.tools.checkstyle.Main -c your-checkstyle.xml src
 ```
 
 The above assumes that your sources are in a subdirectory *src*, and that the required JARs and your configuration file are in the current directory.
