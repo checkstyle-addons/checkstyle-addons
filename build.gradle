@@ -455,6 +455,7 @@ def void configureJavadocTask(final Javadoc pTask, final SourceSet pMainSourceSe
     pTask.options.charSet = 'UTF-8';
     pTask.options.author = false;
     pTask.options.use = true;
+    pTask.options.noDeprecated = true;
     pTask.options.windowTitle = project.ext.longName;
     pTask.options.splitIndex = false;
     pTask.options.header = project.ext.longName;
