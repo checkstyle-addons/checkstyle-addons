@@ -60,10 +60,11 @@ breaking change may not affect your configuration, if you don't use the changed 
 
 A check mark in this column indicates that a version upgrade of Checkstyle from the previous version does not require
 changes to a custom check, as long as that custom check uses only the public API. Cases where the custom check is
-implemented by subclassing a built-in check were not considered. Only the differences to the immediately preceding
-version are considered. This information was primarily gathered from the
-[release notes]({{ site.link_cs_releasenotes }}), but additional analysis of the commit history on
-GitHub has turned up further breaking changes:
+implemented by subclassing a built-in check were not considered. Also, changes to test code were not considered, so
+it is possible that unit tests would fail but production code would not. Only the differences to the immediately
+preceding version are considered.\\
+This information was primarily gathered from the [release notes]({{ site.link_cs_releasenotes }}), but additional
+analysis of the commit history on GitHub has turned up further breaking changes:
 
 <div class="checkpage"><dl>
 <dt class="title">Checkstyle</dt><dd class="title">– Breaking Change</dd>
