@@ -9,7 +9,7 @@ projects. By default, it is configured for a basic [Maven Standard Directory Lay
 
 For the purposes of this check, the absolute path of any file checked by Checkstyle is composed of four parts:
 
-<p><tt><span style="background-color:#dddddd;">D:\Projects\myproject</span>\<span style="background-color:#ddddff;">dir1\mymodule1</span>\<span style="background-color:#ffdddd;">src\main\java</span>\<span style="background-color:#ddffdd;">com\acme\MyClass.java</span></tt></p>
+<div style="word-wrap:break-word;"><tt><span style="background-color:#dddddd;">D:\Projects\myproject</span>\<span style="background-color:#ddddff;">dir1\mymodule1</span>\<span style="background-color:#ffdddd;">src\main\java</span>\<span style="background-color:#ddffdd;">com\acme\MyClass.java</span></tt></div>
 
 - the <span style="background-color:#dddddd;">**baseDir**</span> (gray) as specified by the corresponding check
   property `baseDir`
