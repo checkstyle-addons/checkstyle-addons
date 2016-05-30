@@ -33,7 +33,7 @@ exclude: ['README.md', 'LICENSE', '*.iml', 'build', 'gradle']
 latest_version: '3.0.0'
 latest_major: '3'
 latest_version_checkstyle: '6.4.1'
-latest_checkstyle_tested: '6.18'
+latest_checkstyle_tested: '6.19'
 
 # links to external websites that are used in multiple places throughout the site
 link_bintray: 'https://bintray.com/checkstyle-addons/checkstyle-addons/checkstyle-addons/view'
