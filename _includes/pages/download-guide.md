@@ -26,7 +26,7 @@ descriptions here. The most important factor is the Checkstyle version that you 
  - [checkstyle-addons-eclipse-{{ page.csa_version }}.jar](https://github.com/{{ site.github }}/releases/download/v{{ page.csa_version }}/checkstyle-addons-eclipse-{{ page.csa_version }}.jar) -
    The {{ site.name }} plugin for Eclipse (requires Eclipse-CS 6.2.0 or newer).
  - [sonar-checkstyleaddons-{{ page.csa_version }}.jar](https://github.com/{{ site.github }}/releases/download/v{{ page.csa_version }}/sonar-checkstyleaddons-{{ page.csa_version }}.jar) -
-   The SonarQube plugin (requires SonarQube Checkstyle Plugin 2.3 or newer).
+   The SonarQube plugin (requires SonarQube Checkstyle Plugin 2.3 or newer - [download](https://github.com/checkstyle-addons/sonar-checkstyle/releases)).
 
 ### Checkstyle 6.0 - 6.1.1 (Java&nbsp;6 support)
 
@@ -45,7 +45,7 @@ descriptions here. The most important factor is the Checkstyle version that you 
  - [checkstyle-addons-java6-eclipse-{{ page.csa_version }}.jar](https://github.com/{{ site.github }}/releases/download/v{{ page.csa_version }}/checkstyle-addons-java6-eclipse-{{ page.csa_version }}.jar) -
    The {{ site.name }} plugin for Eclipse (requires Eclipse-CS 6.1.x).
  - [sonar-checkstyleaddons-{{ page.csa_version }}-csp2.2.jar](https://github.com/{{ site.github }}/releases/download/v{{ page.csa_version }}/sonar-checkstyleaddons-{{ page.csa_version }}-csp2.2.jar) -
-   The SonarQube plugin (requires SonarQube Checkstyle Plugin 2.2).
+   The SonarQube plugin (requires SonarQube Checkstyle Plugin 2.2 - [download](https://github.com/checkstyle-addons/sonar-checkstyle/releases/tag/v2.2)).
 
 ### Source Code
 
