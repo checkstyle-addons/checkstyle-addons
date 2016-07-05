@@ -1,8 +1,8 @@
 language: java
 
 jdk:
-  - openjdk7
-  - oraclejdk7
+  - openjdk8
+  - oraclejdk8
 
 sudo: false
 
@@ -16,6 +16,8 @@ env:
   global:
   - checkstyleaddons_jdk6_javac=/usr/lib/jvm/java-6-openjdk-amd64/bin/javac
   - checkstyleaddons_jdk6_javadoc=/usr/lib/jvm/java-6-openjdk-amd64/bin/javadoc
+  - checkstyleaddons_jdk7_javac=/usr/lib/jvm/java-7-openjdk-amd64/bin/javac
+  - checkstyleaddons_jdk7_javadoc=/usr/lib/jvm/java-7-openjdk-amd64/bin/javadoc
 
 script:
   - ./gradlew check xcheck site
