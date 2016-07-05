@@ -4,12 +4,12 @@ jdk:
   - openjdk8
   - oraclejdk8
 
-sudo: false
+sudo: true
 
 before_install:
   - ls -a
   - pwd
-#  - sudo update-alternatives --config java
+  - sudo update-alternatives --config java
   - ./gradlew clean
 
 env:
