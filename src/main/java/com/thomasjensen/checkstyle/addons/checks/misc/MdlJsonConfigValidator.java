@@ -26,9 +26,8 @@ import com.thomasjensen.checkstyle.addons.util.Util;
 /**
  * Small utility which allows people to validate the syntactical correctness of their ModuleDirectoryLayout JSON
  * config.
- * <p/>
- * Call from command line: <code>java -cp checkstyle-addons-x.x.x-all.jar;checkstyle-6.16.1-all.jar
- * com.thomasjensen.checkstyle.addons.checks.misc.MdlJsonConfigValidator path/to/my-directories.json</code>
+ * <p>Call from command line: <code>java -cp checkstyle-addons-x.x.x-all.jar;checkstyle-6.16.1-all.jar
+ * com.thomasjensen.checkstyle.addons.checks.misc.MdlJsonConfigValidator path/to/my-directories.json</code></p>
  *
  * @author Thomas Jensen
  */ // @formatter:on
@@ -45,7 +44,6 @@ public final class MdlJsonConfigValidator
      * Main.
      *
      * @param pArgs command-line arguments
-     * @throws ConfigValidationException validation of the configuration file failed
      */
     public static void main(@Nonnull final String[] pArgs)
     {

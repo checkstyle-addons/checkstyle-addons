@@ -47,9 +47,8 @@ import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 
 /**
  * This check helps to keep a property file in sync with a piece of code that contains the property keys.
- * <p/>
- * <a href="http://checkstyle-addons.thomasjensen.com/latest/checks/misc.html#PropertyCatalog"
- * target="_blank">Documentation</a>
+ * <p><a href="http://checkstyle-addons.thomasjensen.com/latest/checks/misc.html#PropertyCatalog"
+ * target="_blank">Documentation</a></p>
  *
  * @author Thomas Jensen
  */
@@ -57,8 +56,8 @@ public class PropertyCatalogCheck
     extends AbstractAddonsCheck
 {
     /** AST tokens that we want to visit */
-    private static final Set<Integer> TOKENS = Collections.unmodifiableSet(new TreeSet<Integer>(Arrays.asList(
-        TokenTypes.ENUM_CONSTANT_DEF, TokenTypes.VARIABLE_DEF)));
+    private static final Set<Integer> TOKENS = Collections.unmodifiableSet(
+        new TreeSet<Integer>(Arrays.asList(TokenTypes.ENUM_CONSTANT_DEF, TokenTypes.VARIABLE_DEF)));
 
     /** speed up processing by skipping types which are not property catalogs */
     private final Deque<Boolean> skipType = new LinkedList<Boolean>();
@@ -313,8 +312,8 @@ public class PropertyCatalogCheck
 
     /**
      * Assuming that the currently analyzed file is located below the current working directory, this method returns a
-     * new array of exactly <code>pNumSubdirs</code> elements containing the simple names of the directories on the path
-     * to the currently analyzed file, starting just below the current working directory.
+     * new array of exactly <code>pNumSubdirs</code> elements containing the simple names of the directories on the
+     * path to the currently analyzed file, starting just below the current working directory.
      *
      * @param pNumSubdirs the number of subdirectory names to return. If fewer exist, they are padded with
      * <code>null</code>

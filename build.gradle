@@ -51,6 +51,8 @@ ext {
     defaultPublication = 'checkstyleAddons';   // name of the default Gradle publication
     jdk6PropName = 'checkstyleaddons_jdk6_javac';
     javadoc6PropName = 'checkstyleaddons_jdk6_javadoc';
+    jdk7PropName = 'checkstyleaddons_jdk7_javac';
+    javadoc7PropName = 'checkstyleaddons_jdk7_javadoc';
     authorName = 'Thomas Jensen';
     longName = 'Checkstyle Addons';
     orgName = 'Checkstyle Addons';
@@ -232,7 +234,15 @@ project.ext.depConfigs.activeDepConfigs.each { final String csVersion ->
     javadocTask.setSource(mainSourceSet.allJava);
     javadocTask.setDestinationDir(new File((File) project.docsDir, javadocTask.name));
     configureJavadocTask(javadocTask, mainSourceSet, javaLevel);
-    if (JavaVersion.VERSION_1_6.equals(javaLevel)) {
+    if (JavaVersion.VERSION_1_7.equals(javaLevel)) {
+        String javadoc7Exe = BuildUtil.getJdk7Javadoc(project);
+        if (javadoc7Exe == null) {
+            throw new GradleException('ERROR: Property \'' + project.ext.javadoc7PropName +
+                '\' not defined in gradle.properties. It must point to a Java 7 javadoc executable.');
+        }
+        javadocTask.setExecutable(javadoc7Exe);
+    }
+    else if (JavaVersion.VERSION_1_6.equals(javaLevel)) {
         String javadoc6Exe = BuildUtil.getJdk6Javadoc(project);
         if (javadoc6Exe == null) {
             throw new GradleException('ERROR: Property \'' + project.ext.javadoc6PropName +
@@ -266,6 +276,15 @@ def void addDependencies(final DependencyConfig pDepConfig, final Configuration 
         Dependency slf4jNop = project.dependencies.create(
             'org.slf4j:slf4j-nop:' + pDepConfig.getSonarQubeSlf4jNopVersion());
         pProvidedConf.dependencies.add(slf4jNop);
+
+        if ('7.0'.equals(pDepConfig.getCheckstyleBaseVersion())) {
+            // In the transitive Guava dependency of the SonarQube 3.0 API, Guava 10.0.1 is used. This is incompatible
+            // with Checkstyle 7.0, which uses Guava 19.0. Checkstyle Addons does not use Guava, so we can safely force
+            // it in order to enable Checkstyle unit testing. Keep an eye on this for newer Checkstyle versions.
+            pProvidedConf.resolutionStrategy {
+                force 'com.google.guava:guava:19.0';
+            }
+        }
     }
 
     // compile
@@ -385,6 +404,15 @@ def void configureCompileTask(final JavaCompile pTask, final JavaVersion pJavaLe
         }
         pTask.options.forkOptions.executable = javac6;
     }
+    else if (JavaVersion.VERSION_1_7.equals(pJavaLevel)) {
+        pTask.options.fork = true;
+        def javac7 = BuildUtil.getJdk7Compiler(project);
+        if (javac7 == null) {
+            throw new GradleException('ERROR: Property \'' + project.ext.jdk7PropName +
+                '\' not defined in gradle.properties. It must point to a Java 7 compiler executable.');
+        }
+        pTask.options.forkOptions.executable = javac7;
+    }
 }
 
 
@@ -407,16 +435,16 @@ dependencies {
     findbugs group: 'com.mebigfatguy.fb-contrib', name: 'fb-contrib', version: '6.6.1';
 }
 findbugs {
-    toolVersion = "3.0.1";
+    toolVersion = '3.0.1';
     sourceSets = [project.sourceSets.main, project.sourceSets.test];
-    effort = "max";
-    reportLevel = "low";
+    effort = 'max';
+    reportLevel = 'low';
     ignoreFailures = false;
     includeFilter = file("${project.projectDir}/project/findbugs.xml");
     excludeFilter = file("${project.projectDir}/project/findbugs-excludes.xml");
 }
 project.tasks.withType(FindBugs) { final Task task ->
-    if (!"findbugsMain".equals(task.name) && !"findbugsTest".equals(task.name)) {
+    if (!'findbugsMain'.equals(task.name) && !'findbugsTest'.equals(task.name)) {
         project.tasks.remove(task);
     }
 }
@@ -459,13 +487,22 @@ def void configureJavadocTask(final Javadoc pTask, final SourceSet pMainSourceSe
     pTask.options.windowTitle = project.ext.longName;
     pTask.options.splitIndex = false;
     pTask.options.header = project.ext.longName;
-    if (JavaVersion.VERSION_1_7.equals(pJavaLevel)) {
+
+    if (JavaVersion.VERSION_1_8.equals(pJavaLevel)) {
+        pTask.options.links('http://checkstyle-addons.github.io/jsr305-javadoc/3.0.1/',
+            'http://docs.oracle.com/javase/8/docs/api/',
+            'http://jcip.net/annotations/doc/',
+            'http://javadocs.sonarsource.org/3.0/apidocs/',
+            'http://checkstyle.sourceforge.net/apidocs/');
+    }
+    else if (JavaVersion.VERSION_1_7.equals(pJavaLevel)) {
         pTask.options.links('http://checkstyle-addons.github.io/jsr305-javadoc/3.0.1/',
             'http://docs.oracle.com/javase/7/docs/api/',
             'http://jcip.net/annotations/doc/',
             'http://javadocs.sonarsource.org/3.0/apidocs/',
             'http://checkstyle.sourceforge.net/apidocs/');
-    } else if (JavaVersion.VERSION_1_6.equals(pJavaLevel)) {
+    }
+    else if (JavaVersion.VERSION_1_6.equals(pJavaLevel)) {
         pTask.options.links('http://checkstyle-addons.github.io/jsr305-javadoc/3.0.1/',
             'http://docs.oracle.com/javase/6/docs/api/',
             'http://jcip.net/annotations/doc/',

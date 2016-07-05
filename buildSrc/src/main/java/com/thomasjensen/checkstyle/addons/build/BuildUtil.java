@@ -86,6 +86,34 @@ public final class BuildUtil
 
 
 
+    /**
+     * Get the value of the project or system property whose name is set in the project's extra property {@code
+     * "jdk7PropName"}. If the project property exists, it has precedence over the system property.
+     *
+     * @param pProject the project object
+     * @return the absolute path to the javac executable for Java 7
+     */
+    public static String getJdk7Compiler(@Nonnull final Project pProject)
+    {
+        return getPropertyValue(pProject, "jdk7PropName");
+    }
+
+
+
+    /**
+     * Get the value of the project or system property whose name is set in the project's extra property {@code
+     * "javadoc7PropName"}. If the project property exists, it has precedence over the system property.
+     *
+     * @param pProject the project object
+     * @return the absolute path to the javadoc executable for Java 7
+     */
+    public static String getJdk7Javadoc(@Nonnull final Project pProject)
+    {
+        return getPropertyValue(pProject, "javadoc7PropName");
+    }
+
+
+
     private static String getPropertyValue(@Nonnull final Project pProject, @Nonnull final String pExtraPropNameRef)
     {
         final String propName = getExtraPropertyValue(pProject, pExtraPropNameRef);

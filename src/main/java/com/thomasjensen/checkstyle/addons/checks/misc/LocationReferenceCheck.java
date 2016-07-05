@@ -31,8 +31,8 @@ import com.thomasjensen.checkstyle.addons.util.Util;
 
 
 /**
- * This check compares specified method arguments to the names of the current method or class. <p/> <p><a
- * href="http://checkstyle-addons.thomasjensen.com/latest/checks/misc.html#LocationReference"
+ * This check compares specified method arguments to the names of the current method or class.
+ * <p><a href="http://checkstyle-addons.thomasjensen.com/latest/checks/misc.html#LocationReference"
  * target="_blank">Documentation</a></p>
  *
  * @author Thomas Jensen

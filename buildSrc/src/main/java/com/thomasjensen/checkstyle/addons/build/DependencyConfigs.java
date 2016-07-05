@@ -131,8 +131,10 @@ public class DependencyConfigs
             BuildUtil.closeQuietly(fis);
         }
 
-        final Set<String> compatibles = new HashSet<String>(Arrays.asList(props.getProperty("CompatibleWithCheckstyle")
-            .split("\\s*,\\s*")));
+        final Set<String> compatibles = new HashSet<String>();
+        if (props.getProperty("CompatibleWithCheckstyle") != null) {
+            compatibles.addAll(Arrays.asList(props.getProperty("CompatibleWithCheckstyle").split("\\s*,\\s*")));
+        }
         final String publicationSuffix = publicationSuffixFromFile(pDepConfig);
 
         DependencyConfig result = new DependencyConfig(props.getProperty("CheckstyleBase"), compatibles,

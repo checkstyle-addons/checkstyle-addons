@@ -27,11 +27,10 @@ import com.thomasjensen.checkstyle.addons.checks.AbstractMethodCallCheck;
 
 
 /**
- * Flags calls to methods with certain names. Occurrences are flagged based on the name alone; the type of the object to
- * which the method belongs is not taken into account.
- * <p/>
- * <a href="http://checkstyle-addons.thomasjensen.com/latest/checks/coding.html#IllegalMethodCall"
- * target="_blank">Documentation</a>
+ * Flags calls to methods with certain names. Occurrences are flagged based on the name alone; the type of the object
+ * to which the method belongs is not taken into account.
+ * <p><a href="http://checkstyle-addons.thomasjensen.com/latest/checks/coding.html#IllegalMethodCall"
+ * target="_blank">Documentation</a></p>
  *
  * @author Thomas Jensen
  */
