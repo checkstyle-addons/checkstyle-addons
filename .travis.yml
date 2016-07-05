@@ -1,15 +1,14 @@
 language: java
 
 jdk:
-  - openjdk8
   - oraclejdk8
 
-sudo: true
+sudo: false
 
 before_install:
   - ls -a
   - pwd
-  - sudo update-alternatives --config java
+#  - sudo update-alternatives --config java
   - ./gradlew clean
 
 env:
