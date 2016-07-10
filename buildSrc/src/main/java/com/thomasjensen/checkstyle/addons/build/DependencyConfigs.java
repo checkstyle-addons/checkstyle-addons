@@ -174,16 +174,19 @@ public class DependencyConfigs
             final DependencyConfig publishedDepConfig = readPublishedDependencyConfig(depCfgFile);
 
             final JavaVersion myJavaLevel = publishedDepConfig.getJavaLevel();
-            if (JavaVersion.VERSION_1_6 != myJavaLevel || BuildUtil.getJdk6Compiler(project) != null) {
-                result.put(publishedDepConfig.getCheckstyleBaseVersion(), publishedDepConfig);
-            }
-            else {
-                final String jdk6PropName = BuildUtil.getExtraPropertyValue(project, "jdk6PropName");
+            if ((JavaVersion.VERSION_1_6 == myJavaLevel && BuildUtil.getJdk6Compiler(project) == null) || (
+                JavaVersion.VERSION_1_7 == myJavaLevel && BuildUtil.getJdk7Compiler(project) == null)) {
+                final String javacPropName = JavaVersion.VERSION_1_6 == myJavaLevel ? BuildUtil.getExtraPropertyValue(
+                    project, "jdk6PropName") : BuildUtil.getExtraPropertyValue(project, "jdk7PropName");
                 project.getLogger().warn(
                     "WARNING: Skipping dependency configuration file '" + publishedDepConfig.getConfigFile().getName()
-                        + "' because of missing JDK6 compiler configuration.");
-                project.getLogger().warn("Property '" + jdk6PropName + "' not defined in gradle.properties. "
-                    + "It must point to a Java 6 compiler executable.");
+                        + "' because of missing JDK" + myJavaLevel.getMajorVersion() + " compiler configuration.");
+                project.getLogger().warn(
+                    "Property '" + javacPropName + "' not defined in gradle.properties. " + "It must point to a Java "
+                        + myJavaLevel.getMajorVersion() + " compiler executable.");
+            }
+            else {
+                result.put(publishedDepConfig.getCheckstyleBaseVersion(), publishedDepConfig);
             }
 
             // Create ancillary dependency configurations for compatible versions of Checkstyle
