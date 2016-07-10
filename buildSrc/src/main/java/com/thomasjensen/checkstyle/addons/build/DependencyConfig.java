@@ -17,6 +17,7 @@ package com.thomasjensen.checkstyle.addons.build;
 
 import java.io.File;
 import java.util.Collections;
+import java.util.List;
 import java.util.Set;
 import java.util.SortedSet;
 import java.util.TreeSet;
@@ -47,6 +48,8 @@ public final class DependencyConfig
 
     private final String findBugsVersion;
 
+    private final List<String> javadocLinks;
+
     private final boolean sonarQubeSupport;
 
     private final String sonarQubeApiVersion;
@@ -76,6 +79,7 @@ public final class DependencyConfig
      * @param pCompatibleCheckstyleVersions the Checkstyle versions to which we must be compatible
      * @param pJavaLevel the Java level
      * @param pFindBugsVersion the FindBugs version
+     * @param pJavadocLinks list of URLs to be passed to Javadoc for linking to external apidocs
      * @param pSonarQubeSupport flag if SonarQube is supported
      * @param pSonarQubeApiVersion SonarQube API version (for use in dependencies)
      * @param pSonarQubeMinPlatformVersion minimum SonarQube platform version (for use in manifest)
@@ -88,11 +92,11 @@ public final class DependencyConfig
      */
     public DependencyConfig(@Nonnull final String pCheckstyleBaseVersion,
         @Nonnull final Set<String> pCompatibleCheckstyleVersions, @Nonnull final JavaVersion pJavaLevel,
-        @Nonnull final String pFindBugsVersion, final boolean pSonarQubeSupport,
-        @Nullable final String pSonarQubeApiVersion, @Nullable final String pSonarQubeMinPlatformVersion,
-        @Nullable final String pSonarQubeMinJavaPluginVersion, @Nullable final String pSonarQubeMinCsPluginVersion,
-        @Nullable final String pSonarQubeSlf4jNopVersion, final boolean pDefaultConfig,
-        @Nonnull final String pPublicationSuffix, @Nonnull final File pConfigFile)
+        @Nonnull final String pFindBugsVersion, @Nonnull final List<String> pJavadocLinks,
+        final boolean pSonarQubeSupport, @Nullable final String pSonarQubeApiVersion,
+        @Nullable final String pSonarQubeMinPlatformVersion, @Nullable final String pSonarQubeMinJavaPluginVersion,
+        @Nullable final String pSonarQubeMinCsPluginVersion, @Nullable final String pSonarQubeSlf4jNopVersion,
+        final boolean pDefaultConfig, @Nonnull final String pPublicationSuffix, @Nonnull final File pConfigFile)
     {
         if (pCheckstyleBaseVersion == null) {
             throw new IllegalArgumentException("pCheckstyleBaseVersion is null");
@@ -102,6 +106,9 @@ public final class DependencyConfig
         }
         if (pFindBugsVersion == null) {
             throw new IllegalArgumentException("pFindBugsVersion is null");
+        }
+        if (pJavadocLinks == null) {
+            throw new IllegalArgumentException("pJavadocLinks is null");
         }
         if (pConfigFile == null) {
             throw new IllegalArgumentException("pConfigFile is null");
@@ -113,6 +120,7 @@ public final class DependencyConfig
         checkstyleBaseVersion = pCheckstyleBaseVersion;
         javaLevel = pJavaLevel;
         findBugsVersion = pFindBugsVersion;
+        javadocLinks = Collections.unmodifiableList(pJavadocLinks);
         sonarQubeSupport = pSonarQubeSupport;
         sonarQubeApiVersion = pSonarQubeApiVersion;
         sonarQubeMinPlatformVersion = pSonarQubeMinPlatformVersion;
@@ -141,6 +149,7 @@ public final class DependencyConfig
         checkstyleBaseVersion = pCheckstyleBaseVersion;
         javaLevel = pPublishedDepConfig.getJavaLevel();
         findBugsVersion = pPublishedDepConfig.getFindBugsVersion();
+        javadocLinks = pPublishedDepConfig.getJavadocLinks();
         sonarQubeSupport = false;
         sonarQubeApiVersion = null;
         sonarQubeMinPlatformVersion = null;
@@ -206,6 +215,18 @@ public final class DependencyConfig
     public String getFindBugsVersion()
     {
         return findBugsVersion;
+    }
+
+
+
+    /**
+     * Getter.
+     *
+     * @return list of URLs to be passed to Javadoc for linking to external apidocs
+     */
+    public List<String> getJavadocLinks()
+    {
+        return javadocLinks;
     }
 
 
@@ -351,6 +372,7 @@ public final class DependencyConfig
         sb.append(", compatibleCheckstyleVersions=").append(compatibleCheckstyleVersions);
         sb.append(", javaLevel=").append(javaLevel);
         sb.append(", findBugsVersion='").append(findBugsVersion).append('\'');
+        sb.append(", javadocLinks=").append(javadocLinks);
         sb.append(", sonarQubeSupport=").append(sonarQubeSupport);
         sb.append(", sonarQubeApiVersion='").append(sonarQubeApiVersion).append('\'');
         sb.append(", sonarQubeMinPlatformVersion='").append(sonarQubeMinPlatformVersion).append('\'');

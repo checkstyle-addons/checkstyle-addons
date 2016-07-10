@@ -233,7 +233,7 @@ project.ext.depConfigs.activeDepConfigs.each { final String csVersion ->
     javadocTask.dependsOn(compileTask);
     javadocTask.setSource(mainSourceSet.allJava);
     javadocTask.setDestinationDir(new File((File) project.docsDir, javadocTask.name));
-    configureJavadocTask(javadocTask, mainSourceSet, javaLevel);
+    configureJavadocTask(javadocTask, mainSourceSet, dcn.getDepConfig(csVersion));
     if (JavaVersion.VERSION_1_7.equals(javaLevel)) {
         String javadoc7Exe = BuildUtil.getJdk7Javadoc(project);
         if (javadoc7Exe == null) {
@@ -472,9 +472,9 @@ idea.module {
  * Javadoc generation
  */
 javadoc {
-    configureJavadocTask(tasks.javadoc, project.sourceSets.main, project.ext.versionDefaults.javaLevel);
+    configureJavadocTask(tasks.javadoc, project.sourceSets.main, project.ext.versionDefaults);
 }
-def void configureJavadocTask(final Javadoc pTask, final SourceSet pMainSourceSet, final JavaVersion pJavaLevel)
+def void configureJavadocTask(final Javadoc pTask, final SourceSet pMainSourceSet, final DependencyConfig pDepConfig)
 {
     pTask.title = project.ext.longName + ' v' + project.version;
     pTask.classpath = pMainSourceSet.compileClasspath;
@@ -487,28 +487,7 @@ def void configureJavadocTask(final Javadoc pTask, final SourceSet pMainSourceSe
     pTask.options.windowTitle = project.ext.longName;
     pTask.options.splitIndex = false;
     pTask.options.header = project.ext.longName;
-
-    if (JavaVersion.VERSION_1_8.equals(pJavaLevel)) {
-        pTask.options.links('http://checkstyle-addons.github.io/jsr305-javadoc/3.0.1/',
-            'http://docs.oracle.com/javase/8/docs/api/',
-            'http://jcip.net/annotations/doc/',
-            'http://javadocs.sonarsource.org/3.0/apidocs/',
-            'http://checkstyle.sourceforge.net/apidocs/');
-    }
-    else if (JavaVersion.VERSION_1_7.equals(pJavaLevel)) {
-        pTask.options.links('http://checkstyle-addons.github.io/jsr305-javadoc/3.0.1/',
-            'http://docs.oracle.com/javase/7/docs/api/',
-            'http://jcip.net/annotations/doc/',
-            'http://javadocs.sonarsource.org/3.0/apidocs/',
-            'http://checkstyle.sourceforge.net/apidocs/');
-    }
-    else if (JavaVersion.VERSION_1_6.equals(pJavaLevel)) {
-        pTask.options.links('http://checkstyle-addons.github.io/jsr305-javadoc/3.0.1/',
-            'http://docs.oracle.com/javase/6/docs/api/',
-            'http://jcip.net/annotations/doc/',
-            'http://javadocs.sonarsource.org/3.0/apidocs/',
-            'http://checkstyle.sourceforge.net/apidocs/');
-    }
+    pTask.options.links = pDepConfig.getJavadocLinks();
 
     // javadoc does not inherit the proxy settings (https://issues.gradle.org/browse/GRADLE-1228)
     if (System.properties['http.proxyHost'] != null) {

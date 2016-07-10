@@ -19,10 +19,12 @@ import java.io.BufferedInputStream;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Map;
 import java.util.Properties;
 import java.util.Set;
@@ -135,10 +137,15 @@ public class DependencyConfigs
         if (props.getProperty("CompatibleWithCheckstyle") != null) {
             compatibles.addAll(Arrays.asList(props.getProperty("CompatibleWithCheckstyle").split("\\s*,\\s*")));
         }
+
+        final List<String> javadocLinks = new ArrayList<String>();
+        if (props.getProperty("JavadocLinks") != null) {
+            javadocLinks.addAll(Arrays.asList(props.getProperty("JavadocLinks").split("\\s*,\\s*")));
+        }
         final String publicationSuffix = publicationSuffixFromFile(pDepConfig);
 
         DependencyConfig result = new DependencyConfig(props.getProperty("CheckstyleBase"), compatibles,
-            JavaVersion.toVersion(props.getProperty("JavaLevel")), props.getProperty("FindBugsVersion"),
+            JavaVersion.toVersion(props.getProperty("JavaLevel")), props.getProperty("FindBugsVersion"), javadocLinks,
             Boolean.parseBoolean(props.getProperty("SonarQubeSupport")), props.getProperty("SonarQubeApiVersion"),
             props.getProperty("SonarQubeMinPlatformVersion"), props.getProperty("SonarQubeMinJavaPlugin"),
             props.getProperty("SonarQubeMinCheckstylePlugin"), props.getProperty("SonarQubeSlf4jNopVersion"),
@@ -176,8 +183,9 @@ public class DependencyConfigs
             final JavaVersion myJavaLevel = publishedDepConfig.getJavaLevel();
             if ((JavaVersion.VERSION_1_6 == myJavaLevel && BuildUtil.getJdk6Compiler(project) == null) || (
                 JavaVersion.VERSION_1_7 == myJavaLevel && BuildUtil.getJdk7Compiler(project) == null)) {
-                final String javacPropName = JavaVersion.VERSION_1_6 == myJavaLevel ? BuildUtil.getExtraPropertyValue(
-                    project, "jdk6PropName") : BuildUtil.getExtraPropertyValue(project, "jdk7PropName");
+                final String javacPropName =
+                    JavaVersion.VERSION_1_6 == myJavaLevel ? BuildUtil.<String>getExtraPropertyValue(project,
+                        "jdk6PropName") : BuildUtil.<String>getExtraPropertyValue(project, "jdk7PropName");
                 project.getLogger().warn(
                     "WARNING: Skipping dependency configuration file '" + publishedDepConfig.getConfigFile().getName()
                         + "' because of missing JDK" + myJavaLevel.getMajorVersion() + " compiler configuration.");
