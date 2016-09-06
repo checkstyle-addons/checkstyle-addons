@@ -15,10 +15,10 @@ package com.thomasjensen.checkstyle.addons.sonarqube;
  * program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-import java.io.IOException;
 import java.io.InputStream;
 import java.util.List;
 
+import com.thomasjensen.checkstyle.addons.util.Util;
 import org.sonar.api.rules.Rule;
 import org.sonar.api.rules.RuleRepository;
 import org.sonar.api.rules.XMLRuleParser;
@@ -84,14 +84,7 @@ public final class CheckstyleExtensionRepository
             return xmlRuleParser.parse(input);
         }
         finally {
-            try {
-                if (input != null) {
-                    input.close();
-                }
-            }
-            catch (IOException e) {
-                // ignore
-            }
+            Util.closeQuietly(input);
         }
     }
 }
