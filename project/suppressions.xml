@@ -41,5 +41,7 @@
     <suppress files="[\\/]BaseCheckTestSupport\.java" checks="AbstractClassName" />
     <suppress files="[\\/]BaseCheckTestSupport\.java" checks="LineLength" lines="32-34"/>
 
-</suppressions>
+    <!-- The DTDs in this directory are in their original form and thus contain tabs. -->
+    <suppress files="[\\/]project[\\/]DTDs[\\/]" checks="FileTabCharacter" />
 
+</suppressions>

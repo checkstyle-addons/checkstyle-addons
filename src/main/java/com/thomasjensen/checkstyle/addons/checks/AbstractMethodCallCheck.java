@@ -73,7 +73,7 @@ public abstract class AbstractMethodCallCheck
      * @param pMethodName the simple name of the called method
      * @return indication of whether the call is relevant (<code>true</code>) or not (<code>false</code>)
      */
-    protected abstract boolean isRelevantCall(@Nullable final String pQualifier, @Nonnull final String pMethodName);
+    protected abstract boolean isRelevantCall(@Nullable String pQualifier, @Nonnull String pMethodName);
 
 
 
@@ -85,7 +85,7 @@ public abstract class AbstractMethodCallCheck
      * @param pMethodCallAst AST of the call, useful for logging issues ( this is a METHOD_DEF, CTOR_CALL, or a
      * SUPER_CTOR_CALL token)
      */
-    protected abstract void visitMethodCall(@Nonnull final String pMethodName, @Nonnull final DetailAST pMethodCallAst);
+    protected abstract void visitMethodCall(@Nonnull String pMethodName, @Nonnull DetailAST pMethodCallAst);
 
 
 
