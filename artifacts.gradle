@@ -276,6 +276,7 @@ public class CreateJarTask extends Jar
             from(mainSourceSet.output.resourcesDir);
 
             exclude '**/sonarqube/**';
+            exclude 'download-guide.html';
             exclude 'sonarqube.xml';
             exclude '**/*.md';
             exclude '**/checks/all_checks.html';
