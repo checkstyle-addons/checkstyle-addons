@@ -513,7 +513,7 @@ def void configureJavadocTask(final Javadoc pTask, final SourceSet pMainSourceSe
  */
 checkstyle {
     configFile file('project/checkstyle.xml');
-    configProperties 'projectDir': project.projectDir;
+    configProperties 'workspace_loc': project.projectDir;
     sourceSets = [project.sourceSets.main, project.sourceSets.test];
     toolVersion '7.1.2';  // depends on our checkstyle.xml; has nothing to do with the version used for building
     showViolations = true;
