@@ -350,6 +350,14 @@ project.ext.depConfigs.activeDepConfigs.each { final String csVersionToCheck ->
         xtestTask.classpath += files(testRuntimeConf.getFiles());
         xtestTask.classpath += files(providedConf.getFiles());
         xtestTask.configure {
+            afterSuite { final TestDescriptor descriptor, final TestResult testResult ->
+                if (descriptor.getParent() == null) {
+                    // log the final summary; this also avoids a Gradle bug I think which prevents test execution
+                    logger.lifecycle('\t' + testResult.testCount + ' tests executed, ' +
+                        testResult.successfulTestCount + ' successful, ' +
+                        testResult.skippedTestCount + ' skipped.');
+                }
+            }
             jacoco {
                 enabled = false;
             }
