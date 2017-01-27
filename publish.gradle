@@ -217,12 +217,14 @@ tasks.all { final Task pTask ->
 
 
 
-task checkProperties << {
-    ['bintray.user', 'bintray.apikey', 'bintray.gpg.passphrase', 'sonatype.user', 'sonatype.password'].each {
-        final String prp ->
-        if (!project.hasProperty(prp)) {
-            throw new GradleException("Could not find property \'${prp}\'. " +
-                'Did you forget to specify it in ~/.gradle/gradle.properties?');
+task checkProperties {
+    doLast {
+        ['bintray.user', 'bintray.apikey', 'bintray.gpg.passphrase', 'sonatype.user', 'sonatype.password'].each {
+            final String prp ->
+            if (!project.hasProperty(prp)) {
+                throw new GradleException("Could not find property \'${prp}\'. " +
+                    'Did you forget to specify it in ~/.gradle/gradle.properties?');
+            }
         }
     }
 }
