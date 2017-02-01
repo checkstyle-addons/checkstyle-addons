@@ -32,6 +32,17 @@ import org.gradle.api.plugins.ExtraPropertiesExtension;
  */
 public final class BuildUtil
 {
+    /** the Maven metadata name {@code "artifactId"} */
+    public static final String ARTIFACT_ID = "artifactId";
+
+    /** the Maven metadata name {@code "groupId"} */
+    public static final String GROUP_ID = "groupId";
+
+    /** the Maven metadata name {@code "version"} */
+    public static final String VERSION = "version";
+
+
+
     private BuildUtil()
     {
         super();
@@ -137,6 +148,7 @@ public final class BuildUtil
     @SuppressWarnings("unchecked")
     public static <T> T getExtraPropertyValue(@Nonnull final Project pProject, @Nonnull final String pExtraPropName)
     {
+        // TODO transform into method of common super task, use enum instead of string
         ExtraPropertiesExtension extraProps = pProject.getExtensions().getByType(ExtraPropertiesExtension.class);
         if (extraProps.has(pExtraPropName)) {
             return (T) extraProps.get(pExtraPropName);

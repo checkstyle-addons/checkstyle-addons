@@ -14,10 +14,7 @@
  * program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-import java.nio.file.Files;
-import java.nio.file.Paths;
-import java.nio.file.StandardCopyOption;
-
+import com.thomasjensen.checkstyle.addons.build.tasks.SiteTask;
 import org.apache.tools.ant.filters.ReplaceTokens;
 
 
@@ -75,84 +72,4 @@ task siteCopyDownloadGuide(type: Copy) {
     }
 }
 
-
-task site (dependsOn: [processResources, siteCopyAllChecks, siteCopyJavadoc, siteCopyDownloadGuide]) {
-    description = project.ext.longName + ': Package documentation for publication on the website';
-
-    FileTree tree = fileTree(sourceSets.main.resources.srcDirs.iterator().next()) {
-        include '**/*.md';
-    }
-    inputs.files(tree.files);
-
-    File siteDir = new File(project.buildDir, 'site');
-    outputs.dir(siteDir);
-
-    doLast {
-        File includesVersionDir = new File(siteDir, "_includes/v${project.version}");
-        includesVersionDir.mkdirs();
-
-        File versionChecksDir = new File(siteDir, "v${project.version}/checks");
-        versionChecksDir.mkdirs();
-        File latestChecksDir = new File(siteDir, 'latest/checks');
-        latestChecksDir.mkdirs();
-
-        SortedMap<String, List<File>> rawDocs = new TreeMap<>(String.CASE_INSENSITIVE_ORDER);
-        tree.files.each {File f ->
-            String cat = f.absoluteFile.parentFile.name;
-            List<File> catDocs = rawDocs.get(cat);
-            if (catDocs == null) {
-                catDocs = new ArrayList<>();
-                rawDocs.put(cat, catDocs);
-            }
-            catDocs.add(f.absoluteFile);
-        }
-
-        for (java.util.Map.Entry<String, List<File>> cat : rawDocs) {
-            File mdDir = new File(includesVersionDir, cat.key);
-            mdDir.mkdir();
-
-            SortedSet<String> frontMatterFileSet = new TreeSet<>(String.CASE_INSENSITIVE_ORDER);
-            for (File f : cat.value) {
-                Files.copy(Paths.get(f.toURI()), Paths.get(new File(mdDir, f.name).toURI()),
-                    StandardCopyOption.REPLACE_EXISTING, StandardCopyOption.COPY_ATTRIBUTES);
-                frontMatterFileSet.add("v${project.version}/${cat.key}/${f.name}".toString());
-            }
-
-            File catPage = new File(versionChecksDir, cat.key + '.html');
-            StringBuilder sb = new StringBuilder();
-            sb.append("---\n");
-            sb.append("layout: checks\n");
-
-            // current version
-            sb.append("check_version: v");
-            sb.append(project.version.toString());
-            sb.append("\n");
-
-            // current check category
-            sb.append("check_category: ");
-            sb.append(cat.key);
-            sb.append("\n");
-
-            // list of all check categories, so Jekyll can construct navigation
-            sb.append("check_categories:\n");
-            for (String s : rawDocs.keySet()) {
-                sb.append("  - ");
-                sb.append(s);
-                sb.append("\n");
-            }
-
-            // list of checks in this category
-            sb.append("check_list:\n");
-            for (String s : frontMatterFileSet) {
-                sb.append("  - ");
-                sb.append(s);
-                sb.append("\n");
-            }
-            sb.append("---\n\n");
-            catPage.withWriter {it << sb.toString()}
-
-            Files.copy(Paths.get(catPage.toURI()), Paths.get(new File(latestChecksDir, catPage.name).toURI()),
-                StandardCopyOption.REPLACE_EXISTING, StandardCopyOption.COPY_ATTRIBUTES);
-        }
-    }
-}
+task site (type: SiteTask);

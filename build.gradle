@@ -30,7 +30,6 @@ plugins {
     id 'maven-publish';
     id 'com.jfrog.bintray' version '1.2';
     id 'org.ajoberstar.grgit' version '1.4.2';
-    //id 'com.github.johnrengelman.shadow' version '1.2.3';
 }
 
 repositories {
@@ -467,6 +466,7 @@ idea.project {
     // example: http://mrhaki.blogspot.de/2012/09/gradle-goodness-customize-idea-project.html
 }
 idea.module {
+    // TODO Project language level is 1.8, but the main module must be on 1.6, using JDK 8 !
     downloadSources = true;
     downloadJavadoc = true;
     excludeDirs += file('.idea');

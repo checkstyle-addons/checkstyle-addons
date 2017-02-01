@@ -1,6 +1,7 @@
+// package-info.java
 /*
  * Checkstyle-Addons - Additional Checkstyle checks
- * Copyright (C) 2015 Thomas Jensen, All rights reserved.
+ * Copyright (C) 2015 Thomas Jensen
  *
  * This program is free software: you can redistribute it and/or modify it under the
  * terms of the GNU General Public License, version 3, as published by the Free
@@ -14,21 +15,9 @@
  * program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-plugins {
-    id 'java';
-}
-repositories {
-    jcenter()
-    maven {
-        url 'https://dl.bintray.com/johnrengelman/gradle-plugins';
-    }
-}
-
-sourceCompatibility = '1.8';
-
-dependencies {
-    compile group: 'com.github.jengelman.gradle.plugins', name: 'shadow', version: '1.2.4';
-    compileOnly group: 'com.google.code.findbugs', name: 'annotations', version: '3.0.1';
-    compileOnly group: 'com.google.code.findbugs', name: 'jsr305', version: '3.0.1';
-    testCompile group: 'junit', name: 'junit', version: '4.11';
-}
+/**
+ * Gradle tasks used for building Checkstyle Addons.
+ *
+ * @author Thomas Jensen
+ */
+package com.thomasjensen.checkstyle.addons.build.tasks;
