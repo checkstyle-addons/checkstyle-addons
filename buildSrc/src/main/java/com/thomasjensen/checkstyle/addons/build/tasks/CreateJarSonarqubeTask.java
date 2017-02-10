@@ -18,12 +18,9 @@ package com.thomasjensen.checkstyle.addons.build.tasks;
 import java.io.File;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
-import java.util.HashMap;
-import java.util.Map;
 import java.util.Set;
 
 import groovy.lang.Closure;
-import org.apache.tools.ant.filters.ReplaceTokens;
 import org.gradle.api.Project;
 import org.gradle.api.file.CopySpec;
 import org.gradle.api.java.archives.Attributes;
@@ -47,7 +44,7 @@ import com.thomasjensen.checkstyle.addons.build.TaskNames;
  * @author Thomas Jensen
  */
 public class CreateJarSonarqubeTask
-    extends Jar
+    extends AbstractAddonsJarTask
 {
     /**
      * Constructor.
@@ -104,16 +101,7 @@ public class CreateJarSonarqubeTask
         final SourceSet mainSourceSet = nameFactory.getSourceSet(SourceSetNames.main, pCheckstyleVersion);
 
         // Configuration of JAR file contents
-        into("META-INF", new Closure<Void>(this)
-        {
-            @Override
-            public Void call(final Object... pArgs)
-            {
-                CopySpec spec = (CopySpec) getDelegate();
-                spec.from("LICENSE");
-                return null;
-            }
-        });
+        intoFrom("META-INF", "LICENSE");
 
         into(inputs.getProperties().get("sqPackage"), new Closure<Void>(this)
         {
@@ -143,28 +131,14 @@ public class CreateJarSonarqubeTask
             {
                 CopySpec spec = (CopySpec) getDelegate();
                 spec.from(new File(mainSourceSet.getOutput().getResourcesDir(), "sonarqube.xml"));
-
-                Map<String, String> placeHolders = new HashMap<>();
-                placeHolders.put("version", inputs.getProperties().get(BuildUtil.VERSION).toString());
-                Map<String, Object> propsMap = new HashMap<>();
-                propsMap.put("tokens", placeHolders);
-                spec.filter(propsMap, ReplaceTokens.class);
+                filterVersion(spec, inputs.getProperties().get(BuildUtil.VERSION).toString());
                 return null;
             }
         });
 
         Set<File> pubLibs = CreateJarEclipseTask.getPublishedDependencyLibs(project, false);
-        into("META-INF/lib", new Closure<Void>(this)
-        {
-            @Override
-            public Void call(final Object... pArgs)
-            {
-                CopySpec spec = (CopySpec) getDelegate();
-                spec.from(jarTask.getArchivePath());
-                spec.from(pubLibs);
-                return null;
-            }
-        });
+        intoFrom("META-INF/lib", jarTask.getArchivePath());
+        intoFrom("META-INF/lib", pubLibs);
 
         Manifest mafest = getManifest();
         final Attributes attrs = mafest.getAttributes();

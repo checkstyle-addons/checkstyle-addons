@@ -36,7 +36,6 @@ import org.gradle.api.java.archives.Manifest;
 import org.gradle.api.plugins.BasePlugin;
 import org.gradle.api.tasks.SourceSet;
 import org.gradle.api.tasks.TaskInputs;
-import org.gradle.api.tasks.bundling.Jar;
 
 import com.thomasjensen.checkstyle.addons.build.BuildUtil;
 import com.thomasjensen.checkstyle.addons.build.DependencyConfigs;
@@ -51,7 +50,7 @@ import com.thomasjensen.checkstyle.addons.build.TaskNames;
  * @author Thomas Jensen
  */
 public class CreateJarEclipseTask
-    extends Jar
+    extends AbstractAddonsJarTask
 {
     /**
      * Constructor.
@@ -159,17 +158,7 @@ public class CreateJarEclipseTask
         inputs.property("authorName", BuildUtil.getExtraPropertyValue(project, "authorName"));
 
         // Configuration of JAR file contents
-        // TODO Extract into-from helper
-        into("META-INF", new Closure<Void>(this)
-        {
-            @Override
-            public Void call(final Object... pArgs)
-            {
-                CopySpec spec = (CopySpec) getDelegate();
-                spec.from("LICENSE");
-                return null;
-            }
-        });
+        intoFrom("META-INF", "LICENSE");
 
         from(mainSourceSet.getOutput(), new Closure<Void>(this)
         {
@@ -209,29 +198,13 @@ public class CreateJarEclipseTask
             {
                 final CopySpec spec = (CopySpec) getDelegate();
                 spec.include("**/checkstyle-metadata.*");
-
-                // TODO extract
-                Map<String, String> placeHolders = new HashMap<>();
-                String buildTimestamp = BuildUtil.getExtraPropertyValue(project, "buildTimestamp").toString();
-                placeHolders.put("version", inputs.getProperties().get("version").toString());
-                Map<String, Object> propsMap = new HashMap<>();
-                propsMap.put("tokens", placeHolders);
-                spec.filter(propsMap, ReplaceTokens.class);
+                filterVersion(spec, inputs.getProperties().get(BuildUtil.VERSION).toString());
                 return null;
             }
         });
 
         final Set<File> pubLibs = getPublishedDependencyLibs(project, false);
-        into("lib", new Closure<Void>(this)
-        {
-            @Override
-            public Void call(final Object... pArgs)
-            {
-                final CopySpec spec = (CopySpec) getDelegate();
-                spec.from(pubLibs);
-                return null;
-            }
-        });
+        intoFrom("lib", pubLibs);
 
         Manifest mafest = getManifest();
         final Attributes attrs = mafest.getAttributes();

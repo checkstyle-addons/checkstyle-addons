@@ -27,7 +27,6 @@ import org.gradle.api.java.archives.Attributes;
 import org.gradle.api.java.archives.Manifest;
 import org.gradle.api.plugins.BasePlugin;
 import org.gradle.api.tasks.SourceSet;
-import org.gradle.api.tasks.bundling.Jar;
 import org.gradle.internal.jvm.Jvm;
 import org.gradle.util.GradleVersion;
 
@@ -44,7 +43,7 @@ import com.thomasjensen.checkstyle.addons.build.TaskNames;
  * @author Thomas Jensen
  */
 public class CreateJarTask
-    extends Jar
+    extends AbstractAddonsJarTask
 {
     /**
      * Constructor.
@@ -129,16 +128,7 @@ public class CreateJarTask
             "eclipsecs-plugin.xml",      //
             "**/checkstyle-metadata.*");
 
-        into("META-INF", new Closure<Void>(this)
-        {
-            @Override
-            public Void call(final Object... pArgs)
-            {
-                CopySpec spec = (CopySpec) getDelegate();
-                spec.from("LICENSE");
-                return null;
-            }
-        });
+        intoFrom("META-INF", "LICENSE");
 
         // add generated pom.xml and pom.properties to archive, setting build timestamp in the process
         into("META-INF/maven/" + project.getGroup() + "/" + project.getName(), new Closure<Void>(this)

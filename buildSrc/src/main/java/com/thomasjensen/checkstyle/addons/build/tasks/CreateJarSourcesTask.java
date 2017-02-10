@@ -17,7 +17,6 @@ package com.thomasjensen.checkstyle.addons.build.tasks;
 
 import groovy.lang.Closure;
 import org.gradle.api.Project;
-import org.gradle.api.file.CopySpec;
 import org.gradle.api.plugins.BasePlugin;
 import org.gradle.api.tasks.SourceSet;
 import org.gradle.api.tasks.bundling.Jar;
@@ -35,7 +34,7 @@ import com.thomasjensen.checkstyle.addons.build.TaskNames;
  * @author Thomas Jensen
  */
 public class CreateJarSourcesTask
-    extends Jar
+    extends AbstractAddonsJarTask
 {
     /**
      * Constructor.
@@ -80,16 +79,7 @@ public class CreateJarSourcesTask
 
         // Configuration of JAR file contents
         from(mainSourceSet.getAllJava());
-        into("META-INF", new Closure<Void>(this)
-        {
-            @Override
-            public Void call(final Object... pArgs)
-            {
-                CopySpec spec = (CopySpec) getDelegate();
-                spec.from("LICENSE");
-                return null;
-            }
-        });
+        intoFrom("META-INF", "LICENSE");
 
         // Manifest
         doFirst(new Closure<Void>(this)
