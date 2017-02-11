@@ -37,6 +37,7 @@ import org.gradle.api.publish.plugins.PublishingPlugin;
 import org.gradle.api.tasks.TaskInputs;
 
 import com.thomasjensen.checkstyle.addons.build.BuildUtil;
+import com.thomasjensen.checkstyle.addons.build.ExtProp;
 import com.thomasjensen.checkstyle.addons.build.PomXml;
 
 
@@ -54,6 +55,8 @@ public class GeneratePomFileTask
 
     private final List<Configuration> bundledConfigs = new ArrayList<>();
 
+    private final BuildUtil buildUtil;
+
 
 
     /**
@@ -65,6 +68,8 @@ public class GeneratePomFileTask
         setGroup(PublishingPlugin.PUBLISH_TASK_GROUP);
 
         final Project project = getProject();
+        buildUtil = new BuildUtil(project);
+
         final TaskInputs inputs = getInputs();
         inputs.property("groupId", project.getGroup());
         inputs.property("artifactId", project.getName());
@@ -72,13 +77,13 @@ public class GeneratePomFileTask
         if (getAppendix() != null) {
             inputs.property("appendix", getAppendix());
         }
-        inputs.property("name", BuildUtil.getExtraPropertyValue(project, "longName"));
+        inputs.property("name", buildUtil.getLongName());
         inputs.property("description", project.getDescription());
-        inputs.property("url", BuildUtil.getExtraPropertyValue(project, "website"));
-        inputs.property("authorName", BuildUtil.getExtraPropertyValue(project, "authorName"));
-        inputs.property("orgName", BuildUtil.getExtraPropertyValue(project, "orgName"));
-        inputs.property("orgUrl", BuildUtil.getExtraPropertyValue(project, "orgUrl"));
-        inputs.property("github", BuildUtil.getExtraPropertyValue(project, "github"));
+        inputs.property("url", buildUtil.getExtraPropertyValue(ExtProp.Website));
+        inputs.property("authorName", buildUtil.getExtraPropertyValue(ExtProp.AuthorName));
+        inputs.property("orgName", buildUtil.getExtraPropertyValue(ExtProp.OrgName));
+        inputs.property("orgUrl", buildUtil.getExtraPropertyValue(ExtProp.OrgUrl));
+        inputs.property("github", buildUtil.getExtraPropertyValue(ExtProp.Github));
 
         getOutputs().file(pomFile);
 

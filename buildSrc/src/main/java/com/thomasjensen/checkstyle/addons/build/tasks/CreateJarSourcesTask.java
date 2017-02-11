@@ -16,13 +16,12 @@ package com.thomasjensen.checkstyle.addons.build.tasks;
  */
 
 import groovy.lang.Closure;
-import org.gradle.api.Project;
 import org.gradle.api.plugins.BasePlugin;
 import org.gradle.api.tasks.SourceSet;
 import org.gradle.api.tasks.bundling.Jar;
 
-import com.thomasjensen.checkstyle.addons.build.BuildUtil;
 import com.thomasjensen.checkstyle.addons.build.DependencyConfigs;
+import com.thomasjensen.checkstyle.addons.build.ExtProp;
 import com.thomasjensen.checkstyle.addons.build.NameFactory;
 import com.thomasjensen.checkstyle.addons.build.SourceSetNames;
 import com.thomasjensen.checkstyle.addons.build.TaskNames;
@@ -43,8 +42,7 @@ public class CreateJarSourcesTask
     {
         super();
         setGroup(BasePlugin.BUILD_GROUP);
-        final String longName = BuildUtil.getExtraPropertyValue(getProject(), "longName");
-        setDescription(longName + ": Build the source JAR for publication '");
+        setDescription(getBuildUtil().getLongName() + ": Build the source JAR for publication '");
 
         setClassifier("sources");
     }
@@ -59,9 +57,8 @@ public class CreateJarSourcesTask
     @SuppressWarnings("MethodDoesntCallSuperMethod")
     public void configureFor(final String pCheckstyleVersion)
     {
-        final Project project = getProject();
-        final NameFactory nameFactory = BuildUtil.getExtraPropertyValue(project, "nameFactory");
-        final DependencyConfigs depConfigs = BuildUtil.getExtraPropertyValue(project, "depConfigs");
+        final NameFactory nameFactory = getBuildUtil().getNameFactory();
+        final DependencyConfigs depConfigs = getBuildUtil().getDepConfigs();
         final boolean isDefaultPublication = depConfigs.isDefault(pCheckstyleVersion);
 
         // set appendix for archive name
@@ -90,7 +87,7 @@ public class CreateJarSourcesTask
                 Jar jarTask = (Jar) nameFactory.getTask(TaskNames.jar, pCheckstyleVersion);
                 setManifest(jarTask.getManifest());
                 getManifest().getAttributes().put("Build-Timestamp",
-                    BuildUtil.getExtraPropertyValue(project, "buildTimestamp").toString());
+                    getBuildUtil().getExtraPropertyValue(ExtProp.BuildTimestamp).toString());
                 return null;
             }
         });

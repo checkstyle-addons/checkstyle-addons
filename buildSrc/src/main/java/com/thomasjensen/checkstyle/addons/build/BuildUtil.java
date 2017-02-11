@@ -41,11 +41,19 @@ public final class BuildUtil
     /** the Maven metadata name {@code "version"} */
     public static final String VERSION = "version";
 
+    private final Project project;
 
 
-    private BuildUtil()
+
+    /**
+     * Constructor.
+     *
+     * @param pProject the Gradle project
+     */
+    public BuildUtil(@Nonnull final Project pProject)
     {
         super();
+        project = pProject;
     }
 
 
@@ -55,7 +63,7 @@ public final class BuildUtil
      *
      * @param pCloseable the closeable to close
      */
-    public static void closeQuietly(@Nullable final Closeable pCloseable)
+    public void closeQuietly(@Nullable final Closeable pCloseable)
     {
         if (pCloseable != null) {
             try {
@@ -73,12 +81,11 @@ public final class BuildUtil
      * Get the value of the project or system property whose name is set in the project's extra property {@code
      * "jdk6PropName"}. If the project property exists, it has precedence over the system property.
      *
-     * @param pProject the project object
      * @return the absolute path to the javac executable for Java 6
      */
-    public static String getJdk6Compiler(@Nonnull final Project pProject)
+    public String getJdk6Compiler()
     {
-        return getPropertyValue(pProject, "jdk6PropName");
+        return getProjectPropertyValue(ExtProp.Jdk6PropName);
     }
 
 
@@ -87,12 +94,11 @@ public final class BuildUtil
      * Get the value of the project or system property whose name is set in the project's extra property {@code
      * "javadoc6PropName"}. If the project property exists, it has precedence over the system property.
      *
-     * @param pProject the project object
      * @return the absolute path to the javadoc executable for Java 6
      */
-    public static String getJdk6Javadoc(@Nonnull final Project pProject)
+    public String getJdk6Javadoc()
     {
-        return getPropertyValue(pProject, "javadoc6PropName");
+        return getProjectPropertyValue(ExtProp.Javadoc6PropName);
     }
 
 
@@ -101,12 +107,47 @@ public final class BuildUtil
      * Get the value of the project or system property whose name is set in the project's extra property {@code
      * "jdk7PropName"}. If the project property exists, it has precedence over the system property.
      *
-     * @param pProject the project object
      * @return the absolute path to the javac executable for Java 7
      */
-    public static String getJdk7Compiler(@Nonnull final Project pProject)
+    public String getJdk7Compiler()
     {
-        return getPropertyValue(pProject, "jdk7PropName");
+        return getProjectPropertyValue(ExtProp.Jdk7PropName);
+    }
+
+
+
+    /**
+     * Getter.
+     *
+     * @return the name factory
+     */
+    public NameFactory getNameFactory()
+    {
+        return getExtraPropertyValue(ExtProp.NameFactory);
+    }
+
+
+
+    /**
+     * Retrieve the dep configs from the project's extra properties.
+     *
+     * @return the dependency configuration container
+     */
+    public DependencyConfigs getDepConfigs()
+    {
+        return getExtraPropertyValue(ExtProp.DepConfigs);
+    }
+
+
+
+    /**
+     * Retrieve the longName from the project's extra properties.
+     *
+     * @return the long name of this software
+     */
+    public String getLongName()
+    {
+        return getExtraPropertyValue(ExtProp.LongName);
     }
 
 
@@ -115,22 +156,21 @@ public final class BuildUtil
      * Get the value of the project or system property whose name is set in the project's extra property {@code
      * "javadoc7PropName"}. If the project property exists, it has precedence over the system property.
      *
-     * @param pProject the project object
      * @return the absolute path to the javadoc executable for Java 7
      */
-    public static String getJdk7Javadoc(@Nonnull final Project pProject)
+    public String getJdk7Javadoc()
     {
-        return getPropertyValue(pProject, "javadoc7PropName");
+        return getProjectPropertyValue(ExtProp.Javadoc7PropName);
     }
 
 
 
-    private static String getPropertyValue(@Nonnull final Project pProject, @Nonnull final String pExtraPropNameRef)
+    private String getProjectPropertyValue(@Nonnull final ExtProp pExtraPropNameRef)
     {
-        final String propName = getExtraPropertyValue(pProject, pExtraPropNameRef);
+        final String propName = getExtraPropertyValue(pExtraPropNameRef);
         String result = System.getenv(propName);
-        if (pProject.hasProperty(propName)) {
-            result = (String) pProject.property(propName);
+        if (project.hasProperty(propName)) {
+            result = (String) project.property(propName);
         }
         return result;
     }
@@ -138,21 +178,20 @@ public final class BuildUtil
 
 
     /**
-     * Read the value of an extra property of the given project.
+     * Read the value of an extra property of the project.
      *
-     * @param pProject the project
-     * @param pExtraPropName the name of the extra property as defined in the build script
+     * @param pExtraPropName the reference to the extra property name
      * @param <T> type of the property value
      * @return the property's value
      */
     @SuppressWarnings("unchecked")
-    public static <T> T getExtraPropertyValue(@Nonnull final Project pProject, @Nonnull final String pExtraPropName)
+    public <T> T getExtraPropertyValue(@Nonnull final ExtProp pExtraPropName)
     {
-        // TODO transform into method of common super task, use enum instead of string
-        ExtraPropertiesExtension extraProps = pProject.getExtensions().getByType(ExtraPropertiesExtension.class);
-        if (extraProps.has(pExtraPropName)) {
-            return (T) extraProps.get(pExtraPropName);
+        ExtraPropertiesExtension extraProps = project.getExtensions().getByType(ExtraPropertiesExtension.class);
+        if (extraProps.has(pExtraPropName.getPropertyName())) {
+            return (T) extraProps.get(pExtraPropName.getPropertyName());
         }
-        throw new GradleException("Reference to non-existing project extra property '" + pExtraPropName + "'");
+        throw new GradleException(
+            "Reference to non-existent project extra property '" + pExtraPropName.getPropertyName() + "'");
     }
 }

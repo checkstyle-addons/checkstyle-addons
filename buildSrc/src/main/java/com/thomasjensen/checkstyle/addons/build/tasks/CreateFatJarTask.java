@@ -21,7 +21,6 @@ import java.util.Set;
 
 import com.github.jengelman.gradle.plugins.shadow.internal.DependencyFilter;
 import com.github.jengelman.gradle.plugins.shadow.tasks.ShadowJar;
-
 import org.gradle.api.Project;
 import org.gradle.api.artifacts.Configuration;
 import org.gradle.api.artifacts.ResolvedDependency;
@@ -42,14 +41,19 @@ import com.thomasjensen.checkstyle.addons.build.TaskNames;
 public class CreateFatJarTask
     extends ShadowJar
 {
+    private final BuildUtil buildUtil;
+
+
+
     /**
      * Constructor.
      */
     public CreateFatJarTask()
     {
         super();
-        final String longName = BuildUtil.getExtraPropertyValue(getProject(), "longName");
-        setDescription(longName + ": Create a combined JAR of project and runtime dependencies of '");
+        final Project project = getProject();
+        buildUtil = new BuildUtil(project);
+        setDescription(buildUtil.getLongName() + ": Create a combined JAR of project and runtime dependencies of '");
         setClassifier("all");
     }
 
@@ -79,8 +83,8 @@ public class CreateFatJarTask
     public void configureFor(final String pCheckstyleVersion)
     {
         final Project project = getProject();
-        final NameFactory nameFactory = BuildUtil.getExtraPropertyValue(project, "nameFactory");
-        final DependencyConfigs depConfigs = BuildUtil.getExtraPropertyValue(project, "depConfigs");
+        final NameFactory nameFactory = buildUtil.getNameFactory();
+        final DependencyConfigs depConfigs = buildUtil.getDepConfigs();
         final boolean isDefaultPublication = depConfigs.isDefault(pCheckstyleVersion);
 
         // set appendix for archive name

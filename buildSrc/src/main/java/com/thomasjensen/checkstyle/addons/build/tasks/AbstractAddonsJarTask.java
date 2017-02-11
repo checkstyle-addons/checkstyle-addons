@@ -24,6 +24,8 @@ import org.apache.tools.ant.filters.ReplaceTokens;
 import org.gradle.api.file.CopySpec;
 import org.gradle.api.tasks.bundling.Jar;
 
+import com.thomasjensen.checkstyle.addons.build.BuildUtil;
+
 
 /**
  * Base class for our JAR creating tasks. Provides common functionality.
@@ -33,9 +35,21 @@ import org.gradle.api.tasks.bundling.Jar;
 public abstract class AbstractAddonsJarTask
     extends Jar
 {
+    private final BuildUtil buildUtil;
+
+
+
     protected AbstractAddonsJarTask()
     {
         super();
+        buildUtil = new BuildUtil(getProject());
+    }
+
+
+
+    public BuildUtil getBuildUtil()
+    {
+        return buildUtil;
     }
 
 

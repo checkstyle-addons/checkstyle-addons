@@ -46,6 +46,7 @@ group = 'com.thomasjensen.checkstyle.addons';
 version = readVersionProps();
 description = 'Additional Checkstyle Checks';
 ext {
+    // keep these in sync with the ExtProp enum
     bundledConfigurations = ['runtime'];
     defaultPublication = 'checkstyleAddons';   // name of the default Gradle publication
     jdk6PropName = 'checkstyleaddons_jdk6_javac';
@@ -68,8 +69,8 @@ ext {
     depConfigs = new DependencyConfigs(project);
     // versionDefaults set by DependencyConfigs
     nameFactory = new NameFactory(project, project.ext.versionDefaults.checkstyleBaseVersion);
+    buildUtil = new BuildUtil(project);
 }
-
 
 
 /*
@@ -234,7 +235,7 @@ project.ext.depConfigs.activeDepConfigs.each { final String csVersion ->
     javadocTask.setDestinationDir(new File((File) project.docsDir, javadocTask.name));
     configureJavadocTask(javadocTask, mainSourceSet, dcn.getDepConfig(csVersion));
     if (JavaVersion.VERSION_1_7.equals(javaLevel)) {
-        String javadoc7Exe = BuildUtil.getJdk7Javadoc(project);
+        String javadoc7Exe = buildUtil.getJdk7Javadoc();
         if (javadoc7Exe == null) {
             throw new GradleException('ERROR: Property \'' + project.ext.javadoc7PropName +
                 '\' not defined in gradle.properties. It must point to a Java 7 javadoc executable.');
@@ -242,7 +243,7 @@ project.ext.depConfigs.activeDepConfigs.each { final String csVersion ->
         javadocTask.setExecutable(javadoc7Exe);
     }
     else if (JavaVersion.VERSION_1_6.equals(javaLevel)) {
-        String javadoc6Exe = BuildUtil.getJdk6Javadoc(project);
+        String javadoc6Exe = buildUtil.getJdk6Javadoc();
         if (javadoc6Exe == null) {
             throw new GradleException('ERROR: Property \'' + project.ext.javadoc6PropName +
                 '\' not defined in gradle.properties. It must point to a Java 6 javadoc executable.');
@@ -404,7 +405,7 @@ def void configureCompileTask(final JavaCompile pTask, final JavaVersion pJavaLe
 
     if (JavaVersion.VERSION_1_6.equals(pJavaLevel)) {
         pTask.options.fork = true;
-        def javac6 = BuildUtil.getJdk6Compiler(project);
+        def javac6 = buildUtil.getJdk6Compiler();
         if (javac6 == null) {
             throw new GradleException('ERROR: Property \'' + project.ext.jdk6PropName +
                 '\' not defined in gradle.properties. It must point to a Java 6 compiler executable.');
@@ -413,7 +414,7 @@ def void configureCompileTask(final JavaCompile pTask, final JavaVersion pJavaLe
     }
     else if (JavaVersion.VERSION_1_7.equals(pJavaLevel)) {
         pTask.options.fork = true;
-        def javac7 = BuildUtil.getJdk7Compiler(project);
+        def javac7 = buildUtil.getJdk7Compiler();
         if (javac7 == null) {
             throw new GradleException('ERROR: Property \'' + project.ext.jdk7PropName +
                 '\' not defined in gradle.properties. It must point to a Java 7 compiler executable.');

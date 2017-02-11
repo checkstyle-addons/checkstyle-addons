@@ -32,6 +32,7 @@ import net.jcip.annotations.Immutable;
  * @author Thomas Jensen
  */
 @XmlRootElement(name = "project")
+@SuppressWarnings("unused")
 public class PomXml
 {
     /** the POM model version */

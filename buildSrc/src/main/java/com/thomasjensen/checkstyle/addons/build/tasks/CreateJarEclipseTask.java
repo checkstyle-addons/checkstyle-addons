@@ -17,14 +17,11 @@ package com.thomasjensen.checkstyle.addons.build.tasks;
 
 import java.io.File;
 import java.util.Collection;
-import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
-import java.util.Map;
 import java.util.Set;
 
 import groovy.lang.Closure;
-import org.apache.tools.ant.filters.ReplaceTokens;
 import org.gradle.api.GradleException;
 import org.gradle.api.Project;
 import org.gradle.api.artifacts.Configuration;
@@ -39,6 +36,7 @@ import org.gradle.api.tasks.TaskInputs;
 
 import com.thomasjensen.checkstyle.addons.build.BuildUtil;
 import com.thomasjensen.checkstyle.addons.build.DependencyConfigs;
+import com.thomasjensen.checkstyle.addons.build.ExtProp;
 import com.thomasjensen.checkstyle.addons.build.NameFactory;
 import com.thomasjensen.checkstyle.addons.build.SourceSetNames;
 import com.thomasjensen.checkstyle.addons.build.TaskNames;
@@ -83,8 +81,8 @@ public class CreateJarEclipseTask
     public static Set<File> getPublishedDependencyLibs(final Project pProject, final boolean pIncludeCheckstyle)
     {
         Set<File> result = new HashSet<>();
-        for (final String configName : (Collection<String>) BuildUtil.getExtraPropertyValue(pProject,
-            "bundledConfigurations")) {
+        for (final String configName : (Collection<String>) new BuildUtil(pProject).getExtraPropertyValue(
+            ExtProp.BundledConfigs)) {
             Configuration cfg = pProject.getConfigurations().getByName(configName);
             if (cfg == null) {
                 throw new GradleException("Unknown configuration: " + configName);
@@ -110,7 +108,7 @@ public class CreateJarEclipseTask
             set.add(prefix + f.getName());
         }
         StringBuilder sb = new StringBuilder();
-        for (final Iterator<String> iter = set.iterator(); iter.hasNext();) {
+        for (final Iterator<String> iter = set.iterator(); iter.hasNext(); ) {
             sb.append(iter.next());
             if (iter.hasNext()) {
                 sb.append(pSeparator);
@@ -130,11 +128,11 @@ public class CreateJarEclipseTask
     public void configureFor(final String pCheckstyleVersion)
     {
         final Project project = getProject();
-        final NameFactory nameFactory = BuildUtil.getExtraPropertyValue(project, "nameFactory");
-        final DependencyConfigs depConfigs = BuildUtil.getExtraPropertyValue(project, "depConfigs");
+        final NameFactory nameFactory = getBuildUtil().getNameFactory();
+        final DependencyConfigs depConfigs = getBuildUtil().getDepConfigs();
         final boolean isDefaultPublication = depConfigs.isDefault(pCheckstyleVersion);
         final String myJavaLevel = depConfigs.getDepConfig(pCheckstyleVersion).getJavaLevel().toString();
-        final String longName = BuildUtil.getExtraPropertyValue(project, "longName");
+        final String longName = getBuildUtil().getLongName();
 
         setDescription(longName + ": Assembles the Eclipse-CS plugin for Checkstyle " + pCheckstyleVersion);
 
@@ -155,7 +153,7 @@ public class CreateJarEclipseTask
         inputs.property(BuildUtil.GROUP_ID, project.getGroup());
         inputs.property(BuildUtil.VERSION, project.getVersion());
         inputs.property("name", longName);
-        inputs.property("authorName", BuildUtil.getExtraPropertyValue(project, "authorName"));
+        inputs.property("authorName", getBuildUtil().getExtraPropertyValue(ExtProp.AuthorName));
 
         // Configuration of JAR file contents
         intoFrom("META-INF", "LICENSE");
@@ -233,7 +231,7 @@ public class CreateJarEclipseTask
             public Void call()
             {
                 // add build timestamp in execution phase so that it does not count for the up-to-date check
-                attrs.put("Build-Timestamp", BuildUtil.getExtraPropertyValue(project, "buildTimestamp").toString());
+                attrs.put("Build-Timestamp", getBuildUtil().getExtraPropertyValue(ExtProp.BuildTimestamp).toString());
                 return null;
             }
         });

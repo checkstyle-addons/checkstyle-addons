@@ -22,14 +22,13 @@ import java.nio.file.Files;
 import java.util.ArrayList;
 import java.util.List;
 
+import com.thomasjensen.checkstyle.addons.build.BuildUtil;
 import groovy.lang.Closure;
 import org.gradle.api.DefaultTask;
 import org.gradle.api.GradleException;
 import org.gradle.api.Project;
 import org.gradle.api.plugins.BasePlugin;
 import org.gradle.api.tasks.TaskInputs;
-
-import com.thomasjensen.checkstyle.addons.build.BuildUtil;
 
 
 /**
@@ -44,6 +43,7 @@ public class GeneratePomPropsTask
 
     private String appendix = null;
 
+    private final BuildUtil buildUtil;
 
 
     /**
@@ -53,7 +53,9 @@ public class GeneratePomPropsTask
     {
         super();
         setGroup(BasePlugin.BUILD_GROUP);
+
         final Project project = getProject();
+        buildUtil = new BuildUtil(project);
 
         // Task Inputs: the property values identifying the artifact
         final TaskInputs inputs = getInputs();
@@ -115,7 +117,7 @@ public class GeneratePomPropsTask
     public void setAppendix(final String pAppendix)
     {
         appendix = pAppendix;
-        final String longName = BuildUtil.getExtraPropertyValue(getProject(), "longName");
+        final String longName = buildUtil.getLongName();
         if (pAppendix != null && pAppendix.length() > 0) {
             getInputs().property("appendix", pAppendix);
             setDescription(longName + ": Create file '" + pluginPomProps.getName() //

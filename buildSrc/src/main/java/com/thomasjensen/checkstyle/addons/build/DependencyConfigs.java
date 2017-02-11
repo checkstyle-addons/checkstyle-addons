@@ -52,6 +52,8 @@ public class DependencyConfigs
 
     private final Project project;
 
+    private final BuildUtil buildUtil;
+
     private final File depConfigDir;
 
     private final FileCollection listOfDepConfigFiles;
@@ -81,6 +83,7 @@ public class DependencyConfigs
     public DependencyConfigs(@Nonnull final Project pProject)
     {
         project = pProject;
+        buildUtil = new BuildUtil(pProject);
         depConfigDir = new File(pProject.getProjectDir(), "project/dependencyConfigs");
         listOfDepConfigFiles = readListOfDepConfigs(depConfigDir);
         depVersions = readAllDependencyVersions(listOfDepConfigFiles);
@@ -129,8 +132,8 @@ public class DependencyConfigs
             throw new GradleException("Unable to read dependency configuration: " + pDepConfig.getAbsolutePath(), e);
         }
         finally {
-            BuildUtil.closeQuietly(bis);
-            BuildUtil.closeQuietly(fis);
+            buildUtil.closeQuietly(bis);
+            buildUtil.closeQuietly(fis);
         }
 
         final Set<String> compatibles = new HashSet<String>();
@@ -181,11 +184,11 @@ public class DependencyConfigs
             final DependencyConfig publishedDepConfig = readPublishedDependencyConfig(depCfgFile);
 
             final JavaVersion myJavaLevel = publishedDepConfig.getJavaLevel();
-            if ((JavaVersion.VERSION_1_6 == myJavaLevel && BuildUtil.getJdk6Compiler(project) == null) || (
-                JavaVersion.VERSION_1_7 == myJavaLevel && BuildUtil.getJdk7Compiler(project) == null)) {
+            if ((JavaVersion.VERSION_1_6 == myJavaLevel && buildUtil.getJdk6Compiler() == null) || (
+                JavaVersion.VERSION_1_7 == myJavaLevel && buildUtil.getJdk7Compiler() == null)) {
                 final String javacPropName =
-                    JavaVersion.VERSION_1_6 == myJavaLevel ? BuildUtil.<String>getExtraPropertyValue(project,
-                        "jdk6PropName") : BuildUtil.<String>getExtraPropertyValue(project, "jdk7PropName");
+                    JavaVersion.VERSION_1_6 == myJavaLevel ? buildUtil.<String>getExtraPropertyValue(
+                        ExtProp.Jdk6PropName) : buildUtil.<String>getExtraPropertyValue(ExtProp.Jdk7PropName);
                 project.getLogger().warn(
                     "WARNING: Skipping dependency configuration file '" + publishedDepConfig.getConfigFile().getName()
                         + "' because of missing JDK" + myJavaLevel.getMajorVersion() + " compiler configuration.");
@@ -216,7 +219,7 @@ public class DependencyConfigs
         final Map<String, DependencyConfig> result = new HashMap<String, DependencyConfig>();
         for (final DependencyConfig depConfig : pDepVersions.values()) {
             if (depConfig.isPublished()) {
-                String pubName = BuildUtil.getExtraPropertyValue(project, "defaultPublication");
+                String pubName = buildUtil.getExtraPropertyValue(ExtProp.DefaultPublication);
                 if (!depConfig.isDefaultConfig()) {
                     pubName += '-' + depConfig.getPublicationSuffix();
                 }

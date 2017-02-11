@@ -33,6 +33,7 @@ import org.gradle.api.tasks.bundling.Jar;
 import com.thomasjensen.checkstyle.addons.build.BuildUtil;
 import com.thomasjensen.checkstyle.addons.build.DependencyConfig;
 import com.thomasjensen.checkstyle.addons.build.DependencyConfigs;
+import com.thomasjensen.checkstyle.addons.build.ExtProp;
 import com.thomasjensen.checkstyle.addons.build.NameFactory;
 import com.thomasjensen.checkstyle.addons.build.SourceSetNames;
 import com.thomasjensen.checkstyle.addons.build.TaskNames;
@@ -66,11 +67,11 @@ public class CreateJarSonarqubeTask
     public void configureFor(final String pCheckstyleVersion)
     {
         final Project project = getProject();
-        final NameFactory nameFactory = BuildUtil.getExtraPropertyValue(project, "nameFactory");
-        final DependencyConfigs depConfigs = BuildUtil.getExtraPropertyValue(project, "depConfigs");
+        final NameFactory nameFactory = getBuildUtil().getNameFactory();
+        final DependencyConfigs depConfigs = getBuildUtil().getDepConfigs();
         final DependencyConfig theVersions = depConfigs.getDepConfig(pCheckstyleVersion);
         final boolean isDefaultConfig = depConfigs.isDefault(pCheckstyleVersion);
-        final String longName = BuildUtil.getExtraPropertyValue(project, "longName");
+        final String longName = getBuildUtil().getLongName();
 
         setDescription(longName + ": Assembles the SonarQube plugin for Checkstyle " + pCheckstyleVersion);
 
@@ -80,13 +81,13 @@ public class CreateJarSonarqubeTask
         inputs.property(BuildUtil.VERSION, project.getVersion());
         inputs.property("name", longName);
         inputs.property("description", project.getDescription());
-        inputs.property("authorName", BuildUtil.getExtraPropertyValue(project, "authorName"));
-        inputs.property("sqPluginKey", BuildUtil.getExtraPropertyValue(project, "sqPluginKey"));
-        inputs.property("sqPackage", BuildUtil.getExtraPropertyValue(project, "sqPackage"));
-        inputs.property("gitHash", BuildUtil.getExtraPropertyValue(project, "gitHash"));
-        inputs.property("orgUrl", BuildUtil.getExtraPropertyValue(project, "orgUrl"));
-        inputs.property("issueTrackerUrl", BuildUtil.getExtraPropertyValue(project, "issueTrackerUrl"));
-        inputs.property("website", BuildUtil.getExtraPropertyValue(project, "website"));
+        inputs.property("authorName", getBuildUtil().getExtraPropertyValue(ExtProp.AuthorName));
+        inputs.property("sqPluginKey", getBuildUtil().getExtraPropertyValue(ExtProp.SqPluginKey));
+        inputs.property("sqPackage", getBuildUtil().getExtraPropertyValue(ExtProp.SqPackage));
+        inputs.property("gitHash", getBuildUtil().getExtraPropertyValue(ExtProp.GitHash));
+        inputs.property("orgUrl", getBuildUtil().getExtraPropertyValue(ExtProp.OrgUrl));
+        inputs.property("issueTrackerUrl", getBuildUtil().getExtraPropertyValue(ExtProp.IssueTrackerUrl));
+        inputs.property("website", getBuildUtil().getExtraPropertyValue(ExtProp.Website));
 
         // archive name
         setArchiveName(
@@ -173,7 +174,7 @@ public class CreateJarSonarqubeTask
             public Void call()
             {
                 final DateFormat sdf = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ssZ");  // required by SonarQube
-                attrs.put("Plugin-BuildDate", sdf.format(BuildUtil.getExtraPropertyValue(project, "buildTimestamp")));
+                attrs.put("Plugin-BuildDate", sdf.format(getBuildUtil().getExtraPropertyValue(ExtProp.BuildTimestamp)));
                 return null;
             }
         });

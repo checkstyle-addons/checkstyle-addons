@@ -52,6 +52,10 @@ import com.thomasjensen.checkstyle.addons.build.BuildUtil;
 public class SiteTask
     extends DefaultTask
 {
+    private final BuildUtil buildUtil;
+
+
+
     /**
      * Constructor.
      */
@@ -59,8 +63,8 @@ public class SiteTask
     {
         super();
         final Project project = getProject();
-        final String longName = BuildUtil.getExtraPropertyValue(project, "longName");
-        setDescription(longName + ": Package documentation for publication on the website");
+        buildUtil = new BuildUtil(project);
+        setDescription(buildUtil.getLongName() + ": Package documentation for publication on the website");
 
         final TaskContainer tasks = project.getTasks();
         for (final String predecTaskName : new String[]{//
@@ -107,6 +111,7 @@ public class SiteTask
 
 
 
+    @SuppressWarnings("ResultOfMethodCallIgnored")
     private void collect(@Nonnull final FileTree pMdFiles, @Nonnull final File pSiteDir)
         throws IOException
     {
@@ -132,8 +137,8 @@ public class SiteTask
 
             SortedSet<String> frontMatterFileSet = new TreeSet<>(String.CASE_INSENSITIVE_ORDER);
             for (final File f : cat.getValue()) {
-                Files.copy(f.toPath(), new File(mdDir, f.getName()).toPath(),
-                    StandardCopyOption.REPLACE_EXISTING, StandardCopyOption.COPY_ATTRIBUTES);
+                Files.copy(f.toPath(), new File(mdDir, f.getName()).toPath(), StandardCopyOption.REPLACE_EXISTING,
+                    StandardCopyOption.COPY_ATTRIBUTES);
                 frontMatterFileSet.add("v" + project.getVersion() + "/" + cat.getKey() + "/" + f.getName());
             }
 

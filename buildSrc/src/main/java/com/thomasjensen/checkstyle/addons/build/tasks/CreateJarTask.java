@@ -32,6 +32,7 @@ import org.gradle.util.GradleVersion;
 
 import com.thomasjensen.checkstyle.addons.build.BuildUtil;
 import com.thomasjensen.checkstyle.addons.build.DependencyConfigs;
+import com.thomasjensen.checkstyle.addons.build.ExtProp;
 import com.thomasjensen.checkstyle.addons.build.NameFactory;
 import com.thomasjensen.checkstyle.addons.build.SourceSetNames;
 import com.thomasjensen.checkstyle.addons.build.TaskNames;
@@ -52,8 +53,7 @@ public class CreateJarTask
     {
         super();
         setGroup(BasePlugin.BUILD_GROUP);
-        final String longName = BuildUtil.getExtraPropertyValue(getProject(), "longName");
-        setDescription(longName + ": Assembles a jar archive containing the classes of '");
+        setDescription(getBuildUtil().getLongName() + ": Assembles a jar archive containing the classes of '");
     }
 
 
@@ -68,7 +68,7 @@ public class CreateJarTask
     {
         Map<String, String> result = new HashMap<>();
         result.put("Manifest-Version", "1.0");
-        result.put("Website", BuildUtil.getExtraPropertyValue(pProject, "website"));
+        result.put("Website", new BuildUtil(pProject).getExtraPropertyValue(ExtProp.Website));
         result.put("Created-By", GradleVersion.current().toString());
         result.put("Built-By", System.getProperty("user.name"));
         result.put("Build-Jdk", Jvm.current().toString());
@@ -86,8 +86,8 @@ public class CreateJarTask
     public void configureFor(final String pCheckstyleVersion)
     {
         final Project project = getProject();
-        final NameFactory nameFactory = BuildUtil.getExtraPropertyValue(project, "nameFactory");
-        final DependencyConfigs depConfigs = BuildUtil.getExtraPropertyValue(project, "depConfigs");
+        final NameFactory nameFactory = getBuildUtil().getNameFactory();
+        final DependencyConfigs depConfigs = getBuildUtil().getDepConfigs();
         final boolean isDefaultPublication = depConfigs.isDefault(pCheckstyleVersion);
 
         // set appendix for archive name
@@ -140,7 +140,7 @@ public class CreateJarTask
                 spec.from(pomUsed);
                 spec.from(pomPropsUsed);
                 Map<String, String> placeHolders = new HashMap<>();
-                String buildTimestamp = BuildUtil.getExtraPropertyValue(project, "buildTimestamp").toString();
+                String buildTimestamp = getBuildUtil().getExtraPropertyValue(ExtProp.BuildTimestamp).toString();
                 placeHolders.put("buildTimestamp", buildTimestamp);
                 Map<String, Object> propsMap = new HashMap<>();
                 propsMap.put("tokens", placeHolders);
@@ -158,14 +158,14 @@ public class CreateJarTask
         final Attributes attrs = mafest.getAttributes();
         attrs.clear();
         attrs.put("Specification-Title", effectiveName);
-        attrs.put("Specification-Vendor", BuildUtil.getExtraPropertyValue(project, "authorName"));
+        attrs.put("Specification-Vendor", getBuildUtil().getExtraPropertyValue(ExtProp.AuthorName));
         attrs.put("Specification-Vendor-Id", "com.thomasjensen");
         attrs.put("Specification-Version", project.getVersion());
         attrs.put("Implementation-Title", effectiveName);
-        attrs.put("Implementation-Vendor", BuildUtil.getExtraPropertyValue(project, "authorName"));
+        attrs.put("Implementation-Vendor", getBuildUtil().getExtraPropertyValue(ExtProp.AuthorName));
         attrs.put("Implementation-Vendor-Id", "com.thomasjensen");
         attrs.put("Implementation-Version", project.getVersion());
-        attrs.put("Implementation-Build", BuildUtil.getExtraPropertyValue(project, "gitHash"));
+        attrs.put("Implementation-Build", getBuildUtil().getExtraPropertyValue(ExtProp.GitHash));
         attrs.put("Checkstyle-Version", pCheckstyleVersion);
         attrs.putAll(mfAttrStd(project));
 
@@ -175,7 +175,7 @@ public class CreateJarTask
             public Void call()
             {
                 // add build timestamp in execution phase so that it does not count for the up-to-date check
-                attrs.put("Build-Timestamp", BuildUtil.getExtraPropertyValue(project, "buildTimestamp").toString());
+                attrs.put("Build-Timestamp", getBuildUtil().getExtraPropertyValue(ExtProp.BuildTimestamp).toString());
                 return null;
             }
         });
