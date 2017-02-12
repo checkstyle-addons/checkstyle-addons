@@ -15,10 +15,11 @@ package com.thomasjensen.checkstyle.addons.sonarqube;
  * program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+import java.io.IOException;
 import java.io.InputStream;
 import java.util.List;
 
-import com.thomasjensen.checkstyle.addons.util.Util;
+import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import org.sonar.api.rules.Rule;
 import org.sonar.api.rules.RuleRepository;
 import org.sonar.api.rules.XMLRuleParser;
@@ -51,8 +52,8 @@ public final class CheckstyleExtensionRepository
      */
     public CheckstyleExtensionRepository(final XMLRuleParser pXmlRuleParser)
     {
-        this(pXmlRuleParser, "/" + CheckstyleExtensionRepository.class.getPackage().getName().replace('.', '/')
-            + "/sonarqube.xml");
+        this(pXmlRuleParser,
+            "/" + CheckstyleExtensionRepository.class.getPackage().getName().replace('.', '/') + "/sonarqube.xml");
     }
 
 
@@ -74,6 +75,7 @@ public final class CheckstyleExtensionRepository
 
 
     @Override
+    @SuppressFBWarnings("DE_MIGHT_IGNORE")
     public List<Rule> createRules()
     {
         InputStream input = getClass().getResourceAsStream(rulesRelativeFilePath);
@@ -84,7 +86,12 @@ public final class CheckstyleExtensionRepository
             return xmlRuleParser.parse(input);
         }
         finally {
-            Util.closeQuietly(input);
+            try {
+                input.close();
+            }
+            catch (IOException e) {
+                // ignore
+            }
         }
     }
 }

@@ -13,13 +13,15 @@ before_install:
 
 env:
   global:
+  - checkstyleaddons_jdk6_java=/usr/lib/jvm/java-6-openjdk-amd64/bin/java
   - checkstyleaddons_jdk6_javac=/usr/lib/jvm/java-6-openjdk-amd64/bin/javac
   - checkstyleaddons_jdk6_javadoc=/usr/lib/jvm/java-6-openjdk-amd64/bin/javadoc
+  - checkstyleaddons_jdk7_java=/usr/lib/jvm/java-7-openjdk-amd64/bin/java
   - checkstyleaddons_jdk7_javac=/usr/lib/jvm/java-7-openjdk-amd64/bin/javac
   - checkstyleaddons_jdk7_javadoc=/usr/lib/jvm/java-7-openjdk-amd64/bin/javadoc
 
 script:
-  - ./gradlew check xcheck site
+  - ./gradlew check xtest site
 
 after_success:
   - ./gradlew jacocoTestReport coveralls

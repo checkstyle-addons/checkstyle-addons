@@ -15,16 +15,12 @@ package com.thomasjensen.checkstyle.addons.build.tasks;
  * program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-import groovy.lang.Closure;
-import org.gradle.api.plugins.BasePlugin;
-import org.gradle.api.tasks.SourceSet;
-import org.gradle.api.tasks.bundling.Jar;
+import javax.annotation.Nonnull;
 
-import com.thomasjensen.checkstyle.addons.build.DependencyConfigs;
-import com.thomasjensen.checkstyle.addons.build.ExtProp;
-import com.thomasjensen.checkstyle.addons.build.NameFactory;
-import com.thomasjensen.checkstyle.addons.build.SourceSetNames;
-import com.thomasjensen.checkstyle.addons.build.TaskNames;
+import org.gradle.api.tasks.SourceSet;
+
+import com.thomasjensen.checkstyle.addons.build.BuildUtil;
+import com.thomasjensen.checkstyle.addons.build.DependencyConfig;
 
 
 /**
@@ -35,61 +31,36 @@ import com.thomasjensen.checkstyle.addons.build.TaskNames;
 public class CreateJarSourcesTask
     extends AbstractAddonsJarTask
 {
-    /**
-     * Constructor.
-     */
     public CreateJarSourcesTask()
     {
         super();
-        setGroup(BasePlugin.BUILD_GROUP);
-        setDescription(getBuildUtil().getLongName() + ": Build the source JAR for publication '");
-
         setClassifier("sources");
     }
 
 
 
-    /**
-     * Configure this task instance for a given dependency configuration.
-     *
-     * @param pCheckstyleVersion the Checkstyle version for which to configure
-     */
-    @SuppressWarnings("MethodDoesntCallSuperMethod")
-    public void configureFor(final String pCheckstyleVersion)
+    @Override
+    public void configureFor(@Nonnull final DependencyConfig pDepConfig)
     {
-        final NameFactory nameFactory = getBuildUtil().getNameFactory();
-        final DependencyConfigs depConfigs = getBuildUtil().getDepConfigs();
-        final boolean isDefaultPublication = depConfigs.isDefault(pCheckstyleVersion);
-
         // set appendix for archive name
-        if (!isDefaultPublication) {
-            final String appendix = depConfigs.getDepConfig(pCheckstyleVersion).getPublicationSuffix();
+        if (!pDepConfig.isDefaultConfig()) {
+            final String appendix = pDepConfig.getName();
             setAppendix(appendix);
-            setDescription(getDescription() + appendix + "'");
         }
-        else {
-            setDescription(getDescription() + "Default'");
-        }
+        setDescription(
+            getBuildUtil().getLongName() + ": Build the source JAR for dependency configuration '" + pDepConfig
+                .getName() + "'");
 
         // SourceSet that fits the dependency configuration
-        SourceSet mainSourceSet = nameFactory.getSourceSet(SourceSetNames.main, pCheckstyleVersion);
+        final SourceSet mainSourceSet = getBuildUtil().getSourceSet(SourceSet.MAIN_SOURCE_SET_NAME);
+        final SourceSet sqSourceSet = getBuildUtil().getSourceSet(BuildUtil.SONARQUBE_SOURCE_SET_NAME);
 
         // Configuration of JAR file contents
         from(mainSourceSet.getAllJava());
+        from(sqSourceSet.getAllJava());
         intoFrom("META-INF", "LICENSE");
 
         // Manifest
-        doFirst(new Closure<Void>(this)
-        {
-            @Override
-            public Void call()
-            {
-                Jar jarTask = (Jar) nameFactory.getTask(TaskNames.jar, pCheckstyleVersion);
-                setManifest(jarTask.getManifest());
-                getManifest().getAttributes().put("Build-Timestamp",
-                    getBuildUtil().getExtraPropertyValue(ExtProp.BuildTimestamp).toString());
-                return null;
-            }
-        });
+        getBuildUtil().inheritManifest(this, pDepConfig);
     }
 }

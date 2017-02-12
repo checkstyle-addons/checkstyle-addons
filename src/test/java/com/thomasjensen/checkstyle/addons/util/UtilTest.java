@@ -26,6 +26,8 @@ import com.puppycrawl.tools.checkstyle.api.DetailAST;
 import org.junit.Assert;
 import org.junit.Test;
 
+import com.thomasjensen.checkstyle.addons.BaseCheckTestSupport;
+
 
 /**
  * Unit tests of {@link Util}.
@@ -82,10 +84,12 @@ public class UtilTest
         Assert.assertTrue(c.isAbsolute());
         Assert.assertFalse(c.getPath().contains("/./") || c.getPath().contains("\\.\\"));
 
-        f = new File("./\u0000");
-        c = Util.canonize(f);
-        Assert.assertTrue(c.isAbsolute());
-        Assert.assertTrue(c.getPath().endsWith("." + File.separator + '\u0000'));
+        if (!BaseCheckTestSupport.isJava6()) {
+            f = new File("./\u0000");
+            c = Util.canonize(f);
+            Assert.assertTrue(c.isAbsolute());
+            Assert.assertTrue(c.getPath().endsWith("." + File.separator + '\u0000'));
+        }
     }
 
 

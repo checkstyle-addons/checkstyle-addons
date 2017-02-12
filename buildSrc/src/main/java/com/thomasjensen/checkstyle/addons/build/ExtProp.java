@@ -25,23 +25,8 @@ import javax.annotation.Nonnull;
  */
 public enum ExtProp
 {
-    /** List of Strings, names of Gradle configurations which should be bundled with our artifacts */
-    BundledConfigs("bundledConfigurations"),
-
     /** String, name of the Gradle publication which is used by default */
     DefaultPublication("defaultPublication"),
-
-    /** String, name of the Gradle project property giving the absolute path to the javac executable for Java&nbsp;6 */
-    Jdk6PropName("jdk6PropName"),
-
-    /** String, name of the Gradle project property giving the absolute path to the javadoc executable for Java 6 */
-    Javadoc6PropName("javadoc6PropName"),
-
-    /** String, name of the Gradle project property giving the absolute path to the javac executable for Java&nbsp;7 */
-    Jdk7PropName("jdk7PropName"),
-
-    /** String, name of the Gradle project property giving the absolute path to the javadoc executable for Java 7 */
-    Javadoc7PropName("javadoc7PropName"),
 
     /** String, name of the author, to be used in manifests and such */
     AuthorName("authorName"),
@@ -88,8 +73,8 @@ public enum ExtProp
     /** {@link DependencyConfig}, the default dependency config to be used in the IDE */
     VersionDefaults("versionDefaults"),
 
-    /** {@link NameFactory}, an instance of a name factory */
-    NameFactory("nameFactory");
+    /** the configuration for test tasks */
+    TestConfigClosure("testConfigClosure");
 
     //
 

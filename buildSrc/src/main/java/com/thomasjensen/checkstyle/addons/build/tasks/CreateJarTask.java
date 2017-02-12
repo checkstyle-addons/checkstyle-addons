@@ -18,6 +18,7 @@ package com.thomasjensen.checkstyle.addons.build.tasks;
 import java.io.File;
 import java.util.HashMap;
 import java.util.Map;
+import javax.annotation.Nonnull;
 
 import groovy.lang.Closure;
 import org.apache.tools.ant.filters.ReplaceTokens;
@@ -25,16 +26,14 @@ import org.gradle.api.Project;
 import org.gradle.api.file.CopySpec;
 import org.gradle.api.java.archives.Attributes;
 import org.gradle.api.java.archives.Manifest;
-import org.gradle.api.plugins.BasePlugin;
 import org.gradle.api.tasks.SourceSet;
 import org.gradle.internal.jvm.Jvm;
 import org.gradle.util.GradleVersion;
 
 import com.thomasjensen.checkstyle.addons.build.BuildUtil;
-import com.thomasjensen.checkstyle.addons.build.DependencyConfigs;
+import com.thomasjensen.checkstyle.addons.build.ClasspathBuilder;
+import com.thomasjensen.checkstyle.addons.build.DependencyConfig;
 import com.thomasjensen.checkstyle.addons.build.ExtProp;
-import com.thomasjensen.checkstyle.addons.build.NameFactory;
-import com.thomasjensen.checkstyle.addons.build.SourceSetNames;
 import com.thomasjensen.checkstyle.addons.build.TaskNames;
 
 
@@ -46,14 +45,9 @@ import com.thomasjensen.checkstyle.addons.build.TaskNames;
 public class CreateJarTask
     extends AbstractAddonsJarTask
 {
-    /**
-     * Constructor.
-     */
     public CreateJarTask()
     {
         super();
-        setGroup(BasePlugin.BUILD_GROUP);
-        setDescription(getBuildUtil().getLongName() + ": Assembles a jar archive containing the classes of '");
     }
 
 
@@ -77,52 +71,48 @@ public class CreateJarTask
 
 
 
-    /**
-     * Configure this task instance for a given dependency configuration.
-     *
-     * @param pCheckstyleVersion the Checkstyle version for which to configure
-     */
+    @Override
     @SuppressWarnings("MethodDoesntCallSuperMethod")
-    public void configureFor(final String pCheckstyleVersion)
+    public void configureFor(@Nonnull final DependencyConfig pDepConfig)
     {
         final Project project = getProject();
-        final NameFactory nameFactory = getBuildUtil().getNameFactory();
-        final DependencyConfigs depConfigs = getBuildUtil().getDepConfigs();
-        final boolean isDefaultPublication = depConfigs.isDefault(pCheckstyleVersion);
+
+        setDescription(
+            getBuildUtil().getLongName() + ": Assembles a jar archive containing the '" + SourceSet.MAIN_SOURCE_SET_NAME
+                + "' classes for dependency configuration '" + pDepConfig.getName() + "'");
 
         // set appendix for archive name
-        final String appendix = depConfigs.getDepConfig(pCheckstyleVersion).getPublicationSuffix();
-        if (!isDefaultPublication) {
+        final String appendix = pDepConfig.getName();
+        if (!pDepConfig.isDefaultConfig()) {
             setAppendix(appendix);
         }
 
         // Dependency on pom.properties generating task
-        dependsOn(nameFactory.getName(TaskNames.generatePomProperties, pCheckstyleVersion));
-        final File pomPropsUsed = ((GeneratePomPropsTask) nameFactory.getTask(TaskNames.generatePomProperties,
-            pCheckstyleVersion)).getPluginPomProps();
+        dependsOn(TaskNames.generatePomProperties.getName(pDepConfig));
+
+        // Task Input pom.properties file
+        final File pomPropsUsed = ((GeneratePomPropsTask) getBuildUtil().getTask(TaskNames.generatePomProperties,
+            pDepConfig)).getPluginPomProps();
         getInputs().file(pomPropsUsed);
 
         // Dependency on pom.xml generating task
-        dependsOn(nameFactory.getName(TaskNames.generatePom, pCheckstyleVersion));
-        final File pomUsed = ((GeneratePomFileTask) nameFactory.getTask(TaskNames.generatePom, pCheckstyleVersion))
+        dependsOn(TaskNames.generatePom.getName(pDepConfig));
+
+        // Task Input: pom.xml
+        final File pomUsed = ((GeneratePomFileTask) getBuildUtil().getTask(TaskNames.generatePom, pDepConfig))
             .getPomFile();
         getInputs().file(pomUsed);
 
         // Dependency on 'classes' task (compile and resources)
-        dependsOn(nameFactory.getName(TaskNames.mainClasses, pCheckstyleVersion));
-
-        // SourceSet that fits the dependency configuration
-        SourceSet mainSourceSet = nameFactory.getSourceSet(SourceSetNames.main, pCheckstyleVersion);
-        setDescription(getDescription() + mainSourceSet.getName() + "'.");
+        dependsOn(getBuildUtil().getTask(TaskNames.mainClasses, pDepConfig));
 
         // Configuration of JAR file contents
-        from(mainSourceSet.getOutput().getClassesDir());
-        from(mainSourceSet.getOutput().getResourcesDir());
         from(pomUsed);
+        final SourceSet mainSourceSet = getBuildUtil().getSourceSet(SourceSet.MAIN_SOURCE_SET_NAME);
+        from(new ClasspathBuilder(this).getClassesDir(mainSourceSet, pDepConfig));
+        from(mainSourceSet.getOutput().getResourcesDir());
 
-        exclude("**/sonarqube/**",       //
-            "download-guide.html",       //
-            "sonarqube.xml",             //
+        exclude("download-guide.html",   //
             "**/*.md",                   //
             "**/checks/all_checks.html", //
             "eclipsecs-plugin.xml",      //
@@ -151,7 +141,7 @@ public class CreateJarTask
 
         // Manifest
         String effectiveName = project.getName();
-        if (!isDefaultPublication) {
+        if (!pDepConfig.isDefaultConfig()) {
             effectiveName += '-' + appendix;
         }
         Manifest mafest = getManifest();
@@ -166,18 +156,9 @@ public class CreateJarTask
         attrs.put("Implementation-Vendor-Id", "com.thomasjensen");
         attrs.put("Implementation-Version", project.getVersion());
         attrs.put("Implementation-Build", getBuildUtil().getExtraPropertyValue(ExtProp.GitHash));
-        attrs.put("Checkstyle-Version", pCheckstyleVersion);
+        attrs.put("Checkstyle-Version", pDepConfig.getCheckstyleBaseVersion());
         attrs.putAll(mfAttrStd(project));
 
-        doFirst(new Closure<Void>(this)
-        {
-            @Override
-            public Void call()
-            {
-                // add build timestamp in execution phase so that it does not count for the up-to-date check
-                attrs.put("Build-Timestamp", getBuildUtil().getExtraPropertyValue(ExtProp.BuildTimestamp).toString());
-                return null;
-            }
-        });
+        getBuildUtil().addBuildTimestampDeferred(this, attrs);
     }
 }

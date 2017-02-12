@@ -30,15 +30,17 @@ import java.util.Properties;
 import java.util.Set;
 import java.util.SortedMap;
 import java.util.TreeMap;
-import javax.annotation.CheckForNull;
 import javax.annotation.Nonnull;
 
 import org.gradle.api.GradleException;
 import org.gradle.api.JavaVersion;
 import org.gradle.api.Project;
+import org.gradle.api.artifacts.Configuration;
+import org.gradle.api.artifacts.Dependency;
 import org.gradle.api.file.FileCollection;
 import org.gradle.api.internal.file.collections.SimpleFileCollection;
-import org.gradle.api.plugins.ExtraPropertiesExtension;
+import org.gradle.api.logging.Logger;
+import org.gradle.api.plugins.JavaPlugin;
 
 
 /**
@@ -48,7 +50,8 @@ import org.gradle.api.plugins.ExtraPropertiesExtension;
  */
 public class DependencyConfigs
 {
-    private static final String DEFAULT_PUBL_SUFFIX = "default";
+    /** name of the default dependency configuration */
+    public static final String DEFAULT_NAME = "default";
 
     private final Project project;
 
@@ -56,55 +59,35 @@ public class DependencyConfigs
 
     private final File depConfigDir;
 
-    private final FileCollection listOfDepConfigFiles;
-
     /**
-     * map from dependency configuration names (which is the same as a Checkstyle version) to their corresponding
-     * configuration maps
+     * map from dependency configuration names (e.g. {@code "default"}, or {@code "java6"}) to their corresponding
+     * dependency configurations
      */
-    private final SortedMap<String, DependencyConfig> depVersions;
-
-    /**
-     * map from publication name (e.g. "checkstyleAddons-java6") to configuration maps for the corresponding dependency
-     * configurations
-     */
-    private final Map<String, DependencyConfig> publications;
-
-    /** the list of all known dependency configurations (published and ancillary) */
-    private final Set<String> activeDepConfigs;
+    private final SortedMap<String, DependencyConfig> depConfigs;
 
 
 
-    /**
-     * Constructor.
-     *
-     * @param pProject the project
-     */
     public DependencyConfigs(@Nonnull final Project pProject)
     {
         project = pProject;
         buildUtil = new BuildUtil(pProject);
         depConfigDir = new File(pProject.getProjectDir(), "project/dependencyConfigs");
-        listOfDepConfigFiles = readListOfDepConfigs(depConfigDir);
-        depVersions = readAllDependencyVersions(listOfDepConfigFiles);
-        publications = getPublicationList(depVersions);
-        activeDepConfigs = Collections.unmodifiableSet(depVersions.keySet());
+        final FileCollection listOfDepConfigFiles = readListOfDepConfigs(depConfigDir);
+        depConfigs = readAllDependencyVersions(listOfDepConfigFiles);
 
-        String defaultCsVersion = null;
-        for (Map.Entry<String, DependencyConfig> entry : depVersions.entrySet()) {
-            if (entry.getValue().isDefaultConfig()) {
-                defaultCsVersion = entry.getKey();
-                ExtraPropertiesExtension extProps = pProject.getExtensions().getByType(ExtraPropertiesExtension.class);
-                extProps.set("versionDefaults", entry.getValue());
-                break;
-            }
-        }
-        if (defaultCsVersion == null) {
-            throw new GradleException("Broken dependency configuration - default Checkstyle version unknown");
+        if (getDefault() == null || !DEFAULT_NAME.equals(getDefault().getName()) || !getDefault().isDefaultConfig()) {
+            throw new GradleException("corrupt default dependency configuration");
         }
 
-        pProject.getLogger().lifecycle(
-            "Dependency configurations found: " + activeDepConfigs + "; default: " + defaultCsVersion);
+        final Logger log = pProject.getLogger();
+        log.lifecycle("Default Checkstyle version: " + getDefault().getCheckstyleBaseVersion());
+        log.lifecycle("Active dependency configurations:");
+        for (Map.Entry<String, DependencyConfig> entry : depConfigs.entrySet()) {
+            DependencyConfig depConfig = entry.getValue();
+            log.lifecycle("  - " + entry.getKey() + ": Checkstyle " + depConfig.getCheckstyleBaseVersion() //
+                + ", Java " + depConfig.getJavaLevel() //
+                + ", compatible: " + depConfig.getCompatibleCheckstyleVersions());
+        }
     }
 
 
@@ -112,61 +95,107 @@ public class DependencyConfigs
     private FileCollection readListOfDepConfigs(@Nonnull final File pDepConfigDir)
     {
         File[] listOfFiles = pDepConfigDir.listFiles(new PropertyFileFilter());
+        if (listOfFiles == null) {
+            throw new GradleException("no dependency configurations found in dir: " + pDepConfigDir);
+        }
         return new SimpleFileCollection(listOfFiles);
     }
 
 
 
-    private DependencyConfig readPublishedDependencyConfig(final File pDepConfig)
+    private DependencyConfig loadDependencyConfig(final File pDepConfigFile)
     {
         final Properties props = new Properties();
 
         FileInputStream fis = null;
         BufferedInputStream bis = null;
         try {
-            fis = new FileInputStream(pDepConfig);
+            fis = new FileInputStream(pDepConfigFile);
             bis = new BufferedInputStream(fis);
             props.load(bis);
         }
         catch (IOException e) {
-            throw new GradleException("Unable to read dependency configuration: " + pDepConfig.getAbsolutePath(), e);
+            throw new GradleException("Error reading dependency configuration: " + pDepConfigFile.getAbsolutePath(), e);
         }
         finally {
             buildUtil.closeQuietly(bis);
             buildUtil.closeQuietly(fis);
         }
 
-        final Set<String> compatibles = new HashSet<String>();
+        final Set<String> compatibles = new HashSet<>();
         if (props.getProperty("CompatibleWithCheckstyle") != null) {
             compatibles.addAll(Arrays.asList(props.getProperty("CompatibleWithCheckstyle").split("\\s*,\\s*")));
         }
-
-        final List<String> javadocLinks = new ArrayList<String>();
+        final List<String> javadocLinks = new ArrayList<>();
         if (props.getProperty("JavadocLinks") != null) {
             javadocLinks.addAll(Arrays.asList(props.getProperty("JavadocLinks").split("\\s*,\\s*")));
         }
-        final String publicationSuffix = publicationSuffixFromFile(pDepConfig);
+        final String name = getNameFromFile(pDepConfigFile);
+        final Map<String, String> artifactVersions = getArtifactVersions(props, DEFAULT_NAME.equals(name));
 
-        DependencyConfig result = new DependencyConfig(props.getProperty("CheckstyleBase"), compatibles,
-            JavaVersion.toVersion(props.getProperty("JavaLevel")), props.getProperty("FindBugsVersion"), javadocLinks,
-            Boolean.parseBoolean(props.getProperty("SonarQubeSupport")), props.getProperty("SonarQubeApiVersion"),
+        DependencyConfig result = new DependencyConfig(name, compatibles,
+            JavaVersion.toVersion(props.getProperty("JavaLevel")), javadocLinks,
+            Boolean.parseBoolean(props.getProperty("SonarQubeSupport")),
             props.getProperty("SonarQubeMinPlatformVersion"), props.getProperty("SonarQubeMinJavaPlugin"),
-            props.getProperty("SonarQubeMinCheckstylePlugin"), props.getProperty("SonarQubeSlf4jNopVersion"),
-            DEFAULT_PUBL_SUFFIX.equals(publicationSuffix), publicationSuffix, pDepConfig);
+            props.getProperty("SonarQubeMinCheckstylePlugin"), artifactVersions, DEFAULT_NAME.equals(name),
+            pDepConfigFile);
         return result;
     }
 
 
 
-    @CheckForNull
-    private String publicationSuffixFromFile(@Nonnull final File pDepConfigFile)
+    @Nonnull
+    private Map<String, String> getArtifactVersions(@Nonnull final Properties pProps, final boolean pIsDefault)
+    {
+        final String prefix = "dependencyVersion.";
+        final Map<String, String> result = new HashMap<>();
+        for (final String key : pProps.stringPropertyNames()) {
+            if (key.length() > prefix.length() && key.startsWith(prefix)) {
+                final String groupId = key.substring(prefix.length());
+                final String version = pProps.getProperty(key);
+                if (version == null) {
+                    throw new GradleException("Invalid entry in dependency configuration: " + key + "=null");
+                }
+                result.put(groupId, version);
+            }
+        }
+        if (pIsDefault && !result.containsKey(DependencyConfig.CHECKSTYLE_GROUPID)) {
+            result.put(DependencyConfig.CHECKSTYLE_GROUPID, getDefaultCheckstyleVersion());
+        }
+        return Collections.unmodifiableMap(result);
+    }
+
+
+
+    private String getDefaultCheckstyleVersion()
+    {
+        String result = null;
+        final Configuration compileConfig = project.getConfigurations().getByName(
+            JavaPlugin.COMPILE_CONFIGURATION_NAME);
+        for (final Dependency dependency : compileConfig.getAllDependencies()) {
+            if (DependencyConfig.CHECKSTYLE_GROUPID.equals(dependency.getGroup()) && "checkstyle".equals(
+                dependency.getName())) {
+                result = dependency.getVersion();
+                break;
+            }
+        }
+        if (result == null) {
+            throw new GradleException("Checkstyle dependency not found in build script");
+        }
+        return result;
+    }
+
+
+
+    @Nonnull
+    private String getNameFromFile(@Nonnull final File pDepConfigFile)
     {
         String result = null;
         int dotPos = pDepConfigFile.getName().lastIndexOf('.');
         if (dotPos > 0) {
             result = pDepConfigFile.getName().substring(0, dotPos);
         }
-        if (result == null || result.length() == 0) {
+        if (result == null || result.length() == 0 || "java".equalsIgnoreCase(result)) {
             throw new GradleException("Invalid dependency configuration file name: " + pDepConfigFile.getName());
         }
         return result;
@@ -177,35 +206,21 @@ public class DependencyConfigs
     @SuppressWarnings("unchecked")
     private SortedMap<String, DependencyConfig> readAllDependencyVersions(final FileCollection pAllDepConfigs)
     {
-        final SortedMap<String, DependencyConfig> result = new TreeMap<String, DependencyConfig>(
-            new VersionComparator());
+        final SortedMap<String, DependencyConfig> result = new TreeMap<>();
+        final JavaLevelUtil javaLevelUtil = new JavaLevelUtil(project);
 
         for (final File depCfgFile : pAllDepConfigs) {
-            final DependencyConfig publishedDepConfig = readPublishedDependencyConfig(depCfgFile);
+            final DependencyConfig depConfig = loadDependencyConfig(depCfgFile);
 
-            final JavaVersion myJavaLevel = publishedDepConfig.getJavaLevel();
-            if ((JavaVersion.VERSION_1_6 == myJavaLevel && buildUtil.getJdk6Compiler() == null) || (
-                JavaVersion.VERSION_1_7 == myJavaLevel && buildUtil.getJdk7Compiler() == null)) {
-                final String javacPropName =
-                    JavaVersion.VERSION_1_6 == myJavaLevel ? buildUtil.<String>getExtraPropertyValue(
-                        ExtProp.Jdk6PropName) : buildUtil.<String>getExtraPropertyValue(ExtProp.Jdk7PropName);
+            final JavaVersion myJavaLevel = depConfig.getJavaLevel();
+            if ((myJavaLevel.isJava6() && !javaLevelUtil.java6Configured()) || (myJavaLevel.isJava7() && !javaLevelUtil
+                .java7Configured())) {
                 project.getLogger().warn(
-                    "WARNING: Skipping dependency configuration file '" + publishedDepConfig.getConfigFile().getName()
+                    "WARNING: Skipping dependency configuration file '" + depConfig.getConfigFile().getName()
                         + "' because of missing JDK" + myJavaLevel.getMajorVersion() + " compiler configuration.");
-                project.getLogger().warn(
-                    "Property '" + javacPropName + "' not defined in gradle.properties. " + "It must point to a Java "
-                        + myJavaLevel.getMajorVersion() + " compiler executable.");
             }
             else {
-                result.put(publishedDepConfig.getCheckstyleBaseVersion(), publishedDepConfig);
-            }
-
-            // Create ancillary dependency configurations for compatible versions of Checkstyle
-            for (String compatibleVersion : (Set<String>) publishedDepConfig.getCompatibleCheckstyleVersions()) {
-                if (result.containsKey(compatibleVersion)) {
-                    throw new GradleException("Checkstyle version '" + compatibleVersion + "' defined twice");
-                }
-                result.put(compatibleVersion, new DependencyConfig(publishedDepConfig, compatibleVersion));
+                result.put(depConfig.getName(), depConfig);
             }
         }
         return Collections.unmodifiableSortedMap(result);
@@ -213,32 +228,15 @@ public class DependencyConfigs
 
 
 
-    private Map<String, DependencyConfig> getPublicationList(
-        @Nonnull final SortedMap<String, DependencyConfig> pDepVersions)
-    {
-        final Map<String, DependencyConfig> result = new HashMap<String, DependencyConfig>();
-        for (final DependencyConfig depConfig : pDepVersions.values()) {
-            if (depConfig.isPublished()) {
-                String pubName = buildUtil.getExtraPropertyValue(ExtProp.DefaultPublication);
-                if (!depConfig.isDefaultConfig()) {
-                    pubName += '-' + depConfig.getPublicationSuffix();
-                }
-                result.put(pubName, depConfig);
-            }
-        }
-        return Collections.unmodifiableMap(result);
-    }
-
-
-
     /**
      * Prints all dependency configurations with full contents for debugging purposes.
      */
+    @SuppressWarnings("unused")
     public void printAll()
     {
         project.getLogger().lifecycle("Full contents of dependency configurations:");
         project.getLogger().lifecycle("-------------------------------------------");
-        for (final Map.Entry<String, DependencyConfig> entry : depVersions.entrySet()) {
+        for (final Map.Entry<String, DependencyConfig> entry : depConfigs.entrySet()) {
             project.getLogger().lifecycle("- " + entry.getKey() + ":\t" + entry.getValue());
         }
     }
@@ -246,50 +244,9 @@ public class DependencyConfigs
 
 
     @Nonnull
-    public Set<String> getActiveDepConfigs()
+    public SortedMap<String, DependencyConfig> getAll()
     {
-        return activeDepConfigs;
-    }
-
-
-
-    @Nonnull
-    public FileCollection getListOfDepConfigFiles()
-    {
-        return listOfDepConfigFiles;
-    }
-
-
-
-    @Nonnull
-    public File getDepConfigDir()
-    {
-        return depConfigDir;
-    }
-
-
-
-    @Nonnull
-    public SortedMap<String, DependencyConfig> getDepVersions()
-    {
-        return depVersions;
-    }
-
-
-
-    /**
-     * Get one particular dependency configuration.
-     *
-     * @param pCheckstyleVersion the Checkstyle version, e.g. {@code "6.12.1"}
-     * @return the dependency configuration for the given Checkstyle version
-     */
-    @Nonnull
-    public DependencyConfig getDepConfig(@Nonnull final String pCheckstyleVersion)
-    {
-        if (depVersions.containsKey(pCheckstyleVersion)) {
-            return depVersions.get(pCheckstyleVersion);
-        }
-        throw new GradleException("Unknown dependency configuration - " + pCheckstyleVersion);
+        return depConfigs;
     }
 
 
@@ -297,47 +254,22 @@ public class DependencyConfigs
     @Nonnull
     public Map<String, DependencyConfig> getPublications()
     {
-        return publications;
+        final Map<String, DependencyConfig> result = new HashMap<>();
+        for (final DependencyConfig depConfig : depConfigs.values()) {
+            String pubName = buildUtil.getExtraPropertyValue(ExtProp.DefaultPublication);
+            if (!depConfig.isDefaultConfig()) {
+                pubName += '-' + depConfig.getName();
+            }
+            result.put(pubName, depConfig);
+        }
+        return Collections.unmodifiableMap(result);
     }
 
 
 
-    /**
-     * Convenience method for checking SonarQube support of a given Checkstyle version.
-     *
-     * @param pCheckstyleVersion the Checkstyle version, e.g. {@code "6.12.1"}
-     * @return the flag as given in the dependency configuration
-     */
-    public boolean supportsSonarQube(@Nonnull final String pCheckstyleVersion)
+    @Nonnull
+    public DependencyConfig getDefault()
     {
-        return depVersions.get(pCheckstyleVersion).isSonarQubeSupported();
-    }
-
-
-
-    /**
-     * Convenience method for checking if the given Checkstyle version is the base version in one of the dependency
-     * configuration files, so that we must create artifacts for it.
-     *
-     * @param pCheckstyleVersion the Checkstyle version, e.g. {@code "6.12.1"}
-     * @return the flag as given in the dependency configuration
-     */
-    public boolean isPublished(@Nonnull final String pCheckstyleVersion)
-    {
-        return depVersions.get(pCheckstyleVersion).isPublished();
-    }
-
-
-
-    /**
-     * Convenience method for checking if the given Checkstyle version is the <i>default</i> version, which means that
-     * it is used in the IDE.
-     *
-     * @param pCheckstyleVersion the Checkstyle version, e.g. {@code "6.12.1"}
-     * @return the flag as given in the dependency configuration
-     */
-    public boolean isDefault(@Nonnull final String pCheckstyleVersion)
-    {
-        return depVersions.get(pCheckstyleVersion).isDefaultConfig();
+        return depConfigs.get(DEFAULT_NAME);
     }
 }

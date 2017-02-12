@@ -22,13 +22,14 @@ import java.nio.file.Files;
 import java.util.ArrayList;
 import java.util.List;
 
-import com.thomasjensen.checkstyle.addons.build.BuildUtil;
 import groovy.lang.Closure;
 import org.gradle.api.DefaultTask;
 import org.gradle.api.GradleException;
 import org.gradle.api.Project;
 import org.gradle.api.plugins.BasePlugin;
 import org.gradle.api.tasks.TaskInputs;
+
+import com.thomasjensen.checkstyle.addons.build.BuildUtil;
 
 
 /**
@@ -44,6 +45,7 @@ public class GeneratePomPropsTask
     private String appendix = null;
 
     private final BuildUtil buildUtil;
+
 
 
     /**

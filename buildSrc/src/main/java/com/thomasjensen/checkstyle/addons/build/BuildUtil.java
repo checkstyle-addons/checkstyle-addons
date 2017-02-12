@@ -20,9 +20,16 @@ import java.io.IOException;
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 
+import groovy.lang.Closure;
 import org.gradle.api.GradleException;
 import org.gradle.api.Project;
+import org.gradle.api.Task;
+import org.gradle.api.java.archives.Attributes;
 import org.gradle.api.plugins.ExtraPropertiesExtension;
+import org.gradle.api.plugins.JavaPluginConvention;
+import org.gradle.api.tasks.SourceSet;
+import org.gradle.api.tasks.SourceSetContainer;
+import org.gradle.api.tasks.bundling.Jar;
 
 
 /**
@@ -41,7 +48,12 @@ public final class BuildUtil
     /** the Maven metadata name {@code "version"} */
     public static final String VERSION = "version";
 
+    /** the name of our 'sonarqube' source set */
+    public static final String SONARQUBE_SOURCE_SET_NAME = "sonarqube";
+
     private final Project project;
+
+    private final SourceSetContainer sourceSets;
 
 
 
@@ -54,6 +66,8 @@ public final class BuildUtil
     {
         super();
         project = pProject;
+        final JavaPluginConvention javaConvention = project.getConvention().getPlugin(JavaPluginConvention.class);
+        sourceSets = javaConvention.getSourceSets();
     }
 
 
@@ -73,57 +87,6 @@ public final class BuildUtil
                 // ignore
             }
         }
-    }
-
-
-
-    /**
-     * Get the value of the project or system property whose name is set in the project's extra property {@code
-     * "jdk6PropName"}. If the project property exists, it has precedence over the system property.
-     *
-     * @return the absolute path to the javac executable for Java 6
-     */
-    public String getJdk6Compiler()
-    {
-        return getProjectPropertyValue(ExtProp.Jdk6PropName);
-    }
-
-
-
-    /**
-     * Get the value of the project or system property whose name is set in the project's extra property {@code
-     * "javadoc6PropName"}. If the project property exists, it has precedence over the system property.
-     *
-     * @return the absolute path to the javadoc executable for Java 6
-     */
-    public String getJdk6Javadoc()
-    {
-        return getProjectPropertyValue(ExtProp.Javadoc6PropName);
-    }
-
-
-
-    /**
-     * Get the value of the project or system property whose name is set in the project's extra property {@code
-     * "jdk7PropName"}. If the project property exists, it has precedence over the system property.
-     *
-     * @return the absolute path to the javac executable for Java 7
-     */
-    public String getJdk7Compiler()
-    {
-        return getProjectPropertyValue(ExtProp.Jdk7PropName);
-    }
-
-
-
-    /**
-     * Getter.
-     *
-     * @return the name factory
-     */
-    public NameFactory getNameFactory()
-    {
-        return getExtraPropertyValue(ExtProp.NameFactory);
     }
 
 
@@ -153,31 +116,6 @@ public final class BuildUtil
 
 
     /**
-     * Get the value of the project or system property whose name is set in the project's extra property {@code
-     * "javadoc7PropName"}. If the project property exists, it has precedence over the system property.
-     *
-     * @return the absolute path to the javadoc executable for Java 7
-     */
-    public String getJdk7Javadoc()
-    {
-        return getProjectPropertyValue(ExtProp.Javadoc7PropName);
-    }
-
-
-
-    private String getProjectPropertyValue(@Nonnull final ExtProp pExtraPropNameRef)
-    {
-        final String propName = getExtraPropertyValue(pExtraPropNameRef);
-        String result = System.getenv(propName);
-        if (project.hasProperty(propName)) {
-            result = (String) project.property(propName);
-        }
-        return result;
-    }
-
-
-
-    /**
      * Read the value of an extra property of the project.
      *
      * @param pExtraPropName the reference to the extra property name
@@ -193,5 +131,88 @@ public final class BuildUtil
         }
         throw new GradleException(
             "Reference to non-existent project extra property '" + pExtraPropName.getPropertyName() + "'");
+    }
+
+
+
+    /**
+     * Convenience method for getting a specific task directly.
+     *
+     * @param pTaskName the task to get
+     * @param pDepConfig the dependency configuration for which the task is intended
+     * @return a task object
+     */
+    @Nonnull
+    public Task getTask(@Nonnull final TaskNames pTaskName, @Nonnull final DependencyConfig pDepConfig)
+    {
+        return project.getTasks().getByName(pTaskName.getName(pDepConfig));
+    }
+
+
+
+    /**
+     * Get a source set by name.
+     *
+     * @param pName the source set name
+     * @return the source set
+     */
+    @Nonnull
+    public SourceSet getSourceSet(@Nonnull final String pName)
+    {
+        return sourceSets.getByName(pName);
+    }
+
+
+
+    private void addBuildTimestamp(@Nonnull final Attributes pAttributes)
+    {
+        pAttributes.put("Build-Timestamp", getExtraPropertyValue(ExtProp.BuildTimestamp).toString());
+    }
+
+
+
+    /**
+     * Add build timestamp to some manifest attributes in the execution phase, so that it does not count for the
+     * up-to-date check.
+     *
+     * @param pTask the executing task
+     * @param pAttributes the attributes map to add to
+     */
+    public void addBuildTimestampDeferred(@Nonnull final Task pTask, @Nonnull final Attributes pAttributes)
+    {
+        pTask.doFirst(new Closure<Void>(pTask)
+        {
+            @Override
+            @SuppressWarnings("MethodDoesntCallSuperMethod")
+            public Void call()
+            {
+                addBuildTimestamp(pAttributes);
+                return null;
+            }
+        });
+    }
+
+
+
+    /**
+     * Make the given Jar task inherit its manifest from the "main" "thin" Jar task. Also set the build timestamp.
+     *
+     * @param pTask the executing task
+     * @param pDepConfig the dependency configuration for which the Jar task is intended
+     */
+    public void inheritManifest(@Nonnull final Jar pTask, @Nonnull final DependencyConfig pDepConfig)
+    {
+        pTask.doFirst(new Closure<Void>(pTask)
+        {
+            @Override
+            @SuppressWarnings("MethodDoesntCallSuperMethod")
+            public Void call()
+            {
+                final Jar jarTask = (Jar) getTask(TaskNames.jar, pDepConfig);
+                pTask.setManifest(jarTask.getManifest());
+                addBuildTimestamp(pTask.getManifest().getAttributes());
+                return null;
+            }
+        });
     }
 }

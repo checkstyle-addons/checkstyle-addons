@@ -211,4 +211,17 @@ public abstract class BaseCheckTestSupport
             pChecker.destroy();
         }
     }
+
+
+
+    public static boolean isJava6()
+    {
+        try {
+            Assert.assertEquals(1, Integer.parseInt("+1"));
+            return false;
+        }
+        catch (NumberFormatException e) {
+            return true;
+        }
+    }
 }

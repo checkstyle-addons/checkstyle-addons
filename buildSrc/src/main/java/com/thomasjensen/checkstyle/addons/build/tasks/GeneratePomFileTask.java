@@ -21,6 +21,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Iterator;
 import java.util.List;
+import javax.annotation.Nonnull;
 import javax.xml.bind.JAXBContext;
 import javax.xml.bind.JAXBException;
 import javax.xml.bind.Marshaller;
@@ -37,6 +38,8 @@ import org.gradle.api.publish.plugins.PublishingPlugin;
 import org.gradle.api.tasks.TaskInputs;
 
 import com.thomasjensen.checkstyle.addons.build.BuildUtil;
+import com.thomasjensen.checkstyle.addons.build.ClasspathBuilder;
+import com.thomasjensen.checkstyle.addons.build.DependencyConfig;
 import com.thomasjensen.checkstyle.addons.build.ExtProp;
 import com.thomasjensen.checkstyle.addons.build.PomXml;
 
@@ -48,20 +51,16 @@ import com.thomasjensen.checkstyle.addons.build.PomXml;
  */
 public class GeneratePomFileTask
     extends DefaultTask
+    implements ConfigurableAddonsTask
 {
     private final File pomFile = new File(getTemporaryDir(), "pom.xml");
 
-    private String appendix = null;
-
-    private final List<Configuration> bundledConfigs = new ArrayList<>();
-
     private final BuildUtil buildUtil;
 
+    private DependencyConfig depConfig = null;
 
 
-    /**
-     * Constructor.
-     */
+
     public GeneratePomFileTask()
     {
         super();
@@ -74,9 +73,6 @@ public class GeneratePomFileTask
         inputs.property("groupId", project.getGroup());
         inputs.property("artifactId", project.getName());
         inputs.property("version", project.getVersion());
-        if (getAppendix() != null) {
-            inputs.property("appendix", getAppendix());
-        }
         inputs.property("name", buildUtil.getLongName());
         inputs.property("description", project.getDescription());
         inputs.property("url", buildUtil.getExtraPropertyValue(ExtProp.Website));
@@ -113,8 +109,8 @@ public class GeneratePomFileTask
         final TaskInputs inputs = getInputs();
 
         String effectiveArtifactId = (String) inputs.getProperties().get("artifactId");
-        if (getAppendix() != null) {
-            effectiveArtifactId += '-' + getAppendix();
+        if (!depConfig.isDefaultConfig()) {
+            effectiveArtifactId += '-' + depConfig.getName();
         }
 
         final PomXml pom = new PomXml();
@@ -128,25 +124,22 @@ public class GeneratePomFileTask
         pom.setDescription((String) inputs.getProperties().get("description"));
         pom.setUrl((String) inputs.getProperties().get("url"));
 
-        if (bundledConfigs.size() > 0) {
-            final List<PomXml.DependencyXml> dependencies = new ArrayList<>();
-            for (final Configuration cfg : bundledConfigs) {
-                for (Dependency d : cfg.getAllDependencies()) {
-                    if (!(d instanceof ExternalDependency)) {
-                        throw new GradleException("Incompatible dependency: " + d);
-                    }
-                    final ExternalDependency jar = (ExternalDependency) d;
-                    final Iterator<DependencyArtifact> artifactIterator = jar.getArtifacts().iterator();
-                    final DependencyArtifact artifcat = artifactIterator.hasNext() ? artifactIterator.next() : null;
-                    final String depClassifier = artifcat != null ? artifcat.getClassifier() : null;
-
-                    PomXml.DependencyXml dep = new PomXml.DependencyXml(jar.getGroup(), jar.getName(), jar.getVersion(),
-                        depClassifier, "compile");
-                    dependencies.add(dep);
-                }
+        final List<PomXml.DependencyXml> dependencies = new ArrayList<>();
+        final Configuration cfg = new ClasspathBuilder(this).buildMainRuntimeConfiguration(depConfig);
+        for (Dependency d : cfg.getAllDependencies()) {
+            if (!(d instanceof ExternalDependency)) {
+                throw new GradleException("Incompatible dependency: " + d);
             }
-            pom.setDependencies(dependencies);
+            final ExternalDependency jar = (ExternalDependency) d;
+            final Iterator<DependencyArtifact> artifactIterator = jar.getArtifacts().iterator();
+            final DependencyArtifact artifcat = artifactIterator.hasNext() ? artifactIterator.next() : null;
+            final String depClassifier = artifcat != null ? artifcat.getClassifier() : null;
+
+            PomXml.DependencyXml dep = new PomXml.DependencyXml(jar.getGroup(), jar.getName(), jar.getVersion(),
+                depClassifier, "compile");
+            dependencies.add(dep);
         }
+        pom.setDependencies(dependencies);
 
         pom.setInceptionYear("2015");
 
@@ -181,54 +174,22 @@ public class GeneratePomFileTask
 
 
 
-    public String getAppendix()
+    @Override
+    public void configureFor(@Nonnull final DependencyConfig pDepConfig)
     {
-        return this.appendix;
-    }
+        depConfig = pDepConfig;
 
-
-
-    /**
-     * Setter.
-     *
-     * @param pAppendix the appendix to use for this artifact
-     */
-    public void setAppendix(final String pAppendix)
-    {
-        this.appendix = pAppendix;
-        if (pAppendix != null) {
-            getInputs().property("appendix", pAppendix);
+        String appendix = pDepConfig.getName();
+        if (appendix != null) {
+            getInputs().property("appendix", appendix);
         }
         else {
             getInputs().getProperties().remove("appendix");
         }
-    }
 
-
-
-    /**
-     * Add configurations whose artifacts should be listed as dependencies in the POM.
-     *
-     * @param pConfigs said configurations
-     */
-    public void addBundledConfigs(final Configuration... pConfigs)
-    {
-        if (pConfigs != null && pConfigs.length > 0) {
-            for (final Configuration cfg : pConfigs) {
-                if (cfg != null) {
-                    boolean duplicate = false;
-                    for (final Configuration c : bundledConfigs) {
-                        if (c.getName().equals(cfg.getName())) {
-                            duplicate = true;
-                            break;
-                        }
-                    }
-                    if (!duplicate) {
-                        bundledConfigs.add(cfg);
-                    }
-                }
-            }
-        }
+        setDescription(
+            buildUtil.getLongName() + ": Generates the Maven POM file for publication " + "'checkstyleAddons' (" + (
+                pDepConfig.isDefaultConfig() ? "no appendix" : "appendix: " + appendix) + ").");
     }
 
 

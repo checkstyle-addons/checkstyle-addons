@@ -16,29 +16,28 @@ package com.thomasjensen.checkstyle.addons.build.tasks;
  */
 
 import java.io.File;
-import java.util.Collection;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.Set;
+import javax.annotation.Nonnull;
 
 import groovy.lang.Closure;
-import org.gradle.api.GradleException;
 import org.gradle.api.Project;
+import org.gradle.api.Task;
 import org.gradle.api.artifacts.Configuration;
 import org.gradle.api.artifacts.ResolvedArtifact;
 import org.gradle.api.artifacts.ResolvedDependency;
 import org.gradle.api.file.CopySpec;
 import org.gradle.api.java.archives.Attributes;
 import org.gradle.api.java.archives.Manifest;
-import org.gradle.api.plugins.BasePlugin;
 import org.gradle.api.tasks.SourceSet;
 import org.gradle.api.tasks.TaskInputs;
+import org.gradle.api.tasks.compile.JavaCompile;
 
 import com.thomasjensen.checkstyle.addons.build.BuildUtil;
-import com.thomasjensen.checkstyle.addons.build.DependencyConfigs;
+import com.thomasjensen.checkstyle.addons.build.ClasspathBuilder;
+import com.thomasjensen.checkstyle.addons.build.DependencyConfig;
 import com.thomasjensen.checkstyle.addons.build.ExtProp;
-import com.thomasjensen.checkstyle.addons.build.NameFactory;
-import com.thomasjensen.checkstyle.addons.build.SourceSetNames;
 import com.thomasjensen.checkstyle.addons.build.TaskNames;
 
 
@@ -56,7 +55,6 @@ public class CreateJarEclipseTask
     public CreateJarEclipseTask()
     {
         super();
-        setGroup(BasePlugin.BUILD_GROUP);
         setAppendix("eclipse");
     }
 
@@ -74,24 +72,19 @@ public class CreateJarEclipseTask
      * Scan the dependencies of the specified configurations and return a list of File objects for each dependency.
      * Resolves the configurations if they are still unresolved.
      *
-     * @param pProject the project
-     * @param pIncludeCheckstyle flag indicating if the dependency on Checkstyle should be included in the result
+     * @param pTask the calling task
+     * @param pDepConfig the current dependency configuration
      * @return list of files
      */
-    public static Set<File> getPublishedDependencyLibs(final Project pProject, final boolean pIncludeCheckstyle)
+    public static Set<File> getPublishedDependencyLibs(@Nonnull final Task pTask,
+        @Nonnull final DependencyConfig pDepConfig)
     {
         Set<File> result = new HashSet<>();
-        for (final String configName : (Collection<String>) new BuildUtil(pProject).getExtraPropertyValue(
-            ExtProp.BundledConfigs)) {
-            Configuration cfg = pProject.getConfigurations().getByName(configName);
-            if (cfg == null) {
-                throw new GradleException("Unknown configuration: " + configName);
-            }
-            for (ResolvedDependency dep : cfg.getResolvedConfiguration().getFirstLevelModuleDependencies()) {
-                if (pIncludeCheckstyle || !isCheckstyle(dep)) {
-                    for (ResolvedArtifact artifact : dep.getAllModuleArtifacts()) {
-                        result.add(artifact.getFile());
-                    }
+        Configuration cfg = new ClasspathBuilder(pTask).buildMainRuntimeConfiguration(pDepConfig);
+        for (ResolvedDependency dep : cfg.getResolvedConfiguration().getFirstLevelModuleDependencies()) {
+            if (!isCheckstyle(dep)) {
+                for (ResolvedArtifact artifact : dep.getAllModuleArtifacts()) {
+                    result.add(artifact.getFile());
                 }
             }
         }
@@ -108,7 +101,7 @@ public class CreateJarEclipseTask
             set.add(prefix + f.getName());
         }
         StringBuilder sb = new StringBuilder();
-        for (final Iterator<String> iter = set.iterator(); iter.hasNext(); ) {
+        for (final Iterator<String> iter = set.iterator(); iter.hasNext();) {
             sb.append(iter.next());
             if (iter.hasNext()) {
                 sb.append(pSeparator);
@@ -119,34 +112,26 @@ public class CreateJarEclipseTask
 
 
 
-    /**
-     * Configure this task instance for a given dependency configuration.
-     *
-     * @param pCheckstyleVersion the Checkstyle version for which to configure
-     */
+    @Override
     @SuppressWarnings("MethodDoesntCallSuperMethod")
-    public void configureFor(final String pCheckstyleVersion)
+    public void configureFor(@Nonnull final DependencyConfig pDepConfig)
     {
         final Project project = getProject();
-        final NameFactory nameFactory = getBuildUtil().getNameFactory();
-        final DependencyConfigs depConfigs = getBuildUtil().getDepConfigs();
-        final boolean isDefaultPublication = depConfigs.isDefault(pCheckstyleVersion);
-        final String myJavaLevel = depConfigs.getDepConfig(pCheckstyleVersion).getJavaLevel().toString();
+        final String baseCsVersion = pDepConfig.getCheckstyleBaseVersion();
+        final String myJavaLevel = pDepConfig.getJavaLevel().toString();
         final String longName = getBuildUtil().getLongName();
 
-        setDescription(longName + ": Assembles the Eclipse-CS plugin for Checkstyle " + pCheckstyleVersion);
+        setDescription(
+            longName + ": Assembles the Eclipse-CS plugin for dependency configuration '" + pDepConfig.getName() + "'");
 
         // adjust archive name
-        if (!isDefaultPublication) {
-            final String pubSuffix = depConfigs.getDepConfig(pCheckstyleVersion).getPublicationSuffix();
+        if (!pDepConfig.isDefaultConfig()) {
+            final String pubSuffix = pDepConfig.getName();
             setAppendix(pubSuffix + '-' + getAppendix());
         }
 
         // Dependency on 'classes' task (compile and resources)
-        dependsOn(nameFactory.getName(TaskNames.mainClasses, pCheckstyleVersion));
-
-        // SourceSet that fits the dependency configuration
-        SourceSet mainSourceSet = nameFactory.getSourceSet(SourceSetNames.main, pCheckstyleVersion);
+        dependsOn(TaskNames.mainClasses.getName(pDepConfig));
 
         // Inputs for up-to-date checking
         final TaskInputs inputs = getInputs();
@@ -158,19 +143,17 @@ public class CreateJarEclipseTask
         // Configuration of JAR file contents
         intoFrom("META-INF", "LICENSE");
 
-        from(mainSourceSet.getOutput(), new Closure<Void>(this)
+        final JavaCompile compileTask = (JavaCompile) getBuildUtil().getTask(TaskNames.compileJava, pDepConfig);
+        from(compileTask.getDestinationDir());
+
+        final SourceSet mainSourceSet = getBuildUtil().getSourceSet(SourceSet.MAIN_SOURCE_SET_NAME);
+        from(mainSourceSet.getOutput().getResourcesDir(), new Closure<Void>(this)
         {
             @Override
             public Void call(final Object... pArgs)
             {
                 final CopySpec spec = (CopySpec) getDelegate();
-                spec.exclude("**/sonarqube/**",  //
-                    "download-guide.html",       //
-                    "**/sonarqube",              //
-                    "**/*.md",                   //
-                    "**/checks/all_checks.html", //
-                    "sonarqube.xml",             //
-                    "**/checkstyle-metadata.*");
+                spec.exclude("**/*.html", "**/*.md");
                 spec.rename(new Closure<String>(this)
                 {
                     @Override
@@ -185,23 +168,12 @@ public class CreateJarEclipseTask
                         }
                     }
                 });
-                return null;
-            }
-        });
-
-        from(mainSourceSet.getOutput(), new Closure<Void>(this)
-        {
-            @Override
-            public Void call(final Object... pArgs)
-            {
-                final CopySpec spec = (CopySpec) getDelegate();
-                spec.include("**/checkstyle-metadata.*");
                 filterVersion(spec, inputs.getProperties().get(BuildUtil.VERSION).toString());
                 return null;
             }
         });
 
-        final Set<File> pubLibs = getPublishedDependencyLibs(project, false);
+        final Set<File> pubLibs = getPublishedDependencyLibs(this, pDepConfig);
         intoFrom("lib", pubLibs);
 
         Manifest mafest = getManifest();
@@ -209,7 +181,7 @@ public class CreateJarEclipseTask
         attrs.clear();
         attrs.put("Bundle-ManifestVersion", "2");
         attrs.put("Bundle-Name", inputs.getProperties().get("name") //
-            + " Eclipse-CS Extension (based on Checkstyle " + pCheckstyleVersion + ")");
+            + " Eclipse-CS Extension (based on Checkstyle " + baseCsVersion + ")");
         attrs.put("Bundle-SymbolicName", inputs.getProperties().get(BuildUtil.GROUP_ID) + ";singleton:=true");
         attrs.put("Bundle-Version", inputs.getProperties().get(BuildUtil.VERSION));
         attrs.put("Require-Bundle", "net.sf.eclipsecs.checkstyle," + "net.sf.eclipsecs.core," + "net.sf.eclipsecs.ui");
@@ -223,17 +195,6 @@ public class CreateJarEclipseTask
         if (pubLibs != null && pubLibs.size() > 0) {
             attrs.put("Bundle-ClassPath", ".," + flattenPrefixLibs("lib/", pubLibs, ','));
         }
-
-        // TODO extract
-        doFirst(new Closure<Void>(this)
-        {
-            @Override
-            public Void call()
-            {
-                // add build timestamp in execution phase so that it does not count for the up-to-date check
-                attrs.put("Build-Timestamp", getBuildUtil().getExtraPropertyValue(ExtProp.BuildTimestamp).toString());
-                return null;
-            }
-        });
+        getBuildUtil().addBuildTimestampDeferred(this, attrs);
     }
 }

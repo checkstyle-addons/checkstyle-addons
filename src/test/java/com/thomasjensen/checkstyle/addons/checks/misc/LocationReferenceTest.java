@@ -16,8 +16,9 @@ package com.thomasjensen.checkstyle.addons.checks.misc;
  */
 
 import com.puppycrawl.tools.checkstyle.DefaultConfiguration;
-import com.thomasjensen.checkstyle.addons.BaseCheckTestSupport;
 import org.junit.Test;
+
+import com.thomasjensen.checkstyle.addons.BaseCheckTestSupport;
 
 
 /**
@@ -305,7 +306,12 @@ public class LocationReferenceTest
     {
         final DefaultConfiguration checkConfig = createCheckConfig(LocationReferenceCheck.class);
         checkConfig.addAttribute("methodCalls", "checkedCall13");
-        checkConfig.addAttribute("argumentPosition", "+1");
+        if (isJava6()) {
+            checkConfig.addAttribute("argumentPosition", "1");
+        }
+        else {
+            checkConfig.addAttribute("argumentPosition", "+1");
+        }
 
         final String[] expected = {//
             "151:44: Value must reference the current method name, which is 'argPositionsPlus1'", //
@@ -374,5 +380,4 @@ public class LocationReferenceTest
 
         verify(checkConfig, getPath("misc/InputLocationReference.java"), new String[0]);
     }
-
 }

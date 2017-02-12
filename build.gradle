@@ -13,13 +13,12 @@
  * You should have received a copy of the GNU General Public License along with this
  * program.  If not, see <http://www.gnu.org/licenses/>.
  */
+
 buildscript {
     repositories {
-        mavenLocal()
         jcenter()
     }
 }
-
 plugins {
     id 'java';
     id 'jacoco';
@@ -30,29 +29,41 @@ plugins {
     id 'maven-publish';
     id 'com.jfrog.bintray' version '1.2';
     id 'org.ajoberstar.grgit' version '1.4.2';
+    id 'com.dorongold.task-tree' version '1.2.2';
 }
 
 repositories {
-    mavenLocal()
     jcenter()
-    mavenCentral()
 }
 
-import com.thomasjensen.checkstyle.addons.build.*
-import org.ajoberstar.grgit.Grgit
 
+import com.thomasjensen.checkstyle.addons.build.BuildUtil;
+import com.thomasjensen.checkstyle.addons.build.ClasspathBuilder;
+import com.thomasjensen.checkstyle.addons.build.DependencyConfig;
+import com.thomasjensen.checkstyle.addons.build.DependencyConfigs;
+import com.thomasjensen.checkstyle.addons.build.JavaLevelUtil;
+import com.thomasjensen.checkstyle.addons.build.TaskCreator;
+import com.thomasjensen.checkstyle.addons.build.VersionWrapper;
+import com.thomasjensen.checkstyle.addons.build.tasks.JavadocTask;
+import com.thomasjensen.checkstyle.addons.build.tasks.SiteTask;
+import org.ajoberstar.grgit.Grgit;
+import org.apache.tools.ant.filters.ReplaceTokens;
+
+
+// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+//   Project metadata
+// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
 group = 'com.thomasjensen.checkstyle.addons';
-version = readVersionProps();
 description = 'Additional Checkstyle Checks';
+version = new VersionWrapper(project).toString();
+ClasspathBuilder.clearConfigCache();
+new JavaLevelUtil(project).analyzeJavaLevels();
+sourceCompatibility = JavaVersion.VERSION_1_6;
+
 ext {
     // keep these in sync with the ExtProp enum
-    bundledConfigurations = ['runtime'];
     defaultPublication = 'checkstyleAddons';   // name of the default Gradle publication
-    jdk6PropName = 'checkstyleaddons_jdk6_javac';
-    javadoc6PropName = 'checkstyleaddons_jdk6_javadoc';
-    jdk7PropName = 'checkstyleaddons_jdk7_javac';
-    javadoc7PropName = 'checkstyleaddons_jdk7_javadoc';
     authorName = 'Thomas Jensen';
     longName = 'Checkstyle Addons';
     orgName = 'Checkstyle Addons';
@@ -66,542 +77,274 @@ ext {
     website = 'http://checkstyle-addons.thomasjensen.com/';
     gitRepo = Grgit.open(project.file('.'));
     gitHash = gitRepo.head().id;
-    depConfigs = new DependencyConfigs(project);
-    // versionDefaults set by DependencyConfigs
-    nameFactory = new NameFactory(project, project.ext.versionDefaults.checkstyleBaseVersion);
     buildUtil = new BuildUtil(project);
-}
 
-
-/*
- * Set up build for each dependency configuration
- */
-project.ext.depConfigs.activeDepConfigs.each { final String csVersion ->
-
-    final DependencyConfigs dcn = project.ext.depConfigs;
-    if (dcn.isDefault(csVersion)) {
-        return;   // no extra stuff for the default config - important to make IDE configuration work
-    }
-
-    final JavaVersion javaLevel = dcn.getDepConfig(csVersion).javaLevel;
-    final NameFactory nameFactory = project.ext.nameFactory;
-    final boolean hasSonarQube = dcn.supportsSonarQube(csVersion);
-    final boolean isPublished = dcn.isPublished(csVersion);
-    final File depCfgFile = dcn.getDepConfig(csVersion).getConfigFile();
-
-    // 'main' sourceSet
-    SourceSet mainSourceSet = project.sourceSets.create(nameFactory.getName(SourceSetNames.main, csVersion));
-    mainSourceSet.java {
-        srcDirs  = ['src/main/java'];
-        if (!hasSonarQube) {
-            excludes = ['**/sonarqube/**'];
+    testConfigClosure = {
+        testLogging {
+            events 'failed';
+            showStackTraces = true;
+            showExceptions = true;
+            showCauses = true;
+            showStandardStreams = true;
+            exceptionFormat 'full'
         }
-    }
-    mainSourceSet.resources {
-        srcDirs  = ['src/main/resources'];
-    }
-
-    // 'test' sourceSet
-    SourceSet testSourceSet = project.sourceSets.create(nameFactory.getName(SourceSetNames.test, csVersion));
-    testSourceSet.java {
-        srcDirs  = ['src/test/java'];
-        if (!hasSonarQube) {
-            excludes = ['**/sonarqube/**'];
-        }
-    }
-    testSourceSet.resources {
-        srcDirs  = ['src/test/resources'];
-    }
-    testSourceSet.compileClasspath += files(mainSourceSet.output.classesDir);
-    testSourceSet.compileClasspath += files(mainSourceSet.output.resourcesDir);
-    testSourceSet.runtimeClasspath += files(mainSourceSet.output.classesDir);
-    testSourceSet.runtimeClasspath += files(mainSourceSet.output.resourcesDir);
-/*
-    println "-- test";
-    println 'compileConfigurationName = ' + sourceSets['test'].getCompileConfigurationName();
-    println 'runtimeConfigurationName = ' + sourceSets['test'].getRuntimeConfigurationName();
-    println 'output.classesDir = ' + sourceSets['test'].output.classesDir;
-    println 'output.resourcesDir = ' + sourceSets['test'].output.resourcesDir;
-    sourceSets['test'].java.each {println "java = " + it;}
-    sourceSets['test'].compileClasspath.each {println 'compile = ' + it;}
-    sourceSets['test'].runtimeClasspath.each {println 'runtime = ' + it;}
-
-    println '-- test' + depVersions.Checkstyle;
-    println 'compileConfigurationName = ' + sourceSets['test' + depVersions.Checkstyle].getCompileConfigurationName();
-    println 'runtimeConfigurationName = ' + sourceSets['test' + depVersions.Checkstyle].getRuntimeConfigurationName();
-    println 'output.classesDir = ' + sourceSets['test' + depVersions.Checkstyle].output.classesDir;
-    println 'output.resourcesDir = ' + sourceSets['test' + depVersions.Checkstyle].output.resourcesDir;
-    sourceSets['test' + depVersions.Checkstyle].java.each {println "java = " + it;}
-    sourceSets['test' + depVersions.Checkstyle].compileClasspath.each {println 'compile = ' + it;}
-    sourceSets['test' + depVersions.Checkstyle].runtimeClasspath.each {println 'runtime = ' + it;}
-
-    //println sourceSets*.each { println it.name + ':\t' + it.output.classesDir };
-    //println sourceSets*.each { println it.name + ':\t' + it.output.resourcesDir };
-    println "--";
-*/
-    // 'provided' configuration
-    Configuration providedConf = project.configurations.create(nameFactory.getName(ConfigNames.provided, csVersion));
-    providedConf.setDescription("Provided classpath for source sets '${mainSourceSet.name}' and '${testSourceSet.name}'");
-
-    // 'compile' configuration
-    Configuration compileConf = nameFactory.getConfiguration(ConfigNames.mainCompile, csVersion);
-    compileConf.setDescription("Compile classpath for source set '${mainSourceSet.name}'");
-
-    // 'runtime' configuration
-    Configuration runtimeConf = nameFactory.getConfiguration(ConfigNames.mainRuntime, csVersion);
-    runtimeConf.setDescription("Runtime classpath for source set '${mainSourceSet.name}'");
-
-    // 'testCompile' configuration
-    Configuration testCompileConf = nameFactory.getConfiguration(ConfigNames.testCompile, csVersion);
-    testCompileConf.setDescription("Compile classpath for source set '${testSourceSet.name}'");
-    testCompileConf.extendsFrom(compileConf);
-
-    // 'testRuntime' configuration (description text only)
-    Configuration testRuntimeConf = nameFactory.getConfiguration(ConfigNames.testRuntime, csVersion);
-    testRuntimeConf.setDescription("Runtime classpath for source set '${testSourceSet.name}'");
-
-    // Dependencies
-    addDependencies(dcn.getDepConfig(csVersion), compileConf, testCompileConf, providedConf);
-    mainSourceSet.compileClasspath += providedConf;
-    mainSourceSet.runtimeClasspath += providedConf;
-    testSourceSet.compileClasspath += providedConf;
-    testSourceSet.runtimeClasspath += providedConf;
-
-    // 'compileJava' task
-    Task compileTask = nameFactory.getTask(TaskNames.compileJava, csVersion);
-    compileTask.setDescription("${project.ext.longName}: ${compileTask.description} (Java level: ${javaLevel})");
-    compileTask.setGroup(BasePlugin.BUILD_GROUP);
-    compileTask.inputs.file(depCfgFile);
-
-    // 'compileTestJava' task
-    Task testCompileTask = nameFactory.getTask(TaskNames.compileTestJava, csVersion);
-    testCompileTask.setDescription("${project.ext.longName}: ${testCompileTask.description} "
-        + "(Java level: ${javaLevel})");
-    testCompileTask.setGroup(BasePlugin.BUILD_GROUP);
-    testCompileTask.dependsOn compileTask;
-    testCompileTask.inputs.file(depCfgFile);
-
-    // 'testClasses' task
-    Task testClassesTask = nameFactory.getTask(TaskNames.testClasses, csVersion);
-    testClassesTask.setDescription("${project.ext.longName}: ${testClassesTask.description}");
-    testClassesTask.dependsOn nameFactory.getTask(TaskNames.mainClasses, csVersion);
-
-    if (!isPublished) {
-        return;  // no need for additional tasks if we don't publish for this Checkstyle version
-    }
-
-    // 'test' task
-    Task testTask = project.tasks.create(name: nameFactory.getName(TaskNames.test, csVersion), type: Test);
-    testTask.setDescription("${project.ext.longName}: Runs the unit tests in ${testSourceSet.name}.");
-    testTask.setGroup(LifecycleBasePlugin.VERIFICATION_GROUP);
-    testTask.taskDependencies.each { TaskDependency tDep ->
-        tDep.values = [nameFactory.getTask(TaskNames.mainClasses, csVersion), nameFactory.getTask(TaskNames.testClasses, csVersion)];
-    }
-    project.tasks.check.dependsOn testTask;
-    testTask.testClassesDir = testSourceSet.output.classesDir;
-    testTask.reports.html.setDestination(new File((File) project.reportsDir, testTask.name));
-    testTask.reports.getJunitXml().enabled = false;
-    testTask.classpath.getFrom().clear();
-    testTask.classpath += files(testSourceSet.output.classesDir);
-    testTask.classpath += files(testSourceSet.output.resourcesDir);
-    testTask.classpath += files(mainSourceSet.output.classesDir);
-    testTask.classpath += files(mainSourceSet.output.resourcesDir);
-    testTask.classpath += files(testRuntimeConf.getFiles());
-    testTask.classpath += files(providedConf.getFiles());
-    testTask.configure {
-        jacoco {
-            enabled = false;
-        }
-        testLogging(configureTestLogging());
-    }
-    /*
-    println '--- ' + testTask.name;
-    println 'testClassesDir = ' + testTask.testClassesDir;
-    println 'testSrcDirs = ' + testTask.testSrcDirs.collect { it; }
-    println 'reports = ' + testTask.reports.html.entryPoint;
-    println 'workingDir = ' + testTask.workingDir;
-    testTask.classpath.each { println "classpath = " + it; }
-    */
-
-    [compileTask, testCompileTask].each { final JavaCompile pTask -> configureCompileTask(pTask, javaLevel); }
-
-    // 'javadoc' task
-    Javadoc javadocTask = (Javadoc) project.tasks.create(name: nameFactory.getName(TaskNames.javadoc, csVersion), type: Javadoc);
-    javadocTask.setDescription("${project.ext.longName}: Generates Javadoc API documentation for the source " +
-        "code in '${mainSourceSet.name}'.");
-    javadocTask.setGroup(JavaBasePlugin.DOCUMENTATION_GROUP);
-    javadocTask.dependsOn(compileTask);
-    javadocTask.setSource(mainSourceSet.allJava);
-    javadocTask.setDestinationDir(new File((File) project.docsDir, javadocTask.name));
-    configureJavadocTask(javadocTask, mainSourceSet, dcn.getDepConfig(csVersion));
-    if (JavaVersion.VERSION_1_7.equals(javaLevel)) {
-        String javadoc7Exe = buildUtil.getJdk7Javadoc();
-        if (javadoc7Exe == null) {
-            throw new GradleException('ERROR: Property \'' + project.ext.javadoc7PropName +
-                '\' not defined in gradle.properties. It must point to a Java 7 javadoc executable.');
-        }
-        javadocTask.setExecutable(javadoc7Exe);
-    }
-    else if (JavaVersion.VERSION_1_6.equals(javaLevel)) {
-        String javadoc6Exe = buildUtil.getJdk6Javadoc();
-        if (javadoc6Exe == null) {
-            throw new GradleException('ERROR: Property \'' + project.ext.javadoc6PropName +
-                '\' not defined in gradle.properties. It must point to a Java 6 javadoc executable.');
-        }
-        javadocTask.setExecutable(javadoc6Exe);
-    }
-}
-//println 'SourceSets: ' + (sourceSets.collect { it.name });
-
-
-
-/*
- * Dependencies
- */
-def void addDependencies(final DependencyConfig pDepConfig, final Configuration pCompileConf,
-    final Configuration pTestCompileConf, final Configuration pProvidedConf)
-{
-    // provided
-    Dependency fb1 = project.dependencies.create(
-        'com.google.code.findbugs:annotations:' + pDepConfig.getFindBugsVersion());
-    Dependency fb2 = project.dependencies.create(
-        'com.google.code.findbugs:jsr305:' + pDepConfig.getFindBugsVersion());
-    pProvidedConf.dependencies.add(fb1);
-    pProvidedConf.dependencies.add(fb2);
-
-    if (pDepConfig.isSonarQubeSupported()) {
-        Dependency sq = project.dependencies.create(
-            'org.codehaus.sonar:sonar-plugin-api:' + pDepConfig.getSonarQubeApiVersion());
-        pProvidedConf.dependencies.add(sq);
-        Dependency slf4jNop = project.dependencies.create(
-            'org.slf4j:slf4j-nop:' + pDepConfig.getSonarQubeSlf4jNopVersion());
-        pProvidedConf.dependencies.add(slf4jNop);
-
-        if ('7.0'.equals(pDepConfig.getCheckstyleBaseVersion())) {
-            // In the transitive Guava dependency of the SonarQube 3.0 API, Guava 10.0.1 is used. This is incompatible
-            // with Checkstyle 7.0, which uses Guava 19.0. Checkstyle Addons does not use Guava, so we can safely force
-            // it in order to enable Checkstyle unit testing. Keep an eye on this for newer Checkstyle versions.
-            pProvidedConf.resolutionStrategy {
-                force 'com.google.guava:guava:19.0';
-            }
-        }
-    }
-
-    // compile
-    Dependency csDep = project.dependencies.create(
-        'com.puppycrawl.tools:checkstyle:' + pDepConfig.getCheckstyleBaseVersion());
-    pCompileConf.dependencies.add(csDep);
-    Dependency jacksonDep = project.dependencies.create(
-        'com.fasterxml.jackson.core:jackson-databind:2.7.3');
-    pCompileConf.dependencies.add(jacksonDep);
-
-    // testCompile
-    Dependency junitDep = project.dependencies.create('junit:junit:4.11');
-    pTestCompileConf.dependencies.add(junitDep);
-}
-project.configurations.create('provided');
-addDependencies(project.ext.versionDefaults,
-    project.configurations.compile, project.configurations.testCompile, project.configurations.provided);
-
-
-
-/*
- * Set up cross-check feature. We provide an 'xcheck' task which depends on a number of Test tasks that run the
- * unit tests compiled against every Checkstyle version against all the other Checkstyle libraries. In this way, we
- * find out which versions are compatible.
- */
-project.ext.depConfigs.activeDepConfigs.each { final String csVersionToCheck ->
-
-    final DependencyConfig depConfigToCheck = project.ext.depConfigs.getDepConfig(csVersionToCheck);
-    final NameFactory nameFactory = project.ext.nameFactory;
-    final Set<String> compatibleVersions = depConfigToCheck.compatibleCheckstyleVersions;
-    if (!depConfigToCheck.isPublished() || compatibleVersions == null || compatibleVersions.size() == 0) {
-        return;
-    }
-
-    compatibleVersions.each { final String csVersionRuntime ->
-        if (csVersionToCheck.equals(csVersionRuntime)) {
-            return;
-        }
-
-        Task xtestTask = project.tasks.create(
-            name: nameFactory.getNameXCheck(csVersionToCheck, csVersionRuntime), type: Test);
-        xtestTask.setDescription("${project.ext.longName}: Runs the unit tests for Checkstyle " +
-            "${csVersionToCheck} against Checkstyle ${csVersionRuntime}.");
-        xtestTask.setGroup(LifecycleBasePlugin.VERIFICATION_GROUP);
-        xtestTask.taskDependencies.each { TaskDependency tDep ->
-            tDep.values = [nameFactory.getTask(TaskNames.mainClasses, csVersionToCheck),
-                   nameFactory.getTask(TaskNames.testClasses, csVersionToCheck)];
-        }
-
-        SourceSet mainSourceSet = nameFactory.getSourceSet(SourceSetNames.main, csVersionToCheck);
-        SourceSet testSourceSet = nameFactory.getSourceSet(SourceSetNames.test, csVersionToCheck);
-        Configuration providedConf = nameFactory.getConfiguration(ConfigNames.provided, csVersionToCheck);
-        Configuration testRuntimeConf = nameFactory.getConfiguration(ConfigNames.testRuntime, csVersionRuntime);
-
-        xtestTask.testClassesDir = testSourceSet.output.classesDir;
-        xtestTask.reports.getHtml().enabled = false;
-        xtestTask.reports.getJunitXml().enabled = false;
-        xtestTask.classpath.getFrom().clear();
-        xtestTask.classpath += files(testSourceSet.output.classesDir);
-        xtestTask.classpath += files(testSourceSet.output.resourcesDir);
-        xtestTask.classpath += files(mainSourceSet.output.classesDir);
-        xtestTask.classpath += files(mainSourceSet.output.resourcesDir);
-        xtestTask.classpath += files(testRuntimeConf.getFiles());
-        xtestTask.classpath += files(providedConf.getFiles());
-        xtestTask.configure {
-            afterSuite { final TestDescriptor descriptor, final TestResult testResult ->
-                if (descriptor.getParent() == null) {
-                    // log the final summary; this also avoids a Gradle bug I think which prevents test execution
-                    logger.lifecycle('\t' + testResult.testCount + ' tests executed, ' +
+        afterSuite { final TestDescriptor descriptor, final TestResult testResult ->
+            if (descriptor.getParent() == null) {
+                logger.lifecycle('\r\t' + testResult.testCount + ' tests executed, ' +
                         testResult.successfulTestCount + ' successful, ' +
+                        (testResult.testCount - testResult.successfulTestCount) + ' failed, ' +
                         testResult.skippedTestCount + ' skipped.');
-                }
-            }
-            jacoco {
-                enabled = false;
-            }
-            testLogging {
-                events = [];
             }
         }
     }
 }
-task xcheck {
-    setGroup(LifecycleBasePlugin.VERIFICATION_GROUP);
-    setDescription("${project.ext.longName}: Runs the unit tests against other Checkstyle versions " +
-        "which they were not compiled for");
-    dependsOn tasks.check;
-    Set<Task> xtestTasks = tasks.findAll { final Task t -> t.name.startsWith('xtest'); };
-    xtestTasks.each { dependsOn it; }
-}
-tasks.build.dependsOn tasks.xcheck;
 
 
+// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+//   Dependencies of the 'default' dependency configuration, which is also used by the IDE
+// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
-/*
- * Remove superfluous Checkstyle tasks that were created for our additional source sets. We only run Checkstyle on the
- * 'main' and 'test' source sets. The Checkstyle plugin is configured to do that below, but it still creates these
- * undead tasks. So we clean up after it by removing them.
- */
-project.tasks.withType(Checkstyle) { Task task ->
-    if (!"checkstyleMain".equals(task.name) && !"checkstyleTest".equals(task.name)) {
-        project.tasks.remove(task);
-    }
-}
+final TaskCreator taskCreator = new TaskCreator(project);
+taskCreator.establishSonarQubeSourceSet();
 
-
-
-def void configureCompileTask(final JavaCompile pTask, final JavaVersion pJavaLevel)
-{
-    pTask.sourceCompatibility = pJavaLevel;
-    pTask.targetCompatibility = pJavaLevel;
-    pTask.options.encoding = 'UTF-8';
-    pTask.options.deprecation = true;
-
-    // The warning "Supported source version 'RELEASE_6' from annotation processor 'org.antlr.v4.runtime.misc.
-    // NullUsageProcessor' less than -source '1.7'" is okay and may be ignored. It goes away when Checkstyle
-    // updates to ANTLR 4.5: https://github.com/antlr/antlr4/issues/487 (which they did in version 6.5)
-
-    if (JavaVersion.VERSION_1_6.equals(pJavaLevel)) {
-        pTask.options.fork = true;
-        def javac6 = buildUtil.getJdk6Compiler();
-        if (javac6 == null) {
-            throw new GradleException('ERROR: Property \'' + project.ext.jdk6PropName +
-                '\' not defined in gradle.properties. It must point to a Java 6 compiler executable.');
-        }
-        pTask.options.forkOptions.executable = javac6;
-    }
-    else if (JavaVersion.VERSION_1_7.equals(pJavaLevel)) {
-        pTask.options.fork = true;
-        def javac7 = buildUtil.getJdk7Compiler();
-        if (javac7 == null) {
-            throw new GradleException('ERROR: Property \'' + project.ext.jdk7PropName +
-                '\' not defined in gradle.properties. It must point to a Java 7 compiler executable.');
-        }
-        pTask.options.forkOptions.executable = javac7;
-    }
-}
-
-
-
-[tasks.compileJava, tasks.compileTestJava].each { final JavaCompile pTask ->
-    configureCompileTask(pTask, versionDefaults.javaLevel);
-}
-
-sourceSets.main.compileClasspath += configurations.provided;
-sourceSets.main.runtimeClasspath += configurations.provided;
-sourceSets.test.compileClasspath += configurations.provided;
-sourceSets.test.runtimeClasspath += configurations.provided;
-
-
-/*
- * FindBugs configuration
- */
 dependencies {
+    compileOnly group: 'com.google.code.findbugs', name: 'annotations', version: '3.0.1';
+    compileOnly group: 'com.google.code.findbugs', name: 'jsr305', version: '3.0.1';
+    compile group: 'com.puppycrawl.tools', name: 'checkstyle', version: '7.0';
+    compile group: 'com.fasterxml.jackson.core', name: 'jackson-databind', version: '2.7.3';
+
+    sonarqubeCompileOnly group: 'com.google.code.findbugs', name: 'annotations', version: '3.0.1';
+    sonarqubeCompileOnly group: 'com.google.code.findbugs', name: 'jsr305', version: '3.0.1';
+    sonarqubeCompile group: 'org.codehaus.sonar', name: 'sonar-plugin-api', version: '3.0';
+    sonarqubeRuntime group: 'org.slf4j', name: 'slf4j-nop', version: '1.6.2';
+
+    testCompile group: 'junit', name: 'junit', version: '4.11';
+
     findbugs group: 'com.google.code.findbugs', name: 'findbugs', version: '3.0.1';
     findbugs group: 'com.mebigfatguy.fb-contrib', name: 'fb-contrib', version: '6.6.1';
 }
-findbugs {
-    toolVersion = '3.0.1';
-    sourceSets = [project.sourceSets.main, project.sourceSets.test];
-    effort = 'max';
-    reportLevel = 'low';
-    ignoreFailures = false;
-    includeFilter = file("${project.projectDir}/project/findbugs.xml");
-    excludeFilter = file("${project.projectDir}/project/findbugs-excludes.xml");
+
+ext {
+    depConfigs = new DependencyConfigs(project);
 }
-project.tasks.withType(FindBugs) { final Task task ->
-    if (!'findbugsMain'.equals(task.name) && !'findbugsTest'.equals(task.name)) {
-        project.tasks.remove(task);
+
+
+// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+//   Create all the tasks needed for handling dependency configurations
+// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+
+project.ext.depConfigs.getAll().findAll{ !it.value.isDefaultConfig() }.each {
+    final Map.Entry<String, DependencyConfig> entry -> taskCreator.setupBuildTasks(entry.getValue());
+}
+taskCreator.setupCrossCheckTasks();
+taskCreator.adjustTaskGroupAssignments();
+
+tasks.withType(JavaCompile) {
+    options.encoding = 'UTF-8';
+    options.compilerArgs << '-Xlint:unchecked';
+    if (it.name != JavaPlugin.COMPILE_JAVA_TASK_NAME) {
+        options.compilerArgs << '-Xlint:deprecation';
     }
 }
 
 
-/*
- * Configure IntelliJ IDEA
- */
-idea.project {
-    languageLevel = project.ext.versionDefaults.javaLevel;
-    // TODO set file encoding to UTF-8
-    // example: http://mrhaki.blogspot.de/2012/09/gradle-goodness-customize-idea-project.html
+// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+//   FindBugs configuration
+// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+
+findbugs {
+    toolVersion = '3.0.1';
+    effort = 'max';
+    reportLevel = 'low';
+    ignoreFailures = false;
+    includeFilter = file('project/findbugs.xml');
+    excludeFilter = file('project/findbugs-excludes.xml');
 }
+
+
+// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+//   IntelliJ IDEA
+// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+
+// TODO set file encoding to UTF-8
+// example: http://mrhaki.blogspot.de/2012/09/gradle-goodness-customize-idea-project.html
 idea.module {
-    // TODO Project language level is 1.8, but the main module must be on 1.6, using JDK 8 !
     downloadSources = true;
     downloadJavadoc = true;
     excludeDirs += file('.idea');
     excludeDirs += file('_site');
     excludeDirs += file('_support');
-    scopes.PROVIDED.plus += [configurations.provided];
 }
 
 
-/*
- * Javadoc generation
- */
-javadoc {
-    configureJavadocTask(tasks.javadoc, project.sourceSets.main, project.ext.versionDefaults);
-}
-def void configureJavadocTask(final Javadoc pTask, final SourceSet pMainSourceSet, final DependencyConfig pDepConfig)
-{
-    pTask.title = project.ext.longName + ' v' + project.version;
-    pTask.classpath = pMainSourceSet.compileClasspath;
-    pTask.options.encoding = 'UTF-8';
-    pTask.options.docEncoding = 'UTF-8';
-    pTask.options.charSet = 'UTF-8';
-    pTask.options.author = false;
-    pTask.options.use = true;
-    pTask.options.noDeprecated = true;
-    pTask.options.windowTitle = project.ext.longName;
-    pTask.options.splitIndex = false;
-    pTask.options.header = project.ext.longName;
-    pTask.options.links = pDepConfig.getJavadocLinks();
+// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+//   Javadoc
+// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
-    // javadoc does not inherit the proxy settings (https://issues.gradle.org/browse/GRADLE-1228)
-    if (System.properties['http.proxyHost'] != null) {
-        pTask.options.jFlags('-DproxyHost=' + System.properties['http.proxyHost'],
-            '-DproxyPort=' + System.properties['http.proxyPort'],
-            '-DproxyUser=' + System.properties['http.proxyUser'],
-            '-DproxyPassword=' + System.properties['http.proxyPassword']);
-    }
-}
+JavadocTask.configureJavadocTask(tasks.javadoc, project.ext.depConfigs.getDefault());
 
 
+// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+//   Checkstyle configuration for checking our own code
+// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
-/*
- * Checkstyle configuration
- */
 checkstyle {
     configFile file('project/checkstyle.xml');
     configProperties 'workspace_loc': project.projectDir;
-    sourceSets = [project.sourceSets.main, project.sourceSets.test];
-    toolVersion '7.1.2';  // depends on our checkstyle.xml; has nothing to do with the version used for building
+    toolVersion '7.1.2';    // depends on our checkstyle.xml; has nothing to do with the version used for building
     showViolations = true;
     ignoreFailures = false;
 }
 
 
-/*
- * JaCoCo test coverage configuration
- */
-final Test realTest = (Test) project.tasks['test'];
-realTest.dependsOn(tasks.testClasses);
-realTest.classpath += files((File) project.sourceSets.test.output.classesDir);
-realTest.classpath += files((File) project.sourceSets.test.output.resourcesDir);
-realTest.classpath += files((File) project.sourceSets.main.output.classesDir);
-realTest.classpath += files((File) project.sourceSets.main.output.resourcesDir);
-realTest.classpath += files((Set<File>) project.configurations['testRuntime'].getFiles());
+// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+//   JaCoCo
+// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+
 String[] excludedClasses = ['**/com/thomasjensen/checkstyle/addons/util/CheckstyleApiFixer*',
                             '**/com/thomasjensen/checkstyle/addons/checks/misc/MdlJsonConfigValidator*'];
+test((Closure) testConfigClosure);
 test {
     jacoco {
         append = false;
         excludes = excludedClasses;
     }
-    testLogging(configureTestLogging());
-    jacocoTestReport {
-        reports {
-            html.enabled = true;
-            xml.enabled = true;     // coveralls plugin depends on xml format report
-            csv.enabled = false;
+}
+jacocoTestReport {
+    reports {
+        html.enabled = true;
+        xml.enabled = true;     // coveralls plugin depends on xml format report
+        csv.enabled = false;
+    }
+    sourceSets(sourceSets.main, sourceSets.sonarqube);
+    doFirst {
+        classDirectories = fileTree(dir: sourceSets.main.output.classesDir).exclude(excludedClasses);
+        additionalClassDirs = fileTree(dir: sourceSets.sonarqube.output.classesDir);
+    }
+}
+tasks.jacocoTestReport.dependsOn tasks.test;
+
+
+// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+//   Packaging of documentation for publication on the website
+// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+
+task siteCopyJavadoc(type: Copy, dependsOn: javadoc) {
+    description = project.ext.longName + ': Copy Javadoc to site directory';
+
+    destinationDir = new File(project.buildDir, 'site');
+    into("v${project.version}/apidocs") {
+        from fileTree(dir: javadoc.destinationDir);
+        filter { String line ->
+            line.contains("${project.ext.website}latest/checks/") ? line.replace("${project.ext.website}latest/checks/",
+                "${project.ext.website}v${project.version}/checks/") : line;
         }
-        doFirst {
-            classDirectories = fileTree(dir: sourceSets.main.output.classesDir).exclude(excludedClasses);
+    }
+    into("v${project.version}/apidocs/resources") {
+        from fileTree(dir: new File(javadoc.destinationDir, 'resources'));
+    }
+    into('latest/apidocs') {
+        from fileTree(dir: javadoc.destinationDir);
+    }
+}
+
+
+task siteCopyAllChecks(type: Copy) {
+    description = project.ext.longName + ': Copy list of all checks to site directory';
+
+    destinationDir = new File(project.buildDir, 'site');
+    final File originalFile = new File(sourceSets.main.resources.srcDirs.iterator().next(),
+        '/' + project.ext.checksPackage + '/all_checks.html');
+    into("v${project.version}/checks") {
+        from originalFile;
+        rename { String fileName -> fileName.replace(originalFile.name, 'index.html'); }
+        filter(ReplaceTokens, tokens: [version: "v${project.version}".toString()]);
+    }
+    into('latest/checks') {
+        from originalFile;
+        rename { String fileName -> fileName.replace(originalFile.name, 'index.html'); }
+        filter(ReplaceTokens, tokens: [version: "v${project.version}".toString()]);
+    }
+}
+
+
+task siteCopyDownloadGuide(type: Copy) {
+    description = project.ext.longName + ': Copy download guide frontmatter stub to site directory';
+
+    destinationDir = new File(project.buildDir, 'site');
+    final File originalFile = new File(sourceSets.main.resources.srcDirs.iterator().next(), '/download-guide.html');
+    into("v${project.version}") {
+        from originalFile;
+        filter(ReplaceTokens, tokens: [version: project.version]);
+    }
+    into('latest') {
+        from originalFile;
+        filter(ReplaceTokens, tokens: [version: project.version]);
+    }
+}
+
+task site (type: SiteTask);
+
+
+// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+//   Publishing of artifacts
+// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+
+taskCreator.setupArtifactTasks();
+taskCreator.rewirePublishingTasks(this);
+
+task checkProperties {
+    description = project.ext.longName + ': Ensure that all properties required for bintray upload are set';
+    setGroup(PublishingPlugin.PUBLISH_TASK_GROUP);
+    doLast {
+        ['bintray.user', 'bintray.apikey', 'bintray.gpg.passphrase', 'sonatype.user', 'sonatype.password'].each {
+            final String prp ->
+                if (!project.hasProperty(prp)) {
+                    throw new GradleException("Could not find property \'${prp}\'. " +
+                        'Did you forget to specify it in ~/.gradle/gradle.properties?');
+                }
         }
     }
 }
 
+bintray {
+    if (project.hasProperty('bintray.user') && project.hasProperty('bintray.apikey')
+        && project.hasProperty('bintray.gpg.passphrase') && project.hasProperty('sonatype.user')
+        && project.hasProperty('sonatype.password'))
+    {
+        user = project.property('bintray.user');
+        key = project.property('bintray.apikey');
 
-def Closure configureTestLogging()
-{
-    return {
-        events 'failed';
-        showStackTraces = true;
-        showExceptions = true;
-        showCauses = true;
-        showStandardStreams = true;
-        exceptionFormat 'full';
-    };
-}
-
-
-def String readVersionProps()
-{
-    final File versionFile = new File("project/version.properties");
-    def props = new Properties();
-    versionFile.withInputStream {
-        InputStream stream -> props.load(stream);
+        Set<String> pubNames = project.ext.depConfigs.publications.keySet();
+        publications = pubNames.toArray(new String[pubNames.size()]);
+        publish = true;
+        dryRun = true;   // comment out for actual release deployment
+        pkg {
+            repo = 'checkstyle-addons'
+            userOrg = 'checkstyle-addons';
+            name = project.name;
+            desc = project.description;
+            websiteUrl = project.ext.website;
+            issueTrackerUrl = project.ext.issueTrackerUrl;
+            vcsUrl = "https://github.com/${project.ext.github}.git";
+            licenses = ['GPL-3.0'];
+            publicDownloadNumbers = true;
+            version {
+                name = project.version;  // Bintray logical version name
+                desc = project.description;
+                released = project.ext.buildTimestamp;
+                vcsTag = 'v' + project.version;
+                gpg {
+                    sign = true;
+                    passphrase = project.property('bintray.gpg.passphrase');
+                }
+                mavenCentralSync {
+                    sync = true;
+                    user = project.property('sonatype.user');
+                    password = project.property('sonatype.password');
+                }
+            }
+        }
     }
-
-    final StringBuilder sb = new StringBuilder();
-    sb.append(props.getProperty('major'));
-    sb.append('.');
-    sb.append(props.getProperty('minor'));
-    sb.append('.');
-    sb.append(props.getProperty('patch'));
-    if (!Boolean.parseBoolean(props.getProperty('release'))) {
-        sb.append('-SNAPSHOT');
-    }
-
-    final String v = sb.toString();
-    System.out.println('Building version: ' + v);
-    return v;
 }
-
-
-
-/*
- * Packaging of documentation for publication on the website
- */
-apply from: 'site.gradle';
-
-/*
- * Publishing of artifacts
- */
-apply from: 'publish.gradle';
-
-/*
- * Creation of the individual JARs produced by this project
- */
-apply from: 'artifacts.gradle';
+tasks['bintrayUpload'].dependsOn('checkProperties');

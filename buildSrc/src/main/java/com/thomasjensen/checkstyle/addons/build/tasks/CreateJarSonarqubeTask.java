@@ -18,24 +18,23 @@ package com.thomasjensen.checkstyle.addons.build.tasks;
 import java.io.File;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
+import java.util.Map;
 import java.util.Set;
+import javax.annotation.Nonnull;
 
 import groovy.lang.Closure;
 import org.gradle.api.Project;
+import org.gradle.api.Task;
 import org.gradle.api.file.CopySpec;
 import org.gradle.api.java.archives.Attributes;
-import org.gradle.api.java.archives.Manifest;
-import org.gradle.api.plugins.BasePlugin;
 import org.gradle.api.tasks.SourceSet;
 import org.gradle.api.tasks.TaskInputs;
 import org.gradle.api.tasks.bundling.Jar;
+import org.gradle.api.tasks.compile.JavaCompile;
 
 import com.thomasjensen.checkstyle.addons.build.BuildUtil;
 import com.thomasjensen.checkstyle.addons.build.DependencyConfig;
-import com.thomasjensen.checkstyle.addons.build.DependencyConfigs;
 import com.thomasjensen.checkstyle.addons.build.ExtProp;
-import com.thomasjensen.checkstyle.addons.build.NameFactory;
-import com.thomasjensen.checkstyle.addons.build.SourceSetNames;
 import com.thomasjensen.checkstyle.addons.build.TaskNames;
 
 
@@ -47,33 +46,22 @@ import com.thomasjensen.checkstyle.addons.build.TaskNames;
 public class CreateJarSonarqubeTask
     extends AbstractAddonsJarTask
 {
-    /**
-     * Constructor.
-     */
     public CreateJarSonarqubeTask()
     {
         super();
-        setGroup(BasePlugin.BUILD_GROUP);
     }
 
 
 
-    /**
-     * Configure this task instance for a given dependency configuration.
-     *
-     * @param pCheckstyleVersion the Checkstyle version for which to configure
-     */
+    @Override
     @SuppressWarnings("MethodDoesntCallSuperMethod")
-    public void configureFor(final String pCheckstyleVersion)
+    public void configureFor(@Nonnull final DependencyConfig pDepConfig)
     {
         final Project project = getProject();
-        final NameFactory nameFactory = getBuildUtil().getNameFactory();
-        final DependencyConfigs depConfigs = getBuildUtil().getDepConfigs();
-        final DependencyConfig theVersions = depConfigs.getDepConfig(pCheckstyleVersion);
-        final boolean isDefaultConfig = depConfigs.isDefault(pCheckstyleVersion);
         final String longName = getBuildUtil().getLongName();
 
-        setDescription(longName + ": Assembles the SonarQube plugin for Checkstyle " + pCheckstyleVersion);
+        setDescription(
+            longName + ": Assembles the SonarQube plugin for dependency configuration '" + pDepConfig.getName() + "'");
 
         // Inputs for up-to-date checking
         TaskInputs inputs = getInputs();
@@ -92,38 +80,21 @@ public class CreateJarSonarqubeTask
         // archive name
         setArchiveName(
             "sonar-" + inputs.getProperties().get("sqPluginKey") + "-" + inputs.getProperties().get(BuildUtil.VERSION)
-                + (isDefaultConfig ? "" : ("-csp" + theVersions.getSonarQubeMinCsPluginVersion())) + ".jar");
+                + (pDepConfig.isDefaultConfig() ? "" : ("-csp" + pDepConfig.getSonarQubeMinCsPluginVersion()))
+                + ".jar");
 
-        // Dependency on 'jar' task
-        final Jar jarTask = (Jar) nameFactory.getTask(TaskNames.jar, pCheckstyleVersion);
+        // Task Dependencies
+        final Jar jarTask = (Jar) getBuildUtil().getTask(TaskNames.jar, pDepConfig);
         dependsOn(jarTask);
-
-        // SourceSet that fits the dependency configuration
-        final SourceSet mainSourceSet = nameFactory.getSourceSet(SourceSetNames.main, pCheckstyleVersion);
+        final Task sqClassesTask = getBuildUtil().getTask(TaskNames.sonarqubeClasses, pDepConfig);
+        dependsOn(sqClassesTask);
 
         // Configuration of JAR file contents
         intoFrom("META-INF", "LICENSE");
 
-        into(inputs.getProperties().get("sqPackage"), new Closure<Void>(this)
-        {
-            @Override
-            public Void call(final Object... pArgs)
-            {
-                CopySpec spec = (CopySpec) getDelegate();
-                spec.from(new File(mainSourceSet.getOutput().getClassesDir(),
-                    (String) inputs.getProperties().get("sqPackage")), new Closure<Void>(this)
-                {
-                    @Override
-                    public Void call(final Object... pArgs)
-                    {
-                        CopySpec spec = (CopySpec) getDelegate();
-                        spec.include("CheckstyleExtensionPlugin.class", "CheckstyleExtensionRepository.class");
-                        return null;
-                    }
-                });
-                return null;
-            }
-        });
+        final JavaCompile compileTask = (JavaCompile) getBuildUtil().getTask(TaskNames.compileSonarqubeJava,
+            pDepConfig);
+        from(compileTask.getDestinationDir());
 
         into(inputs.getProperties().get("sqPackage"), new Closure<Void>(this)
         {
@@ -131,50 +102,65 @@ public class CreateJarSonarqubeTask
             public Void call(final Object... pArgs)
             {
                 CopySpec spec = (CopySpec) getDelegate();
-                spec.from(new File(mainSourceSet.getOutput().getResourcesDir(), "sonarqube.xml"));
+                final SourceSet sqSourceSet = getBuildUtil().getSourceSet(BuildUtil.SONARQUBE_SOURCE_SET_NAME);
+                spec.from(new File(sqSourceSet.getOutput().getResourcesDir(), "sonarqube.xml"));
                 filterVersion(spec, inputs.getProperties().get(BuildUtil.VERSION).toString());
                 return null;
             }
         });
 
-        Set<File> pubLibs = CreateJarEclipseTask.getPublishedDependencyLibs(project, false);
+        final Set<File> pubLibs = CreateJarEclipseTask.getPublishedDependencyLibs(this, pDepConfig);
         intoFrom("META-INF/lib", jarTask.getArchivePath());
         intoFrom("META-INF/lib", pubLibs);
 
-        Manifest mafest = getManifest();
-        final Attributes attrs = mafest.getAttributes();
-        attrs.clear();
-        attrs.put("Plugin-Name", inputs.getProperties().get("name"));
-        attrs.put("Plugin-Base", "checkstyle");
-        attrs.put("Plugin-Key", inputs.getProperties().get("sqPluginKey"));
-        attrs.put("Implementation-Build", inputs.getProperties().get("gitHash"));
-        attrs.put("Plugin-Description",
-            inputs.getProperties().get("description") + " (based on Checkstyle " + pCheckstyleVersion + ")");
-        attrs.put("Plugin-Version", inputs.getProperties().get(BuildUtil.VERSION));
-        attrs.put("Plugin-Organization", inputs.getProperties().get("authorName"));
-        attrs.put("Plugin-OrganizationUrl", inputs.getProperties().get("orgUrl"));
-        attrs.put("Plugin-SourcesUrl", "https://github.com/checkstyle-addons/checkstyle-addons");
-        attrs.put("Plugin-IssueTrackerUrl", inputs.getProperties().get("issueTrackerUrl"));
-        attrs.put("Plugin-Class", "com.thomasjensen.checkstyle.addons.sonarqube.CheckstyleExtensionPlugin");
-        attrs.put("Plugin-RequirePlugins", "java:" + theVersions.getSonarQubeMinJavaPluginVersion() //
-            + ",checkstyle:" + theVersions.getSonarQubeMinCsPluginVersion());
-        attrs.put("Plugin-Dependencies", "META-INF/lib/" + jarTask.getArchiveName() //
-            + (pubLibs.size() > 0 ? " " : "") + CreateJarEclipseTask.flattenPrefixLibs("META-INF/lib/", pubLibs, ' '));
-        attrs.put("Plugin-License", "GPLv3");
-        attrs.put("Plugin-Homepage", inputs.getProperties().get("website"));
+        // Manifest
+        setManifestAttributes(getManifest().getAttributes(), inputs, pDepConfig, pubLibs);
+    }
+
+
+
+    private void setManifestAttributes(@Nonnull final Attributes pAttributes, @Nonnull final TaskInputs pInputs,
+        @Nonnull final DependencyConfig pDepConfig, @Nonnull final Set<File> pPubLibs)
+    {
+        final String baseCsVersion = pDepConfig.getCheckstyleBaseVersion();
+        final Map<String, Object> inputProps = pInputs.getProperties();
+        final Jar jarTask = (Jar) getBuildUtil().getTask(TaskNames.jar, pDepConfig);
+
+        pAttributes.clear();
+        pAttributes.put("Plugin-Name", inputProps.get("name"));
+        pAttributes.put("Plugin-Base", "checkstyle");
+        pAttributes.put("Plugin-Key", inputProps.get("sqPluginKey"));
+        pAttributes.put("Implementation-Build", inputProps.get("gitHash"));
+        pAttributes.put("Plugin-Description",
+            inputProps.get("description") + " (based on Checkstyle " + baseCsVersion + ")");
+        pAttributes.put("Plugin-Version", inputProps.get(BuildUtil.VERSION));
+        pAttributes.put("Plugin-Organization", inputProps.get("authorName"));
+        pAttributes.put("Plugin-OrganizationUrl", inputProps.get("orgUrl"));
+        pAttributes.put("Plugin-SourcesUrl", "https://github.com/checkstyle-addons/checkstyle-addons");
+        pAttributes.put("Plugin-IssueTrackerUrl", inputProps.get("issueTrackerUrl"));
+        pAttributes.put("Plugin-Class", "com.thomasjensen.checkstyle.addons.sonarqube.CheckstyleExtensionPlugin");
+        pAttributes.put("Plugin-RequirePlugins", "java:" + pDepConfig.getSonarQubeMinJavaPluginVersion() //
+            + ",checkstyle:" + pDepConfig.getSonarQubeMinCsPluginVersion());
+        pAttributes.put("Plugin-Dependencies", "META-INF/lib/" + jarTask.getArchiveName() //
+            + (pPubLibs.size() > 0 ? " " : "") //
+            + CreateJarEclipseTask.flattenPrefixLibs("META-INF/lib/", pPubLibs, ' '));
+        pAttributes.put("Plugin-License", "GPLv3");
+        pAttributes.put("Plugin-Homepage", inputProps.get("website"));
         //attrs.put("Plugin-TermsConditionsUrl", "");
         // TODO use same SonarQube version in manifest and compile dependencies
-        attrs.put("Sonar-Version", theVersions.getSonarQubeMinPlatformVersion());
-        attrs.putAll(CreateJarTask.mfAttrStd(project));
-        attrs.remove("Website");
+        pAttributes.put("Sonar-Version", pDepConfig.getSonarQubeMinPlatformVersion());
+        pAttributes.putAll(CreateJarTask.mfAttrStd(getProject()));
+        pAttributes.remove("Website");
 
         doFirst(new Closure<Void>(this)
         {
             @Override
+            @SuppressWarnings("MethodDoesntCallSuperMethod")
             public Void call()
             {
                 final DateFormat sdf = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ssZ");  // required by SonarQube
-                attrs.put("Plugin-BuildDate", sdf.format(getBuildUtil().getExtraPropertyValue(ExtProp.BuildTimestamp)));
+                pAttributes.put("Plugin-BuildDate",
+                    sdf.format(getBuildUtil().getExtraPropertyValue(ExtProp.BuildTimestamp)));
                 return null;
             }
         });

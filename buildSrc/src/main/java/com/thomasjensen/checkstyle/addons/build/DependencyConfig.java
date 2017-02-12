@@ -17,7 +17,9 @@ package com.thomasjensen.checkstyle.addons.build;
 
 import java.io.File;
 import java.util.Collections;
+import java.util.Iterator;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 import java.util.SortedSet;
 import java.util.TreeSet;
@@ -25,35 +27,36 @@ import javax.annotation.CheckForNull;
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 
-import net.jcip.annotations.Immutable;
-
 import org.gradle.api.JavaVersion;
+
+import net.jcip.annotations.Immutable;
 
 
 /**
- * Represents a dependency configuration. A dependency configuration can be <i>published</i>, which means that it
- * directly comes from a dependency configuration file, and artifacts will be created for it. Or, it can be
- * <i>ancillary</i>, which means it is derived from a published dependency configuration and exists for the purpose of
- * compatibility testing.
+ * Represents a dependency configuration. A dependency configuration is the major structuring entity of a Checkstyle
+ * Addons build. For each dependency configuration, Gradle tasks are created and artifacts published. It has a base
+ * Checkstyle version against which sources are compiled. The compiled classes are expected (and tested) to be
+ * compatible with a number of other Checkstyle runtimes, whose versions are listed in the dependency configuration.
+ * Each dependency configuration may also modify some of the third party artifact versions that Checkstyle Addons
+ * depends on.
  *
  * @author Thomas Jensen
  */
 @Immutable
 public final class DependencyConfig
 {
-    private final String checkstyleBaseVersion;
+    /** Maven group ID of the Checkstyle artifacts */
+    public static final String CHECKSTYLE_GROUPID = "com.puppycrawl.tools";
+
+    private final String name;
 
     private final SortedSet<String> compatibleCheckstyleVersions;
 
     private final JavaVersion javaLevel;
 
-    private final String findBugsVersion;
-
     private final List<String> javadocLinks;
 
     private final boolean sonarQubeSupport;
-
-    private final String sonarQubeApiVersion;
 
     private final String sonarQubeMinPlatformVersion;
 
@@ -61,52 +64,44 @@ public final class DependencyConfig
 
     private final String sonarQubeMinCsPluginVersion;
 
-    private final String sonarQubeSlf4jNopVersion;
+    private final Map<String, String> artifactVersions;
 
     private final boolean defaultConfig;
-
-    private final boolean published;
-
-    private final String publicationSuffix;
 
     private final File configFile;
 
 
 
     /**
-     * Constructor for a <i>published</i> dependency configuration.
+     * Constructor.
      *
-     * @param pCheckstyleBaseVersion the Checkstyle version
+     * @param pName the publication suffix
      * @param pCompatibleCheckstyleVersions the Checkstyle versions to which we must be compatible
      * @param pJavaLevel the Java level
-     * @param pFindBugsVersion the FindBugs version
      * @param pJavadocLinks list of URLs to be passed to Javadoc for linking to external apidocs
      * @param pSonarQubeSupport flag if SonarQube is supported
-     * @param pSonarQubeApiVersion SonarQube API version (for use in dependencies)
      * @param pSonarQubeMinPlatformVersion minimum SonarQube platform version (for use in manifest)
      * @param pSonarQubeMinJavaPluginVersion minimum SonarQube Java plugin version
      * @param pSonarQubeMinCsPluginVersion minimum SonarQube Checkstyle plugin version
-     * @param pSonarQubeSlf4jNopVersion SLF4J Nop Binding version
+     * @param pArtifactVersions versions of certain artifact dependencies
      * @param pDefaultConfig flag if this is the default dependency configuration
-     * @param pPublicationSuffix the publication suffix
      * @param pConfigFile the dependency config file
      */
-    public DependencyConfig(@Nonnull final String pCheckstyleBaseVersion,
-        @Nonnull final Set<String> pCompatibleCheckstyleVersions, @Nonnull final JavaVersion pJavaLevel,
-        @Nonnull final String pFindBugsVersion, @Nonnull final List<String> pJavadocLinks,
-        final boolean pSonarQubeSupport, @Nullable final String pSonarQubeApiVersion,
-        @Nullable final String pSonarQubeMinPlatformVersion, @Nullable final String pSonarQubeMinJavaPluginVersion,
-        @Nullable final String pSonarQubeMinCsPluginVersion, @Nullable final String pSonarQubeSlf4jNopVersion,
-        final boolean pDefaultConfig, @Nonnull final String pPublicationSuffix, @Nonnull final File pConfigFile)
+    public DependencyConfig(@Nonnull final String pName, @Nonnull final Set<String> pCompatibleCheckstyleVersions,
+        @Nonnull final JavaVersion pJavaLevel, @Nonnull final List<String> pJavadocLinks,
+        final boolean pSonarQubeSupport, @Nullable final String pSonarQubeMinPlatformVersion,
+        @Nullable final String pSonarQubeMinJavaPluginVersion, @Nullable final String pSonarQubeMinCsPluginVersion,
+        @Nonnull final Map<String, String> pArtifactVersions, final boolean pDefaultConfig,
+        @Nonnull final File pConfigFile)
     {
-        if (pCheckstyleBaseVersion == null) {
-            throw new IllegalArgumentException("pCheckstyleBaseVersion is null");
+        if (pName == null) {
+            throw new IllegalArgumentException("pName is null");
         }
         if (pJavaLevel == null) {
             throw new IllegalArgumentException("pJavaLevel is null");
         }
-        if (pFindBugsVersion == null) {
-            throw new IllegalArgumentException("pFindBugsVersion is null");
+        if (pArtifactVersions == null) {
+            throw new IllegalArgumentException("pArtifactVersions is null");
         }
         if (pJavadocLinks == null) {
             throw new IllegalArgumentException("pJavadocLinks is null");
@@ -114,53 +109,23 @@ public final class DependencyConfig
         if (pConfigFile == null) {
             throw new IllegalArgumentException("pConfigFile is null");
         }
+        if (pArtifactVersions.get(CHECKSTYLE_GROUPID) == null) {
+            throw new IllegalArgumentException("Checkstyle version is null");
+        }
 
+        name = pName;
         SortedSet<String> ccv = new TreeSet<String>(new VersionComparator());
         ccv.addAll(pCompatibleCheckstyleVersions);
         compatibleCheckstyleVersions = Collections.unmodifiableSortedSet(ccv);
-        checkstyleBaseVersion = pCheckstyleBaseVersion;
         javaLevel = pJavaLevel;
-        findBugsVersion = pFindBugsVersion;
         javadocLinks = Collections.unmodifiableList(pJavadocLinks);
         sonarQubeSupport = pSonarQubeSupport;
-        sonarQubeApiVersion = pSonarQubeApiVersion;
         sonarQubeMinPlatformVersion = pSonarQubeMinPlatformVersion;
         sonarQubeMinJavaPluginVersion = pSonarQubeMinJavaPluginVersion;
         sonarQubeMinCsPluginVersion = pSonarQubeMinCsPluginVersion;
-        sonarQubeSlf4jNopVersion = pSonarQubeSlf4jNopVersion;
+        artifactVersions = pArtifactVersions;
         defaultConfig = pDefaultConfig;
-        published = true;
-        publicationSuffix = pPublicationSuffix;
         configFile = pConfigFile;
-    }
-
-
-
-    /**
-     * Constructor for an <i>ancillary</i> dependency configuration.
-     *
-     * @param pPublishedDepConfig the published dependency configuration upon which this ancillary dependency
-     * configuration is based
-     * @param pCheckstyleBaseVersion the Checkstyle version to be used in this ancillary dependency configuration
-     */
-    public DependencyConfig(@Nonnull final DependencyConfig pPublishedDepConfig,
-        @Nonnull final String pCheckstyleBaseVersion)
-    {
-        compatibleCheckstyleVersions = Collections.unmodifiableSortedSet(new TreeSet<String>(new VersionComparator()));
-        checkstyleBaseVersion = pCheckstyleBaseVersion;
-        javaLevel = pPublishedDepConfig.getJavaLevel();
-        findBugsVersion = pPublishedDepConfig.getFindBugsVersion();
-        javadocLinks = pPublishedDepConfig.getJavadocLinks();
-        sonarQubeSupport = false;
-        sonarQubeApiVersion = null;
-        sonarQubeMinPlatformVersion = null;
-        sonarQubeMinJavaPluginVersion = null;
-        sonarQubeMinCsPluginVersion = null;
-        sonarQubeSlf4jNopVersion = null;
-        defaultConfig = false;
-        published = false;
-        publicationSuffix = null;
-        configFile = pPublishedDepConfig.getConfigFile();
     }
 
 
@@ -168,13 +133,26 @@ public final class DependencyConfig
     /**
      * Getter.
      *
-     * @return the version of Checkstyle against which this dependency configuration is built. This is the version that
-     * Checkstyle classes have in the IDE. Example: {@code "6.12.1"}
+     * @return the name of the dependency configuration, also the name without extension of the configuration file, and
+     * the suffix of the corresponding publication name
+     */
+    @Nonnull
+    public String getName()
+    {
+        return name;
+    }
+
+
+
+    /**
+     * Getter.
+     *
+     * @return the version of Checkstyle against which this dependency configuration is built. Example: {@code "6.12.1"}
      */
     @Nonnull
     public String getCheckstyleBaseVersion()
     {
-        return checkstyleBaseVersion;
+        return artifactVersions.get(CHECKSTYLE_GROUPID);
     }
 
 
@@ -210,19 +188,6 @@ public final class DependencyConfig
     /**
      * Getter.
      *
-     * @return The version of the FindBugs annotation JARs to use. Depends on the Java level.
-     */
-    @Nonnull
-    public String getFindBugsVersion()
-    {
-        return findBugsVersion;
-    }
-
-
-
-    /**
-     * Getter.
-     *
      * @return list of URLs to be passed to Javadoc for linking to external apidocs
      */
     public List<String> getJavadocLinks()
@@ -240,20 +205,6 @@ public final class DependencyConfig
     public boolean isSonarQubeSupported()
     {
         return sonarQubeSupport;
-    }
-
-
-
-    /**
-     * Getter.
-     *
-     * @return The version of the SonarQube API to use in this dependency configuration. This should really be merged
-     * with {@link #SonarQubeMinPlatformVersion}, but well, it's more work than it sounds.
-     */
-    @CheckForNull
-    public String getSonarQubeApiVersion()
-    {
-        return sonarQubeApiVersion;
     }
 
 
@@ -298,16 +249,10 @@ public final class DependencyConfig
 
 
 
-    /**
-     * Getter.
-     *
-     * @return In order to avoid some warnings during test execution, we must add an SLF4J mapping to the classpath.
-     * This property specifies the version of the slf4j-nop mapping to use.
-     */
-    @Nullable
-    public String getSonarQubeSlf4jNopVersion()
+    @Nonnull
+    public Map<String, String> getArtifactVersions()
     {
-        return sonarQubeSlf4jNopVersion;
+        return artifactVersions;
     }
 
 
@@ -320,33 +265,6 @@ public final class DependencyConfig
     public boolean isDefaultConfig()
     {
         return defaultConfig;
-    }
-
-
-
-    /**
-     * Getter.
-     *
-     * @return Flag indicating if this dependency configuration is published (i.e. a file) or virtual (i.e. for
-     * compatibility checks).
-     */
-    public boolean isPublished()
-    {
-        return published;
-    }
-
-
-
-    /**
-     * Getter.
-     *
-     * @return The suffix of the publication, directly derived from the file name. For the default publication, this is
-     * <code>null</code>.
-     */
-    @CheckForNull
-    public String getPublicationSuffix()
-    {
-        return publicationSuffix;
     }
 
 
@@ -369,21 +287,32 @@ public final class DependencyConfig
     public String toString()
     {
         final StringBuilder sb = new StringBuilder("DependencyConfig{");
-        sb.append("checkstyleBaseVersion='").append(checkstyleBaseVersion).append('\'');
-        sb.append(", compatibleCheckstyleVersions=").append(compatibleCheckstyleVersions);
+        sb.append("name='").append(name).append('\'');
+        sb.append(", defaultConfig=").append(defaultConfig);
         sb.append(", javaLevel=").append(javaLevel);
-        sb.append(", findBugsVersion='").append(findBugsVersion).append('\'');
-        sb.append(", javadocLinks=").append(javadocLinks);
+        sb.append(", artifactVersions=");
+        if (artifactVersions != null) {
+            sb.append('{');
+            for (Iterator<Map.Entry<String, String>> iter = artifactVersions.entrySet().iterator(); iter.hasNext(); ) {
+                final Map.Entry<String, String> entry = iter.next();
+                sb.append(entry.getKey());
+                sb.append("->'").append(entry.getValue()).append('\'');
+                if (iter.hasNext()) {
+                    sb.append(", ");
+                }
+            }
+            sb.append('}');
+        }
+        else {
+            sb.append("null");
+        }
+        sb.append(", compatibleCheckstyleVersions=").append(compatibleCheckstyleVersions);
         sb.append(", sonarQubeSupport=").append(sonarQubeSupport);
-        sb.append(", sonarQubeApiVersion='").append(sonarQubeApiVersion).append('\'');
         sb.append(", sonarQubeMinPlatformVersion='").append(sonarQubeMinPlatformVersion).append('\'');
         sb.append(", sonarQubeMinJavaPluginVersion='").append(sonarQubeMinJavaPluginVersion).append('\'');
         sb.append(", sonarQubeMinCsPluginVersion='").append(sonarQubeMinCsPluginVersion).append('\'');
-        sb.append(", sonarQubeSlf4jNopVersion='").append(sonarQubeSlf4jNopVersion).append('\'');
-        sb.append(", defaultConfig=").append(defaultConfig);
-        sb.append(", published=").append(published);
-        sb.append(", publicationSuffix='").append(publicationSuffix).append('\'');
         sb.append(", configFile=").append(configFile);
+        sb.append(", javadocLinks=").append(javadocLinks);
         sb.append('}');
         return sb.toString();
     }

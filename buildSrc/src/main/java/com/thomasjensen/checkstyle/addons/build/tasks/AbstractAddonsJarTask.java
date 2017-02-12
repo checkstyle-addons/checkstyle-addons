@@ -19,6 +19,7 @@ import java.util.HashMap;
 import java.util.Map;
 import javax.annotation.Nonnull;
 
+import com.thomasjensen.checkstyle.addons.build.TaskCreator;
 import groovy.lang.Closure;
 import org.apache.tools.ant.filters.ReplaceTokens;
 import org.gradle.api.file.CopySpec;
@@ -34,6 +35,7 @@ import com.thomasjensen.checkstyle.addons.build.BuildUtil;
  */
 public abstract class AbstractAddonsJarTask
     extends Jar
+    implements ConfigurableAddonsTask
 {
     private final BuildUtil buildUtil;
 
@@ -43,6 +45,7 @@ public abstract class AbstractAddonsJarTask
     {
         super();
         buildUtil = new BuildUtil(getProject());
+        setGroup(TaskCreator.ARTIFACTS_GROUP_NAME);
     }
 
 

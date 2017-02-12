@@ -18,18 +18,21 @@ package com.thomasjensen.checkstyle.addons.build.tasks;
 import java.util.Collections;
 import java.util.HashSet;
 import java.util.Set;
+import javax.annotation.Nonnull;
 
 import com.github.jengelman.gradle.plugins.shadow.internal.DependencyFilter;
 import com.github.jengelman.gradle.plugins.shadow.tasks.ShadowJar;
+
 import org.gradle.api.Project;
 import org.gradle.api.artifacts.Configuration;
 import org.gradle.api.artifacts.ResolvedDependency;
+import org.gradle.api.tasks.SourceSet;
 import org.gradle.api.tasks.bundling.Jar;
 
 import com.thomasjensen.checkstyle.addons.build.BuildUtil;
-import com.thomasjensen.checkstyle.addons.build.DependencyConfigs;
-import com.thomasjensen.checkstyle.addons.build.NameFactory;
-import com.thomasjensen.checkstyle.addons.build.SourceSetNames;
+import com.thomasjensen.checkstyle.addons.build.ClasspathBuilder;
+import com.thomasjensen.checkstyle.addons.build.DependencyConfig;
+import com.thomasjensen.checkstyle.addons.build.TaskCreator;
 import com.thomasjensen.checkstyle.addons.build.TaskNames;
 
 
@@ -40,20 +43,18 @@ import com.thomasjensen.checkstyle.addons.build.TaskNames;
  */
 public class CreateFatJarTask
     extends ShadowJar
+    implements ConfigurableAddonsTask
 {
     private final BuildUtil buildUtil;
 
 
 
-    /**
-     * Constructor.
-     */
     public CreateFatJarTask()
     {
         super();
         final Project project = getProject();
         buildUtil = new BuildUtil(project);
-        setDescription(buildUtil.getLongName() + ": Create a combined JAR of project and runtime dependencies of '");
+        setGroup(TaskCreator.ARTIFACTS_GROUP_NAME);
         setClassifier("all");
     }
 
@@ -75,35 +76,28 @@ public class CreateFatJarTask
 
 
 
-    /**
-     * Configure this task instance for a given dependency configuration.
-     *
-     * @param pCheckstyleVersion the Checkstyle version for which to configure
-     */
-    public void configureFor(final String pCheckstyleVersion)
+    @Override
+    public void configureFor(@Nonnull final DependencyConfig pDepConfig)
     {
         final Project project = getProject();
-        final NameFactory nameFactory = buildUtil.getNameFactory();
-        final DependencyConfigs depConfigs = buildUtil.getDepConfigs();
-        final boolean isDefaultPublication = depConfigs.isDefault(pCheckstyleVersion);
 
         // set appendix for archive name
-        final String appendix = depConfigs.getDepConfig(pCheckstyleVersion).getPublicationSuffix();
-        if (!isDefaultPublication) {
+        final String appendix = pDepConfig.getName();
+        if (!pDepConfig.isDefaultConfig()) {
             setAppendix(appendix);
         }
 
         // dependency on the corresponding (thin) Jar task
-        final Jar thinJarTask = (Jar) nameFactory.getTask(TaskNames.jar, pCheckstyleVersion);
+        final Jar thinJarTask = (Jar) buildUtil.getTask(TaskNames.jar, pDepConfig);
         dependsOn(thinJarTask);
 
-        setDescription(getDescription() + nameFactory.getName(SourceSetNames.main, pCheckstyleVersion) + "'.");
+        setDescription(buildUtil.getLongName() + ": Create a combined JAR of project and runtime dependencies of '"
+            + SourceSet.MAIN_SOURCE_SET_NAME + "' for dependency configuration '" + pDepConfig.getName() + "'");
 
         getManifest().inheritFrom(thinJarTask.getManifest());
 
         from(thinJarTask.getArchivePath());
-        Configuration cfg = project.getConfigurations().getByName(
-            nameFactory.getSourceSet(SourceSetNames.main, pCheckstyleVersion).getRuntimeConfigurationName());
+        Configuration cfg = new ClasspathBuilder(this).buildMainRuntimeConfiguration(pDepConfig);
         setConfigurations(Collections.singletonList(cfg));
         exclude("META-INF/INDEX.LIST", "META-INF/*.SF", "META-INF/*.DSA", "META-INF/*.RSA", "META-INF/maven/**/*",
             "pom.xml");
