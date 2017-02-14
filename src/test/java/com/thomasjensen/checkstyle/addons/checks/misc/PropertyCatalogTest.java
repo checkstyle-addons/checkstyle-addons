@@ -17,12 +17,15 @@ package com.thomasjensen.checkstyle.addons.checks.misc;
 
 import java.io.File;
 import java.io.IOException;
+import java.util.regex.Pattern;
 
 import com.puppycrawl.tools.checkstyle.DefaultConfiguration;
-import com.thomasjensen.checkstyle.addons.BaseCheckTestSupport;
-import com.thomasjensen.checkstyle.addons.checks.BinaryName;
 import org.junit.Assert;
 import org.junit.Test;
+
+import com.thomasjensen.checkstyle.addons.BaseCheckTestSupport;
+import com.thomasjensen.checkstyle.addons.checks.BinaryName;
+import com.thomasjensen.checkstyle.addons.util.Util;
 
 
 /**
@@ -45,23 +48,25 @@ public class PropertyCatalogTest
         throws IOException
     {
         PropertyCatalogCheck check = new PropertyCatalogCheck(getPath("misc/InputPropertyCatalog1.java"));
-        check.setPropertyFile("|{0}|{1}|{2}|{3}|{4}|{5}|{6}|{7}|{8}|{9}|{10}|{11}|");
+        check.setPropertyFile("|{0}|{1}|{2}|{3}|{4}|{5}|{6}|{7}|{8}|{9}|{10}|{11}|{12}|");
 
         String s = check.buildPropertyFilePath(new BinaryName("com.foo", "Bar", "Inner"), 0, true);
         Assert.assertEquals("|com.foo.Bar$Inner|com/foo/Bar/Inner|com.foo.Bar|com/foo/Bar|../../..|com/foo|Bar|Inner|"
-            + "src|test|resources||", s);
+            + "src|test|resources|||", s);
 
         s = check.buildPropertyFilePath(new BinaryName("com.foo", "Bar", "Inner1", "Inner2"), 1, true);
         Assert.assertEquals(
             "|com.foo.Bar$Inner1$Inner2|com/foo/Bar/Inner1/Inner2|com.foo.Bar|com/foo/Bar|../../..|com/foo|Bar|Inner2|"
-                + "src|test|resources|src/|", s);
+                + "src|test|resources|src/||", s);
 
         s = check.buildPropertyFilePath(new BinaryName("com.foo", "Bar"), 2, true);
         Assert.assertEquals("|com.foo.Bar|com/foo/Bar|com.foo.Bar|com/foo/Bar|../../..|com/foo|Bar|null|"
-            + "src|test|resources|src/test/|", s);
+            + "src|test|resources|src/test/||", s);
 
         s = check.buildPropertyFilePath(new BinaryName(null, "Bar"), 3, true);
-        Assert.assertEquals("|Bar|Bar|Bar|Bar|..||Bar|null|src|test|resources|src/test/resources/|", s);
+        s = s.replaceAll(Pattern.quote("\\"), "/");
+        Assert.assertEquals("|Bar|Bar|Bar|Bar|..||Bar|null|src|test|resources|src/test/resources/|src/test"
+            + "/resources/com/thomasjensen/checkstyle/addons/checks/misc|", s);
     }
 
 
@@ -83,21 +88,21 @@ public class PropertyCatalogTest
     {
         PropertyCatalogCheck check = new PropertyCatalogCheck(getPath("misc/InputPropertyCatalog1.java"));
         check.setBaseDir("src");
-        check.setPropertyFile("|{0}|{1}|{2}|{3}|{4}|{5}|{6}|{7}|{8}|{9}|{10}|{11}|");
+        check.setPropertyFile("|{0}|{1}|{2}|{3}|{4}|{5}|{6}|{7}|{8}|{9}|{10}|{11}|{12}|");
 
         String s = check.buildPropertyFilePath(new BinaryName("com.foo", "Bar", "Inner"), 0, true);
         Assert.assertEquals("|com.foo.Bar$Inner|com/foo/Bar/Inner|com.foo.Bar|com/foo/Bar|../../..|com/foo|Bar|Inner|"
-            + "test|resources|com||", s);
+            + "test|resources|com|||", s);
 
         check.setBaseDir("src/test");   // forward slash
         s = check.buildPropertyFilePath(new BinaryName("com.foo", "Bar", "Inner"), 0, true);
         Assert.assertEquals("|com.foo.Bar$Inner|com/foo/Bar/Inner|com.foo.Bar|com/foo/Bar|../../..|com/foo|Bar|Inner|"
-            + "resources|com|thomasjensen||", s);
+            + "resources|com|thomasjensen|||", s);
 
         check.setBaseDir("src\\test");   // backslash
         s = check.buildPropertyFilePath(new BinaryName("com.foo", "Bar", "Inner"), 0, true);
         Assert.assertEquals("|com.foo.Bar$Inner|com/foo/Bar/Inner|com.foo.Bar|com/foo/Bar|../../..|com/foo|Bar|Inner|"
-            + "resources|com|thomasjensen||", s);
+            + "resources|com|thomasjensen|||", s);
     }
 
 
@@ -618,5 +623,25 @@ public class PropertyCatalogTest
         checkConfig.addAttribute("propertyFile", getPath("misc/InputPropertyCatalog1.properties"));
 
         verify(checkConfig, getPath("misc/InputPropertyCatalog17DefaultPackage.java"), new String[0]);
+    }
+
+
+
+    @Test
+    public void testMultipleSourceSets()
+        throws Exception
+    {
+        final DefaultConfiguration checkConfig = createCheckConfig(PropertyCatalogCheck.class);
+        final File baseDir = Util.canonize(
+            new File(new File(getPath("misc/InputPropertyCatalog1.properties")).getParentFile(), "PropertyCatalog"));
+        checkConfig.addAttribute("baseDir", baseDir.getAbsolutePath());
+        checkConfig.addAttribute("selection", "Messages$");
+        checkConfig.addAttribute("propertyFile", "{12}/../resources/{1}.properties");
+
+        final File[] filesToCheck = new File[]{//
+            new File(getPath("misc/PropertyCatalog/subsys/module/src/it/java/com/foo/FooMessages.java")),  //
+            new File(getPath("misc/PropertyCatalog/subsys/module/src/main/java/com/foo/BarMessages.java")) //
+        };
+        verify(createChecker(checkConfig), filesToCheck, "doesNotMatter", new String[0]);
     }
 }

@@ -22,8 +22,9 @@ import com.puppycrawl.tools.checkstyle.DefaultLogger;
 import com.puppycrawl.tools.checkstyle.TreeWalker;
 import com.puppycrawl.tools.checkstyle.api.AuditEvent;
 import com.puppycrawl.tools.checkstyle.api.Configuration;
-import com.thomasjensen.checkstyle.addons.util.Util;
 import org.junit.Assert;
+
+import com.thomasjensen.checkstyle.addons.util.Util;
 
 // @formatter:off
 /**
@@ -178,32 +179,36 @@ public abstract class BaseCheckTestSupport
         final String[] pExpected)
         throws Exception
     {
-        mStream.flush();
-        final List<File> theFiles = Lists.newArrayList();
-        Collections.addAll(theFiles, pProcessedFiles);
-        final int errs = pChecker.process(theFiles);
+        try {
+            mStream.flush();
+            final List<File> theFiles = Lists.newArrayList();
+            Collections.addAll(theFiles, pProcessedFiles);
+            final int errs = pChecker.process(theFiles);
 
-        // process each of the lines
-        final ByteArrayInputStream bais = new ByteArrayInputStream(mBAOS.toByteArray());
-        final LineNumberReader lnr = new LineNumberReader(new InputStreamReader(bais, Util.UTF8));
+            // process each of the lines
+            final ByteArrayInputStream bais = new ByteArrayInputStream(mBAOS.toByteArray());
+            final LineNumberReader lnr = new LineNumberReader(new InputStreamReader(bais, Util.UTF8));
 
-        for (int i = 0; i < pExpected.length; i++) {
-            final String expected = pMessageFileName + ":" + pExpected[i];
-            String actual = lnr.readLine();
-            if (actual != null) {
-                actual = actual.replaceFirst(Pattern.quote("error: "), "");    // fix message format changed in 6.11
+            for (int i = 0; i < pExpected.length; i++) {
+                final String expected = pMessageFileName + ":" + pExpected[i];
+                String actual = lnr.readLine();
+                if (actual != null) {
+                    actual = actual.replaceFirst(Pattern.quote("error: "), "");   // fix message format changed in 6.11
 
-                // fix message format changed in 6.14 (Checkstyle Issue #2666)
-                actual = actual.replaceFirst(Pattern.quote("[ERROR] "), "");
-                final String moduleHint = " [" + checkShortname + "]";
-                if (actual.endsWith(moduleHint)) {
-                    actual = actual.substring(0, actual.length() - moduleHint.length());
+                    // fix message format changed in 6.14 (Checkstyle Issue #2666)
+                    actual = actual.replaceFirst(Pattern.quote("[ERROR] "), "");
+                    final String moduleHint = " [" + checkShortname + "]";
+                    if (actual.endsWith(moduleHint)) {
+                        actual = actual.substring(0, actual.length() - moduleHint.length());
+                    }
                 }
+                Assert.assertEquals("error message " + i, expected, actual);
             }
-            Assert.assertEquals("error message " + i, expected, actual);
-        }
 
-        Assert.assertEquals("unexpected output: " + lnr.readLine(), pExpected.length, errs);
-        pChecker.destroy();
+            Assert.assertEquals("unexpected output: " + lnr.readLine(), pExpected.length, errs);
+        }
+        finally {
+            pChecker.destroy();
+        }
     }
 }

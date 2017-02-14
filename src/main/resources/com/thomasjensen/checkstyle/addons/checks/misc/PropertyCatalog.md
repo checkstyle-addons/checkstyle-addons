@@ -139,6 +139,8 @@ This check find duplicate keys in the Java code, but not in the property file. U
         <dd>simple name of the third subdirectory on the path to the message catalog (<code>subdir3</code>)</dd>
         <dt><code>{11}</code></dt>
         <dd>This placeholder is special because it is dynamic. It is replaced by the empty String, <code>{8}/</code>, <code>{8}/{9}/</code>, and <code>{8}/{9}/{10}/</code> (in that order). Once the property file is found, the location is used. If not, the next variation is checked. This is useful when the same Checkstyle configuration is used for multiple projects with different structures.</dd>
+        <dt><code>{12}</code></dt>
+        <dd>the relative path fragment between the <code>baseDir</code> and the package directories (e.g. <code>module1/src/main/java</code>)</dd>
     </dl>
     <span class="propdefault">(not set)</span></dd>
 

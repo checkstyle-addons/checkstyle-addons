@@ -32,6 +32,7 @@ import java.util.Properties;
 import java.util.Set;
 import java.util.TreeMap;
 import java.util.TreeSet;
+import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import javax.annotation.CheckForNull;
 import javax.annotation.Nonnull;
@@ -39,10 +40,11 @@ import javax.annotation.Nullable;
 
 import com.puppycrawl.tools.checkstyle.api.DetailAST;
 import com.puppycrawl.tools.checkstyle.api.TokenTypes;
+import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
+
 import com.thomasjensen.checkstyle.addons.checks.AbstractAddonsCheck;
 import com.thomasjensen.checkstyle.addons.checks.BinaryName;
 import com.thomasjensen.checkstyle.addons.util.Util;
-import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 
 
 /**
@@ -52,6 +54,7 @@ import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
  *
  * @author Thomas Jensen
  */
+@SuppressWarnings("MethodDoesntCallSuperMethod")
 public class PropertyCatalogCheck
     extends AbstractAddonsCheck
 {
@@ -293,6 +296,7 @@ public class PropertyCatalogCheck
 
         final String pg = pBinaryClassName.getPackage();
         final String pkgPath = pg != null ? pg.replace('.', '/') : "";
+        final String pathToClass = getPathToClass(pkgPath);
 
         final StringBuilder ph11 = new StringBuilder();
         final String[] subdirs = getFirstSubdirs(NUM_SUBDIRS);
@@ -305,7 +309,7 @@ public class PropertyCatalogCheck
 
         return MessageFormat.format(propertyFileTemplate, pBinaryClassName, completePath, outerFqcn, outerFqcnPath,
             outerFqcnBackrefs, pkgPath, outerSimpleName, innerSimpleName, subdirs[0], subdirs[1], subdirs[2],
-            pReplace11 ? ph11.toString() : "{11}");
+            pReplace11 ? ph11.toString() : "{11}", pathToClass);
     }
 
 
@@ -334,6 +338,30 @@ public class PropertyCatalogCheck
             for (String elem : pathElements) {
                 if (i < pNumSubdirs) {
                     result[i++] = elem;
+                }
+            }
+        }
+        return result;
+    }
+
+
+
+    @Nonnull
+    private String getPathToClass(@Nonnull final String pPkgPath)
+    {
+        String result = "";
+        final File thisFile = Util.canonize(getApiFixer().getCurrentFileName().getParentFile());
+        if (thisFile.getPath().startsWith(baseDir.getPath())
+            && thisFile.getPath().length() >= baseDir.getPath().length() + 1) {
+            final String relPath = thisFile.getPath().substring(baseDir.getPath().length() + 1);
+            if (pPkgPath.isEmpty()) {
+                result = relPath;
+            }
+            else {
+                Matcher m = Pattern.compile(pPkgPath.replace("/", Matcher.quoteReplacement("[\\/]")) + "$").matcher(
+                    relPath);
+                if (m.find()) {
+                    result = relPath.substring(0, m.start() - 1);
                 }
             }
         }
