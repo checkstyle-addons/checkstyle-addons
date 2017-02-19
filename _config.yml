@@ -30,10 +30,10 @@ future: true
 exclude: ['README.md', 'LICENSE', '*.iml', 'build', 'gradle']
 
 # checkstyle-addons custom variables
-latest_version: '3.0.0'
-latest_major: '3'
-latest_version_checkstyle: '6.4.1'
-latest_checkstyle_tested: '7.5'
+latest_version: '4.0.0'
+latest_major: '4'
+latest_version_checkstyle: '7.0'
+latest_checkstyle_tested: '7.5.1'
 
 # links to external websites that are used in multiple places throughout the site
 link_bintray: 'https://bintray.com/checkstyle-addons/checkstyle-addons/checkstyle-addons/view'

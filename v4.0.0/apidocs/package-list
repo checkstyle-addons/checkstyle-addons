@@ -1,0 +1,6 @@
+com.thomasjensen.checkstyle.addons.checks
+com.thomasjensen.checkstyle.addons.checks.coding
+com.thomasjensen.checkstyle.addons.checks.misc
+com.thomasjensen.checkstyle.addons.checks.regexp
+com.thomasjensen.checkstyle.addons.sonarqube
+com.thomasjensen.checkstyle.addons.util
