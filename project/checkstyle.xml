@@ -175,20 +175,10 @@
                 value="Type Javadoc tag {0} must show the full name, e.g. ''Sheldon Cooper''. The regex: ''{1}''"/>
         </module>
         <module name="JavadocMethod">
-            <property name="scope" value="public"/>
-            <property name="allowUndeclaredRTE" value="true"/>
-            <property name="allowThrowsTagsForSubclasses" value="true"/>
-            <property name="allowMissingPropertyJavadoc" value="true"/>
-        </module>
-        <module name="JavadocMethod">
-            <property name="excludeScope" value="public"/>
             <property name="allowUndeclaredRTE" value="true"/>
             <property name="allowThrowsTagsForSubclasses" value="true"/>
             <property name="allowMissingPropertyJavadoc" value="true"/>
             <property name="allowMissingJavadoc" value="true"/>
-        </module>
-        <module name="JavadocVariable">
-            <property name="scope" value="protected"/>
         </module>
         <module name="JavadocStyle">
             <property name="checkEmptyJavadoc" value="true"/>
