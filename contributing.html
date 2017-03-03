@@ -8,11 +8,11 @@ longContent: true
 
 Great to see you on this page! It means you are interested in how {{ site.name }} is built or you are even considering a contribution.
 
-If you've got an idea or - even better - some *code* for a new high-quality check, we should talk about getting it on board. In fact, you can put it on board yourself by creating a pull request for it (more below). The same is true for all kinds of improvements, including this website itself.
+If you've got an idea or - even better - some *code* for a new high-quality check, we should talk about getting it on board. In fact, you can put it on board yourself by creating a pull request for it (more below). The same is true for all kinds of improvements, including improvements to the website.
 
 ## Current Status
 
-{{ site.name }} is using the [Travis](https://travis-ci.org/checkstyle-addons/checkstyle-addons) Continuous Integration system. Every push to *master* and every pull request are automatically built by Travis-CI. If the Travis status is *passing*{:style="color:#468847;"}, then it was successfully built with different JDKs and different Checkstyle versions, and all unit tests were successful.
+{{ site.name }} is using the [Travis](https://travis-ci.org/checkstyle-addons/checkstyle-addons) Continuous Integration system. Every push to *master* and every pull request are automatically built by Travis-CI. If the Travis status is *passing*{:style="color:#468847;"}, then it was successfully built with different Checkstyle versions, and all unit tests were successful.
 Test coverage is measured by [Coveralls](https://coveralls.io/r/checkstyle-addons/checkstyle-addons). The badge below shows the current coverage, which is recomputed upon every successful build. Also, the coverage is calculated for every pull request, and reported on the pull request's discussion page.
 
 <div id="travis-status" class="panel panel-success">
@@ -35,7 +35,7 @@ Test coverage is measured by [Coveralls](https://coveralls.io/r/checkstyle-addon
 
 ## Collaboration Model
 
-{{ site.name }} follows a *Fork & Pull* collaboration model, which means that all changes go through [pull requests](https://help.github.com/articles/using-pull-requests/).
+{{ site.name }} follows a *Fork &amp; Pull* collaboration model, which means that all changes go through [pull requests](https://help.github.com/articles/using-pull-requests/).
 Please feel free to suggest anything that's good. If you are going to expend a lot of work, it may make sense to [open an issue](https://help.github.com/articles/creating-an-issue/) about it first, so we can discuss your plans.
 
 
@@ -62,20 +62,23 @@ In order to build {{ site.name }} yourself, follow these steps:
  1. If you don't have a Gradle User Home yet, set it up by creating an empty directory called `.gradle` somewhere,
     for example `d:\.gradle` (Windows) or `~/.gradle` (Unix). Create an environment variable `GRADLE_USER_HOME` which
     points to this directory. This directory may grow quite large over time, because Gradle uses it to cache all
-    downloaded stuff. Mine is 3&nbsp;GB.
+    downloaded stuff. Mine is 3&nbsp;GB. All Gradle processes, including your IDE, should see this environment variable.
  1. Create an empty text file in `GRADLE_USER_HOME` called `gradle.properties`. Inside, add the following lines:
 
         org.gradle.daemon=true
         org.gradle.jvmargs=-Xmx1536m -XX:MaxPermSize=384m
+        checkstyleaddons_jdk6_java=C:/PROGRA~1/Java/jdk1.6.0_45/bin/java.exe
         checkstyleaddons_jdk6_javac=C:/PROGRA~1/Java/jdk1.6.0_45/bin/javac.exe
         checkstyleaddons_jdk6_javadoc=C:/PROGRA~1/Java/jdk1.6.0_45/bin/javadoc.exe
+        checkstyleaddons_jdk7_java=C:/PROGRA~1/Java/jdk1.7.0_80/bin/java.exe
         checkstyleaddons_jdk7_javac=C:/PROGRA~1/Java/jdk1.7.0_80/bin/javac.exe
         checkstyleaddons_jdk7_javadoc=C:/PROGRA~1/Java/jdk1.7.0_80/bin/javadoc.exe
 
-    The `checkstyleaddons_jdk6_javac` must point to the Java&nbsp;6 compiler executable (adjust this depending on
-    where you installed your Java&nbsp;6 SDK), and should not contain spaces. The same goes for
-    `checkstyleaddons_jdk6_javadoc`, and yet again for the `jdk7` variables. The first two lines are optional and may
-    be left out if the build works for you.
+    The first two lines are optional and may be left out if the build works for you. The other lines
+    basically configure where the executables from the lower version JDKs are at. This is used to build
+    artifacts compatible with previous versions of Java. If these properties are missing, those artifacts
+    will not be created. Adjust the paths depending on where you installed your Java&nbsp;6 and Java&nbsp;7
+    SDKs). The paths should not contain spaces (may still work, but not tested).
  1. Clone the {{ site.name }} repo by running on the command line:\\
     `git clone https://github.com/{{ site.github }}.git`
  1. `cd checkstyle-addons`
