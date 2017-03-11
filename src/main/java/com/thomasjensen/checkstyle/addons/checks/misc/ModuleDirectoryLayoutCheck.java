@@ -290,7 +290,7 @@ public class ModuleDirectoryLayoutCheck
             if (matcher.find() && matcher.start() == 0) {
                 modulePath = cutSlashes(matcher.group(0));
             }
-            else {
+            else if (filePath.contains("\\") || filePath.contains("/")) {     // no error if file is in baseDir
                 log(0, "moduledirectorylayout.invalid.module", filePath, moduleRegexp.pattern());
                 return null;
             }

@@ -18,7 +18,6 @@ package com.thomasjensen.checkstyle.addons.build.tasks;
 import java.io.File;
 import javax.annotation.Nonnull;
 
-import groovy.lang.Closure;
 import org.gradle.api.JavaVersion;
 import org.gradle.api.Project;
 import org.gradle.api.plugins.JavaBasePlugin;
@@ -79,7 +78,7 @@ public class TestTask
 
         dependsOn(TaskNames.testClasses.getName(pDepConfig));
 
-        configure((Closure<?>) buildUtil.getExtraPropertyValue(ExtProp.TestConfigClosure));
+        configure(buildUtil.getExtraPropertyValue(ExtProp.TestConfigClosure));
         setTestClassesDir(((JavaCompile) buildUtil.getTask(TaskNames.compileTestJava, pDepConfig)).getDestinationDir());
 
         if (baseCsVersion.equals(pCsVersion)) {

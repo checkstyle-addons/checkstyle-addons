@@ -25,12 +25,13 @@ import java.util.Set;
 
 import com.puppycrawl.tools.checkstyle.DefaultConfiguration;
 import com.puppycrawl.tools.checkstyle.api.CheckstyleException;
-import com.thomasjensen.checkstyle.addons.BaseFileSetCheckTestSupport;
-import com.thomasjensen.checkstyle.addons.util.Util;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
+
+import com.thomasjensen.checkstyle.addons.BaseFileSetCheckTestSupport;
+import com.thomasjensen.checkstyle.addons.util.Util;
 
 
 /**
@@ -468,7 +469,6 @@ public class ModuleDirectoryLayoutTest
 
 
 
-
     @Test
     public void testGoodContent2b()
         throws Exception
@@ -504,8 +504,8 @@ public class ModuleDirectoryLayoutTest
         for (int i = 1; i <= 18; i++) {
             setUp();
             mCheckConfig.addAttribute("baseDir", getPath("misc/ModuleDirectoryLayout/default"));
-            mCheckConfig.addAttribute("configFile", getPath(
-                "misc/ModuleDirectoryLayout/directories-broken" + i + ".json"));
+            mCheckConfig.addAttribute("configFile",
+                getPath("misc/ModuleDirectoryLayout/directories-broken" + i + ".json"));
 
             try {
                 final String filepath = getPath("misc/ModuleDirectoryLayout/default/src/main/java/a/b/illegal.txt");
@@ -578,5 +578,26 @@ public class ModuleDirectoryLayoutTest
     public void testCutSlashesNPE()
     {
         new ModuleDirectoryLayoutCheck().cutSlashes(null);
+    }
+
+
+
+    /**
+     * Check that even when submodules are specified, files may always be in the module root and baseDir.
+     *
+     * @throws Exception test failed
+     */
+    @Test
+    public void testRootFilesWhenModuleRegexGivenOk()
+        throws Exception
+    {
+        mCheckConfig.addAttribute("baseDir", getPath("misc/ModuleDirectoryLayout/scenario7"));
+        mCheckConfig.addAttribute("configFile", getPath("misc/ModuleDirectoryLayout/directories-scenario7.json"));
+
+        final File[] filesToCheck = new File[]{//
+            new File(getPath("misc/ModuleDirectoryLayout/scenario7/module/src/file.txt")), //
+            new File(getPath("misc/ModuleDirectoryLayout/scenario7/module/moduleRootfile.txt")), //
+            new File(getPath("misc/ModuleDirectoryLayout/scenario7/rootFile.txt"))};
+        verify(createChecker(mCheckConfig), filesToCheck, "unused", new String[0]);
     }
 }

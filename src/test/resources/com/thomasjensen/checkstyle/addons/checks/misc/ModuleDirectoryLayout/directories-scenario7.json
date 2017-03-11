@@ -1,0 +1,10 @@
+{
+    "settings": {
+        "formatVersion": 1,
+        "moduleRegex": "module",
+        "allowNestedSrcFolder": false
+    },
+    "structure": {
+        "src": {}
+    }
+}
