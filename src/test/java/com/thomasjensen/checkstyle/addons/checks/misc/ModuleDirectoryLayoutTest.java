@@ -596,7 +596,7 @@ public class ModuleDirectoryLayoutTest
 
         final File[] filesToCheck = new File[]{//
             new File(getPath("misc/ModuleDirectoryLayout/scenario7/module/src/file.txt")), //
-            new File(getPath("misc/ModuleDirectoryLayout/scenario7/module/moduleRootfile.txt")), //
+            new File(getPath("misc/ModuleDirectoryLayout/scenario7/module/moduleRootFile.txt")), //
             new File(getPath("misc/ModuleDirectoryLayout/scenario7/rootFile.txt"))};
         verify(createChecker(mCheckConfig), filesToCheck, "unused", new String[0]);
     }
