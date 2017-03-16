@@ -33,6 +33,8 @@ import javax.annotation.Nullable;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.puppycrawl.tools.checkstyle.api.AbstractFileSetCheck;
+
+import com.thomasjensen.checkstyle.addons.util.CallableNoEx;
 import com.thomasjensen.checkstyle.addons.util.Util;
 
 
@@ -48,18 +50,19 @@ public class ModuleDirectoryLayoutCheck
 {
     private static final String DEFAULT_CONFIG_FILENAME = "ModuleDirectoryLayout-default.json";
 
-    /** the base directory to be assumed for this check, usually the project's root directory */
-    private File baseDir = Util.canonize(new File("."));
-
-    /** the parsed contents of the UTF-8 encoded configuration file in JSON */
-    private MdlJsonConfig mdlConfig;
-
     /** matches the file extension in a pathname in its capturing group */
     private static final Pattern FILE_EXTENSION = Pattern.compile("\\.([^\\\\/]+)$");
 
     private static final Pattern SINGLE_MODULE_PROJECT = Pattern.compile("");
 
-    private Pattern moduleRegexp = SINGLE_MODULE_PROJECT;
+    /** the base directory to be assumed for this check, usually the project's root directory */
+    private File baseDir = Util.canonize(new File("."));
+
+    private boolean failQuietly = false;
+
+    private CallableNoEx<MdlConfig> mdlConfigCallable;
+
+    private MdlConfig mdlConfigCache = null;
 
 
 
@@ -98,14 +101,33 @@ public class ModuleDirectoryLayoutCheck
     public ModuleDirectoryLayoutCheck()
     {
         super();
-        InputStream is = null;
-        try {
-            is = ModuleDirectoryLayoutCheck.class.getResourceAsStream(DEFAULT_CONFIG_FILENAME);
-            activateConfigFile(is, DEFAULT_CONFIG_FILENAME);
-        }
-        finally {
-            Util.closeQuietly(is);
-        }
+        mdlConfigCallable = new CallableNoEx<MdlConfig>()
+        {
+            @Override
+            @Nonnull
+            public MdlConfig call()
+            {
+                MdlConfig result = null;
+                InputStream is = null;
+                try {
+                    is = ModuleDirectoryLayoutCheck.class.getResourceAsStream(DEFAULT_CONFIG_FILENAME);
+                    result = activateConfigFile(is, DEFAULT_CONFIG_FILENAME);
+                }
+                finally {
+                    Util.closeQuietly(is);
+                }
+                return result;
+            }
+        };
+    }
+
+
+
+    @Override
+    public void beginProcessing(final String pCharset)
+    {
+        super.beginProcessing(pCharset);
+        mdlConfigCache = null;
     }
 
 
@@ -113,9 +135,11 @@ public class ModuleDirectoryLayoutCheck
     @Override
     protected void processFiltered(final File pFile, final List<String> pLines)
     {
+        final MdlConfig wrapper = getMdlConfig();
+        final MdlJsonConfig mdlConfig = wrapper.getJson();
         if (mdlConfig != null) {
             final String filePath = Util.canonize(pFile).getPath();
-            final DecomposedPath decomposedPath = decomposePath(filePath);
+            final DecomposedPath decomposedPath = decomposePath(wrapper, filePath);
             if (decomposedPath != null) {
                 MdlJsonConfig.MdlSpec mdlSpec = mdlConfig.getStructure().get(decomposedPath.getMdlPath());
 
@@ -129,8 +153,8 @@ public class ModuleDirectoryLayoutCheck
                         decomposedPath.getModulePath());
                 }
 
-                else if (!isSpecificPathAllowedInMdl(mdlSpec, decomposedPath) || !isAllowListPostProcessingOk(
-                    mdlSpec.getAllow(), decomposedPath)) {
+                else if (!isSpecificPathAllowedInMdl(mdlConfig, mdlSpec, decomposedPath)
+                    || !isAllowListPostProcessingOk(mdlSpec.getAllow(), decomposedPath)) {
                     log(0, "moduledirectorylayout.illegalcontent", decomposedPath.getMdlPath(),
                         decomposedPath.getSpecificPath());
                 }
@@ -186,16 +210,16 @@ public class ModuleDirectoryLayoutCheck
 
 
 
-    private boolean isSpecificPathAllowedInMdl(@Nonnull final MdlJsonConfig.MdlSpec pMdlSpec,
-        @Nonnull final DecomposedPath pDecomposedPath)
+    private boolean isSpecificPathAllowedInMdl(@Nonnull final MdlJsonConfig pJsonConfig,
+        @Nonnull final MdlJsonConfig.MdlSpec pMdlSpec, @Nonnull final DecomposedPath pDecomposedPath)
     {
         boolean allowed = true;
         boolean denied = false;
         if (pMdlSpec.isWhitelist() && pMdlSpec.getAllow() != null && !pMdlSpec.getAllow().isEmpty()) {
-            allowed = processSpecList(pMdlSpec.getAllow(), pDecomposedPath, SpecListType.Allow);
+            allowed = processSpecList(pJsonConfig, pMdlSpec.getAllow(), pDecomposedPath, SpecListType.Allow);
         }
         if (pMdlSpec.getDeny() != null && !pMdlSpec.getDeny().isEmpty()) {
-            denied = processSpecList(pMdlSpec.getDeny(), pDecomposedPath, SpecListType.Deny);
+            denied = processSpecList(pJsonConfig, pMdlSpec.getDeny(), pDecomposedPath, SpecListType.Deny);
         }
         return allowed && !denied;
     }
@@ -211,8 +235,9 @@ public class ModuleDirectoryLayoutCheck
 
 
 
-    private boolean processSpecList(@Nullable final List<MdlJsonConfig.SpecElement> pSpecList,
-        @Nonnull final DecomposedPath pDecomposedPath, @Nonnull final SpecListType pListType)
+    private boolean processSpecList(@Nonnull final MdlJsonConfig pJsonConfig,
+        @Nullable final List<MdlJsonConfig.SpecElement> pSpecList, @Nonnull final DecomposedPath pDecomposedPath,
+        @Nonnull final SpecListType pListType)
     {
         boolean match = false;
         if (pSpecList != null) {
@@ -253,8 +278,8 @@ public class ModuleDirectoryLayoutCheck
 
                     case FromPath:
                         // only possible in deny lists
-                        match = processSpecList(mdlConfig.getStructure().get(se.getSpec()).getAllow(), pDecomposedPath,
-                            pListType);
+                        match = processSpecList(pJsonConfig, pJsonConfig.getStructure().get(se.getSpec()).getAllow(),
+                            pDecomposedPath, pListType);
                         break;
 
                     default:
@@ -271,8 +296,10 @@ public class ModuleDirectoryLayoutCheck
 
 
     @CheckForNull
-    DecomposedPath decomposePath(@Nonnull final String pFilePath)
+    DecomposedPath decomposePath(@Nonnull final MdlConfig pMdlConfig, @Nonnull final String pFilePath)
     {
+        final MdlJsonConfig mdlConfig = pMdlConfig.getJson();
+        final Pattern moduleRegexp = pMdlConfig.getModuleRegex();
         String modulePath = "";
         String mdlPath = null;
         String specificPath = null;
@@ -373,32 +400,56 @@ public class ModuleDirectoryLayoutCheck
      */
     public final void setConfigFile(@Nonnull final String pConfigFile)
     {
-        FileInputStream fis = null;
-        try {
-            fis = new FileInputStream(Util.canonize(new File(pConfigFile)));
-            activateConfigFile(fis, pConfigFile);
-        }
-        catch (IllegalArgumentException e) {
-            activateConfigFile(null, null);
-            throw e;
-        }
-        catch (FileNotFoundException e) {
-            activateConfigFile(null, null);
-            throw new IllegalArgumentException(
-                "Config file not found for " + getClass().getSimpleName() + ": " + pConfigFile, e);
-        }
-        finally {
-            Util.closeQuietly(fis);
-        }
+        mdlConfigCallable = new CallableNoEx<MdlConfig>()
+        {
+            @Override
+            @Nonnull
+            public MdlConfig call()
+            {
+                MdlConfig result = null;
+                FileInputStream fis = null;
+                try {
+                    fis = new FileInputStream(Util.canonize(new File(pConfigFile)));
+                    result = activateConfigFile(fis, pConfigFile);
+                }
+                catch (IllegalArgumentException e) {
+                    result = activateConfigFile(null, null);
+                    throw e;
+                }
+                catch (FileNotFoundException e) {
+                    result = activateConfigFile(null, null);
+                    if (!failQuietly) {
+                        throw new IllegalArgumentException(
+                            "Config file not found for " + ModuleDirectoryLayoutCheck.class.getSimpleName() + ": "
+                                + pConfigFile, e);
+                    }
+                }
+                finally {
+                    Util.closeQuietly(fis);
+                }
+                return result;
+            }
+        };
     }
 
 
 
-    private void activateConfigFile(@Nullable final InputStream pInputStream, @Nullable final String pFilename)
+    public void setFailQuietly(final boolean pFailQuietly)
     {
+        failQuietly = pFailQuietly;
+    }
+
+
+
+    @Nonnull
+    private MdlConfig activateConfigFile(@Nullable final InputStream pInputStream, @Nullable final String pFilename)
+    {
+        MdlConfig result = new MdlConfig(null, SINGLE_MODULE_PROJECT);
         if (pInputStream != null) {
+            MdlJsonConfig json = null;
+            Pattern moduleRegexp = null;
             try {
-                mdlConfig = readConfigFile(pInputStream);
+                json = readConfigFile(pInputStream);
             }
             catch (IOException e) {
                 throw new IllegalArgumentException(
@@ -406,20 +457,18 @@ public class ModuleDirectoryLayoutCheck
             }
 
             try {
-                mdlConfig.validate();
-                moduleRegexp = Pattern.compile(mdlConfig.getSettings().getModuleRegex());
+                json.validate();
+                moduleRegexp = Pattern.compile(json.getSettings().getModuleRegex());
             }
             catch (ConfigValidationException e) {
-                mdlConfig = null;
+                json = null;
                 moduleRegexp = SINGLE_MODULE_PROJECT;
                 throw new IllegalArgumentException(
                     "Module directory layout configFile contains invalid configuration: " + pFilename, e);
             }
+            result = new MdlConfig(json, moduleRegexp);
         }
-        else {
-            mdlConfig = null;
-            moduleRegexp = SINGLE_MODULE_PROJECT;
-        }
+        return result;
     }
 
 
@@ -431,5 +480,16 @@ public class ModuleDirectoryLayoutCheck
         final String json = new String(fileContents, Util.UTF8);
         final MdlJsonConfig result = new ObjectMapper().readValue(json, MdlJsonConfig.class);
         return result;
+    }
+
+
+
+    @Nonnull
+    MdlConfig getMdlConfig()
+    {
+        if (mdlConfigCache == null) {
+            mdlConfigCache = mdlConfigCallable.call();
+        }
+        return mdlConfigCache;
     }
 }

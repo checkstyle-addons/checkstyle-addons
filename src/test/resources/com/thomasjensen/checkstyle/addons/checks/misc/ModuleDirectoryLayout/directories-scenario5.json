@@ -6,6 +6,7 @@
     },
     "structure": {
         "src/main/java": {
+            "allow": [],
             "deny": [
                 {
                     "type": "SpecificPathRegex",

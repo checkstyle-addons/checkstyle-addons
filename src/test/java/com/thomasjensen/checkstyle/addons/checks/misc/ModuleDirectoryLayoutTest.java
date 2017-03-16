@@ -16,6 +16,7 @@ package com.thomasjensen.checkstyle.addons.checks.misc;
  */
 
 import java.io.File;
+import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -71,7 +72,7 @@ public class ModuleDirectoryLayoutTest
         check.setConfigFile(getPath("misc/ModuleDirectoryLayout/directories-multi.json"));
 
         final String path = "D:/Projects/project1/group/module1/src/test/resources/foo/bar/Filename.tar.gz";
-        DecomposedPath dcp = check.decomposePath(Util.canonize(new File(path)).getPath());
+        DecomposedPath dcp = check.decomposePath(check.getMdlConfig(), Util.canonize(new File(path)).getPath());
 
         Assert.assertNotNull(dcp);
         Assert.assertEquals("group" + File.separator + "module1", dcp.getModulePath());
@@ -102,7 +103,7 @@ public class ModuleDirectoryLayoutTest
         check.setConfigFile(getPath("misc/ModuleDirectoryLayout/directories-multi.json"));
 
         final String path = "D:/Projects/project1/group/module1/src/test/resources/foo/bar/file";
-        DecomposedPath dcp = check.decomposePath(Util.canonize(new File(path)).getPath());
+        DecomposedPath dcp = check.decomposePath(check.getMdlConfig(), Util.canonize(new File(path)).getPath());
 
         Assert.assertNotNull(dcp);
         Assert.assertEquals("group" + File.separator + "module1", dcp.getModulePath());
@@ -130,7 +131,7 @@ public class ModuleDirectoryLayoutTest
         check.setConfigFile(getPath("misc/ModuleDirectoryLayout/directories-multi.json"));
 
         final String path = "D:/Projects/project1/group/module1/src/test/resources/foo/bar/.gitignore";
-        DecomposedPath dcp = check.decomposePath(Util.canonize(new File(path)).getPath());
+        DecomposedPath dcp = check.decomposePath(check.getMdlConfig(), Util.canonize(new File(path)).getPath());
 
         Assert.assertNotNull(dcp);
         Assert.assertEquals("group" + File.separator + "module1", dcp.getModulePath());
@@ -160,7 +161,7 @@ public class ModuleDirectoryLayoutTest
         check.setConfigFile(getPath("misc/ModuleDirectoryLayout/directories-multi.json"));
 
         final String path = "D:/Projects/project1/group/module1/src/test/resources/foo/bar/file..txt";
-        DecomposedPath dcp = check.decomposePath(Util.canonize(new File(path)).getPath());
+        DecomposedPath dcp = check.decomposePath(check.getMdlConfig(), Util.canonize(new File(path)).getPath());
 
         Assert.assertNotNull(dcp);
         Assert.assertEquals("group" + File.separator + "module1", dcp.getModulePath());
@@ -190,7 +191,7 @@ public class ModuleDirectoryLayoutTest
         check.setConfigFile(getPath("misc/ModuleDirectoryLayout/directories-multi.json"));
 
         final String path = "D:/Projects/project1/group/module1/src/test/resources/foo/bar/file.tar..gz";
-        DecomposedPath dcp = check.decomposePath(Util.canonize(new File(path)).getPath());
+        DecomposedPath dcp = check.decomposePath(check.getMdlConfig(), Util.canonize(new File(path)).getPath());
 
         Assert.assertNotNull(dcp);
         Assert.assertEquals("group" + File.separator + "module1", dcp.getModulePath());
@@ -222,7 +223,7 @@ public class ModuleDirectoryLayoutTest
         check.setConfigFile(getPath("misc/ModuleDirectoryLayout/directories-multi.json"));
 
         final String path = "D:/Projects/project1/group/module1/src/test/resources/foo/bar/Filename.tar.gz";
-        DecomposedPath dcp = check.decomposePath(Util.canonize(new File(path)).getPath());
+        DecomposedPath dcp = check.decomposePath(check.getMdlConfig(), Util.canonize(new File(path)).getPath());
 
         Assert.assertNull(dcp);
     }
@@ -239,7 +240,7 @@ public class ModuleDirectoryLayoutTest
         check.setConfigFile(getPath("misc/ModuleDirectoryLayout/directories-multi.json"));
 
         final String path = "D:/Projects/project1/group/module1/file.txt";
-        DecomposedPath dcp = check.decomposePath(Util.canonize(new File(path)).getPath());
+        DecomposedPath dcp = check.decomposePath(check.getMdlConfig(), Util.canonize(new File(path)).getPath());
 
         Assert.assertNull(dcp);
     }
@@ -506,16 +507,27 @@ public class ModuleDirectoryLayoutTest
             mCheckConfig.addAttribute("baseDir", getPath("misc/ModuleDirectoryLayout/default"));
             mCheckConfig.addAttribute("configFile",
                 getPath("misc/ModuleDirectoryLayout/directories-broken" + i + ".json"));
+            mCheckConfig.addAttribute("failQuietly", "true");  // flag must not have any effect!
 
+            Throwable expectedException = null;
             try {
                 final String filepath = getPath("misc/ModuleDirectoryLayout/default/src/main/java/a/b/illegal.txt");
                 verify(mCheckConfig, filepath, new String[0]);
                 Assert.fail("expected exception was not thrown");
             }
-            catch (CheckstyleException e) {
-                // expected
-                Assert.assertTrue(e.getMessage().contains("Cannot set property 'configFile'"));
+            catch (IllegalArgumentException e) {
+                // expected - Versions of Checkstyle prior to 6.12 give the expected exception directly
+                expectedException = e;
             }
+            catch (CheckstyleException e) {
+                // expected - Checkstyle 6.12 and later wrap the exception in a CheckstyleException
+                expectedException = e.getCause();
+            }
+            Assert.assertTrue(expectedException instanceof IllegalArgumentException);
+            Assert.assertTrue(expectedException.getMessage().contains(//
+                "Could not read or parse the module directory layout configFile") //
+                || expectedException.getMessage().contains(//
+                "Module directory layout configFile contains invalid configuration"));
         }
     }
 
@@ -544,15 +556,38 @@ public class ModuleDirectoryLayoutTest
         mCheckConfig.addAttribute("baseDir", getPath("misc/ModuleDirectoryLayout/default"));
         mCheckConfig.addAttribute("configFile", "non/existent/file.json");
 
+        Throwable expectedException = null;
         try {
             final String filepath = getPath("misc/ModuleDirectoryLayout/default/src/main/java/a/b/illegal.txt");
             verify(mCheckConfig, filepath, new String[0]);
             Assert.fail("expected exception was not thrown");
         }
-        catch (CheckstyleException e) {
-            // expected
-            Assert.assertTrue(e.getMessage().contains("Cannot set property 'configFile'"));
+        catch (IllegalArgumentException e) {
+            // expected - Versions of Checkstyle prior to 6.12 give the expected exception directly
+            expectedException = e;
         }
+        catch (CheckstyleException e) {
+            // expected - Checkstyle 6.12 and later wrap the exception in a CheckstyleException
+            expectedException = e.getCause();
+        }
+        Assert.assertTrue(expectedException instanceof IllegalArgumentException);
+        Assert.assertTrue(expectedException.getCause() instanceof FileNotFoundException);
+        Assert.assertTrue(expectedException.getMessage().contains("Config file not found for"));
+    }
+
+
+
+    @Test
+    public void testConfigFileNotFoundFailQuietly()
+        throws Exception
+    {
+        mCheckConfig.addAttribute("baseDir", getPath("misc/ModuleDirectoryLayout/default"));
+        mCheckConfig.addAttribute("configFile", "non/existent/file.json");
+        mCheckConfig.addAttribute("failQuietly", "true");
+
+        final String filepath = getPath("misc/ModuleDirectoryLayout/default/src/main/java/a/b/illegal.txt");
+        // The check should be disabled because the json could not be found.
+        verify(mCheckConfig, filepath, new String[0]);
     }
 
 

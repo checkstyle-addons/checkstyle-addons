@@ -44,6 +44,14 @@ and the specific content they may contain.
     If the specified file cannot be found or parsed, the check will be disabled.</span>
     <span class="propdefault"><a href="https://github.com/{{ site.github }}/blob/{{ page.check_version }}/src/main/resources/com/thomasjensen/checkstyle/addons/checks/misc/ModuleDirectoryLayout-default.json">Maven
     Directory Layout</a></span></dd>
+
+<dt><span class="propname">failQuietly</span>
+    <span class="proptype"><a href="{{ site.link_cs_type_boolean }}">Boolean</a></span></dt>
+<dd><span class="propdesc">This flag determines the check behavior when the specified <code>configFile</code> cannot be
+    found. When <code>true</code>, a missing <code>configFile</code> will simply disable the check with no warning.
+    When <code>false</code>, a missing <code>configFile</code> will throw an exception. Syntax errors in the config
+    file will <i>always</i> throw an exception.</span>
+    <span class="propdefault"><code>false</code></span></dd>
 </dl>
 
 Only these two properties are set in the check configuration. Everything else is configured via the *directories.json*
