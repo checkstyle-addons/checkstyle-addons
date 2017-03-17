@@ -78,25 +78,6 @@ ext {
     gitRepo = Grgit.open(project.file('.'));
     gitHash = gitRepo.head().id;
     buildUtil = new BuildUtil(project);
-
-    testConfigClosure = {
-        testLogging {
-            events 'failed';
-            showStackTraces = true;
-            showExceptions = true;
-            showCauses = true;
-            showStandardStreams = true;
-            exceptionFormat 'full'
-        }
-        afterSuite { final TestDescriptor descriptor, final TestResult testResult ->
-            if (descriptor.getParent() == null) {
-                logger.lifecycle('\r\t' + testResult.testCount + ' tests executed, ' +
-                        testResult.successfulTestCount + ' successful, ' +
-                        (testResult.testCount - testResult.successfulTestCount) + ' failed, ' +
-                        testResult.skippedTestCount + ' skipped.');
-            }
-        }
-    }
 }
 
 
@@ -132,6 +113,27 @@ ext {
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 //   Create all the tasks needed for handling dependency configurations
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+
+ext {
+    testConfigClosure = {
+        testLogging {
+            events 'failed';
+            showStackTraces = true;
+            showExceptions = true;
+            showCauses = true;
+            showStandardStreams = true;
+            exceptionFormat 'full'
+        }
+        afterSuite { final TestDescriptor descriptor, final TestResult testResult ->
+            if (descriptor.getParent() == null) {
+                logger.lifecycle('\r\t' + testResult.testCount + ' tests executed, ' +
+                        testResult.successfulTestCount + ' successful, ' +
+                        (testResult.testCount - testResult.successfulTestCount) + ' failed, ' +
+                        testResult.skippedTestCount + ' skipped.');
+            }
+        }
+    }
+}
 
 project.ext.depConfigs.getAll().findAll{ !it.value.isDefaultConfig() }.each {
     final Map.Entry<String, DependencyConfig> entry -> taskCreator.setupBuildTasks(entry.getValue());
