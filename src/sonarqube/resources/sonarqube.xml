@@ -104,6 +104,10 @@
         <param key="configFile" type="STRING">
             <description>Location of configuration file in JSON format</description>
         </param>
+        <param key="failQuietly" type="BOOLEAN">
+            <description>When the file specified in the ``configFile`` option cannot be found, and this flag is ``true``, the check will quietly disable itself and do nothing. If ``false``, an exception will be thrown.</description>
+            <defaultValue>false</defaultValue>
+        </param>
     </rule>
 
     <!-- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -->
