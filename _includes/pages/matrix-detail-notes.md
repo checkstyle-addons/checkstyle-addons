@@ -68,7 +68,9 @@ analysis of the commit history on GitHub has turned up further breaking changes:
 
 <div class="checkpage"><dl>
 <dt class="title">Checkstyle</dt><dd class="title">– Breaking Change</dd>
-<dt>6.12</dt><dd>– public method renamed in utils/CheckUtils (commit <a href="https://github.com/checkstyle/checkstyle/commit/e2b4e687d7b8f9d6d5e1346d874b90e4567aff81">#e2b4e68</a>)</dd>
+<dt>6.12</dt><dd>– public method renamed in utils/CheckUtils (commit <a href="https://github.com/checkstyle/checkstyle/commit/e2b4e687d7b8f9d6d5e1346d874b90e4567aff81">#e2b4e68</a>),
+             exception handling changed in Checker (issue <a href="https://github.com/checkstyle/checkstyle/issues/2109">#2109</a>,
+             commit <a href="https://github.com/checkstyle/checkstyle/commit/f020066f8bdfb378df36904af3df8b5bc48858fd">#f020066</a>)</dd>
 <dt>6.9</dt><dd>– public methods removed from api/JavadocTagInfo (commit <a href="https://github.com/checkstyle/checkstyle/commit/534536aa623b2f723daf95d9e43d31f1b2734906">#534536a</a>)</dd>
 <dt>6.6</dt><dd>– public method <code>getFilename()</code> renamed to <code>getFileName()</code> in api/FileContents (commit <a href="https://github.com/checkstyle/checkstyle/commit/7dd24c8c35572b5db3e5c905d440e813cfe2538c">#7dd24c8</a>)</dd>
 <dt>5.7</dt><dd>– signature of public method <code>fireErrors()</code> changed in api/MessageDispatcher (commit <a href="https://github.com/checkstyle/checkstyle/commit/1d614c3a7ecf8a3ede4df8a50da46e71792d0025">#1d614c3</a>)</dd>
