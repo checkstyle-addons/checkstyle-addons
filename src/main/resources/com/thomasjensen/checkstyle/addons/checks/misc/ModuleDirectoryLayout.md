@@ -17,7 +17,7 @@ For the purposes of this check, the absolute path of any file checked by Checkst
   setting in *directories.json*. In a single-module project, the module path is the empty
   String.
 - the <span style="background-color:#ffdddd;">**MDL path**</span> (red) as configured in the *directories.json* config
-  file. Within a module, every file must be located either on an MDL path or in the module root.
+  file. Within a module, every file must be located either on an MDL path or in the module root. Files may also be located directly in the `baseDir`.
 - The <span style="background-color:#ddffdd;">**specific path**</span> (green) may play a role if it is used in the
   *directories.json* config file in order to control the contents of specific MDL paths.
 
@@ -40,8 +40,7 @@ and the specific content they may contain.
     <span class="proptype"><a href="{{ site.link_cs_type_string }}">String</a></span></dt>
 <dd><span class="propdesc">Location of the configuration file for this check. Relative paths are interpreted relative
     to the current directory of the Checkstyle analysis process, which is usually the project root. The configuration
-    file is a JSON file with UTF-8 character set in the format described below.<br/>
-    If the specified file cannot be found or parsed, the check will be disabled.</span>
+    file is a JSON file with UTF-8 character set in the format described below.</span>
     <span class="propdefault"><a href="https://github.com/{{ site.github }}/blob/{{ page.check_version }}/src/main/resources/com/thomasjensen/checkstyle/addons/checks/misc/ModuleDirectoryLayout-default.json">Maven
     Directory Layout</a></span></dd>
 
@@ -125,7 +124,7 @@ structures:
 </module>
 {% endhighlight %}
 
-The above example is for Eclipse, where `${workspace_loc}` may be used to [refer](http://eclipse-cs.sourceforge.net/#!/properties) to the file system location of the current workspace. For SonarQube, you may use relative file paths. For the other environments, you may define a custom [module property]({{ site.link_cs_properties }}), which you dynamically set to the project directory. Example for Gradle:
+The above example is for IntelliJ and Eclipse, where `${workspace_loc}` may be used to [refer](http://eclipse-cs.sourceforge.net/#!/properties) to the file system location of the current workspace. For SonarQube, you may use relative file paths. For the other environments, you may define a custom [module property]({{ site.link_cs_properties }}), which you dynamically set to the project directory. Example for Gradle:
 
 {% highlight groovy %}
 checkstyle {
