@@ -28,7 +28,7 @@ Test coverage is measured by [Coveralls](https://coveralls.io/r/checkstyle-addon
        alt="Coverage Status" height="20" /></a><br/>
     <a href="https://www.openhub.net/p/checkstyle-addons" target="_blank"><img style="margin-top: 15px;"
        src="https://www.openhub.net/p/checkstyle-addons/widgets/project_thin_badge?format=gif&ref=Thin+badge"
-       alt="OpenHub Stats" height="21" /></a>
+       alt="OpenHub Stats" height="20" /></a>
   </div>
 </div>
 
@@ -85,6 +85,20 @@ In order to build {{ site.name }} yourself, follow these steps:
  1. `gradlew build`\\
      This will take care of everything needed for a successful build of {{ site.name }}, including download and installation of Gradle.
  1. Find the fresh artifacts in build/libs. Done!
+
+
+<a name="dev-intellij" class="csa-offset-anchor"/>
+
+## IntelliJ IDEA Configuration
+
+In case you want to use IntelliJ IDEA as your IDE to develop {{ site.name }}, you need to make sure that these
+settings are configured correctly:
+
+- When importing the Gradle project, be sure to activate the option "Create separate module per source set".
+  The code will not compile if you forget to do that.
+- Before running the unit tests from IntelliJ, make sure that the option
+  "Add runtime assertions for not-null annotated methods and parameters" is turned *off* in the compiler settings.
+  The tests will not run successfully if you forget to do that.
 
 
 <a name="local-jekyll" class="csa-offset-anchor"/>
