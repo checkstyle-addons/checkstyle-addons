@@ -200,23 +200,6 @@ public class TaskCreator
 
 
 
-    private void addArchive(@Nonnull final Task pArchiveTask)
-    {
-        // TODO what happens when we just don't do this at all?
-        project.artifacts(new Closure<Void>(this)
-        {
-            @Override
-            @SuppressWarnings("MethodDoesntCallSuperMethod")
-            public Void call()
-            {
-                project.getArtifacts().add("archives", pArchiveTask);
-                return null;
-            }
-        });
-    }
-
-
-
     public void setupArtifactTasks()
     {
         final TaskContainer tasks = project.getTasks();
@@ -238,25 +221,21 @@ public class TaskCreator
             final String jarTaskName = TaskNames.jar.getName(depConfig);
             final CreateJarTask jarTask = tasks.create(jarTaskName, CreateJarTask.class);
             jarTask.configureFor(depConfig);
-            addArchive(jarTask);
 
             // 'fatjar' task
             final String fatjarTaskName = TaskNames.fatJar.getName(depConfig);
             final CreateFatJarTask fatjarTask = tasks.create(fatjarTaskName, CreateFatJarTask.class);
             fatjarTask.configureFor(depConfig);
-            addArchive(fatjarTask);
 
             // 'jarSources' task
             final String jarSourcesTaskName = TaskNames.jarSources.getName(depConfig);
             final CreateJarSourcesTask jarSourcesTask = tasks.create(jarSourcesTaskName, CreateJarSourcesTask.class);
             jarSourcesTask.configureFor(depConfig);
-            addArchive(jarSourcesTask);
 
             // 'jarJavadoc' task
             final String jarJavadocTaskName = TaskNames.jarJavadoc.getName(depConfig);
             final CreateJarJavadocTask jarJavadocTask = tasks.create(jarJavadocTaskName, CreateJarJavadocTask.class);
             jarJavadocTask.configureFor(depConfig);
-            addArchive(jarJavadocTask);
 
             // Add JARs to list of artifacts to publish
             String pubName = "checkstyleAddons";
@@ -276,7 +255,6 @@ public class TaskCreator
             final String eclipseTaskName = TaskNames.jarEclipse.getName(depConfig);
             final CreateJarEclipseTask jarEclipseTask = tasks.create(eclipseTaskName, CreateJarEclipseTask.class);
             jarEclipseTask.configureFor(depConfig);
-            addArchive(jarEclipseTask);
 
             // 'jarSonarqube' task
             CreateJarSonarqubeTask jarSqTask = null;
@@ -284,15 +262,19 @@ public class TaskCreator
                 final String sqTaskName = TaskNames.jarSonarqube.getName(depConfig);
                 jarSqTask = tasks.create(sqTaskName, CreateJarSonarqubeTask.class);
                 jarSqTask.configureFor(depConfig);
-                addArchive(jarSqTask);
             }
 
-            // 'assemble' task for Checkstyle-version-specific artifacts
-            final Task assembleTask = tasks.create(TaskNames.assemble.getName(depConfig));
+            // 'assemble' task for the dependency configuration
+            Task assembleTask = tasks.getByName(BasePlugin.ASSEMBLE_TASK_NAME);
+            if (!depConfig.isDefaultConfig()) {
+                assembleTask = tasks.create(TaskNames.assemble.getName(depConfig));
+                assembleTask.setDescription(
+                    buildUtil.getLongName() + ": Assembles the artifacts belonging to dependency configuration '"
+                        + depConfig.getName() + "'");
+                final Task buildTask = tasks.getByName(LifecycleBasePlugin.BUILD_TASK_NAME);
+                buildTask.dependsOn(assembleTask);
+            }
             assembleTask.setGroup(ARTIFACTS_GROUP_NAME);
-            assembleTask.setDescription(
-                buildUtil.getLongName() + ": Assembles the artifacts belonging to dependency configuration '"
-                    + depConfig.getName() + "'");
             assembleTask.dependsOn(jarTask);
             assembleTask.dependsOn(fatjarTask);
             assembleTask.dependsOn(jarSourcesTask);
