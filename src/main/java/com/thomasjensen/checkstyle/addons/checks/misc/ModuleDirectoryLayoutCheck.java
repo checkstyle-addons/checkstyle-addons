@@ -327,9 +327,13 @@ public class ModuleDirectoryLayoutCheck
         }
 
         for (final String mdlPathCandidate : mdlConfig.getStructure().keySet()) {
-            if (filePath.startsWith(Util.standardizeSlashes(mdlPathCandidate))) {
+            if (mdlPathCandidate.length() < filePath.length() //
+                && filePath.startsWith(Util.standardizeSlashes(mdlPathCandidate)) //
+                && "/\\".indexOf(filePath.charAt(mdlPathCandidate.length())) >= 0) //
+            {
                 mdlPath = mdlPathCandidate;
                 filePath = cutSlashes(filePath.substring(mdlPathCandidate.length()));
+                break;
             }
         }
         if (mdlPath == null) {

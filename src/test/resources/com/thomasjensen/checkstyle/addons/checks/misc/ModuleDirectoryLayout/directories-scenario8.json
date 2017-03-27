@@ -1,0 +1,18 @@
+{
+    "settings": {
+        "formatVersion": 1,
+        "moduleRegex": "module\\d"
+    },
+    "structure": {
+        "a": {},
+        "module1": {
+            "whitelist": true,
+            "allow": [
+                {
+                    "type": "SimpleName",
+                    "spec": "non-existing.file"
+                }
+            ]
+        }
+    }
+}

@@ -635,4 +635,28 @@ public class ModuleDirectoryLayoutTest
             new File(getPath("misc/ModuleDirectoryLayout/scenario7/rootFile.txt"))};
         verify(createChecker(mCheckConfig), filesToCheck, "unused", new String[0]);
     }
+
+
+
+    /**
+     * Tests an interesting corner case where one MDL path occurs as the first part of the name of a file in a
+     * different MDL path. This "scenario8" is modeled after an actual production bug.
+     *
+     * @throws Exception test failed
+     */
+    @Test
+    public void testOneFilenameStartsWithMdlPathName()
+        throws Exception
+    {
+        mCheckConfig.addAttribute("baseDir", getPath("misc/ModuleDirectoryLayout/scenario8"));
+        mCheckConfig.addAttribute("configFile", getPath("misc/ModuleDirectoryLayout/directories-scenario8.json"));
+
+        final File[] filesToCheck = new File[]{//
+            new File(getPath("misc/ModuleDirectoryLayout/scenario8/module1/a/allowed.txt")), //
+            new File(getPath("misc/ModuleDirectoryLayout/scenario8/module1/a/module1-allowed.txt")), //
+            new File(getPath("misc/ModuleDirectoryLayout/scenario8/module1/allowed.txt")), //
+            new File(getPath("misc/ModuleDirectoryLayout/scenario8/module1/module1-allowed.txt"))};
+
+        verify(createChecker(mCheckConfig), filesToCheck, "unused", new String[0]);
+    }
 }
