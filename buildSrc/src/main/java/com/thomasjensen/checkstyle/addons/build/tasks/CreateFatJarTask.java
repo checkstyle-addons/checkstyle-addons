@@ -22,7 +22,6 @@ import javax.annotation.Nonnull;
 
 import com.github.jengelman.gradle.plugins.shadow.internal.DependencyFilter;
 import com.github.jengelman.gradle.plugins.shadow.tasks.ShadowJar;
-
 import org.gradle.api.Project;
 import org.gradle.api.artifacts.Configuration;
 import org.gradle.api.artifacts.ResolvedDependency;
@@ -79,8 +78,6 @@ public class CreateFatJarTask
     @Override
     public void configureFor(@Nonnull final DependencyConfig pDepConfig)
     {
-        final Project project = getProject();
-
         // set appendix for archive name
         final String appendix = pDepConfig.getName();
         if (!pDepConfig.isDefaultConfig()) {
@@ -97,7 +94,7 @@ public class CreateFatJarTask
         getManifest().inheritFrom(thinJarTask.getManifest());
 
         from(thinJarTask.getArchivePath());
-        Configuration cfg = new ClasspathBuilder(this).buildMainRuntimeConfiguration(pDepConfig);
+        Configuration cfg = new ClasspathBuilder(getProject()).buildMainRuntimeConfiguration(pDepConfig);
         setConfigurations(Collections.singletonList(cfg));
         exclude("META-INF/INDEX.LIST", "META-INF/*.SF", "META-INF/*.DSA", "META-INF/*.RSA", "META-INF/maven/**/*",
             "pom.xml");

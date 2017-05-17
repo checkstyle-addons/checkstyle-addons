@@ -80,7 +80,7 @@ public class CreateJarEclipseTask
         @Nonnull final DependencyConfig pDepConfig)
     {
         Set<File> result = new HashSet<>();
-        Configuration cfg = new ClasspathBuilder(pTask).buildMainRuntimeConfiguration(pDepConfig);
+        Configuration cfg = new ClasspathBuilder(pTask.getProject()).buildMainRuntimeConfiguration(pDepConfig);
         for (ResolvedDependency dep : cfg.getResolvedConfiguration().getFirstLevelModuleDependencies()) {
             if (!isCheckstyle(dep)) {
                 for (ResolvedArtifact artifact : dep.getAllModuleArtifacts()) {

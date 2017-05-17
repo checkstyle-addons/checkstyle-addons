@@ -95,7 +95,7 @@ public class TestTask
             JacocoPluginExtension.TASK_EXTENSION_NAME);
         jacoco.setEnabled(false);
 
-        setClasspath(new ClasspathBuilder(this)
+        setClasspath(new ClasspathBuilder(project)
             .buildClassPath(pDepConfig, pCsVersion, true, buildUtil.getSourceSet(SourceSet.TEST_SOURCE_SET_NAME),
                 buildUtil.getSourceSet(SourceSet.MAIN_SOURCE_SET_NAME),
                 buildUtil.getSourceSet(BuildUtil.SONARQUBE_SOURCE_SET_NAME)));

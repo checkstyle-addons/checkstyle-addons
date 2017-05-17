@@ -100,7 +100,7 @@ public class JavadocTask
 
         pTask.setSource(buildUtil.getSourceSet(SourceSet.MAIN_SOURCE_SET_NAME).getAllJava()
             .plus(buildUtil.getSourceSet(BuildUtil.SONARQUBE_SOURCE_SET_NAME).getAllJava()));
-        pTask.setClasspath(new ClasspathBuilder(pTask)
+        pTask.setClasspath(new ClasspathBuilder(project)
             .buildClassPath(pDepConfig, null, false, buildUtil.getSourceSet(SourceSet.MAIN_SOURCE_SET_NAME),
                 buildUtil.getSourceSet(BuildUtil.SONARQUBE_SOURCE_SET_NAME)));
 

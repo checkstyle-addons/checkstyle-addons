@@ -183,7 +183,7 @@ idea.module {
 //   Javadoc
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
-JavadocTask.configureJavadocTask(tasks.javadoc, project.ext.depConfigs.getDefault());
+JavadocTask.configureJavadocTask((Javadoc) tasks.javadoc, (DependencyConfig) project.ext.depConfigs.getDefault());
 
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
@@ -232,7 +232,7 @@ tasks.jacocoTestReport.dependsOn tasks.test;
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
 task siteCopyJavadoc(type: Copy, dependsOn: javadoc) {
-    description = project.ext.longName + ': Copy Javadoc to site directory';
+    setDescription((String) project.ext.longName + ': Copy Javadoc to site directory');
 
     destinationDir = new File(project.buildDir, 'site');
     into("v${project.version}/apidocs") {
@@ -252,11 +252,11 @@ task siteCopyJavadoc(type: Copy, dependsOn: javadoc) {
 
 
 task siteCopyAllChecks(type: Copy) {
-    description = project.ext.longName + ': Copy list of all checks to site directory';
+    setDescription((String) project.ext.longName + ': Copy list of all checks to site directory');
 
     destinationDir = new File(project.buildDir, 'site');
     final File originalFile = new File(sourceSets.main.resources.srcDirs.iterator().next(),
-        '/' + project.ext.checksPackage + '/all_checks.html');
+        '/' + (String) project.ext.checksPackage + '/all_checks.html');
     into("v${project.version}/checks") {
         from originalFile;
         rename { String fileName -> fileName.replace(originalFile.name, 'index.html'); }
@@ -271,7 +271,7 @@ task siteCopyAllChecks(type: Copy) {
 
 
 task siteCopyDownloadGuide(type: Copy) {
-    description = project.ext.longName + ': Copy download guide frontmatter stub to site directory';
+    setDescription((String) project.ext.longName + ': Copy download guide frontmatter stub to site directory');
 
     destinationDir = new File(project.buildDir, 'site');
     final File originalFile = new File(sourceSets.main.resources.srcDirs.iterator().next(), '/download-guide.html');
@@ -296,7 +296,7 @@ taskCreator.setupArtifactTasks();
 taskCreator.rewirePublishingTasks(this);
 
 task checkProperties {
-    description = project.ext.longName + ': Ensure that all properties required for bintray upload are set';
+    setDescription((String) project.ext.longName + ': Ensure that all properties required for bintray upload are set');
     setGroup(PublishingPlugin.PUBLISH_TASK_GROUP);
     doLast {
         ['bintray.user', 'bintray.apikey', 'bintray.gpg.passphrase', 'sonatype.user', 'sonatype.password'].each {

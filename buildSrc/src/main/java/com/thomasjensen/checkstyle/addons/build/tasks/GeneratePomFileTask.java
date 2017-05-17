@@ -125,7 +125,7 @@ public class GeneratePomFileTask
         pom.setUrl((String) inputs.getProperties().get("url"));
 
         final List<PomXml.DependencyXml> dependencies = new ArrayList<>();
-        final Configuration cfg = new ClasspathBuilder(this).buildMainRuntimeConfiguration(depConfig);
+        final Configuration cfg = new ClasspathBuilder(getProject()).buildMainRuntimeConfiguration(depConfig);
         for (Dependency d : cfg.getAllDependencies()) {
             if (!(d instanceof ExternalDependency)) {
                 throw new GradleException("Incompatible dependency: " + d);

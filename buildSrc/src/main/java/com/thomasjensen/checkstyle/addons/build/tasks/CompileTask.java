@@ -62,7 +62,6 @@ public class CompileTask
     {
         final Project project = getProject();
         final JavaVersion javaLevel = pDepConfig.getJavaLevel();
-        final String csVersion = pDepConfig.getCheckstyleBaseVersion();
         setDescription(buildUtil.getLongName() + ": Compile sources from '" + pSourceSetToCompile.getName()
             + "' source set using dependency configuration '" + pDepConfig.getName() + "' (Java level: " + javaLevel
             + ")");
@@ -96,12 +95,12 @@ public class CompileTask
         //setDependencyCacheDir(new File(project.getBuildDir(), "dependency-cache"));
         FileCollection cp = null;
         if (pIsTest) {
-            cp = new ClasspathBuilder(this).buildClassPath(pDepConfig, null, false, pSourceSetToCompile,
+            cp = new ClasspathBuilder(project).buildClassPath(pDepConfig, null, false, pSourceSetToCompile,
                 buildUtil.getSourceSet(SourceSet.MAIN_SOURCE_SET_NAME),
                 buildUtil.getSourceSet(BuildUtil.SONARQUBE_SOURCE_SET_NAME));
         }
         else {
-            cp = new ClasspathBuilder(this).buildClassPath(pDepConfig, null, false, pSourceSetToCompile);
+            cp = new ClasspathBuilder(project).buildClassPath(pDepConfig, null, false, pSourceSetToCompile);
         }
         setClasspath(cp);
 
