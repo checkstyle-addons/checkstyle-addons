@@ -53,7 +53,7 @@ and the specific content they may contain.
     <span class="propdefault"><code>false</code></span></dd>
 </dl>
 
-Only these two properties are set in the check configuration. Everything else is configured via the *directories.json*
+Only these properties are set in the check configuration. Everything else is configured via the *directories.json*
 file, which allows a central check definition (e.g. in SonarQube) to be used for many different projects, each of which
 features its own *directories.json*.
 
