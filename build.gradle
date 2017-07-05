@@ -128,8 +128,8 @@ ext {
             if (descriptor.getParent() == null) {
                 logger.lifecycle('\r\t' + testResult.testCount + ' tests executed, ' +
                         testResult.successfulTestCount + ' successful, ' +
-                        (testResult.testCount - testResult.successfulTestCount) + ' failed, ' +
-                        testResult.skippedTestCount + ' skipped.');
+                        (testResult.testCount - testResult.successfulTestCount - testResult.skippedTestCount) +
+                        ' failed, ' + testResult.skippedTestCount + ' skipped.');
             }
         }
     }
