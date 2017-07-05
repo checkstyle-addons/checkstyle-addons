@@ -312,6 +312,10 @@ public class ModuleDirectoryLayoutCheck
         }
         String filePath = cutSlashes(pFilePath.substring(baseDir.getPath().length()));
 
+        if (pMdlConfig.getExcludeRegex().matcher(filePath).find()) {
+            return null;   // the file path is excluded from checking
+        }
+
         if (moduleRegexp.pattern().length() > 0) {
             final Matcher matcher = moduleRegexp.matcher(filePath);
             if (matcher.find() && matcher.start() == 0) {
@@ -448,10 +452,11 @@ public class ModuleDirectoryLayoutCheck
     @Nonnull
     private MdlConfig activateConfigFile(@Nullable final InputStream pInputStream, @Nullable final String pFilename)
     {
-        MdlConfig result = new MdlConfig(null, SINGLE_MODULE_PROJECT);
+        MdlConfig result = new MdlConfig(null, SINGLE_MODULE_PROJECT, Util.NEVER_MATCH);
         if (pInputStream != null) {
             MdlJsonConfig json = null;
             Pattern moduleRegexp = null;
+            Pattern excludeRegexp = null;
             try {
                 json = readConfigFile(pInputStream);
             }
@@ -463,14 +468,16 @@ public class ModuleDirectoryLayoutCheck
             try {
                 json.validate();
                 moduleRegexp = Pattern.compile(json.getSettings().getModuleRegex());
+                excludeRegexp = Pattern.compile(json.getSettings().getExcludeRegex());
             }
             catch (ConfigValidationException e) {
                 json = null;
                 moduleRegexp = SINGLE_MODULE_PROJECT;
+                excludeRegexp = Util.NEVER_MATCH;
                 throw new IllegalArgumentException(
                     "Module directory layout configFile contains invalid configuration: " + pFilename, e);
             }
-            result = new MdlConfig(json, moduleRegexp);
+            result = new MdlConfig(json, moduleRegexp, excludeRegexp);
         }
         return result;
     }

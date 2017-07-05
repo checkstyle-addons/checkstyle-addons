@@ -21,10 +21,12 @@ import java.util.Map;
 import java.util.regex.Pattern;
 import java.util.regex.PatternSyntaxException;
 import javax.annotation.CheckForNull;
+import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
+import com.thomasjensen.checkstyle.addons.util.Util;
 
 
 /**
@@ -35,6 +37,9 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 public class MdlJsonConfig
     implements SelfValidating
 {
+    @JsonProperty
+    private String comment;
+
     @JsonProperty
     private Settings settings;
 
@@ -58,6 +63,9 @@ public class MdlJsonConfig
         private String moduleRegex = "";
 
         @JsonProperty
+        private String excludeRegex = Util.NEVER_MATCH.pattern();
+
+        @JsonProperty
         private boolean allowNestedSrcFolder = false;
 
 
@@ -76,6 +84,13 @@ public class MdlJsonConfig
 
 
 
+        public String getExcludeRegex()
+        {
+            return excludeRegex;
+        }
+
+
+
         public boolean isAllowNestedSrcFolder()
         {
             return allowNestedSrcFolder;
@@ -90,14 +105,8 @@ public class MdlJsonConfig
             if (getFormatVersion() != 1) {
                 throw new ConfigValidationException("The settings field 'formatVersion' must be present unchanged");
             }
-
-            try {
-                Pattern.compile(moduleRegex);
-            }
-            catch (PatternSyntaxException e) {
-                throw new ConfigValidationException("Invalid pattern in settings field 'moduleRegex': " + moduleRegex,
-                    e);
-            }
+            ensureRegexSyntax("moduleRegex", moduleRegex);
+            ensureRegexSyntax("excludeRegex", excludeRegex);
         }
     }
 
@@ -113,6 +122,9 @@ public class MdlJsonConfig
         implements SelfValidating
     {
         @JsonProperty
+        private String comment;
+
+        @JsonProperty
         private String modules;
 
         @JsonProperty
@@ -123,6 +135,14 @@ public class MdlJsonConfig
 
         @JsonProperty
         private List<SpecElement> deny;
+
+
+
+        @CheckForNull
+        public String getComment()
+        {
+            return comment;
+        }
 
 
 
@@ -164,12 +184,7 @@ public class MdlJsonConfig
             throws ConfigValidationException
         {
             if (modules != null) {
-                try {
-                    Pattern.compile(modules);
-                }
-                catch (PatternSyntaxException e) {
-                    throw new ConfigValidationException("Invalid pattern in 'modules' field: " + modules, e);
-                }
+                ensureRegexSyntax("modules", modules);
             }
             for (List<SpecElement> list : Arrays.asList(allow, deny)) {
                 if (list != null) {
@@ -248,12 +263,7 @@ public class MdlJsonConfig
                 throw new ConfigValidationException("Required field 'type' not set in SpecElement");
             }
             if (type == MdlContentSpecType.SpecificPathRegex) {
-                try {
-                    Pattern.compile(spec);
-                }
-                catch (PatternSyntaxException e) {
-                    throw new ConfigValidationException("Invalid pattern in 'spec' field: " + spec, e);
-                }
+                ensureRegexSyntax("spec", spec);
             }
         }
 
@@ -278,6 +288,15 @@ public class MdlJsonConfig
 
 
 
+    @CheckForNull
+    public String getComment()
+    {
+        return comment;
+    }
+
+
+
+    @Nonnull
     public Settings getSettings()
     {
         return settings;
@@ -285,6 +304,7 @@ public class MdlJsonConfig
 
 
 
+    @Nonnull
     public Map<String, MdlSpec> getStructure()
     {
         return structure;
@@ -345,6 +365,19 @@ public class MdlJsonConfig
                     }
                 }
             }
+        }
+    }
+
+
+
+    private static void ensureRegexSyntax(@Nonnull final String pFieldName, @Nonnull final String pRegex)
+        throws ConfigValidationException
+    {
+        try {
+            Pattern.compile(pRegex);
+        }
+        catch (PatternSyntaxException e) {
+            throw new ConfigValidationException("Invalid pattern in '" + pFieldName + "' field: " + pRegex, e);
         }
     }
 }

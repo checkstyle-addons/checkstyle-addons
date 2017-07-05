@@ -1,4 +1,5 @@
 {
+    "comment": "A sunny day config file.",
     "settings": {},
     "structure": {
         "src/main/java": {
@@ -82,6 +83,7 @@
             ]
         },
         "src/main/webapp": {
+            "comment": "a nice MDL path comment",
             "modules": "[\\\\/]svc-",
             "whitelist": false,
             "allow": [

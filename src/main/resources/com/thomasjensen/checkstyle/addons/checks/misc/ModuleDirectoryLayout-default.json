@@ -1,7 +1,9 @@
 {
+    "comment": "The default module directory layout as defined by Maven",
     "settings": {
         "formatVersion": 1,
         "moduleRegex": "",
+        "excludeRegex": "^\\.idea[\\\\/](?:checkstyleidea\\.tmp[\\\\/])?csi-\\w+[\\\\/]",
         "allowNestedSrcFolder": false
     },
     "structure": {

@@ -26,13 +26,12 @@ import java.util.Set;
 
 import com.puppycrawl.tools.checkstyle.DefaultConfiguration;
 import com.puppycrawl.tools.checkstyle.api.CheckstyleException;
+import com.thomasjensen.checkstyle.addons.BaseFileSetCheckTestSupport;
+import com.thomasjensen.checkstyle.addons.util.Util;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
-
-import com.thomasjensen.checkstyle.addons.BaseFileSetCheckTestSupport;
-import com.thomasjensen.checkstyle.addons.util.Util;
 
 
 /**
@@ -658,5 +657,20 @@ public class ModuleDirectoryLayoutTest
             new File(getPath("misc/ModuleDirectoryLayout/scenario8/module1/module1-allowed.txt"))};
 
         verify(createChecker(mCheckConfig), filesToCheck, "unused", new String[0]);
+    }
+
+
+
+    @Test
+    public void testExcludeRegex()
+        throws Exception
+    {
+        mCheckConfig.addAttribute("baseDir", getPath("misc/ModuleDirectoryLayout/default"));
+        mCheckConfig.addAttribute("configFile", new File(
+            "src/main/resources/com/thomasjensen/checkstyle/addons/checks/misc/ModuleDirectoryLayout-default.json")
+            .getCanonicalPath());
+
+        final String filepath = getPath("misc/ModuleDirectoryLayout/default/.idea/csi-007/ignore_this.txt");
+        verify(mCheckConfig, filepath, new String[0]);
     }
 }

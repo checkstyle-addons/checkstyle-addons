@@ -51,6 +51,7 @@ public final class MdlJsonConfigTest
         cfg.validate();  // should be ok
 
         Assert.assertNotNull(cfg);
+        Assert.assertEquals("A sunny day config file.", cfg.getComment());
         Assert.assertNotNull(cfg.getSettings());
         Assert.assertNotNull(cfg.getStructure());
 
@@ -59,6 +60,7 @@ public final class MdlJsonConfigTest
         Assert.assertFalse(cfg.getSettings().isAllowNestedSrcFolder());
 
         Assert.assertEquals(5, cfg.getStructure().size());
+        Assert.assertEquals("a nice MDL path comment", cfg.getStructure().get("src/main/webapp").getComment());
     }
 
 

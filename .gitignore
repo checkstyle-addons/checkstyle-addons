@@ -8,7 +8,7 @@
 *.iws
 *.iml
 *.ipr
-.idea/
+/.idea/
 
 # Netbeans control files
 nbactions.xml

@@ -16,7 +16,6 @@ package com.thomasjensen.checkstyle.addons.checks.misc;
  */
 
 import java.util.regex.Pattern;
-
 import javax.annotation.CheckForNull;
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
@@ -36,12 +35,16 @@ public class MdlConfig
 
     private final Pattern moduleRegex;
 
+    private final Pattern excludeRegex;
 
 
-    public MdlConfig(@Nullable final MdlJsonConfig pJson, @Nonnull final Pattern pModuleRegex)
+
+    public MdlConfig(@Nullable final MdlJsonConfig pJson, @Nonnull final Pattern pModuleRegex,
+        @Nonnull final Pattern pExcludeRegex)
     {
         json = pJson;
         moduleRegex = pModuleRegex;
+        excludeRegex = pExcludeRegex;
     }
 
 
@@ -63,5 +66,13 @@ public class MdlConfig
     public Pattern getModuleRegex()
     {
         return moduleRegex;
+    }
+
+
+
+    @Nonnull
+    public Pattern getExcludeRegex()
+    {
+        return excludeRegex;
     }
 }
