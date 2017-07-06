@@ -25,8 +25,6 @@ import org.junit.Test;
 
 /**
  * Unit test of {@link IllegalMethodCallCheck}.
- *
- * @author Thomas Jensen
  */
 public class IllegalMethodCallCheckTest
     extends BaseCheckTestSupport

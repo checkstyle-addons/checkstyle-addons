@@ -21,8 +21,6 @@ import org.junit.Test;
 
 /**
  * Unit tests of {@link VersionComparator}.
- *
- * @author Thomas Jensen
  */
 public class VersionComparatorTest
 {

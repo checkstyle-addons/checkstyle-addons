@@ -26,8 +26,6 @@ import javax.annotation.Nullable;
  * Defines an ordering by version number. The Strings are assumed to be in the form {@code "n.m.k"}, where <i>n</i>,
  * <i>m</i>, and <i>k</i> are integer numbers. Strings that do not match this format are sorted alphabetically at the
  * end. <code>null</code> values are sorted at the very end.
- *
- * @author Thomas Jensen
  */
 public final class VersionComparator
     implements Comparator<String>, Serializable

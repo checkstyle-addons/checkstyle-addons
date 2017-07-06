@@ -34,8 +34,6 @@ import org.junit.Test;
 
 /**
  * Unit tests for the binary name handling features of {@link AbstractAddonsCheck}.
- *
- * @author Thomas Jensen
  */
 public class BinaryNameTest
     extends BaseCheckTestSupport

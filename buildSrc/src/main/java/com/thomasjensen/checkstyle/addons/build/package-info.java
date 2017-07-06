@@ -17,7 +17,5 @@
 
 /**
  * Types used by the Checkstyle Addons build.
- *
- * @author Thomas Jensen
  */
 package com.thomasjensen.checkstyle.addons.build;

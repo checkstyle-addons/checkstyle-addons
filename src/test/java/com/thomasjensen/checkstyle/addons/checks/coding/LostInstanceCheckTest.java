@@ -22,8 +22,6 @@ import org.junit.Test;
 
 /**
  * Unit test of {@link LostInstanceCheck}.
- *
- * @author Thomas Jensen
  */
 public class LostInstanceCheckTest
     extends BaseCheckTestSupport

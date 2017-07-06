@@ -25,8 +25,6 @@ import com.thomasjensen.checkstyle.addons.build.DependencyConfig;
 
 /**
  * Gradle task to create a sources JAR.
- *
- * @author Thomas Jensen
  */
 public class CreateJarSourcesTask
     extends AbstractAddonsJarTask

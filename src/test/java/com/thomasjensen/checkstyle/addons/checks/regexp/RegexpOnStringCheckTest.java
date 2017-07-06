@@ -22,8 +22,6 @@ import org.junit.Test;
 
 /**
  * Unit test of {@link RegexpOnStringCheck}.
- *
- * @author Thomas Jensen
  */
 public class RegexpOnStringCheckTest
     extends BaseCheckTestSupport

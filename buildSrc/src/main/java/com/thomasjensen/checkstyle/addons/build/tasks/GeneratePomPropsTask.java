@@ -34,8 +34,6 @@ import com.thomasjensen.checkstyle.addons.build.BuildUtil;
 
 /**
  * Gradle task to generate a 'pom.properties' file.
- *
- * @author Thomas Jensen
  */
 public class GeneratePomPropsTask
     extends DefaultTask

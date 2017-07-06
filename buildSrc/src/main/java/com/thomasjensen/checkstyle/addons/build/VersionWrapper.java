@@ -28,8 +28,6 @@ import org.gradle.api.Project;
 
 /**
  * Wrapper around our version.properties file.
- *
- * @author Thomas Jensen
  */
 public class VersionWrapper
 {

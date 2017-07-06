@@ -17,7 +17,5 @@
 
 /**
  * Generic helper classes for all checks.
- *
- * @author Thomas Jensen
  */
 package com.thomasjensen.checkstyle.addons.util;

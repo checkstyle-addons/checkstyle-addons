@@ -37,8 +37,6 @@ import com.puppycrawl.tools.checkstyle.api.TokenTypes;
 
 /**
  * Utility class.
- *
- * @author Thomas Jensen
  */
 public final class Util
 {

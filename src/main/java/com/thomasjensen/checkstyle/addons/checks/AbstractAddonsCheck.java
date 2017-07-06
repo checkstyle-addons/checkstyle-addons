@@ -40,8 +40,6 @@ import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 
 /**
  * Base class of all Checkstyle Addons checks.
- *
- * @author Thomas Jensen
  */
 @SuppressFBWarnings("ACEM_ABSTRACT_CLASS_EMPTY_METHODS")
 public abstract class AbstractAddonsCheck

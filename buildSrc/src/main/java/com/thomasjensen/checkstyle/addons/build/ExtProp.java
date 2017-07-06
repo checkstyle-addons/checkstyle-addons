@@ -20,8 +20,6 @@ import javax.annotation.Nonnull;
 
 /**
  * List of extra properties used in the Gradle project along with their descriptions.
- *
- * @author Thomas Jensen
  */
 public enum ExtProp
 {

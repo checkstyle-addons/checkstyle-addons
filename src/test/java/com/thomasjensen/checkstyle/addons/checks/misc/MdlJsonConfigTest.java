@@ -26,8 +26,6 @@ import org.junit.Test;
 
 /**
  * Unit tests of {@link MdlJsonConfig}.
- *
- * @author Thomas Jensen
  */
 public final class MdlJsonConfigTest
 {

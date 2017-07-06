@@ -22,8 +22,6 @@ import com.thomasjensen.checkstyle.addons.build.DependencyConfig;
 
 /**
  * Defines common methods for all Checkstyle Addons Gradle tasks.
- *
- * @author Thomas Jensen
  */
 public interface ConfigurableAddonsTask
 {

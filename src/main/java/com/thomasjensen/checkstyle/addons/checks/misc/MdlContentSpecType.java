@@ -20,8 +20,6 @@ package com.thomasjensen.checkstyle.addons.checks.misc;
 /**
  * The <code>type</code> values which are possible in the allow and deny lists of the <i>directories.json</i>
  * configuration file used by the {@link ModuleDirectoryLayoutCheck}.
- *
- * @author Thomas Jensen
  */
 public enum MdlContentSpecType
 {

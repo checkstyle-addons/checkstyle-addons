@@ -31,8 +31,6 @@ import com.thomasjensen.checkstyle.addons.BaseCheckTestSupport;
 
 /**
  * Unit tests of {@link Util}.
- *
- * @author Thomas Jensen
  */
 public class UtilTest
 {

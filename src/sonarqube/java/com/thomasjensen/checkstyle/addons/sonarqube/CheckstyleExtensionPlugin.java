@@ -23,8 +23,6 @@ import org.sonar.api.SonarPlugin;
 
 /**
  * The Checkstyle Addons SonarQube plugin main class.
- *
- * @author Thomas Jensen
  */
 public final class CheckstyleExtensionPlugin
     extends SonarPlugin

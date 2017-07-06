@@ -39,8 +39,6 @@ import net.jcip.annotations.Immutable;
  * compatible with a number of other Checkstyle runtimes, whose versions are listed in the dependency configuration.
  * Each dependency configuration may also modify some of the third party artifact versions that Checkstyle Addons
  * depends on.
- *
- * @author Thomas Jensen
  */
 @Immutable
 public final class DependencyConfig

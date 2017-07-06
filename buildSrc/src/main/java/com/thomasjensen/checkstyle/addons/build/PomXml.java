@@ -28,8 +28,6 @@ import net.jcip.annotations.Immutable;
 
 /**
  * The content of a pom.xml.
- *
- * @author Thomas Jensen
  */
 @XmlRootElement(name = "project")
 @SuppressWarnings("unused")

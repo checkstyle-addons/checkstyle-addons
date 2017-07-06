@@ -24,8 +24,6 @@ import net.jcip.annotations.Immutable;
 
 /**
  * The key in the {@link ClasspathBuilder}'s cache of detached configurations.
- *
- * @author Thomas Jensen
  */
 @Immutable
 public final class CacheKey

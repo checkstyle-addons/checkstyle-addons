@@ -40,8 +40,6 @@ import org.gradle.api.tasks.compile.JavaCompile;
  * configuration. The Checkstyle version used can sometimes be individually overridden. Any references to JAR
  * dependencies may also be altered if the given dependency configuration requires it.
  * <p>Internally, a cache of detached configurations is maintained in order to improve build performance.</p>
- *
- * @author Thomas Jensen
  */
 public class ClasspathBuilder
 {

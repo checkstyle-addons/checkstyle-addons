@@ -51,8 +51,6 @@ import com.thomasjensen.checkstyle.addons.util.Util;
  * This check helps to keep a property file in sync with a piece of code that contains the property keys.
  * <p><a href="http://checkstyle-addons.thomasjensen.com/latest/checks/misc.html#PropertyCatalog"
  * target="_blank">Documentation</a></p>
- *
- * @author Thomas Jensen
  */
 @SuppressWarnings("MethodDoesntCallSuperMethod")
 public class PropertyCatalogCheck

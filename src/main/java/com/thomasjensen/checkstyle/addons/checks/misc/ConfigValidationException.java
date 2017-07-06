@@ -19,8 +19,6 @@ package com.thomasjensen.checkstyle.addons.checks.misc;
 
 /**
  * The ModuleDirectoryLayout check's JSON configuration was faulty.
- *
- * @author Thomas Jensen
  */
 public class ConfigValidationException
     extends Exception

@@ -25,8 +25,6 @@ import org.gradle.internal.jvm.Jvm;
 
 /**
  * Handles property based configuration of older JDKs.
- *
- * @author Thomas Jensen
  */
 public class JavaLevelUtil
 {

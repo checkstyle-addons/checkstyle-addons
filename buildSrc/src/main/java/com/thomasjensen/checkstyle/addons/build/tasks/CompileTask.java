@@ -37,8 +37,6 @@ import com.thomasjensen.checkstyle.addons.build.TaskNames;
 
 /**
  * Compile the sources with the settings specified in the given dependency configuration.
- *
- * @author Thomas Jensen
  */
 public class CompileTask
     extends JavaCompile

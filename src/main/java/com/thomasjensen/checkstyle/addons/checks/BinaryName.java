@@ -31,8 +31,6 @@ import net.jcip.annotations.Immutable;
  * Represents a Java binary class name for reference types, in the form of its fragments. This is the only way to tell
  * the difference between a class called <code>A$B</code> and a class called <code>A</code> that has an inner class
  * <code>B</code>.
- *
- * @author Thomas Jensen
  */
 @Immutable
 public final class BinaryName

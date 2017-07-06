@@ -17,7 +17,5 @@
 
 /**
  * Checks that find miscellaneous problems.
- *
- * @author Thomas Jensen
  */
 package com.thomasjensen.checkstyle.addons.checks.misc;

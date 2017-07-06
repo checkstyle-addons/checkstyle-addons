@@ -22,8 +22,6 @@ import com.thomasjensen.checkstyle.addons.util.Util;
 
 /**
  * Represents the possible modes of operation for the {@link RegexpOnFilenameOrgCheck}.
- *
- * @author Thomas Jensen
  */
 public enum RegexpOnFilenameOrgOption
 {

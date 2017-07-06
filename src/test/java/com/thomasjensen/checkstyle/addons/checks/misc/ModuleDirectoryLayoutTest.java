@@ -36,8 +36,6 @@ import org.junit.Test;
 
 /**
  * Unit tests of {@link ModuleDirectoryLayoutCheck}.
- *
- * @author Thomas Jensen
  */
 public class ModuleDirectoryLayoutTest
     extends BaseFileSetCheckTestSupport

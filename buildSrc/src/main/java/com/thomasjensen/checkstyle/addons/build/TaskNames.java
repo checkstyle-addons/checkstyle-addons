@@ -23,8 +23,6 @@ import javax.annotation.Nonnull;
 /**
  * All tasks for which we create dependency configuration specific variants in Checkstyle Addons, along with factory
  * methods for concrete task names.
- *
- * @author Thomas Jensen
  */
 public enum TaskNames
 {

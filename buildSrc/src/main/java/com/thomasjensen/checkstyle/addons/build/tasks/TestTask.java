@@ -39,8 +39,6 @@ import com.thomasjensen.checkstyle.addons.build.TaskNames;
 
 /**
  * Execute the tests according to a given dependency configuration.
- *
- * @author Thomas Jensen
  */
 public class TestTask
     extends Test

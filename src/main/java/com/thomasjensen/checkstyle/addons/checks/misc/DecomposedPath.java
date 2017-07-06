@@ -27,8 +27,6 @@ import net.jcip.annotations.Immutable;
 
 /**
  * Encapsulates the components of a checked file path.
- *
- * @author Thomas Jensen
  */
 @Immutable
 public class DecomposedPath

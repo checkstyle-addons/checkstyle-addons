@@ -33,8 +33,6 @@ import com.thomasjensen.checkstyle.addons.util.Util;
 /**
  * Checks deriving from this type are aware of method calls occurring anywhere in the source, and get explicitly
  * notified when such calls are encountered. The full qualifier of the call is provided.
- *
- * @author Thomas Jensen
  */
 public abstract class AbstractMethodCallCheck
     extends AbstractAddonsCheck

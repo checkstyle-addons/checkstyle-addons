@@ -25,8 +25,6 @@ import net.jcip.annotations.Immutable;
 
 /**
  * Encapsulates the data gained from reading the JSON configuration file.
- *
- * @author Thomas Jensen
  */
 @Immutable
 public class MdlConfig

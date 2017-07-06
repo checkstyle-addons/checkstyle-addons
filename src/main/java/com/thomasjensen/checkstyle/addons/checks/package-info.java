@@ -16,7 +16,5 @@
  */
 /**
  * Common classes for all checks.
- *
- * @author Thomas Jensen
  */
 package com.thomasjensen.checkstyle.addons.checks;

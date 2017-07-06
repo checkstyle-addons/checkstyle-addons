@@ -31,8 +31,6 @@ import com.thomasjensen.checkstyle.addons.checks.AbstractMethodCallCheck;
  * to which the method belongs is not taken into account.
  * <p><a href="http://checkstyle-addons.thomasjensen.com/latest/checks/coding.html#IllegalMethodCall"
  * target="_blank">Documentation</a></p>
- *
- * @author Thomas Jensen
  */
 public class IllegalMethodCallCheck
     extends AbstractMethodCallCheck

@@ -30,8 +30,6 @@ import com.thomasjensen.checkstyle.addons.util.Util;
 
 /**
  * Unit test of {@link PropertyCatalogCheck}.
- *
- * @author Thomas Jensen
  */
 public class PropertyCatalogTest
     extends BaseCheckTestSupport

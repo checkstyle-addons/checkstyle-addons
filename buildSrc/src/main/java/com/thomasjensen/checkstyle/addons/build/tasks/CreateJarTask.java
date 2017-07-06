@@ -39,8 +39,6 @@ import com.thomasjensen.checkstyle.addons.build.TaskNames;
 
 /**
  * Gradle task to create the main binary JAR.
- *
- * @author Thomas Jensen
  */
 public class CreateJarTask
     extends AbstractAddonsJarTask

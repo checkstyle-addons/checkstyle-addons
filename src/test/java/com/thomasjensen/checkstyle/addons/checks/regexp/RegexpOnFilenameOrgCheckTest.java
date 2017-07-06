@@ -29,8 +29,6 @@ import org.junit.Test;
 
 /**
  * Unit test of {@link RegexpOnFilenameOrgCheck}.
- *
- * @author Thomas Jensen
  */
 public class RegexpOnFilenameOrgCheckTest
     extends BaseFileSetCheckTestSupport

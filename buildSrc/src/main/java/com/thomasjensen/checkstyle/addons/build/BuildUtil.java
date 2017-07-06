@@ -34,8 +34,6 @@ import org.gradle.api.tasks.bundling.Jar;
 
 /**
  * Utility class for use by the build.
- *
- * @author Thomas Jensen
  */
 public final class BuildUtil
 {

@@ -17,7 +17,5 @@
 
 /**
  * Checks that find coding problems.
- *
- * @author Thomas Jensen
  */
 package com.thomasjensen.checkstyle.addons.checks.coding;

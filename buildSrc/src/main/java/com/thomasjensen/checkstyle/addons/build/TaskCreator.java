@@ -55,8 +55,6 @@ import com.thomasjensen.checkstyle.addons.build.tasks.TestTask;
 
 /**
  * Creates and wires a whole bunch of Gradle tasks required by this complex build.
- *
- * @author Thomas Jensen
  */
 public class TaskCreator
 {

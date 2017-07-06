@@ -23,8 +23,6 @@ import com.thomasjensen.checkstyle.addons.BaseCheckTestSupport;
 
 /**
  * Unit tests for {@link LocationReferenceCheck}.
- *
- * @author Thomas Jensen
  */
 public class LocationReferenceTest
     extends BaseCheckTestSupport

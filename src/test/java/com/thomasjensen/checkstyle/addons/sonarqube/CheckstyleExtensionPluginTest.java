@@ -23,8 +23,6 @@ import org.junit.Test;
 
 /**
  * Unit test of {@link CheckstyleExtensionPlugin}.
- *
- * @author Thomas Jensen
  */
 public class CheckstyleExtensionPluginTest
 {

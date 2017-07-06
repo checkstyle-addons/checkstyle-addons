@@ -19,8 +19,6 @@ package com.thomasjensen.checkstyle.addons.checks.misc;
 
 /**
  * Defines a method that can be called for self-validation of an object.
- *
- * @author Thomas Jensen
  */
 public interface SelfValidating
 {

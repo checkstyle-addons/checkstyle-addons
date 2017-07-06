@@ -31,8 +31,6 @@ import com.thomasjensen.checkstyle.addons.util.Util;
 
 /**
  * Deserialized version of the <i>directories.json</i>.
- *
- * @author Thomas Jensen
  */
 public class MdlJsonConfig
     implements SelfValidating
@@ -50,8 +48,6 @@ public class MdlJsonConfig
 
     /**
      * Encapsulates the general settings which are supported in a <i>directories.json</i>.
-     *
-     * @author Thomas Jensen
      */
     public static class Settings
         implements SelfValidating
@@ -115,8 +111,6 @@ public class MdlJsonConfig
     /**
      * An MDL Spec specifies the characteristics of one directory in the module directory layout, for example
      * <tt>src/main/java</tt>.
-     *
-     * @author Thomas Jensen
      */
     public static class MdlSpec
         implements SelfValidating
@@ -200,8 +194,6 @@ public class MdlJsonConfig
 
     /**
      * The allow and deny lists in each MDL path specification are composed of elements of <code>SpecElement</code>s.
-     *
-     * @author Thomas Jensen
      */
     public static class SpecElement
         implements SelfValidating

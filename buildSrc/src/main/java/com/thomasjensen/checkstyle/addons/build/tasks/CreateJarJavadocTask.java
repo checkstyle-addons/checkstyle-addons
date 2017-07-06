@@ -25,8 +25,6 @@ import com.thomasjensen.checkstyle.addons.build.TaskNames;
 
 /**
  * Gradle task to create Javadoc JARs for publication.
- *
- * @author Thomas Jensen
  */
 public class CreateJarJavadocTask
     extends AbstractAddonsJarTask

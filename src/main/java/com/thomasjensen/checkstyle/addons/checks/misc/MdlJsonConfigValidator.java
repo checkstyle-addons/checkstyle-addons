@@ -28,8 +28,6 @@ import com.thomasjensen.checkstyle.addons.util.Util;
  * config.
  * <p>Call from command line: <code>java -cp checkstyle-addons-x.x.x-all.jar;checkstyle-7.0-all.jar
  * com.thomasjensen.checkstyle.addons.checks.misc.MdlJsonConfigValidator path/to/my-directories.json</code></p>
- *
- * @author Thomas Jensen
  */ // @formatter:on
 public final class MdlJsonConfigValidator
 {

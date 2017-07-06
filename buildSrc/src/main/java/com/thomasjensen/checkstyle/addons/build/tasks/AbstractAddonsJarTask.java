@@ -30,8 +30,6 @@ import com.thomasjensen.checkstyle.addons.build.BuildUtil;
 
 /**
  * Base class for our JAR creating tasks. Provides common functionality.
- *
- * @author Thomas Jensen
  */
 public abstract class AbstractAddonsJarTask
     extends Jar

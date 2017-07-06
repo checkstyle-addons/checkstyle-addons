@@ -31,8 +31,6 @@ import com.puppycrawl.tools.checkstyle.api.TokenTypes;
  * The public API of the Checkstyle tool changes frequently, and many releases of Checkstyle are incompatible with their
  * predecessors. This class uses reflection in order to allow the Checkstyle Addons code to work with all dependency
  * configurations. It simply provides a stable interface with workarounds for all supported Checkstyle versions.
- *
- * @author Thomas Jensen
  */
 public class CheckstyleApiFixer
 {

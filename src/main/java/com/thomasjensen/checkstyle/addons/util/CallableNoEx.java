@@ -23,7 +23,6 @@ import javax.annotation.Nonnull;
  * The same as {@link Callable}, but throws no checked exceptions.
  *
  * @param <R> type of the result
- * @author Thomas Jensen
  */
 public interface CallableNoEx<R>
     extends Callable<R>

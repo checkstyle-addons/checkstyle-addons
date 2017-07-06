@@ -42,8 +42,6 @@ import com.thomasjensen.checkstyle.addons.util.Util;
  * This check helps ensure that the source folder structure in a module follows a configurable convention. <p><a
  * href="http://checkstyle-addons.thomasjensen.com/latest/checks/misc.html#ModuleDirectoryLayout"
  * target="_blank">Documentation</a></p>
- *
- * @author Thomas Jensen
  */
 public class ModuleDirectoryLayoutCheck
     extends AbstractFileSetCheck

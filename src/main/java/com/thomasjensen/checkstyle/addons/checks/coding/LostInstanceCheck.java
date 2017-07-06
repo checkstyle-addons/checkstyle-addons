@@ -32,8 +32,6 @@ import com.thomasjensen.checkstyle.addons.checks.BinaryName;
  * assigned to a variable or passed as a parameter is enough. A full data flow analysis is not performed.
  * <p><a href="http://checkstyle-addons.thomasjensen.com/latest/checks/coding.html#LostInstance"
  * target="_blank">Documentation</a></p>
- *
- * @author Thomas Jensen
  */
 public class LostInstanceCheck
     extends AbstractAddonsCheck

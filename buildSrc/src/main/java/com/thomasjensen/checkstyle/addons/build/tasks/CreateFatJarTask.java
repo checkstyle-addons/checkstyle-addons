@@ -37,8 +37,6 @@ import com.thomasjensen.checkstyle.addons.build.TaskNames;
 
 /**
  * Gradle task to create a Checkstyle Addons FatJar.
- *
- * @author Thomas Jensen
  */
 public class CreateFatJarTask
     extends ShadowJar

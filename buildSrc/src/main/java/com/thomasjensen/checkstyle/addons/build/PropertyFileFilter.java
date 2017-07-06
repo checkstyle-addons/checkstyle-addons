@@ -22,8 +22,6 @@ import javax.annotation.Nonnull;
 
 /**
  * FilenameFilter which selects files that have a <code>.properties</code> extension.
- *
- * @author Thomas Jensen
  */
 public class PropertyFileFilter
     implements FilenameFilter

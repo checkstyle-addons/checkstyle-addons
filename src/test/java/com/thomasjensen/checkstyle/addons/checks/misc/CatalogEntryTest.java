@@ -27,8 +27,6 @@ import org.junit.Test;
 
 /**
  * Unit tests of {@link CatalogEntry}.
- *
- * @author Thomas Jensen
  */
 public class CatalogEntryTest
 {

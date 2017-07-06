@@ -40,8 +40,6 @@ import com.thomasjensen.checkstyle.addons.build.TaskNames;
 
 /**
  * Gradle task to produce the SonarQube plugin.
- *
- * @author Thomas Jensen
  */
 public class CreateJarSonarqubeTask
     extends AbstractAddonsJarTask

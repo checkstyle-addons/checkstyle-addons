@@ -46,8 +46,6 @@ import com.thomasjensen.checkstyle.addons.build.PomXml;
 
 /**
  * Gradle task to generate pom.xml files.
- *
- * @author Thomas Jensen
  */
 public class GeneratePomFileTask
     extends DefaultTask

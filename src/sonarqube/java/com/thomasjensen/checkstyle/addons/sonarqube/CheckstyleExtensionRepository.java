@@ -27,8 +27,6 @@ import org.sonar.api.rules.XMLRuleParser;
 
 /**
  * Container for the SonarQube rules provided by this plugin.
- *
- * @author Thomas Jensen
  */
 public final class CheckstyleExtensionRepository
     extends RuleRepository

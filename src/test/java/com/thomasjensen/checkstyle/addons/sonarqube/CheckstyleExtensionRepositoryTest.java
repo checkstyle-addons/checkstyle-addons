@@ -25,8 +25,6 @@ import org.sonar.api.rules.XMLRuleParser;
 
 /**
  * Unit test of {@link CheckstyleExtensionRepository}.
- *
- * @author Thomas Jensen
  */
 public class CheckstyleExtensionRepositoryTest
 {

@@ -35,8 +35,6 @@ import com.thomasjensen.checkstyle.addons.util.Util;
  * This check applies a regular expression to String literals found in the source. <p><a
  * href="http://checkstyle-addons.thomasjensen.com/latest/checks/regexp.html#RegexpOnString"
  * target="_blank">Documentation</a></p>
- *
- * @author Thomas Jensen
  */
 public class RegexpOnStringCheck
     extends AbstractAddonsCheck

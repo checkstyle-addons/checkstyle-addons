@@ -25,7 +25,6 @@ import net.jcip.annotations.Immutable;
  * Stores a syntactically valid property catalog entry extracted from the source file. Instances of this type are always
  * case sensitive.
  *
- * @author Thomas Jensen
  * @see PropertyCatalogCheck
  */
 @Immutable

@@ -22,8 +22,6 @@ import com.thomasjensen.checkstyle.addons.util.Util;
 
 /**
  * Represents the possible locations that an instance of the {@link LocationReferenceCheck} may refer to.
- *
- * @author Thomas Jensen
  */
 public enum LocationReferenceOption
 {

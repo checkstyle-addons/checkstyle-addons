@@ -45,8 +45,6 @@ import org.gradle.api.plugins.JavaPlugin;
 
 /**
  * Read all dependency configurations from 'project/dependencyConfigs' and make them available.
- *
- * @author Thomas Jensen
  */
 public class DependencyConfigs
 {

@@ -36,8 +36,6 @@ import com.thomasjensen.checkstyle.addons.build.TaskNames;
 
 /**
  * Create Javadoc for the given dependency configuration.
- *
- * @author Thomas Jensen
  */
 public class JavadocTask
     extends Javadoc
