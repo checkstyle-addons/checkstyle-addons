@@ -22,7 +22,7 @@ import javax.annotation.CheckForNull;
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 
-import com.puppycrawl.tools.checkstyle.api.Check;
+import com.puppycrawl.tools.checkstyle.api.AbstractCheck;
 import com.puppycrawl.tools.checkstyle.api.FileContents;
 import com.puppycrawl.tools.checkstyle.api.TokenTypes;
 
@@ -34,7 +34,7 @@ import com.puppycrawl.tools.checkstyle.api.TokenTypes;
  */
 public class CheckstyleApiFixer
 {
-    private final Check check;
+    private final AbstractCheck check;
 
     private final File currentFileNameMockFile;
 
@@ -45,7 +45,7 @@ public class CheckstyleApiFixer
      *
      * @param pCheck the check for which this instance of the API fixer shall run
      */
-    public CheckstyleApiFixer(@Nonnull final Check pCheck)
+    public CheckstyleApiFixer(@Nonnull final AbstractCheck pCheck)
     {
         this(pCheck, null);
     }
@@ -58,7 +58,7 @@ public class CheckstyleApiFixer
      * @param pCheck the check for which this instance of the API fixer shall run
      * @param pCurrentFileNameMockFile file to use as result of {@link #getCurrentFileName()} in unit tests
      */
-    public CheckstyleApiFixer(@Nonnull final Check pCheck, @Nullable final String pCurrentFileNameMockFile)
+    public CheckstyleApiFixer(@Nonnull final AbstractCheck pCheck, @Nullable final String pCurrentFileNameMockFile)
     {
         check = pCheck;
         currentFileNameMockFile = pCurrentFileNameMockFile != null ? new File(pCurrentFileNameMockFile) : null;

@@ -77,9 +77,6 @@ public class TestTask
         dependsOn(TaskNames.testClasses.getName(pDepConfig));
 
         configure(buildUtil.getExtraPropertyValue(ExtProp.TestConfigClosure));
-        if (JavaVersion.VERSION_1_6.equals(pDepConfig.getJavaLevel())) {
-            getTestLogging().setShowStandardStreams(false);
-        }
         setTestClassesDir(((JavaCompile) buildUtil.getTask(TaskNames.compileTestJava, pDepConfig)).getDestinationDir());
 
         if (baseCsVersion.equals(pCsVersion)) {

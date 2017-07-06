@@ -30,7 +30,7 @@ import javax.annotation.CheckForNull;
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 
-import com.puppycrawl.tools.checkstyle.api.Check;
+import com.puppycrawl.tools.checkstyle.api.AbstractCheck;
 import com.puppycrawl.tools.checkstyle.api.DetailAST;
 import com.puppycrawl.tools.checkstyle.api.TokenTypes;
 import com.thomasjensen.checkstyle.addons.util.CheckstyleApiFixer;
@@ -43,11 +43,11 @@ import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
  */
 @SuppressFBWarnings("ACEM_ABSTRACT_CLASS_EMPTY_METHODS")
 public abstract class AbstractAddonsCheck
-    extends Check
+    extends AbstractCheck
 {
-    private static final Set<Integer> TOKENS = Collections.unmodifiableSet(new HashSet<Integer>(Arrays.asList(
-        TokenTypes.PACKAGE_DEF, TokenTypes.ENUM_DEF, TokenTypes.CLASS_DEF, TokenTypes.INTERFACE_DEF,
-        TokenTypes.ANNOTATION_DEF)));
+    private static final Set<Integer> TOKENS = Collections.unmodifiableSet(new HashSet<Integer>(Arrays
+        .asList(TokenTypes.PACKAGE_DEF, TokenTypes.ENUM_DEF, TokenTypes.CLASS_DEF, TokenTypes.INTERFACE_DEF,
+            TokenTypes.ANNOTATION_DEF)));
 
     /** binary name of the outer (or only) class */
     private BinaryName iOuterClassName = null;
@@ -83,8 +83,17 @@ public abstract class AbstractAddonsCheck
 
 
 
+    /**
+     * The tokens which this check is interested in. Will be added to the tokens of the base class.
+     *
+     * @return the relevant tokens
+     */
+    public abstract Set<Integer> getRelevantTokens();
+
+
+
     @Override
-    public final int[] getDefaultTokens()
+    public final int[] getRequiredTokens()
     {
         final Set<Integer> tokens = new TreeSet<Integer>();
         tokens.addAll(TOKENS);
@@ -100,19 +109,18 @@ public abstract class AbstractAddonsCheck
 
 
 
-    /**
-     * The tokens which this check is interested in. Will be added to the tokens of the base class.
-     *
-     * @return the relevant tokens
-     */
-    public abstract Set<Integer> getRelevantTokens();
+    @Override
+    public final int[] getAcceptableTokens()
+    {
+        return getRequiredTokens();
+    }
 
 
 
     @Override
-    public int[] getRequiredTokens()
+    public final int[] getDefaultTokens()
     {
-        return getDefaultTokens();
+        return getRequiredTokens();
     }
 
 

@@ -48,6 +48,7 @@ import com.thomasjensen.checkstyle.addons.build.tasks.JavadocTask;
 import com.thomasjensen.checkstyle.addons.build.tasks.SiteTask;
 import org.ajoberstar.grgit.Grgit;
 import org.apache.tools.ant.filters.ReplaceTokens;
+import org.gradle.internal.jvm.Jvm;
 
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
@@ -59,7 +60,7 @@ description = 'Additional Checkstyle Checks';
 version = new VersionWrapper(project).toString();
 ClasspathBuilder.clearConfigCache();
 new JavaLevelUtil(project).analyzeJavaLevels();
-sourceCompatibility = JavaVersion.VERSION_1_6;
+sourceCompatibility = JavaVersion.VERSION_1_7;
 
 ext {
     // keep these in sync with the ExtProp enum
@@ -91,7 +92,7 @@ taskCreator.establishSonarQubeSourceSet();
 dependencies {
     compileOnly group: 'com.google.code.findbugs', name: 'annotations', version: '3.0.1';
     compileOnly group: 'com.google.code.findbugs', name: 'jsr305', version: '3.0.1';
-    compile group: 'com.puppycrawl.tools', name: 'checkstyle', version: '7.0';
+    compile group: 'com.puppycrawl.tools', name: 'checkstyle', version: '8.0';
     compile group: 'com.fasterxml.jackson.core', name: 'jackson-databind', version: '2.7.3';
 
     sonarqubeCompileOnly group: 'com.google.code.findbugs', name: 'annotations', version: '3.0.1';
@@ -124,8 +125,9 @@ ext {
             exceptionFormat 'full';
         }
         onOutput { final TestDescriptor descriptor, final TestOutputEvent event ->
-            if (descriptor.className != 'com.thomasjensen.checkstyle.addons.checks.misc.MdlJsonConfigValidatorTest' ||
-                    event.getDestination() == TestOutputEvent.Destination.StdErr) {
+            if ((Jvm.current().getJavaVersion() != JavaVersion.VERSION_1_6) &&
+                (descriptor.className != 'com.thomasjensen.checkstyle.addons.checks.misc.MdlJsonConfigValidatorTest' ||
+                    event.getDestination() == TestOutputEvent.Destination.StdErr)) {
                 logger.lifecycle(event.message);
             }
         }

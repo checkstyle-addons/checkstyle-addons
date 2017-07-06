@@ -11,17 +11,21 @@ before_install:
 #  - sudo update-alternatives --config java
   - ./gradlew clean
 
+# Update JDK8 to latest version available for Travis
+addons:
+  apt:
+    packages:
+      - oracle-java8-installer
+
 env:
   global:
-  - checkstyleaddons_jdk6_java=/usr/lib/jvm/java-6-openjdk-amd64/bin/java
-  - checkstyleaddons_jdk6_javac=/usr/lib/jvm/java-6-openjdk-amd64/bin/javac
-  - checkstyleaddons_jdk6_javadoc=/usr/lib/jvm/java-6-openjdk-amd64/bin/javadoc
   - checkstyleaddons_jdk7_java=/usr/lib/jvm/java-7-openjdk-amd64/bin/java
   - checkstyleaddons_jdk7_javac=/usr/lib/jvm/java-7-openjdk-amd64/bin/javac
   - checkstyleaddons_jdk7_javadoc=/usr/lib/jvm/java-7-openjdk-amd64/bin/javadoc
 
+install: true
 script:
-  - ./gradlew check xtest site
+  - ./gradlew build site
 
 after_success:
   - ./gradlew jacocoTestReport coveralls
