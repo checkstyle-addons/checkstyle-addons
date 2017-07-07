@@ -11,7 +11,7 @@ Here's how to use {{ site.name }} with your standard software.
 
 {{ site.name }} is distributed via [Maven Central]({{ site.link_mavencentral }}) and [Bintray jcenter]({{ site.link_bintray }}), so major build tools can automatically access it.
 
-{{ site.name }} is compatible with all Checkstyle versions starting from 6.0. That is because Checkstyle 5.9 and earlier were based on Java&nbsp;5, which is no longer available on our continuous integration platform, Travis CI.
+{{ site.name }} is compatible with all Checkstyle versions starting from 6.16.1. ({{ site.name }} v4.2.0 and earlier were also compatible with Checkstyle 6.0 - 6.15.)
 
 {{ site.name }} uses [semantic versioning](http://semver.org/){:target="_blank"}, so you can always use the latest within a major version, but you should try things out before moving to a higher major version.
 
@@ -21,7 +21,9 @@ Here's how to use {{ site.name }} with your standard software.
 
 ## Gradle
 
-{{ site.name }} is available on [Maven Central]({{ site.link_mavencentral }}) and [jcenter]({{ site.link_bintray }}), so you can just use it in your Gradle build. In Gradle, {{ site.name }} runs as part of the [Gradle Checkstyle Plugin](https://gradle.org/docs/current/userguide/checkstyle_plugin.html){:target="_blank"}. The classpath is extended to include {{ site.name }}. Note that the Checkstyle tool version must be specified.
+{{ site.name }} is available on [Maven Central]({{ site.link_mavencentral }}) and [jcenter]({{ site.link_bintray }}), so you can just use it in your Gradle build.
+In Gradle, {{ site.name }} runs as part of the [Gradle Checkstyle Plugin](https://gradle.org/docs/current/userguide/checkstyle_plugin.html){:target="_blank"}.
+The classpath is extended to include {{ site.name }}. Note that the Checkstyle tool version must be specified.
 
 {% highlight groovy %}
 plugins {
@@ -38,7 +40,9 @@ checkstyle {
 
 For the `checkstyle-addons` dependency, you may also use the version notation `version: '{{ site.latest_major }}.+'` in order to always get the latest compatible version.
 
-The example above has been tested with Checkstyle `toolVersion` set to 6.2 - {{ site.latest_checkstyle_tested }}. The older Checkstyle versions 6.0 - 6.1.1 are also supported, but if you set `toolVersion` to these, you must depend on `checkstyle-addons-java6` instead of `checkstyle-addons` (even if you use Java&nbsp;7 or higher).
+The example above has been tested with Checkstyle `toolVersion` set to 7.0 - {{ site.latest_checkstyle_tested }}. The Gradle build must use Java&nbsp;8.
+The older Checkstyle versions 6.16.1 - 6.19 which can run on Java&nbsp;7 are also supported, but if you set `toolVersion` to these,
+you must depend on `checkstyle-addons-java7` instead of `checkstyle-addons` (even if you use Java&nbsp;8 or higher).
 
 
 <!-- ======================================================================================= -->
@@ -46,7 +50,9 @@ The example above has been tested with Checkstyle `toolVersion` set to 6.2 - {{ 
 
 ## Maven
 
-{{ site.name }} is available on [Maven Central]({{ site.link_mavencentral }}), so you can just use it in your Maven build. In Maven, {{ site.name }} runs as part of the [Maven Checkstyle Plugin](https://maven.apache.org/plugins/maven-checkstyle-plugin/){:target="_blank"}. The classpath is extended to include {{ site.name }}. Note that the explicit dependency on Checkstyle itself must also be specified in order to set the correct Checkstyle version.
+{{ site.name }} is available on [Maven Central]({{ site.link_mavencentral }}), so you can just use it in your Maven build.
+In Maven, {{ site.name }} runs as part of the [Maven Checkstyle Plugin](https://maven.apache.org/plugins/maven-checkstyle-plugin/){:target="_blank"}.
+The classpath is extended to include {{ site.name }}. Note that the explicit dependency on Checkstyle itself must also be specified in order to set the correct Checkstyle version.
 
 {% highlight xml %}
 <project>
@@ -59,7 +65,7 @@ The example above has been tested with Checkstyle `toolVersion` set to 6.2 - {{ 
   <plugin>
     <groupId>org.apache.maven.plugins</groupId>
     <artifactId>maven-checkstyle-plugin</artifactId>
-    <version>2.16</version>
+    <version>2.17</version>
     <dependencies>
       <dependency>
         <groupId>com.puppycrawl.tools</groupId>
@@ -76,7 +82,9 @@ The example above has been tested with Checkstyle `toolVersion` set to 6.2 - {{ 
 </project>
 {% endhighlight %}
 
-The example above has been tested with the Checkstyle dependency set to 6.2 - {{ site.latest_checkstyle_tested }}. The older Checkstyle versions 6.0 - 6.1.1 are also supported, but if you use these, you must depend on `checkstyle-addons-java6` instead of `checkstyle-addons` (even if you use Java&nbsp;7 or higher).
+The example above has been tested with the Checkstyle dependency set to 7.0 - {{ site.latest_checkstyle_tested }}. Maven must run on Java&nbsp;8.
+The older Checkstyle versions 6.16.1 - 6.19 which can run on Java&nbsp;7 are also supported, but if you use these,
+you must depend on `checkstyle-addons-java7` instead of `checkstyle-addons` (even if you use Java&nbsp;8 or higher).
 
 
 <!-- ======================================================================================= -->
@@ -84,7 +92,8 @@ The example above has been tested with the Checkstyle dependency set to 6.2 - {{
 
 ## Ant
 
-In Ant, we must add {{ site.name }} to the classpath of the [Checkstyle Ant Task]({{ site.link_cs_anttask }}){:target="_blank"}. The Ant task is part of the standard Checkstyle distribution. We need **at least Checkstyle 6.2** (currently tested up to {{ site.latest_checkstyle_tested }}), and the {{ site.name }} FatJAR:
+In Ant, we must add {{ site.name }} to the classpath of the [Checkstyle Ant Task]({{ site.link_cs_anttask }}){:target="_blank"}.
+The Ant task is part of the standard Checkstyle distribution. We need **at least Checkstyle 7.0** (currently tested up to {{ site.latest_checkstyle_tested }}), and the {{ site.name }} FatJAR:
 
 <p><a href="https://github.com/{{ site.github }}/releases/download/v{{ site.latest_version }}/checkstyle-addons-{{ site.latest_version }}-all.jar" class="btn btn-primary">Download FatJAR</a></p>
 
@@ -114,6 +123,9 @@ The *checkstyletask.properties* is read from checkstyle-{{ site.latest_version_c
 
 For more information on Checkstyle Ant task configuration, please refer to its [website]({{ site.link_cs_anttask }}){:target="_blank"}.
 
+As with Maven and Gradle, you may use a Java&nbsp;7 compatible version of {{ site.name }} by using the `-java7` FatJAR
+([download](https://github.com/{{ site.github }}/releases/download/v{{ site.latest_version }}/checkstyle-addons-java7-{{ site.latest_version }}-all.jar)) and Checkstyle 6.16.1 -&nbsp;6.19.
+
 If you use Ivy for dependency management in Ant, you can take advantage of the fact that {{ site.name }} is on Maven Central.
 
 
@@ -134,9 +146,10 @@ After that, you can add {{ site.name }} to the third-party checks:
 
 Checkstyle-IDEA does not offer a visual editor, so you'll have to activate the {{ site.name }} checks by modifying your *checkstyle.xml* directly.
 
-The {{ site.name }} version offered by the above download button is compatible with Checkstyle 6.2 - {{ site.latest_checkstyle_tested }} (which means Checkstyle-IDEA 4.14.0 and up). If you are using the older Checkstyle versions 6.0 - 6.1.1, you must use a special, compatible version of {{ site.name }} instead:
+The {{ site.name }} version offered by the above download button is compatible with Checkstyle 7.0 - {{ site.latest_checkstyle_tested }} (which means Checkstyle-IDEA 4.30.0 and up).
+If you are using the older Checkstyle versions 6.16.1 - 6.19, you must use a special, compatible version of {{ site.name }} instead:
 
-<p><a href="https://github.com/{{ site.github }}/releases/download/v{{ site.latest_version }}/checkstyle-addons-java6-{{ site.latest_version }}-all.jar" class="btn btn-warning btn-sm">Download Legacy Plugin</a></p>
+<p><a href="https://github.com/{{ site.github }}/releases/download/v{{ site.latest_version }}/checkstyle-addons-java7-{{ site.latest_version }}-all.jar" class="btn btn-warning btn-sm">Download Legacy Plugin</a></p>
 
 
 <!-- ======================================================================================= -->
@@ -144,21 +157,26 @@ The {{ site.name }} version offered by the above download button is compatible w
 
 ## Eclipse
 
-In Eclipse, {{ site.name }} runs as an addon to [Eclipse-CS](http://eclipse-cs.sourceforge.net/){:target="_blank"}. So first make sure you've got Eclipse-CS [installed](http://eclipse-cs.sourceforge.net/#!/install){:target="_blank"} at version 6.2.0 or higher. (Eclipse-CS 6.1.x is also supported with the legacy plugin, see below.) Then:
+In Eclipse, {{ site.name }} runs as an addon to [Eclipse-CS](http://eclipse-cs.sourceforge.net/){:target="_blank"}.
+So first make sure you've got Eclipse-CS [installed](http://eclipse-cs.sourceforge.net/#!/install){:target="_blank"} at version 7.2.0 or higher.
+(Eclipse-CS 6.16.0 and 6.19.x are also supported with the legacy plugin, see below.) Then:
 
 <p><a href="https://github.com/{{ site.github }}/releases/download/v{{ site.latest_version }}/checkstyle-addons-eclipse-{{ site.latest_version }}.jar" class="btn btn-primary">Download Eclipse Plugin</a></p>
 
 **Installation:** Drop the downloaded plugin JAR into the *dropins* folder of your Eclipse installation and restart Eclipse.
 
-In order to verify that {{ site.name }} was installed correctly, open the Checkstyle configuration dialog and you should see a new module category named '{{ site.name }}'. {{ site.name }} fully supports the visual Checkstyle configuration editor of Eclipse-CS:
+In order to verify that {{ site.name }} was installed correctly, open the Checkstyle configuration dialog and you should see a new module category
+named '{{ site.name }}'. {{ site.name }} fully supports the visual Checkstyle configuration editor of Eclipse-CS:
 
 <div class="csa-largeImageWrapper">
 <img src="{{ site.baseurl }}/images/run-eclipse.png" alt="{{ site.name }} in Eclipse" width="549" height="368" />
 </div>
 
-The {{ site.name }} version offered by the above download button is compatible with Checkstyle 6.2 - {{ site.latest_checkstyle_tested }} (which means Eclipse-CS 6.2.0 and up). If you are using the older Checkstyle versions 6.0 - 6.1.1, you must use a special, compatible version of {{ site.name }} instead:
+The {{ site.name }} version offered by the above download button is compatible with Checkstyle 7.0 - {{ site.latest_checkstyle_tested }}
+(which means Eclipse-CS 7.2.0 and up). If you are using the older Checkstyle versions 6.16.1 - 6.19, you must use a special, compatible version of {{ site.name }} instead:
 
-<p><a href="https://github.com/{{ site.github }}/releases/download/v{{ site.latest_version }}/checkstyle-addons-java6-eclipse-{{ site.latest_version }}.jar" class="btn btn-warning btn-sm">Download Legacy Plugin</a></p>
+<p><a href="https://github.com/{{ site.github }}/releases/download/v{{ site.latest_version }}/checkstyle-addons-java7-eclipse-{{ site.latest_version }}.jar" class="btn btn-warning btn-sm">Download Legacy Plugin</a></p>
+
 
 <!-- ======================================================================================= -->
 <a name="run-sonarqube" class="csa-offset-anchor"/>
@@ -168,8 +186,11 @@ The {{ site.name }} version offered by the above download button is compatible w
 In [SonarQube]({{ site.link_sq_home }}){:target="_blank"}, {{ site.name }} runs as an extension of the SonarQube
 Checkstyle Plugin ([download]({{ site.link_sq_csplugin }}/releases),
 [legacy download](https://github.com/checkstyle-addons/sonar-checkstyle/releases)). {{ site.name }} currently supports
-the SonarQube Checkstyle Plugin versions 2.2 (<span style="color: #ffbc68;">orange column</span>) or later
-(<span style="color: #75ccf7;">blue columns</span>). Make sure your SonarQube installation is configured accordingly:
+the SonarQube Checkstyle Plugin versions 3.1 or later (<span style="color: #75ccf7;">blue columns</span>). Up to
+{{ site.name }} v4.2.0, the <span style="color: #bbbb00;">yellow columns</span> were also supported,
+and even the <span style="color: #ff5555;">red column</span> was supported with the
+[legacy plugin](https://github.com/{{ site.github }}/releases/download/v4.2.0/sonar-checkstyleaddons-4.2.0-csp2.2.jar).
+Make sure your SonarQube installation is configured accordingly:
 
 <div class="csa-largeImageWrapper">
 <table class="table table-striped csa-version-table" style="width:auto;">
@@ -179,18 +200,18 @@ the SonarQube Checkstyle Plugin versions 2.2 (<span style="color: #ffbc68;">oran
       <td>2.0</td>
       <td>2.1</td>
       <td>2.1.1</td>
-      <td class="orange"><b>2.2</b></td>
-      <td class="info"><b>2.3</b></td>
-      <td class="info"><b>2.4</b></td>
+      <td class="danger"><b>2.2</b></td>
+      <td class="warning"><b>2.3</b></td>
+      <td class="warning"><b>2.4</b></td>
       <td class="info"><b>3.1 - 3.3</b></td>
       <td class="info"><b>&ge;&nbsp;3.4</b></td>
     </tr>
     <tr>
       <td><a href="{{ site.link_sq_relupgradenotes }}" target="_blank">SonarQube Platform</a></td>
       <td>3.6 - 4.1.2</td>
-      <td colspan="3" class="orange" style="text-align:center;">4.2 - 4.4</td>
-      <td class="info">&ge;&nbsp;4.5.2</td>
-      <td class="info">&ge;&nbsp;4.5.2</td>
+      <td colspan="3" class="danger" style="text-align:center;">4.2 - 4.4</td>
+      <td class="warning">&ge;&nbsp;4.5.2</td>
+      <td class="warning">&ge;&nbsp;4.5.2</td>
       <td class="info">&ge;&nbsp;4.5.2</td>
       <td class="info">&ge;&nbsp;5.6.4</td>
     </tr>
@@ -199,9 +220,9 @@ the SonarQube Checkstyle Plugin versions 2.2 (<span style="color: #ffbc68;">oran
       <td>5.6</td>
       <td>5.6</td>
       <td>5.6</td>
-      <td class="orange">6.1</td>
-      <td class="info">6.4.1</td>
-      <td class="info">6.12.1</td>
+      <td class="danger">6.1</td>
+      <td class="warning">6.4.1</td>
+      <td class="warning">6.12.1</td>
       <td class="info">7.1 - 7.3</td>
       <td class="info">&ge;&nbsp;7.4</td>
     </tr>
@@ -210,9 +231,9 @@ the SonarQube Checkstyle Plugin versions 2.2 (<span style="color: #ffbc68;">oran
       <td>&ge; 6</td>
       <td>&ge; 6</td>
       <td>&ge; 6</td>
-      <td class="orange">&ge; 6</td>
-      <td class="info">&ge; 7</td>
-      <td class="info">&ge; 7</td>
+      <td class="danger">&ge; 6</td>
+      <td class="warning">&ge; 7</td>
+      <td class="warning">&ge; 7</td>
       <td class="info">&ge; 8</td>
       <td class="info">&ge; 8</td>
     </tr>
@@ -221,9 +242,9 @@ the SonarQube Checkstyle Plugin versions 2.2 (<span style="color: #ffbc68;">oran
       <td>&le; 7</td>
       <td>&le; 7</td>
       <td>&le; 7</td>
-      <td class="orange">&le; 8</td>
-      <td class="info">&le; 8</td>
-      <td class="info">&le; 8</td>
+      <td class="danger">&le; 8</td>
+      <td class="warning">&le; 8</td>
+      <td class="warning">&le; 8</td>
       <td class="info">&le; 8</td>
       <td class="info">&le; 8</td>
     </tr>
@@ -231,15 +252,15 @@ the SonarQube Checkstyle Plugin versions 2.2 (<span style="color: #ffbc68;">oran
 </table>
 </div>
 
-The Checkstyle version is directly determined by the version of the SonarQube Checkstyle plugin, so you don't need to check that explicitly. Starting with Checkstyle 7.1, the Checkstyle team release a matching SonarQube plugin every time.
-SonarQube 3.6 is the earliest version on which {{ site.name }} could possibly run, even if you built from source.
+The Checkstyle version is directly determined by the version of the SonarQube Checkstyle plugin, so you don't need to check that explicitly.
+Starting with Checkstyle 7.1, the Checkstyle team release a matching SonarQube plugin every time. (Let's hope they keep this up!)
 
 The SonarQube rules provided by {{ site.name }} are tagged with `checkstyle-addons`, which is useful to filter them from the overall list of Checkstyle rules.
 
-<p><a href="https://github.com/{{ site.github }}/releases/download/v{{ site.latest_version }}/sonar-checkstyleaddons-{{ site.latest_version }}.jar" class="btn btn-primary">Download SonarQube Plugin</a> &nbsp; &nbsp; &nbsp;
-<a href="https://github.com/{{ site.github }}/releases/download/v{{ site.latest_version }}/sonar-checkstyleaddons-{{ site.latest_version }}-csp2.2.jar" class="btn btn-warning btn-sm">Download SonarQube Plugin for 2.2</a></p>
+<p><a href="https://github.com/{{ site.github }}/releases/download/v{{ site.latest_version }}/sonar-checkstyleaddons-{{ site.latest_version }}.jar" class="btn btn-primary">Download SonarQube Plugin</a></p>
 
-**Installation:** Drop the downloaded plugin into the *extensions/plugins* folder of your SonarQube installation (where all the other plugins are). Double-check the version of the SonarQube Checkstyle plugin according to the above table. Upgrade that if necessary. Restart SonarQube.
+**Installation:** Drop the downloaded plugin into the *extensions/plugins* folder of your SonarQube installation (where all the other plugins are).
+Double-check the version of the SonarQube Checkstyle plugin according to the above table. Upgrade that if necessary. Restart SonarQube.
 
 
 <!-- ======================================================================================= -->
@@ -247,11 +268,13 @@ The SonarQube rules provided by {{ site.name }} are tagged with `checkstyle-addo
 
 ## Command Line
 
-Checkstyle can also be run [from the command line](http://checkstyle.sourceforge.net/cmdline.html){:target="_blank"}. {{ site.name }} is included by simply adding its FatJAR to the classpath.
-If you are using at least Java&nbsp;7, and at least Checkstyle 6.2 (tested up to {{ site.latest_checkstyle_tested }}), you may use the regular JAR. If you are using Checkstyle 6.0 - 6.1.1, you must use the legacy JAR. The code you're analyzing can be anything up to Java&nbsp;8.
+Checkstyle can also be run [from the command line](http://checkstyle.sourceforge.net/cmdline.html){:target="_blank"}.
+{{ site.name }} is included by simply adding its FatJAR to the classpath.
+If you are using at least Java&nbsp;8, and at least Checkstyle 7.0 (tested up to {{ site.latest_checkstyle_tested }}), you may use the regular JAR.
+If you are using Checkstyle 6.16.1 - 6.19, you must use the legacy JAR. The code you're analyzing can be anything up to Java&nbsp;8.
 
 <p><a href="https://github.com/{{ site.github }}/releases/download/v{{ site.latest_version }}/checkstyle-addons-{{ site.latest_version }}-all.jar" class="btn btn-primary">Download regular JAR</a> &nbsp; &nbsp; &nbsp;
-<a href="https://github.com/{{ site.github }}/releases/download/v{{ site.latest_version }}/checkstyle-addons-java6-{{ site.latest_version }}-all.jar" class="btn btn-warning btn-sm">Download legacy JAR</a></p>
+<a href="https://github.com/{{ site.github }}/releases/download/v{{ site.latest_version }}/checkstyle-addons-java7-{{ site.latest_version }}-all.jar" class="btn btn-warning btn-sm">Download legacy JAR</a></p>
 
 Now you can run Checkstyle with {{ site.name }} like this (example for regular JAR):
 
