@@ -31,6 +31,8 @@ but additional analysis of the commit history on GitHub has turned up further br
 
 <div class="checkpage"><dl>
 <dt class="title">Checkstyle</dt><dd class="title">– Breaking Change</dd>
+<dt>7.6</dt><dd>– set of acceptable tokens reduced in <i>IllegalTokenText</i> check
+(commit <a href="https://github.com/checkstyle/checkstyle/commit/cd88872f9db17c838641bcd32ad7f334893827c0">#cd88872</a>)</dd>
 <dt>6.12.1</dt><dd>– default value of property <code>processJavadoc</code> changed in <i>UnusedImports</i> check
 (commit <a href="https://github.com/checkstyle/checkstyle/commit/afbb944fe23b1be090ed69bfb97641be9dc2842c">#afbb944</a>,
 mentioned in release notes as "bug fix")</dd>
@@ -68,27 +70,39 @@ analysis of the commit history on GitHub has turned up further breaking changes:
 
 <div class="checkpage"><dl>
 <dt class="title">Checkstyle</dt><dd class="title">– Breaking Change</dd>
+<dt>7.7</dt><dd>– public method <code>excapeAllControlChars()</code> renamed to <code>escapeAllControlChars()</code> in <code>JavadocUtils</code>
+             (commit <a href="https://github.com/checkstyle/checkstyle/commit/3bd3a52280388520c64ec813dd1e4ffb3a0063a2">#3bd3a52</a>)</dd>
+<dt>7.6.1</dt><dd>– error handling changed / different exceptions thrown
+             (commit <a href="https://github.com/checkstyle/checkstyle/commit/ce21086e087661553f3a774c38362327ee88996a">#ce21086</a>)</dd>
 <dt>6.12</dt><dd>– public method renamed in utils/CheckUtils (commit <a href="https://github.com/checkstyle/checkstyle/commit/e2b4e687d7b8f9d6d5e1346d874b90e4567aff81">#e2b4e68</a>),
              exception handling changed in Checker (issue <a href="https://github.com/checkstyle/checkstyle/issues/2109">#2109</a>,
              commit <a href="https://github.com/checkstyle/checkstyle/commit/f020066f8bdfb378df36904af3df8b5bc48858fd">#f020066</a>)</dd>
-<dt>6.9</dt><dd>– public methods removed from api/JavadocTagInfo (commit <a href="https://github.com/checkstyle/checkstyle/commit/534536aa623b2f723daf95d9e43d31f1b2734906">#534536a</a>)</dd>
-<dt>6.6</dt><dd>– public method <code>getFilename()</code> renamed to <code>getFileName()</code> in api/FileContents (commit <a href="https://github.com/checkstyle/checkstyle/commit/7dd24c8c35572b5db3e5c905d440e813cfe2538c">#7dd24c8</a>)</dd>
-<dt>5.7</dt><dd>– signature of public method <code>fireErrors()</code> changed in api/MessageDispatcher (commit <a href="https://github.com/checkstyle/checkstyle/commit/1d614c3a7ecf8a3ede4df8a50da46e71792d0025">#1d614c3</a>)</dd>
+<dt>6.9</dt><dd>– public methods removed from api/JavadocTagInfo
+             (commit <a href="https://github.com/checkstyle/checkstyle/commit/534536aa623b2f723daf95d9e43d31f1b2734906">#534536a</a>)</dd>
+<dt>6.6</dt><dd>– public method <code>getFilename()</code> renamed to <code>getFileName()</code> in api/FileContents
+             (commit <a href="https://github.com/checkstyle/checkstyle/commit/7dd24c8c35572b5db3e5c905d440e813cfe2538c">#7dd24c8</a>)</dd>
+<dt>5.7</dt><dd>– signature of public method <code>fireErrors()</code> changed in api/MessageDispatcher
+             (commit <a href="https://github.com/checkstyle/checkstyle/commit/1d614c3a7ecf8a3ede4df8a50da46e71792d0025">#1d614c3</a>)</dd>
 </dl></div>
 
-This is not the complete list of undocumented breaking changes - only the first breaking change was confirmed, but more may exist. The breaking change may not affect your custom checks - if you don't make use of the changed part of the API.
+This is not the complete list of undocumented breaking changes - only the first breaking change was confirmed, but more may exist.
+The breaking change may not affect your custom checks - if you don't make use of the changed part of the API.
 
 <a name="e" class="csa-offset-anchor"/>
 
 ### E. Java Version used to run Checkstyle
 
-This is the Java version required by Checkstyle, i.e. the version of the JVM in which the Checkstyle process is running. It has nothing to do with the Java version of the code being analyzed. Java versions are backwards compatible, so only a minimum version is shown. The required Java version is clearly stated in the Checkstyle [release notes]({{ site.link_cs_releasenotes }}). Where that did not suffice, the class files of the binary distributions were used to obtain the minimum Java version.
+This is the Java version required by Checkstyle, i.e. the version of the JVM in which the Checkstyle process is running.
+It has nothing to do with the Java version of the code being analyzed. Java versions are backwards compatible, so only a minimum version is shown.
+The required Java version is clearly stated in the Checkstyle [release notes]({{ site.link_cs_releasenotes }}). Where that did not suffice,
+the class files of the binary distributions were used to obtain the minimum Java version.
 
 <a name="f" class="csa-offset-anchor"/>
 
 ### F. Java Version of the code being analyzed
 
-This is the Java version of the code being given to Checkstyle for analysis. Checkstyle must understand its grammar, so there is a maximum Java level for each Checkstyle version, which is clearly stated in the release notes.
+This is the Java version of the code being given to Checkstyle for analysis. Checkstyle must understand its grammar, so there is a
+maximum Java level for each Checkstyle version, which is clearly stated in the release notes.
 
 <a name="g" class="csa-offset-anchor"/>
 
@@ -110,7 +124,17 @@ Checkstyle-IDEA sometimes requires a more recent Java version than Checkstyle it
 
 <a name="j" class="csa-offset-anchor"/>
 
-### J. Maven Checkstyle Plugin
+### J. NetBeans Checkstyle
+
+The NetBeans IDE supports Checkstyle by way of the [Checkstyle Beans](http://plugins.netbeans.org/plugin/3413/checkstyle-beans) plugin.
+This plugin bundles a fixed Checkstyle version, which is updated every once in a while. The plugin consists of two JARs,
+of which the one called *netbeans-checkstyle-library-x.x.x.nbm* contains the bundled Checkstyle JAR in its netbeans/modules/autoload/ext folder.
+This is how the data for this column was gathered. The historical versions of the plugin are available from the plugin developer's
+[website](https://www.sickboy.cz/repository/cz/sickboy/netbeans-checkstyle/).
+
+<a name="k" class="csa-offset-anchor"/>
+
+### K. Maven Checkstyle Plugin
 
 For the [Maven Checkstyle Plugin](https://maven.apache.org/plugins/maven-checkstyle-plugin/), its POM files where analyzed as found on [Maven Central](http://search.maven.org/#search%7Cgav%7C1%7Cg%3A%22org.apache.maven.plugins%22%20AND%20a%3A%22maven-checkstyle-plugin%22). This column can have one of the following entries:
 
@@ -129,9 +153,9 @@ provide it via your own infrastructure.</dd>
 
 TODO We may have to improve on this data by actually trying the different combinations of Maven Plugin and Checkstyle versions, because breaking changes are introduced and may forbid specific combinations.
 
-<a name="k" class="csa-offset-anchor"/>
+<a name="l" class="csa-offset-anchor"/>
 
-### K. Gradle
+### L. Gradle
 
 In [Gradle](https://gradle.org/) 1.0, the Gradle Checkstyle plugin was created by extracting it out of the Code Quality
 plugin which existed in Gradle&nbsp;0.9. At the same time, the `toolVersion` property was introduced to the Gradle
@@ -143,44 +167,38 @@ Checkstyle 5.2 is the oldest version available there, so it is also the oldest y
 are willing to provide it via your own infrastructure. Because of this, the corresponding entries are set in parentheses.\\
 This data was gathered by GitHub source code analysis.
 
-<a name="l" class="csa-offset-anchor"/>
+<a name="m" class="csa-offset-anchor"/>
 
-### L. Gradle Checkstyle Plugin
+### M. Gradle Checkstyle Plugin
 
 This column shows which versions of Checkstyle are used as the default version by the [Gradle Checkstyle Plugin](https://docs.gradle.org/current/userguide/checkstyle_plugin.html). This information was gained by analyzing the [source code of the plugin](https://github.com/gradle/gradle/tree/REL_2.7/subprojects/code-quality/src/main/groovy/org/gradle/api/plugins/quality) on GitHub. The default version gets used when `toolVersion` is not set. A checkmark (✓) indicates that the Checkstyle version is available via `toolVersion`, but not by default. The bottom line is that one should *always* set `toolVersion`.\\
 Entries are set in parentheses when either the Checkstyle version is less than 5.2 (because then it is not available on Maven Central or Bintray jcenter), or the Gradle version is less than 1.0 (because then no Gradle Checkstyle plugin exists).
 
-<a name="m" class="csa-offset-anchor"/>
+<a name="n" class="csa-offset-anchor"/>
 
-### M. {{ site.name }}
+### N. {{ site.name }}
 
 {{ site.name }} features a build process that actually tries running the compiled checks against every single Checkstyle runtime ([example log file](https://travis-ci.org/{{ site.github }}/jobs/78284770#L353)). Since we have very [high test coverage](https://coveralls.io/builds/3457153), the fact that all unit tests complete successfully against a Checkstyle runtime is significant. {{ site.name }} also includes a reflection-based component that smoothes over the API differences between Checkstyle versions, so that we have full compatibility with almost every recent Checkstyle version.
 
-<a name="n" class="csa-offset-anchor"/>
+<a name="o" class="csa-offset-anchor"/>
 
-### N. SevNTU Checkstyle
+### O. SevNTU Checkstyle
 
 For [SevNTU Checkstyle](https://github.com/sevntu-checkstyle/sevntu.checkstyle), source versions are tagged on GitHub for versions 1.8.0 and upwards, so source archives are easily available for downloading. For versions down to 1.5.x, POM files could still be found with the [binaries](https://github.com/sevntu-checkstyle/sevntu.checkstyle/tree/gh-pages/maven2/com/github/sevntu/checkstyle/sevntu-checks) which give information on the Checkstyle version for which that version of SevNTU Checkstyle was built. For versions 1.8.0 and upwards, SevNTU Checkstyle is compiled and the unit tests are executed against the different Checkstyle runtimes. When all tests pass without errors, the versions are considered compatible. Versions declared in the POM files are *always* considered compatible (and proved to be so in the tests conducted). Compilation and tests for SevNTU Checkstyle versions 1.13.0 and upwards were performed with Java&nbsp;7, all previous versions were compiled and tested with Java&nbsp;6.\\
 Compatibility was analyzed based on the assumption that the full SevNTU Checkstyle feature set is required to work. In many cases, only a handful of tests were failing, so it may still be an option to use SevNTU Checkstyle with an incompatible version of Checkstyle, if the subset of SevNTU checks you are using work.\\
 Also, you may be able to set up the SevNTU checks in a separate job with a configuration file of its own. That second job would use a version of Checkstyle that is compatible with SevNTU Checkstyle (for example, v6.6).
 
-<a name="o" class="csa-offset-anchor"/>
+<a name="p" class="csa-offset-anchor"/>
 
-### O. SonarQube Checkstyle Plugin
+### P. SonarQube Checkstyle Plugin
 
 The [SonarQube Checkstyle Plugin]({{ site.link_sq_csplugin }}) lists the Checkstyle versions it uses on its website. The given version of Checkstyle is bundled with the plugin and cannot be changed. The plugin has a dependency on the SonarQube platform and the SonarQube Java plugin. Updates to this plugin are quite rare, so only a small number of Checkstyle versions are supported by SonarQube.
 
-<a name="p" class="csa-offset-anchor"/>
-
-### P. SonarQube Platform
-
-This column shows the version of the SonarQube platform (a.k.a. the SonarQube version) required to run the SonarQube Checkstyle plugin at the given version.
-
 <a name="q" class="csa-offset-anchor"/>
 
-### Q. SonarQube Java Plugin
+### Q. SonarQube Platform
 
-This column shows the version of the [SonarQube Java Plugin](http://docs.sonarqube.org/display/PLUG/Java+Plugin) required to run the SonarQube Checkstyle plugin at the given version. This was obtained by looking at the manifest.mf entry in the plugin's JAR file.
+This column shows the version of the SonarQube platform (a.k.a. the SonarQube version) required to run the SonarQube Checkstyle plugin at the given version.
 
 
 ### Jenkins / Bamboo
