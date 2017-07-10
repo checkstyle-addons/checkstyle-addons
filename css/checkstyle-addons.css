@@ -436,6 +436,7 @@ table.table-header-rotated-jb tr.javaLevel {
     border-top: 3px solid #888;
 }
 /* vertical groups by topic */
+table.table-header-rotated-jb tr > td:nth-child(2),  table.table-header-rotated-jb tr.subheading > th:nth-child(2),  table.table-header-rotated-jb th.rotate-45:nth-child(2) > div,
 table.table-header-rotated-jb tr > td:nth-child(7),  table.table-header-rotated-jb tr.subheading > th:nth-child(7),  table.table-header-rotated-jb th.rotate-45:nth-child(7) > div,
 table.table-header-rotated-jb tr > td:nth-child(11), table.table-header-rotated-jb tr.subheading > th:nth-child(11), table.table-header-rotated-jb th.rotate-45:nth-child(11) > div,
 table.table-header-rotated-jb tr > td:nth-child(14), table.table-header-rotated-jb tr.subheading > th:nth-child(14), table.table-header-rotated-jb th.rotate-45:nth-child(14) > div,
