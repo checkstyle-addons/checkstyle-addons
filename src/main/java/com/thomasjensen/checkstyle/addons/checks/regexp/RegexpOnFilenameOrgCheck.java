@@ -17,11 +17,13 @@ package com.thomasjensen.checkstyle.addons.checks.regexp;
 
 import java.io.File;
 import java.io.IOException;
+import java.util.Collections;
 import java.util.List;
 import java.util.Locale;
 import java.util.regex.Pattern;
 
 import com.puppycrawl.tools.checkstyle.api.AbstractFileSetCheck;
+import com.puppycrawl.tools.checkstyle.api.FileText;
 
 
 /**
@@ -122,5 +124,12 @@ public class RegexpOnFilenameOrgCheck
             // used. It is important to be accurate here in order to enable people to check results.
             log(0, msgKey, filePath, regexp.pattern());
         }
+    }
+
+
+
+    protected void processFiltered(final File pFile, final FileText pLines)
+    {
+        processFiltered(pFile, Collections.<String>emptyList());
     }
 }
