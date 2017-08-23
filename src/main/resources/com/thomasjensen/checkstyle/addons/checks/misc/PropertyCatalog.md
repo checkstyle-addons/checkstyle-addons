@@ -1,11 +1,13 @@
 ## PropertyCatalog
 
-The *PropertyCatalog* check helps to keep a property file in sync with a piece of code that contains the property keys. That piece of code is called the "property catalog", and may be:
+The *PropertyCatalog* check helps to keep a property file in sync with a piece of code that contains the property keys.
+That piece of code is called the "property catalog", and may be:
 
   - an enum, where each enum constant requires an entry in the property file, or
   - a class or even an interface with constants, where each constant requires an entry in the property file.
 
-The property catalog and the properties file are expected to be connected to each other by a configurable naming convention.
+The property catalog and the properties file are expected to be connected to each other by a configurable naming
+convention.
 
 ### Example
 
@@ -33,7 +35,8 @@ two = Could be anything
 three = These values do not matter for the check.
 {% endhighlight %}
 
-In this example, the property with key `one` is *orphaned*, because it is not referenced by the property catalog. It would be flagged along with the duplicate reference to `two`.
+In this example, the property with key `one` is *orphaned*, because it is not referenced by the property catalog. It
+would be flagged along with the duplicate reference to `two`.
 
 ### Other forms of property catalogs
 
@@ -67,14 +70,21 @@ public final class PropertyCatalog {
 
 The check roughly works like this:
 
-  1. Select the Java source files (called the *property catalogs*) to check. Only types which match the regular expression specified in `selection` are checked.
+  1. Select the Java source files (called the *property catalogs*) to check. Only types which match the regular
+     expression specified in `selection` are checked.
   1. The constants defined in the property catalog are read. Constants that match `excludedFields` are ignored.
   1. Using the template specified as `propertyFile`, the corresponding property file is located.
-  1. Then, keys from the property catalog are compared to keys in the property file. Warnings are logged if any problems are found.
+  1. Then, keys from the property catalog are compared to keys in the property file. Warnings are logged if any problems
+     are found.
 
-If the property catalog is a class or interface, the values of the defined constants are the property keys. If the property catalog is an enum, you can choose whether the enum constant itself shall be the key, or the first parameter passed to the enum constant's constructor (via `enumArgument`). In a class, private constants are never considered.
+If the property catalog is a class or interface, the values of the defined constants are the property keys. If the
+property catalog is an enum, you can choose whether the enum constant itself shall be the key, or the first parameter
+passed to the enum constant's constructor (via `enumArgument`). In a class, private constants are never considered.
 
-This check find duplicate keys in the Java code, but not in the property file. Use [UniqueProperties]({{ site.link_cs_check_uniqueprops }}) for that. It also does not help keep the translations of your property files in sync (e.g. file.properties, file_de.properties, file_fr.properties, etc.). Use [Translation]({{ site.link_cs_check_translation }}) for that, and configure this check only for one of the property files.
+This check find duplicate keys in the Java code, but not in the property file. Use [UniqueProperties]({{
+site.link_cs_check_uniqueprops }}) for that. It also does not help keep the translations of your property files in sync
+(e.g. file.properties, file_de.properties, file_fr.properties, etc.). Use [Translation]({{
+site.link_cs_check_translation }}) for that, and configure this check only for one of the property files.
 
 
 ### Properties
@@ -101,9 +111,9 @@ This check find duplicate keys in the Java code, but not in the property file. U
 
 <dt><span class="propname">enumArgument</span>
     <span class="proptype"><a href="{{ site.link_cs_type_boolean }}">Boolean</a></span></dt>
-<dd><span class="propdesc">Determines whether the property key shall be the enum constant itself (<code>false</code>), or
-        the first argument of the enum constant's constructor (<code>true</code>). When the property catalog is not an
-        enum, then this property is ignored.</span>
+<dd><span class="propdesc">Determines whether the property key shall be the enum constant itself (<code>false</code>),
+        or the first argument of the enum constant's constructor (<code>true</code>). When the property catalog is not
+        an enum, then this property is ignored.</span>
     <span class="propdefault"><code>false</code></span></dd>
 
 <dt><span class="propname">baseDir</span>
@@ -113,8 +123,9 @@ This check find duplicate keys in the Java code, but not in the property file. U
 
 <dt><span class="propname">propertyFile</span>
     <span class="proptype"><a href="{{ site.link_cs_type_string }}">String</a></span></dt>
-<dd><span class="propdesc">Template for the property file path. Relative paths are resolved against the <code>baseDir</code>. In this template, the following placeholders may be
-    used (examples are for <code>com.foo.Bar$Inner</code>):</span>
+<dd><span class="propdesc">Template for the property file path. Relative paths are resolved against the
+    <code>baseDir</code>. In this template, the following placeholders may be used (examples are for
+    <code>com.foo.Bar$Inner</code>):</span>
     <dl class="inner"><dt><code>{0}</code></dt>
         <dd>the original binary class name (<code>com.foo.Bar$Inner</code>)</dd>
         <dt><code>{1}</code></dt>
@@ -132,15 +143,21 @@ This check find duplicate keys in the Java code, but not in the property file. U
         <dt><code>{7}</code></dt>
         <dd>simple name of the inner class (<code>Inner</code>)</dd>
         <dt><code>{8}</code></dt>
-        <dd>simple name of the first subdirectory below the <code>baseDir</code> on the path to the message catalog (<code>subdir1</code>). This placeholder, as well as <code>{9}</code> and <code>{10}</code> are useful if your project being analyzed consists of submodules.</dd>
+        <dd>simple name of the first subdirectory below the <code>baseDir</code> on the path to the message catalog
+            (<code>subdir1</code>). This placeholder, as well as <code>{9}</code> and <code>{10}</code> are useful if
+            your project being analyzed consists of submodules.</dd>
         <dt><code>{9}</code></dt>
         <dd>simple name of the next subdirectory on the path to the message catalog (<code>subdir2</code>)</dd>
         <dt><code>{10}</code></dt>
         <dd>simple name of the third subdirectory on the path to the message catalog (<code>subdir3</code>)</dd>
         <dt><code>{11}</code></dt>
-        <dd>This placeholder is special because it is dynamic. It is replaced by the empty String, <code>{8}/</code>, <code>{8}/{9}/</code>, and <code>{8}/{9}/{10}/</code> (in that order). Once the property file is found, the location is used. If not, the next variation is checked. This is useful when the same Checkstyle configuration is used for multiple projects with different structures.</dd>
+        <dd>This placeholder is special because it is dynamic. It is replaced by the empty String, <code>{8}/</code>,
+            <code>{8}/{9}/</code>, and <code>{8}/{9}/{10}/</code> (in that order). Once the property file is found, the
+            location is used. If not, the next variation is checked. This is useful when the same Checkstyle
+            configuration is used for multiple projects with different structures.</dd>
         <dt><code>{12}</code></dt>
-        <dd>the relative path fragment between the <code>baseDir</code> and the package directories (e.g. <code>module1/src/main/java</code>)</dd>
+        <dd>the relative path fragment between the <code>baseDir</code> and the package directories (e.g.
+            <code>module1/src/main/java</code>)</dd>
     </dl>
     <span class="propdefault">(not set)</span></dd>
 
@@ -164,12 +181,20 @@ This check find duplicate keys in the Java code, but not in the property file. U
 <dd><span class="propdesc">If <code>true</code>, the property keys are treated as case sensitive; if <code>false</code>,
         case is ignored.</span>
     <span class="propdefault"><code>true</code></span></dd>
+    
+<dt><span class="propname">fileExludes</span>
+    <span class="proptype"><a href="{{ site.link_cs_type_regexp }}">regular expression</a></span></dt>
+<dd><span class="propdesc">Files whose absolute path matches this regular expression are not checked.</span>
+    <span class="propdefault"><code>[\\/]\.idea[\\/](?:checkstyleidea\.tmp[\\/])?csi-\w+[\\/]</code> (temp files of the
+        Checkstyle plugin for IntelliJ IDEA)</span></dd>
 </dl>
 
 
 ### Examples
 
-In the following example, it is assumed that you have a naming convention which requires all property catalogs to have a type name that ends in `Catalog`. The corresponding property file is assumed to share the name of the Java file and reside in the same package, but under *src/main/resources*:
+In the following example, it is assumed that you have a naming convention which requires all property catalogs to have
+a type name that ends in `Catalog`. The corresponding property file is assumed to share the name of the Java file and
+reside in the same package, but under *src/main/resources*:
 
 {% highlight xml %}
 <module name="PropertyCatalog">
@@ -179,7 +204,10 @@ In the following example, it is assumed that you have a naming convention which 
 </module>
 {% endhighlight %}
 
-The above example is for Eclipse, where `${workspace_loc}` may be used to [refer](http://eclipse-cs.sourceforge.net/#!/properties) to the file system location of the current workspace. For SonarQube, you may use relative file paths. For the other environments, you may define a custom [module property]({{ site.link_cs_properties }}), which you dynamically set to the project directory. Example for Gradle:
+The above example is for Eclipse and IntelliJ, where `${workspace_loc}` may be used to
+[refer](http://eclipse-cs.sourceforge.net/#!/properties) to the file system location of the current workspace. For
+SonarQube, you may use relative file paths. For the other environments, you may define a custom [module property]({{
+site.link_cs_properties }}), which you dynamically set to the project directory. Example for Gradle:
 
 {% highlight groovy %}
 checkstyle {

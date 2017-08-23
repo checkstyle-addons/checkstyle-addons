@@ -110,6 +110,10 @@
         <property-metadata name="caseSensitive" datatype="Boolean" default-value="true">
             <description>%PropertyCatalog.caseSensitive</description>
         </property-metadata>
+        <property-metadata name="fileExludes" datatype="Regex"
+                default-value="[\\/]\.idea[\\/](?:checkstyleidea\.tmp[\\/])?csi-\w+[\\/]">
+            <description>%PropertyCatalog.fileExludes</description>
+        </property-metadata>
 
         <message-key key="propertycatalog.unclear.constant"/>
         <message-key key="propertycatalog.unclear.enumparam"/>

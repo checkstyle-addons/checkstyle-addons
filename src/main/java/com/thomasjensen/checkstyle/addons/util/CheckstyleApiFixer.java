@@ -102,10 +102,7 @@ public class CheckstyleApiFixer
             try {
                 filename = (String) getFilename.invoke(fileContents);
             }
-            catch (IllegalAccessException e) {
-                throw new UnsupportedOperationException("FileContents.getFilename()", e);
-            }
-            catch (InvocationTargetException e) {
+            catch (IllegalAccessException | InvocationTargetException e) {
                 throw new UnsupportedOperationException("FileContents.getFilename()", e);
             }
         }

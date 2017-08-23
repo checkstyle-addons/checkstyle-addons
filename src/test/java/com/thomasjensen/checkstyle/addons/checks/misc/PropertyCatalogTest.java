@@ -642,4 +642,22 @@ public class PropertyCatalogTest
         };
         verify(createChecker(checkConfig), filesToCheck, "doesNotMatter", new String[0]);
     }
+
+
+
+    @Test
+    public void testFileExclusion()
+        throws Exception
+    {
+        final DefaultConfiguration checkConfig = createCheckConfig(PropertyCatalogCheck.class);
+        checkConfig.addAttribute("selection", ".");
+        checkConfig.addAttribute("fileExludes", "InputPropertyCatalog14Missing");
+        checkConfig.addAttribute("propertyFile", getPath("misc/InputPropertyCatalog14-missing.properties"));
+
+        final File[] filesToCheck = new File[]{//
+            new File(getPath("misc/InputPropertyCatalog14.java")), //
+            new File(getPath("misc/InputPropertyCatalog14Missing.java")),   // has the error, but suppressed
+        };
+        verify(createChecker(checkConfig), filesToCheck, "doesNotMatter", new String[0]);
+    }
 }

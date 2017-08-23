@@ -48,7 +48,7 @@ import com.thomasjensen.checkstyle.addons.util.Util;
 
 
 /**
- * This check helps to keep a property file in sync with a piece of code that contains the property keys.
+ * This check helps keeping a property file in sync with a piece of code that contains the property keys.
  * <p><a href="http://checkstyle-addons.thomasjensen.com/latest/checks/misc.html#PropertyCatalog"
  * target="_blank">Documentation</a></p>
  */
@@ -58,16 +58,16 @@ public class PropertyCatalogCheck
 {
     /** AST tokens that we want to visit */
     private static final Set<Integer> TOKENS = Collections.unmodifiableSet(
-        new TreeSet<Integer>(Arrays.asList(TokenTypes.ENUM_CONSTANT_DEF, TokenTypes.VARIABLE_DEF)));
+        new TreeSet<>(Arrays.asList(TokenTypes.ENUM_CONSTANT_DEF, TokenTypes.VARIABLE_DEF)));
 
     /** speed up processing by skipping types which are not property catalogs */
-    private final Deque<Boolean> skipType = new LinkedList<Boolean>();
+    private final Deque<Boolean> skipType = new LinkedList<>();
 
     /**
      * Stack of sets of catalog entries found in the current source file. Each item on the stack is a list for the
      * currently active class; this is used for properly scoping nested inner classes.
      */
-    private final Deque<Set<CatalogEntry>> catalogEntries = new LinkedList<Set<CatalogEntry>>();
+    private final Deque<Set<CatalogEntry>> catalogEntries = new LinkedList<>();
 
     /** Maximum number of directory levels that may exist between the base directory and an individual module root */
     static final int NUM_SUBDIRS = 3;
@@ -78,6 +78,10 @@ public class PropertyCatalogCheck
 
     /** the base directory to be assumed for this check, usually the project's root directory */
     private File baseDir = Util.canonize(new File("."));
+
+    /** Files that match this pattern are ignored by this check */
+    private Pattern fileExludes = Pattern.compile(
+        "[\\\\/]\\.idea[\\\\/](?:checkstyleidea\\.tmp[\\\\/])?csi-\\w+[\\\\/]");
 
     /** Regexp that matches the Java sources which are property catalogs */
     private Pattern selection = Util.NEVER_MATCH;
@@ -147,7 +151,10 @@ public class PropertyCatalogCheck
     protected void visitKnownType(@Nonnull final BinaryName pBinaryClassName, @Nonnull final DetailAST pAst)
     {
         catalogEntries.push(new TreeSet<CatalogEntry>());
-        skipType.push(Boolean.valueOf(!isPropertyCatalog(pBinaryClassName)));
+        boolean isExcludedFile = fileExludes.matcher(
+            Util.canonize(getApiFixer().getCurrentFileName()).getAbsolutePath()).find();
+        boolean isPropertyCatalog = isPropertyCatalog(pBinaryClassName);
+        skipType.push(Boolean.valueOf(!isPropertyCatalog || isExcludedFile));
     }
 
 
@@ -544,6 +551,13 @@ public class PropertyCatalogCheck
     public void setBaseDir(final String pBaseDir)
     {
         baseDir = Util.canonize(new File(pBaseDir));
+    }
+
+
+
+    public void setFileExludes(final String pFileExludes)
+    {
+        fileExludes = Pattern.compile(pFileExludes);
     }
 
 
