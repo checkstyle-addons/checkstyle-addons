@@ -170,8 +170,8 @@ public enum TaskNames
      * Turn any String into a String that can be used in a Gradle entity name by replacing dots with underscores
      * and capitalizing the first character.
      *
-     * @param pRawString the raw String, for example {@code "6.4.1"} or {@code "java6"}
-     * @return the Gradle-compatible String, for example {@code "6_4_1"} or {@code "Java6"}
+     * @param pRawString the raw String, for example {@code "6.4.1"} or {@code "java7"}
+     * @return the Gradle-compatible String, for example {@code "6_4_1"} or {@code "Java7"}
      */
     private String gradlify(final String pRawString)
     {

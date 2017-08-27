@@ -58,7 +58,7 @@ public class DependencyConfigs
     private final File depConfigDir;
 
     /**
-     * map from dependency configuration names (e.g. {@code "default"}, or {@code "java6"}) to their corresponding
+     * map from dependency configuration names (e.g. {@code "default"}, or {@code "java7"}) to their corresponding
      * dependency configurations
      */
     private final SortedMap<String, DependencyConfig> depConfigs;
@@ -211,8 +211,7 @@ public class DependencyConfigs
             final DependencyConfig depConfig = loadDependencyConfig(depCfgFile);
 
             final JavaVersion myJavaLevel = depConfig.getJavaLevel();
-            if ((myJavaLevel.isJava6() && !javaLevelUtil.java6Configured()) || (myJavaLevel.isJava7() && !javaLevelUtil
-                .java7Configured())) {
+            if (myJavaLevel.isJava7() && !javaLevelUtil.java7Configured()) {
                 project.getLogger().warn(
                     "WARNING: Skipping dependency configuration file '" + depConfig.getConfigFile().getName()
                         + "' because of missing JDK" + myJavaLevel.getMajorVersion() + " compiler configuration.");

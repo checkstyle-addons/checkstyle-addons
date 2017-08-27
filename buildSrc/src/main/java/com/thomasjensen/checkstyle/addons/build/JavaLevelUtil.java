@@ -28,15 +28,6 @@ import org.gradle.internal.jvm.Jvm;
  */
 public class JavaLevelUtil
 {
-    /** Name of the system / project property pointing to the VM executable for Java&nbsp;6 */
-    public static final String JAVA6_VM_EXEC_PROPNAME = "checkstyleaddons_jdk6_java";
-
-    /** Name of the system / project property pointing to the Javadoc executable for Java&nbsp;6 */
-    public static final String JAVA6_JAVADOC_EXEC_PROPNAME = "checkstyleaddons_jdk6_javadoc";
-
-    /** Name of the system / project property pointing to the compiler executable for Java&nbsp;6 */
-    public static final String JAVA6_COMPILER_EXEC_PROPNAME = "checkstyleaddons_jdk6_javac";
-
     /** Name of the system / project property pointing to the VM executable for Java&nbsp;7 */
     public static final String JAVA7_VM_EXEC_PROPNAME = "checkstyleaddons_jdk7_java";
 
@@ -79,14 +70,6 @@ public class JavaLevelUtil
 
 
 
-    public boolean java6Configured()
-    {
-        return isPropertyPresent(JAVA6_VM_EXEC_PROPNAME) && isPropertyPresent(JAVA6_JAVADOC_EXEC_PROPNAME)
-            && isPropertyPresent(JAVA6_COMPILER_EXEC_PROPNAME);
-    }
-
-
-
     public boolean java7Configured()
     {
         return isPropertyPresent(JAVA7_VM_EXEC_PROPNAME) && isPropertyPresent(JAVA7_JAVADOC_EXEC_PROPNAME)
@@ -97,7 +80,7 @@ public class JavaLevelUtil
 
     public boolean isOlderSupportedJava(@Nonnull final JavaVersion pJavaLevel)
     {
-        return pJavaLevel.isJava6() || pJavaLevel.isJava7();
+        return pJavaLevel.isJava7();
     }
 
 
@@ -115,8 +98,7 @@ public class JavaLevelUtil
     public String getCompilerExecutable(@Nonnull final JavaVersion pJavaLevel)
     {
         assertKnownJavaLevel(pJavaLevel);
-        return getPropertyValue(
-            pJavaLevel == JavaVersion.VERSION_1_6 ? JAVA6_COMPILER_EXEC_PROPNAME : JAVA7_COMPILER_EXEC_PROPNAME);
+        return getPropertyValue(JAVA7_COMPILER_EXEC_PROPNAME);
     }
 
 
@@ -125,8 +107,7 @@ public class JavaLevelUtil
     public String getJavadocExecutable(@Nonnull final JavaVersion pJavaLevel)
     {
         assertKnownJavaLevel(pJavaLevel);
-        return getPropertyValue(
-            pJavaLevel == JavaVersion.VERSION_1_6 ? JAVA6_JAVADOC_EXEC_PROPNAME : JAVA7_JAVADOC_EXEC_PROPNAME);
+        return getPropertyValue(JAVA7_JAVADOC_EXEC_PROPNAME);
     }
 
 
@@ -135,8 +116,7 @@ public class JavaLevelUtil
     public String getJvmExecutable(@Nonnull final JavaVersion pJavaLevel)
     {
         assertKnownJavaLevel(pJavaLevel);
-        return getPropertyValue(
-            pJavaLevel == JavaVersion.VERSION_1_6 ? JAVA6_VM_EXEC_PROPNAME : JAVA7_VM_EXEC_PROPNAME);
+        return getPropertyValue(JAVA7_VM_EXEC_PROPNAME);
     }
 
 
@@ -145,7 +125,7 @@ public class JavaLevelUtil
     {
         final JavaVersion currentJava = Jvm.current().getJavaVersion();
         if (currentJava != JavaVersion.VERSION_1_8) {
-            if (currentJava.isJava9Compatible()) {
+            if (currentJava != null && currentJava.isJava9Compatible()) {
                 project.getLogger().warn(
                     "This project must be built with Java 8. You are using a newer version of Java (" + currentJava
                         + "), which will lead to undefined build results.");
@@ -153,11 +133,6 @@ public class JavaLevelUtil
             else {
                 throw new GradleException("Outdated Java version " + currentJava + ". Use at least Java 8.");
             }
-        }
-        if (!java6Configured()) {
-            project.getLogger().warn(
-                "WARNING: The properties for Java 6 support are not configured as system properties or"
-                    + " in your gradle.properties. Artifacts for Java 6 support will not be created.");
         }
         if (!java7Configured()) {
             project.getLogger().warn(

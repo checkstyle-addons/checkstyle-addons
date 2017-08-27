@@ -28,14 +28,13 @@ plugins {
     id 'idea';
     id 'maven-publish';
     id 'com.jfrog.bintray' version '1.2';
-    id 'org.ajoberstar.grgit' version '1.4.2';
+    id 'org.ajoberstar.grgit' version '2.0.0';
     id 'com.dorongold.task-tree' version '1.3';
 }
 
 repositories {
     jcenter()
 }
-
 
 import com.thomasjensen.checkstyle.addons.build.BuildUtil;
 import com.thomasjensen.checkstyle.addons.build.ClasspathBuilder;
@@ -48,7 +47,6 @@ import com.thomasjensen.checkstyle.addons.build.tasks.JavadocTask;
 import com.thomasjensen.checkstyle.addons.build.tasks.SiteTask;
 import org.ajoberstar.grgit.Grgit;
 import org.apache.tools.ant.filters.ReplaceTokens;
-import org.gradle.internal.jvm.Jvm;
 
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
@@ -76,7 +74,7 @@ ext {
     sqPackage = 'com/thomasjensen/checkstyle/addons/sonarqube';
     checksPackage = 'com/thomasjensen/checkstyle/addons/checks';
     website = 'http://checkstyle-addons.thomasjensen.com/';
-    gitRepo = Grgit.open(project.file('.'));
+    gitRepo = Grgit.open();
     gitHash = gitRepo.head().id;
     buildUtil = new BuildUtil(project);
 }
@@ -100,7 +98,7 @@ dependencies {
     sonarqubeCompile group: 'org.codehaus.sonar', name: 'sonar-plugin-api', version: '3.0';
     sonarqubeRuntime group: 'org.slf4j', name: 'slf4j-nop', version: '1.6.2';
 
-    testCompile group: 'junit', name: 'junit', version: '4.11';
+    testCompile group: 'junit', name: 'junit', version: '4.12';
 
     findbugs group: 'com.google.code.findbugs', name: 'findbugs', version: '3.0.1';
     findbugs group: 'com.mebigfatguy.fb-contrib', name: 'fb-contrib', version: '6.6.1';
@@ -125,9 +123,8 @@ ext {
             exceptionFormat 'full';
         }
         onOutput { final TestDescriptor descriptor, final TestOutputEvent event ->
-            if ((Jvm.current().getJavaVersion() != JavaVersion.VERSION_1_6) &&
-                (descriptor.className != 'com.thomasjensen.checkstyle.addons.checks.misc.MdlJsonConfigValidatorTest' ||
-                    event.getDestination() == TestOutputEvent.Destination.StdErr)) {
+            if (descriptor.className != 'com.thomasjensen.checkstyle.addons.checks.misc.MdlJsonConfigValidatorTest' ||
+                    event.getDestination() == TestOutputEvent.Destination.StdErr) {
                 logger.lifecycle(event.message);
             }
         }
