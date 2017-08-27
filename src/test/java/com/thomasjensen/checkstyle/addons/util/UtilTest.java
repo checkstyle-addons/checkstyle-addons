@@ -116,8 +116,8 @@ public class UtilTest
     @Test
     public void testUnion()
     {
-        Set<String> set1 = new HashSet<String>(Arrays.asList("a", "b", "c"));
-        Set<String> set2 = new HashSet<String>(Arrays.asList("c", "d", "e"));
+        Set<String> set1 = new HashSet<>(Arrays.asList("a", "b", "c"));
+        Set<String> set2 = new HashSet<>(Arrays.asList("c", "d", "e"));
         Set<String> union = Util.union(set1, set2);
         Assert.assertEquals(set1.size() + set2.size() - 1, union.size());
     }
@@ -127,7 +127,7 @@ public class UtilTest
     @Test
     public void testUnionNull()
     {
-        Set<String> someSet = new HashSet<String>(Arrays.asList("a", "b", "c"));
+        Set<String> someSet = new HashSet<>(Arrays.asList("a", "b", "c"));
         Set<String> union = Util.union(someSet, null);
         Assert.assertEquals(someSet, union);
 
