@@ -76,15 +76,18 @@ public class ClasspathBuilder
 
 
     /**
-     * Determine the directory where the dependency configuration specific compile tasks stores its compiled classes.
+     * Determine the directory where the dependency configuration specific compile tasks store their compiled classes.
+     * This can be just a single directory (the destination directory of teh Java compile task), or a file collection
+     * (the classes directories of the source set output).
      *
      * @param pSourceSet the source set
      * @param pDepConfig the dependency configuration whose classes dir we are interested in
      * @return the classes dir
      */
-    public File getClassesDir(@Nonnull final SourceSet pSourceSet, @Nonnull final DependencyConfig pDepConfig)
+    public FileCollection getClassesDirs(@Nonnull final SourceSet pSourceSet,
+        @Nonnull final DependencyConfig pDepConfig)
     {
-        File result = pSourceSet.getOutput().getClassesDir();
+        FileCollection result = pSourceSet.getOutput().getClassesDirs();
         if (!pDepConfig.isDefaultConfig()) {
             JavaCompile compileTask = null;
             if (SourceSet.MAIN_SOURCE_SET_NAME.equals(pSourceSet.getName())) {
@@ -99,7 +102,7 @@ public class ClasspathBuilder
             else {
                 throw new GradleException("unknown source set: " + pSourceSet.getName());
             }
-            result = compileTask.getDestinationDir();
+            result = project.files(compileTask.getDestinationDir());
         }
         return result;
     }
@@ -133,12 +136,12 @@ public class ClasspathBuilder
         @Nullable final String pCsVersionOverride, final boolean pIsTestRun, @Nonnull final SourceSet pSourceSet1,
         @Nullable final SourceSet... pOtherSourceSets)
     {
-        FileCollection cp = project.files(getClassesDir(pSourceSet1, pDepConfig),
-            pSourceSet1.getOutput().getResourcesDir());
+        FileCollection cp = getClassesDirs(pSourceSet1, pDepConfig).plus(
+            project.files(pSourceSet1.getOutput().getResourcesDir()));
         if (pOtherSourceSets != null && pOtherSourceSets.length > 0) {
             for (final SourceSet sourceSet : pOtherSourceSets) {
-                cp = cp.plus(
-                    project.files(getClassesDir(sourceSet, pDepConfig), sourceSet.getOutput().getResourcesDir()));
+                cp = cp.plus(getClassesDirs(sourceSet, pDepConfig)).plus(
+                    project.files(sourceSet.getOutput().getResourcesDir()));
             }
         }
 

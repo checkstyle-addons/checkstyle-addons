@@ -81,10 +81,7 @@ public class CompileTask
             options.getForkOptions().setExecutable(javaLevelUtil.getCompilerExecutable(javaLevel));
         }
 
-        final File sourceSetClassesDir = pSourceSetToCompile.getOutput().getClassesDir();
-        final File destDir = new File(sourceSetClassesDir.getParent(),
-            sourceSetClassesDir.getName() + Character.toUpperCase(pDepConfig.getName().charAt(0))
-            + pDepConfig.getName().substring(1));
+        final File destDir = calculateDestDirFromSourceSet(pSourceSetToCompile, pDepConfig.getName());
 
         setSource(pSourceSetToCompile.getJava());
         setDestinationDir(destDir);
@@ -107,5 +104,19 @@ public class CompileTask
             Task sqClassesTask = buildUtil.getTask(TaskNames.sonarqubeClasses, pDepConfig);
             dependsOn(mainClassesTask, sqClassesTask);
         }
+    }
+
+
+
+    @Nonnull
+    private File calculateDestDirFromSourceSet(@Nonnull final SourceSet pSourceSetToCompile,
+        @Nonnull final String pDepConfigName)
+    {
+        final FileCollection sourceSetClassesDirs = pSourceSetToCompile.getOutput().getClassesDirs();
+        final File firstSourceSetClassesDir = sourceSetClassesDirs.iterator().next();  // normally the one for 'java'
+        final File result = new File(firstSourceSetClassesDir.getParent(),
+            firstSourceSetClassesDir.getName() + Character.toUpperCase(pDepConfigName.charAt(0)) + pDepConfigName
+                .substring(1));
+        return result;
     }
 }

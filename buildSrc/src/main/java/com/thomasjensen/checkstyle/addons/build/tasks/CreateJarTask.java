@@ -107,7 +107,7 @@ public class CreateJarTask
         // Configuration of JAR file contents
         from(pomUsed);
         final SourceSet mainSourceSet = getBuildUtil().getSourceSet(SourceSet.MAIN_SOURCE_SET_NAME);
-        from(new ClasspathBuilder(project).getClassesDir(mainSourceSet, pDepConfig));
+        from(new ClasspathBuilder(project).getClassesDirs(mainSourceSet, pDepConfig));
         from(mainSourceSet.getOutput().getResourcesDir());
 
         exclude("download-guide.html",   //

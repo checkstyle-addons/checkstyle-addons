@@ -108,8 +108,8 @@ public class TaskCreator
         tasks.getByName(JavaPlugin.COMPILE_TEST_JAVA_TASK_NAME).dependsOn(
             tasks.getByName(sqSourceSet.getClassesTaskName()));
 
-        final FileCollection sqOutputs = project.files(sqSourceSet.getOutput().getClassesDir(),
-            sqSourceSet.getOutput().getResourcesDir());
+        final FileCollection sqOutputs = sqSourceSet.getOutput().getClassesDirs().plus(
+            project.files(sqSourceSet.getOutput().getResourcesDir()));
         testSourceSet.setCompileClasspath(testSourceSet.getCompileClasspath().plus(sqOutputs));
         testSourceSet.setRuntimeClasspath(testSourceSet.getRuntimeClasspath().plus(sqOutputs));
     }

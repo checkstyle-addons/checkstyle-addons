@@ -77,7 +77,8 @@ public class TestTask
         dependsOn(TaskNames.testClasses.getName(pDepConfig));
 
         configure(buildUtil.getExtraPropertyValue(ExtProp.TestConfigClosure));
-        setTestClassesDir(((JavaCompile) buildUtil.getTask(TaskNames.compileTestJava, pDepConfig)).getDestinationDir());
+        setTestClassesDirs(project.files(((JavaCompile) buildUtil.getTask(TaskNames.compileTestJava, pDepConfig))
+            .getDestinationDir()));
 
         if (baseCsVersion.equals(pCsVersion)) {
             project.getTasks().getByName(JavaBasePlugin.CHECK_TASK_NAME).dependsOn(this);
