@@ -16,6 +16,7 @@ package com.thomasjensen.checkstyle.addons.build;
  */
 
 import java.io.File;
+import java.util.Arrays;
 import java.util.Map;
 import javax.annotation.Nonnull;
 
@@ -23,6 +24,7 @@ import groovy.lang.Closure;
 import org.gradle.api.JavaVersion;
 import org.gradle.api.Project;
 import org.gradle.api.Task;
+import org.gradle.api.artifacts.Configuration;
 import org.gradle.api.artifacts.ConfigurationContainer;
 import org.gradle.api.file.FileCollection;
 import org.gradle.api.plugins.BasePlugin;
@@ -67,6 +69,9 @@ public class TaskCreator
     /** name of the task bundling all the xtest tasks */
     public static final String XTEST_TASK_NAME = "xtest";
 
+    /** name of the configuration for compileOnly dependencies which get added to all source sets */
+    public static final String GENERAL_COMPILE_ONLY_CONFIG_NAME = "generalCompileOnly";
+
     private final Project project;
 
     private final BuildUtil buildUtil;
@@ -95,14 +100,10 @@ public class TaskCreator
         final SourceSet testSourceSet = sourceSets.getByName(SourceSet.TEST_SOURCE_SET_NAME);
         final SourceSet sqSourceSet = sourceSets.create(BuildUtil.SONARQUBE_SOURCE_SET_NAME);
 
-        configs.getByName(testSourceSet.getCompileConfigurationName()).extendsFrom(
-            configs.getByName(sqSourceSet.getCompileConfigurationName()));
-        configs.getByName(testSourceSet.getCompileClasspathConfigurationName()).extendsFrom(
-            configs.getByName(sqSourceSet.getCompileClasspathConfigurationName()));
-        configs.getByName(testSourceSet.getCompileOnlyConfigurationName()).extendsFrom(
-            configs.getByName(sqSourceSet.getCompileOnlyConfigurationName()));
-        configs.getByName(testSourceSet.getRuntimeConfigurationName()).extendsFrom(
-            configs.getByName(sqSourceSet.getRuntimeConfigurationName()));
+        configs.getByName(testSourceSet.getImplementationConfigurationName()).extendsFrom(
+            configs.getByName(sqSourceSet.getImplementationConfigurationName()));
+        configs.getByName(testSourceSet.getRuntimeOnlyConfigurationName()).extendsFrom(
+            configs.getByName(sqSourceSet.getRuntimeOnlyConfigurationName()));
 
         final TaskContainer tasks = project.getTasks();
         tasks.getByName(JavaPlugin.COMPILE_TEST_JAVA_TASK_NAME).dependsOn(
@@ -116,16 +117,33 @@ public class TaskCreator
 
 
 
+    public void establishGeneralCompileOnlyCfg()
+    {
+        final JavaPluginConvention javaConvention = project.getConvention().getPlugin(JavaPluginConvention.class);
+        final SourceSetContainer sourceSets = javaConvention.getSourceSets();
+        final ConfigurationContainer configs = project.getConfigurations();
+
+        final Configuration generalCompileOnly = configs.create(GENERAL_COMPILE_ONLY_CONFIG_NAME);
+
+        Arrays.asList(SourceSet.MAIN_SOURCE_SET_NAME, BuildUtil.SONARQUBE_SOURCE_SET_NAME,
+            SourceSet.TEST_SOURCE_SET_NAME).forEach((@Nonnull final String pSourceSetName) -> {
+            final SourceSet sourceSet = sourceSets.getByName(pSourceSetName);
+            configs.getByName(sourceSet.getCompileOnlyConfigurationName()).extendsFrom(generalCompileOnly);
+        });
+    }
+
+
+
     public void setupBuildTasks(@Nonnull final DependencyConfig pDepConfig)
     {
         final TaskContainer tasks = project.getTasks();
 
         // compile, classes
-        setupBuildTasksForSourceSet(pDepConfig, SourceSet.MAIN_SOURCE_SET_NAME, TaskNames.compileJava,
+        setupCompileTaskForSourceSet(pDepConfig, SourceSet.MAIN_SOURCE_SET_NAME, TaskNames.compileJava,
             TaskNames.mainClasses);
-        setupBuildTasksForSourceSet(pDepConfig, BuildUtil.SONARQUBE_SOURCE_SET_NAME, TaskNames.compileSonarqubeJava,
+        setupCompileTaskForSourceSet(pDepConfig, BuildUtil.SONARQUBE_SOURCE_SET_NAME, TaskNames.compileSonarqubeJava,
             TaskNames.sonarqubeClasses);
-        setupBuildTasksForSourceSet(pDepConfig, SourceSet.TEST_SOURCE_SET_NAME, TaskNames.compileTestJava,
+        setupCompileTaskForSourceSet(pDepConfig, SourceSet.TEST_SOURCE_SET_NAME, TaskNames.compileTestJava,
             TaskNames.testClasses);
 
         // test
@@ -139,7 +157,7 @@ public class TaskCreator
 
 
 
-    private void setupBuildTasksForSourceSet(@Nonnull final DependencyConfig pDepConfig,
+    private void setupCompileTaskForSourceSet(@Nonnull final DependencyConfig pDepConfig,
         @Nonnull final String pSourceSetName, @Nonnull final TaskNames pCompileTaskName,
         @Nonnull final TaskNames pClassesTaskName)
     {

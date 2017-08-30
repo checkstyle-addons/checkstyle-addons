@@ -113,7 +113,7 @@ public class ClasspathBuilder
     {
         String result = pSourceSet.getCompileClasspathConfigurationName();
         if (pIsTestRun) {
-            result = pSourceSet.getRuntimeConfigurationName();
+            result = pSourceSet.getRuntimeClasspathConfigurationName();
         }
         return result;
     }
@@ -221,10 +221,11 @@ public class ClasspathBuilder
 
     public Configuration buildMainRuntimeConfiguration(@Nonnull final DependencyConfig pDepConfig)
     {
-        String runtimeConfigName = buildUtil.getSourceSet(SourceSet.MAIN_SOURCE_SET_NAME).getRuntimeConfigurationName();
-        Configuration result = project.getConfigurations().getByName(runtimeConfigName);
+        String runtimeCpConfigName = buildUtil.getSourceSet(SourceSet.MAIN_SOURCE_SET_NAME)
+            .getRuntimeClasspathConfigurationName();
+        Configuration result = project.getConfigurations().getByName(runtimeCpConfigName);
         if (!pDepConfig.isDefaultConfig()) {
-            result = getDetachedConfiguration(pDepConfig, null, runtimeConfigName);
+            result = getDetachedConfiguration(pDepConfig, null, runtimeCpConfigName);
         }
         return result;
     }

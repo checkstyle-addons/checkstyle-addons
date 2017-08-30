@@ -20,7 +20,7 @@ buildscript {
     }
 }
 plugins {
-    id 'java';
+    id 'java-library';
     id 'jacoco';
     id 'com.github.kt3k.coveralls' version '2.8.1';
     id 'checkstyle';
@@ -84,19 +84,19 @@ ext {
 
 final TaskCreator taskCreator = new TaskCreator(project);
 taskCreator.establishSonarQubeSourceSet();
+taskCreator.establishGeneralCompileOnlyCfg();
 
 dependencies {
-    compileOnly group: 'com.google.code.findbugs', name: 'annotations', version: '3.0.1';
-    compileOnly group: 'com.google.code.findbugs', name: 'jsr305', version: '3.0.1';
-    compile group: 'com.puppycrawl.tools', name: 'checkstyle', version: '8.0';
-    compile group: 'com.fasterxml.jackson.core', name: 'jackson-databind', version: '2.7.3';
+    generalCompileOnly group: 'com.google.code.findbugs', name: 'annotations', version: '3.0.1';
+    generalCompileOnly group: 'com.google.code.findbugs', name: 'jsr305', version: '3.0.1';
 
-    sonarqubeCompileOnly group: 'com.google.code.findbugs', name: 'annotations', version: '3.0.1';
-    sonarqubeCompileOnly group: 'com.google.code.findbugs', name: 'jsr305', version: '3.0.1';
-    sonarqubeCompile group: 'org.codehaus.sonar', name: 'sonar-plugin-api', version: '3.0';
-    sonarqubeRuntime group: 'org.slf4j', name: 'slf4j-nop', version: '1.6.2';
+    api group: 'com.puppycrawl.tools', name: 'checkstyle', version: '8.0';
+    api group: 'com.fasterxml.jackson.core', name: 'jackson-databind', version: '2.7.3';
 
-    testCompile group: 'junit', name: 'junit', version: '4.12';
+    sonarqubeImplementation group: 'org.codehaus.sonar', name: 'sonar-plugin-api', version: '3.0';
+    sonarqubeRuntimeOnly group: 'org.slf4j', name: 'slf4j-nop', version: '1.6.2';
+
+    testImplementation group: 'junit', name: 'junit', version: '4.12';
 
     findbugs group: 'com.google.code.findbugs', name: 'findbugs', version: '3.0.1';
     findbugs group: 'com.mebigfatguy.fb-contrib', name: 'fb-contrib', version: '6.6.1';
@@ -195,7 +195,7 @@ JavadocTask.configureJavadocTask((Javadoc) tasks.javadoc, (DependencyConfig) pro
 checkstyle {
     configFile file('project/checkstyle.xml');
     configProperties 'workspace_loc': project.projectDir;
-    toolVersion '7.1.2';    // depends on our checkstyle.xml; has nothing to do with the version used for building
+    toolVersion '7.1.2';    // depends on our checkstyle.xml; has nothing to do with the CS version used for building
     showViolations = true;
     ignoreFailures = false;
 }
@@ -222,8 +222,9 @@ jacocoTestReport {
     }
     sourceSets(sourceSets.main, sourceSets.sonarqube);
     doFirst {
-        classDirectories = fileTree(dir: sourceSets.main.output.classesDir).exclude(excludedClasses);
-        additionalClassDirs = fileTree(dir: sourceSets.sonarqube.output.classesDir);
+        setClassDirectories((FileCollection)
+            fileTree(dir: sourceSets.main.output.classesDirs.first()).exclude(excludedClasses));
+        additionalClassDirs = fileTree(dir: sourceSets.sonarqube.output.classesDirs.first());
     }
 }
 tasks.jacocoTestReport.dependsOn tasks.test;

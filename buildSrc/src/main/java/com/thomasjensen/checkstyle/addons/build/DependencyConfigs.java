@@ -168,9 +168,8 @@ public class DependencyConfigs
     private String getDefaultCheckstyleVersion()
     {
         String result = null;
-        final Configuration compileConfig = project.getConfigurations().getByName(
-            JavaPlugin.COMPILE_CONFIGURATION_NAME);
-        for (final Dependency dependency : compileConfig.getAllDependencies()) {
+        final Configuration apiConfig = project.getConfigurations().getByName(JavaPlugin.API_CONFIGURATION_NAME);
+        for (final Dependency dependency : apiConfig.getAllDependencies()) {
             if (DependencyConfig.CHECKSTYLE_GROUPID.equals(dependency.getGroup()) && "checkstyle".equals(
                 dependency.getName())) {
                 result = dependency.getVersion();
