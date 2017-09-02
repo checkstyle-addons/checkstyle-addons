@@ -35,7 +35,7 @@ latest_major: '5'
 # next line gives the Checkstyle version used by the default depconfig
 latest_version_checkstyle: '8.0'
 # next line is the highest Checkstyle version tested by the unit tests
-latest_checkstyle_tested: '8.1'
+latest_checkstyle_tested: '8.2'
 
 # links to external websites that are used in multiple places throughout the site
 link_bintray: 'https://bintray.com/checkstyle-addons/checkstyle-addons/checkstyle-addons/view'
