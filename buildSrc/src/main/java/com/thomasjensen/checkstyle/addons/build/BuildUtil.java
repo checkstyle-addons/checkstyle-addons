@@ -21,6 +21,7 @@ import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 
 import groovy.lang.Closure;
+import org.ajoberstar.grgit.Grgit;
 import org.gradle.api.GradleException;
 import org.gradle.api.Project;
 import org.gradle.api.Task;
@@ -212,5 +213,19 @@ public final class BuildUtil
                 return null;
             }
         });
+    }
+
+
+
+    /**
+     * Determine the git commit hash of the most recent commit in this repo.
+     *
+     * @return the hash
+     */
+    public String currentGitCommitHash()
+    {
+        try (Grgit gitRepo = Grgit.open()) {
+            return gitRepo.head().getId();
+        }
     }
 }
