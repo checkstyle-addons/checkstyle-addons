@@ -27,7 +27,7 @@ permalink: /:year/:month/:title
 #paginate: 10
 future: true
 
-exclude: ['README.md', 'LICENSE', '*.iml', 'build', 'gradle']
+exclude: ['README.md', 'LICENSE', '*.iml', 'build', 'gradle', 'out']
 
 # checkstyle-addons custom variables
 latest_version: '5.2.0'
