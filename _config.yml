@@ -30,7 +30,7 @@ future: true
 exclude: ['README.md', 'LICENSE', '*.iml', 'build', 'gradle']
 
 # checkstyle-addons custom variables
-latest_version: '5.1.0'
+latest_version: '5.2.0'
 latest_major: '5'
 # next line gives the Checkstyle version used by the default depconfig
 latest_version_checkstyle: '8.0'
