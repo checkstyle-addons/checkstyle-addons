@@ -391,11 +391,6 @@ table.table-header-rotated-jb th.broken:before{
 table.table-header-rotated-jb th.broken:after{
     content: ")";
 }
-
-table.table-header-rotated-jb tbody > tr:hover {
-    background-color: #def2fc;
-}
-
 table.table-header-rotated-jb tr.subheading > th, table.table-header-rotated-jb tr.subheading_bottom > td {
     padding: 1px 0;
     margin: 0;
@@ -404,7 +399,6 @@ table.table-header-rotated-jb tr.subheading > th, table.table-header-rotated-jb 
     text-align: center;
     border-right: 1px solid #dddddd;
     border-top: 0;
-    background-color: white;
 }
 table.table-header-rotated-jb tr.subheading_bottom  {
     border-top: 3px solid #888;
@@ -515,4 +509,16 @@ table.table-header-rotated-jb tr > th:first-child > div {
 }
 .footer a {
     color: inherit;
+}
+
+.csa-hilite-exceeded {
+    background-color: #5d8018;
+    color: white;
+}
+.csa-hilite-exceeded:after {
+    content: "(too many cells highlighted)";
+    color: #a7e62b;
+    display: block;
+    font-size: 8px;
+    font-weight: normal;
 }
