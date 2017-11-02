@@ -522,3 +522,26 @@ table.table-header-rotated-jb tr > th:first-child > div {
     font-size: 8px;
     font-weight: normal;
 }
+
+table.csa-bordered-table {
+    width: auto;
+    margin-bottom: 10px;
+}
+table.csa-bordered-table > thead > tr > th, table.csa-bordered-table > tbody > tr > td {
+    padding-right: 20px;
+}
+table.table-striped tr:nth-of-type(2n+1) code {
+    background-color: white;
+}
+table.csa-hilite-colors tr:nth-child(1) > td:nth-child(2) {
+    background-color: #f2dede;  /* bootstrap: danger */
+}
+table.csa-hilite-colors tr:nth-child(2) > td:nth-child(2) {
+    background-color: #fcf8e3;  /* bootstrap: warning */
+}
+table.csa-hilite-colors tr:nth-child(3) > td:nth-child(2) {
+    background-color: #d9edf7;  /* bootstrap: info */
+}
+table.csa-hilite-colors tr:nth-child(4) > td:nth-child(2) {
+    background-color: #dff0d8;  /* bootstrap: success */
+}
