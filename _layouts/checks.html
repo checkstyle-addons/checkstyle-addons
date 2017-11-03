@@ -10,8 +10,11 @@
 
 {% for checkfile in page.check_list %}
 {% capture includedMarkdown %}{% include {{ checkfile }} %}{% endcapture %}
-<a name="{{ checkfile | split:"/" | last | split:"." | first }}" class="csa-offset-anchor"></a>
-{{ includedMarkdown | markdownify }}
+{% capture checkname %}{{ checkfile | split:"/" | last | split:"." | first }}{% endcapture %}
+{% capture replstr %}<a name="{{ checkname }}-\2" class="csa-offset-anchor"></a>
+\1{% endcapture %}
+<a name="{{ checkname }}" class="csa-offset-anchor"></a>
+{{ includedMarkdown | markdownify | replace_regex: '(<h[345]) id="([^"]+)"', replstr }}
 {% endfor %}
 </div>
 
