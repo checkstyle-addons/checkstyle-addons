@@ -11,10 +11,20 @@
 {% for checkfile in page.check_list %}
 {% capture includedMarkdown %}{% include {{ checkfile }} %}{% endcapture %}
 {% capture checkname %}{{ checkfile | split:"/" | last | split:"." | first }}{% endcapture %}
-{% capture replstr %}<a name="{{ checkname }}-\2" class="csa-offset-anchor"></a>
-\1{% endcapture %}
+{% capture replstr1 %}<a name="{{ checkname }}-properties" class="csa-offset-anchor"></a>
+<h3>{% endcapture %}
+{% capture replstr2 %}<a name="{{ checkname }}-examples" class="csa-offset-anchor"></a>
+<h3>{% endcapture %}
+{% capture replstr3 %}<a name="{{ checkname }}-parent-module" class="csa-offset-anchor"></a>
+<h3>{% endcapture %}
+{% capture replstr4 %}<a name="{{ checkname }}-overview" class="csa-offset-anchor"></a>
+<h3>{% endcapture %}
 <a name="{{ checkname }}" class="csa-offset-anchor"></a>
-{{ includedMarkdown | markdownify | replace_regex: '(<h[345]) id="([^"]+)"', replstr }}
+{{ includedMarkdown | markdownify
+    | replace: '<h3 id="properties">', replstr1
+    | replace: '<h3 id="examples">', replstr2
+    | replace: '<h3 id="parent-module">', replstr3
+    | replace: '<h3 id="overview">', replstr4 }}
 {% endfor %}
 </div>
 
