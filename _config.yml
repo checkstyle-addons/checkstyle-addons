@@ -35,6 +35,7 @@ latest_version: '5.2.0'
 latest_major: '5'
 # next line gives the Checkstyle version used by the default depconfig
 latest_version_checkstyle: '8.0'
+latest_version_checkstyle_java7: '6.4.1'
 # next line is the highest Checkstyle version tested by the unit tests
 latest_checkstyle_tested: '8.4'
 
