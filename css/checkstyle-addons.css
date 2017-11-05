@@ -542,12 +542,12 @@ table.csa-hilite-colors tr:nth-child(4) > td:nth-child(2) {
 span.glyphicon-link {
     font-size: 0.66em;
 }
-.checkpage > h2 > a, .checkpage > h3 > a, .checkpage > h4 > a, .checkpage > h5 > a {
+h2 > a, h3 > a, h4 > a, h5 > a {
     display: none;
     margin-left: 0.5em;
     color: inherit;
 }
-.checkpage > h2:hover > a, .checkpage > h3:hover > a, .checkpage > h4:hover > a, .checkpage > h5:hover > a {
+h2:hover > a, h3:hover > a, h4:hover > a, h5:hover > a {
     display: inline;
     color: inherit;
 }

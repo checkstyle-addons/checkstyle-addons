@@ -5,21 +5,22 @@
 <h1>{{ page.check_category | capitalize }} <span class="version">{{ page.check_version }}</span></h1>
 
 {% capture headerName %}pages/checks/{{ page.check_category }}.md{% endcapture %}
+{% capture versionedPage %}{{ site.baseurl }}/{{ page.check_version }}/checks/{{ page.check_category }}.html{% endcapture %}
 {% capture headerMarkdown %}{% include {{ headerName }} %}{% endcapture %}
 {{ headerMarkdown | markdownify }}
 
 {% for checkfile in page.check_list %}
 {% capture includedMarkdown %}{% include {{ checkfile }} %}{% endcapture %}
 {% capture checkname %}{{ checkfile | split:"/" | last | split:"." | first }}{% endcapture %}
-{% capture replstr0 %}<a href="#{{ checkname }}"><span class="glyphicon glyphicon-link" aria-hidden="true"></span></a></h2>{% endcapture %}
+{% capture replstr0 %}<a href="{{ versionedPage }}#{{ checkname }}"><span class="glyphicon glyphicon-link" aria-hidden="true"></span></a></h2>{% endcapture %}
 {% capture replstr1 %}<a name="{{ checkname }}-properties" class="csa-offset-anchor"></a>
-<h3>Properties<a href="#{{ checkname }}-properties"><span class="glyphicon glyphicon-link" aria-hidden="true"></span></a>{% endcapture %}
+<h3>Properties<a href="{{ versionedPage }}#{{ checkname }}-properties"><span class="glyphicon glyphicon-link" aria-hidden="true"></span></a>{% endcapture %}
 {% capture replstr2 %}<a name="{{ checkname }}-examples" class="csa-offset-anchor"></a>
-<h3>Examples<a href="#{{ checkname }}-examples"><span class="glyphicon glyphicon-link" aria-hidden="true"></span></a>{% endcapture %}
+<h3>Examples<a href="{{ versionedPage }}#{{ checkname }}-examples"><span class="glyphicon glyphicon-link" aria-hidden="true"></span></a>{% endcapture %}
 {% capture replstr3 %}<a name="{{ checkname }}-parent-module" class="csa-offset-anchor"></a>
-<h3>Parent Module<a href="#{{ checkname }}-parent-module"><span class="glyphicon glyphicon-link" aria-hidden="true"></span></a>{% endcapture %}
+<h3>Parent Module<a href="{{ versionedPage }}#{{ checkname }}-parent-module"><span class="glyphicon glyphicon-link" aria-hidden="true"></span></a>{% endcapture %}
 {% capture replstr4 %}<a name="{{ checkname }}-overview" class="csa-offset-anchor"></a>
-<h3>Overview<a href="#{{ checkname }}-overview"><span class="glyphicon glyphicon-link" aria-hidden="true"></span></a>{% endcapture %}
+<h3>Overview<a href="{{ versionedPage }}#{{ checkname }}-overview"><span class="glyphicon glyphicon-link" aria-hidden="true"></span></a>{% endcapture %}
 <a name="{{ checkname }}" class="csa-offset-anchor"></a>
 {{ includedMarkdown | markdownify
     | replace: '</h2>', replstr0
