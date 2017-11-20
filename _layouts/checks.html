@@ -2,7 +2,7 @@
 
 <div class="checkpage">
 
-<h1>{{ page.check_category | capitalize }} <span class="version">{{ page.check_version }}</span></h1>
+<h1>{{ page.check_category | capitalize }} <small>{{ page.check_version }}</small></h1>
 
 {% capture headerName %}pages/checks/{{ page.check_category }}.md{% endcapture %}
 {% capture versionedPage %}{{ site.baseurl }}/{{ page.check_version }}/checks/{{ page.check_category }}.html{% endcapture %}
