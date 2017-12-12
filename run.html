@@ -94,12 +94,13 @@ The Ant task is part of the standard Checkstyle distribution. We need **at least
 
 <p><a href="https://github.com/{{ site.github }}/releases/download/v{{ site.latest_version }}/checkstyle-addons-{{ site.latest_version }}-all.jar" class="btn btn-primary">Download FatJAR</a></p>
 
-The FatJAR (some people say "UberJAR") is simply a JAR which includes {{ site.name }} along with all its dependencies except Checkstyle itself.
+The FatJAR (some people say "UberJAR") is simply a JAR which includes {{ site.name }} along with all its dependencies
+except Checkstyle itself.
 
 Then, in our Ant *build.xml*, we declare the Checkstyle task as follows:
 
 {% highlight xml %}
-<taskdef resource="checkstyletask.properties">
+<taskdef resource="com/puppycrawl/tools/checkstyle/ant/checkstyle-ant-task.properties">
     <classpath>
         <pathelement location="lib/checkstyle-{{ site.latest_version_checkstyle }}-all.jar"/>
         <pathelement location="lib/checkstyle-addons-{{ site.latest_version }}-all.jar"/>
@@ -107,7 +108,8 @@ Then, in our Ant *build.xml*, we declare the Checkstyle task as follows:
 </taskdef>
 {% endhighlight %}
 
-The *checkstyletask.properties* is read from checkstyle-{{ site.latest_version_checkstyle }}-all.jar. The call to the Checkstyle task is standard Ant:
+The *checkstyle-ant-task.properties* is read from checkstyle-{{ site.latest_version_checkstyle }}-all.jar. The call to
+the Checkstyle task is standard Ant:
 
 {% highlight xml %}
 <checkstyle config="/path/to/your-checkstyle.xml">
