@@ -5,7 +5,7 @@ description: Additional Checkstyle Checks
 
 # Plugins from the whitelist at https://github.com/github/pages-gem/blob/master/lib/github-pages/plugins.rb
 # enable emoticons
-gems:
+plugins:
   - jemoji
 
 # website address
