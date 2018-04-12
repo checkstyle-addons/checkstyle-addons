@@ -101,26 +101,38 @@ the class files of the binary distributions were used to obtain the minimum Java
 
 ### F. Java Version of the code being analyzed
 
-This is the Java version of the code being given to Checkstyle for analysis. Checkstyle must understand its grammar, so there is a
-maximum Java level for each Checkstyle version, which is clearly stated in the release notes.
+This is the Java version of the code being given to Checkstyle for analysis. This can normally be any Java level.
+For example, you can analyze a Java&nbsp;10 source file using Checkstyle 5.9, as long as you have a configuration
+file that matches Checkstyle 5.9.
 
 <a name="g" class="csa-offset-anchor"/>
 
 ### G. Checkstyle-IDEA
 
-The compatibility information was obtained by unpacking [each version](https://plugins.jetbrains.com/plugin/1065?pr=&showAllUpdates=true) of Checkstyle-IDEA and looking inside which version of Checkstyle it contained. As a cross-check, the [version history](https://github.com/jshiell/checkstyle-idea#version-history) of Checkstyle-IDEA was referenced.
+The compatibility information was obtained by unpacking
+[each version](https://plugins.jetbrains.com/plugin/1065?pr=&showAllUpdates=true) of Checkstyle-IDEA and looking
+inside which versions of Checkstyle it contained. As a cross-check, the
+[version history](https://github.com/jshiell/checkstyle-idea#version-history) of Checkstyle-IDEA was referenced.
 
 <a name="h" class="csa-offset-anchor"/>
 
 ### H. Java Version required by Checkstyle-IDEA
 
-Checkstyle-IDEA sometimes requires a more recent Java version than Checkstyle itself. Depending on the Checkstyle-IDEA version, it may be required to run IntelliJ IDEA at a particular Java level, which is given in this column. The information was obtained by looking inside the `org.infernus.idea.checkstyle.CheckStylePlugin` class file and reading the version number of the class file format.
+Checkstyle-IDEA sometimes requires a more recent Java version than Checkstyle itself. Depending on the Checkstyle-IDEA
+version, it may be required to run IntelliJ IDEA at a particular Java level, which is given in this column. The
+information was obtained by looking inside the `org.infernus.idea.checkstyle.CheckStylePlugin` class file and reading
+the version number of the class file format.
 
 <a name="i" class="csa-offset-anchor"/>
 
 ### I. Eclipse-CS
 
-[Eclipse-CS](http://eclipse-cs.sourceforge.net), the Checkstyle plugin for Eclipse, is very professionally managed. Its version numbers are synched to the Checkstyle version numbers, and every change is meticulously documented in its [release notes](http://eclipse-cs.sourceforge.net/#!/releasenotes). The required Java level is the same as for Checkstyle itself.
+[Eclipse-CS](http://eclipse-cs.sourceforge.net), the Checkstyle plugin for Eclipse, was very professionally
+managed by Lars Ködderitzsch. Its version numbers are synched to the Checkstyle version numbers, and every change
+is documented in its [release notes](http://eclipse-cs.sourceforge.net/#!/releasenotes). The required Java level is
+the same as for Checkstyle itself.\\
+In 2018, Lars decided to put the project into the hands of the core Checkstyle team, who are looking for a new
+maintainer.
 
 <a name="j" class="csa-offset-anchor"/>
 
@@ -184,9 +196,25 @@ Entries are set in parentheses when either the Checkstyle version is less than 5
 
 ### O. SevNTU Checkstyle
 
-For [SevNTU Checkstyle](https://github.com/sevntu-checkstyle/sevntu.checkstyle), source versions are tagged on GitHub for versions 1.8.0 and upwards, so source archives are easily available for downloading. For versions down to 1.5.x, POM files could still be found with the [binaries](https://github.com/sevntu-checkstyle/sevntu.checkstyle/tree/gh-pages/maven2/com/github/sevntu/checkstyle/sevntu-checks) which give information on the Checkstyle version for which that version of SevNTU Checkstyle was built. For versions 1.8.0 and upwards, SevNTU Checkstyle is compiled and the unit tests are executed against the different Checkstyle runtimes. When all tests pass without errors, the versions are considered compatible. Versions declared in the POM files are *always* considered compatible (and proved to be so in the tests conducted). Compilation and tests for SevNTU Checkstyle versions 1.13.0 and upwards were performed with Java&nbsp;7, all previous versions were compiled and tested with Java&nbsp;6.\\
-Compatibility was analyzed based on the assumption that the full SevNTU Checkstyle feature set is required to work. In many cases, only a handful of tests were failing, so it may still be an option to use SevNTU Checkstyle with an incompatible version of Checkstyle, if the subset of SevNTU checks you are using work.\\
-Also, you may be able to set up the SevNTU checks in a separate job with a configuration file of its own. That second job would use a version of Checkstyle that is compatible with SevNTU Checkstyle (for example, v6.6).
+For [SevNTU Checkstyle](https://github.com/sevntu-checkstyle/sevntu.checkstyle), source versions are tagged on GitHub
+for versions 1.8.0 and upwards, so source archives are easily available for downloading. For versions down to 1.5.x,
+POM files could still be found with the
+[binaries](https://github.com/sevntu-checkstyle/sevntu.checkstyle/tree/gh-pages/maven2/com/github/sevntu/checkstyle/sevntu-checks)
+which give information on the Checkstyle version for which that version of SevNTU Checkstyle was built.\\
+For versions 1.8.0 - 1.22.0, SevNTU Checkstyle was compiled and the unit tests were executed against the different
+Checkstyle runtimes in order to simply try if it works. When all tests passed without errors, the versions were
+considered compatible. Versions declared in the POM files were *always* considered compatible (and proved to be so
+in the tests conducted). Compilation and tests for SevNTU Checkstyle versions 1.13.0 and upwards were performed with
+Java&nbsp;7, all previous versions were compiled and tested with Java&nbsp;6. Compatibility was analyzed based on the
+assumption that the full SevNTU Checkstyle feature set is required to work. In many cases, only a handful of tests
+were failing, so it may still be an option to use SevNTU Checkstyle with an incompatible version of Checkstyle, if
+the subset of SevNTU checks you are using work.
+
+Starting with SevNTU version 1.23.0, this method of trying it out became too complex, because the correct class path
+is not easy to construct due to the convoluted nature of SevNTU dependencies. So we switched to simply providing the
+Checkstyle version against which a particular version of the SevNTU checks were built. This will miss a few working
+combinations (especially where the corresponding Checkstyle versions are compatible), but at least it's doable and
+we are sure the information is correct.
 
 <a name="p" class="csa-offset-anchor"/>
 
