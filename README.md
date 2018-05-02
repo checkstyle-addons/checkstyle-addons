@@ -7,10 +7,13 @@
 # Checkstyle Addons
 **Additional Checkstyle checks**
 
-[Checkstyle Addons](http://checkstyle-addons.thomasjensen.com/) provides [additional detectors](http://checkstyle-addons.thomasjensen.com/latest/checks/) for the [Checkstyle](http://checkstyle.sourceforge.net/) static code analysis tool for Java.  
-It [integrates](http://checkstyle-addons.thomasjensen.com/run.html) with a large number of standard software and is distributed through Bintray jcenter and Maven Central.
+[Checkstyle Addons](https://checkstyle-addons.thomasjensen.com/) provides
+[additional detectors](https://checkstyle-addons.thomasjensen.com/latest/checks/) for the
+[Checkstyle](http://checkstyle.sourceforge.net/) static code analysis tool for Java.\\
+It [integrates](https://checkstyle-addons.thomasjensen.com/run.html) with a large number of standard software
+and is distributed through Bintray jcenter and Maven Central.
 
-For more information, please visit [the website](http://checkstyle-addons.thomasjensen.com/).
+For more information, please visit [the website](https://checkstyle-addons.thomasjensen.com/).
 
 ### Status
 

@@ -205,7 +205,7 @@ reside in the same package, but under *src/main/resources*:
 {% endhighlight %}
 
 The above example is for Eclipse and IntelliJ, where `${workspace_loc}` may be used to
-[refer](http://eclipse-cs.sourceforge.net/#!/properties) to the file system location of the current workspace. For
+[refer](http://checkstyle.org/eclipse-cs/#!/properties) to the file system location of the current workspace. For
 SonarQube, you may use relative file paths. For the other environments, you may define a custom [module property]({{
 site.link_cs_properties }}), which you dynamically set to the project directory. Example for Gradle:
 

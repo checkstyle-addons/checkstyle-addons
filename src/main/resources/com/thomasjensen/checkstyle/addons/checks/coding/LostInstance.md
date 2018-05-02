@@ -1,6 +1,7 @@
 ## LostInstance
 
-Checks that object instances created explicitly with `new` are actually used for something. Just being assigned to a variable or passed as a parameter is enough. A full data flow analysis is not performed.
+Checks that object instances created explicitly with `new` are actually used for something. Just being assigned to a
+variable or passed as a parameter is enough. A full data flow analysis is not performed.
 
 This helps discover cases like the following:
 
@@ -16,9 +17,12 @@ if (x < 0)
     throw new IllegalArgumentException("x must be nonnegative");
 {% endhighlight %}
 
-The instance might have been created in order to make use of a constructor side effect, but such a case would be a bug in its own right.
+The instance might have been created in order to make use of a constructor side effect, but such a case would be a bug
+in its own right.
 
-This check was inspired by the FindBugs detector [RV_EXCEPTION_NOT_THROWN](http://findbugs.sourceforge.net/bugDescriptions.html#RV_EXCEPTION_NOT_THROWN). However, this check is not restricted to exceptions.
+This check was inspired by the SpotBugs detector
+[RV_EXCEPTION_NOT_THROWN](https://spotbugs.readthedocs.io/en/latest/bugDescriptions.html#rv-exception-created-and-dropped-rather-than-thrown-rv-exception-not-thrown).
+However, this check is not restricted to exceptions.
 
 
 ### Properties
