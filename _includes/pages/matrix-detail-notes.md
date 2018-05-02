@@ -127,9 +127,9 @@ the version number of the class file format.
 
 ### I. Eclipse-CS
 
-[Eclipse-CS](http://eclipse-cs.sourceforge.net), the Checkstyle plugin for Eclipse, was very professionally
+[Eclipse-CS](http://checkstyle.org/eclipse-cs/), the Checkstyle plugin for Eclipse, was very professionally
 managed by Lars Ködderitzsch. Its version numbers are synched to the Checkstyle version numbers, and every change
-is documented in its [release notes](http://eclipse-cs.sourceforge.net/#!/releasenotes). The required Java level is
+is documented in its [release notes](http://checkstyle.org/eclipse-cs/#!/releasenotes). The required Java level is
 the same as for Checkstyle itself.\\
 In 2018, Lars decided to put the project into the hands of the core Checkstyle team, who are looking for a new
 maintainer.
@@ -148,7 +148,10 @@ This is how the data for this column was gathered. The historical versions of th
 
 ### K. Maven Checkstyle Plugin
 
-For the [Maven Checkstyle Plugin](https://maven.apache.org/plugins/maven-checkstyle-plugin/), its POM files where analyzed as found on [Maven Central](http://search.maven.org/#search%7Cgav%7C1%7Cg%3A%22org.apache.maven.plugins%22%20AND%20a%3A%22maven-checkstyle-plugin%22). This column can have one of the following entries:
+For the [Maven Checkstyle Plugin](https://maven.apache.org/plugins/maven-checkstyle-plugin/), its POM files were
+analyzed as found on
+[Maven Central](http://search.maven.org/#search%7Cgav%7C1%7Cg%3A%22org.apache.maven.plugins%22%20AND%20a%3A%22maven-checkstyle-plugin%22).
+This column can have one of the following entries:
 
 <div class="checkpage"><dl>
 <dt class="title">Entry</dt><dd class="title">– Description</dd>
@@ -158,12 +161,13 @@ Be sure to choose the base version of the plugin to match your Java version (for
 In 2015, the Checkstyle team has started checking compatibility with the Maven Checkstyle Plugin in their build process, so it generally works well.</dd>
 <dt>2.15</dt><dd>– The version number of the Maven Checkstyle plugin which is configured to use this version of Checkstyle by default.
 This implies a checkmark (✓).</dd>
-<dt>(✓) <span style="font-weight: normal;">or</span> (2.4)</dt><dd>– This version of Checkstyle can be used, but it is not available on Maven Central, so you would have to
-provide it via your own infrastructure.</dd>
+<dt>(✓) <span style="font-weight: normal;">or</span> (2.4)</dt><dd>– This version of Checkstyle can be used, but it is
+not available on Maven Central, so you would have to provide it via your own infrastructure.</dd>
 <dt>--</dt><dd>– This version of Checkstyle cannot be used with Maven.</dd>
 </dl></div>
 
-TODO We may have to improve on this data by actually trying the different combinations of Maven Plugin and Checkstyle versions, because breaking changes are introduced and may forbid specific combinations.
+TODO We may have to improve on this data by actually trying the different combinations of Maven Plugin and Checkstyle
+versions, because breaking changes are introduced and may forbid specific combinations.
 
 <a name="l" class="csa-offset-anchor"/>
 
@@ -183,14 +187,26 @@ This data was gathered by GitHub source code analysis.
 
 ### M. Gradle Checkstyle Plugin
 
-This column shows which versions of Checkstyle are used as the default version by the [Gradle Checkstyle Plugin](https://docs.gradle.org/current/userguide/checkstyle_plugin.html). This information was gained by analyzing the [source code of the plugin](https://github.com/gradle/gradle/tree/REL_2.7/subprojects/code-quality/src/main/groovy/org/gradle/api/plugins/quality) on GitHub. The default version gets used when `toolVersion` is not set. A checkmark (✓) indicates that the Checkstyle version is available via `toolVersion`, but not by default. The bottom line is that one should *always* set `toolVersion`.\\
-Entries are set in parentheses when either the Checkstyle version is less than 5.2 (because then it is not available on Maven Central or Bintray jcenter), or the Gradle version is less than 1.0 (because then no Gradle Checkstyle plugin exists).
+This column shows which versions of Checkstyle are used as the default version by the
+[Gradle Checkstyle Plugin](https://docs.gradle.org/current/userguide/checkstyle_plugin.html). This information was
+gained by analyzing the [source code of the
+plugin](https://github.com/gradle/gradle/tree/REL_2.7/subprojects/code-quality/src/main/groovy/org/gradle/api/plugins/quality)
+on GitHub. The default version gets used when `toolVersion` is not set. A checkmark (✓) indicates that the Checkstyle
+version is available via `toolVersion`, but not by default. The bottom line is that one should *always* set
+`toolVersion`.\\
+Entries are set in parentheses when either the Checkstyle version is less than 5.2 (because then it is not available
+on Maven Central or Bintray jcenter), or the Gradle version is less than 1.0 (because then no Gradle Checkstyle plugin
+exists).
 
 <a name="n" class="csa-offset-anchor"/>
 
 ### N. {{ site.name }}
 
-{{ site.name }} features a build process that actually tries running the compiled checks against every single Checkstyle runtime ([example log file](https://travis-ci.org/{{ site.github }}/jobs/78284770#L353)). Since we have very [high test coverage](https://coveralls.io/builds/3457153), the fact that all unit tests complete successfully against a Checkstyle runtime is significant. {{ site.name }} also includes a reflection-based component that smoothes over the API differences between Checkstyle versions, so that we have full compatibility with almost every recent Checkstyle version.
+{{ site.name }} features a build process that actually tries running the compiled checks against every single Checkstyle
+runtime ([example log file](https://travis-ci.org/{{ site.github }}/jobs/78284770#L353)). Since we have very [high test
+coverage](https://coveralls.io/builds/3457153), the fact that all unit tests complete successfully against a Checkstyle
+runtime is significant. {{ site.name }} also includes a reflection-based component that smoothes over the API
+differences between Checkstyle versions, so that we have full compatibility with almost every recent Checkstyle version.
 
 <a name="o" class="csa-offset-anchor"/>
 
@@ -220,17 +236,21 @@ we are sure the information is correct.
 
 ### P. SonarQube Checkstyle Plugin
 
-The [SonarQube Checkstyle Plugin]({{ site.link_sq_csplugin }}) lists the Checkstyle versions it uses on its website. The given version of Checkstyle is bundled with the plugin and cannot be changed. The plugin has a dependency on the SonarQube platform and the SonarQube Java plugin. Updates to this plugin are quite rare, so only a small number of Checkstyle versions are supported by SonarQube.
+The [SonarQube Checkstyle Plugin]({{ site.link_sq_csplugin }}) lists the Checkstyle versions it uses on its website.
+The given version of Checkstyle is bundled with the plugin and cannot be changed. The plugin has a dependency on the
+SonarQube platform and the SonarQube Java plugin. Updates to this plugin are quite rare, so only a small number of
+Checkstyle versions are supported by SonarQube.
 
 <a name="q" class="csa-offset-anchor"/>
 
 ### Q. SonarQube Platform
 
-This column shows the version of the SonarQube platform (a.k.a. the SonarQube version) required to run the SonarQube Checkstyle plugin at the given version.
+This column shows the version of the SonarQube platform (a.k.a. the SonarQube version) required to run the SonarQube
+Checkstyle plugin at the given version.
 
 
 ### Jenkins / Bamboo
 
-Jenkins does not run Checkstyle, but parses the XML report generated by Checkstyle. Still, it needs to understand what it sees.
-It seems that the format of the XML report created by Checkstyle has been quite stable over time.
+Jenkins does not run Checkstyle, but parses the XML report generated by Checkstyle. Still, it needs to understand what
+it sees. It seems that the format of the XML report created by Checkstyle has been quite stable over time.
 A detailed analysis of Jenkins and Bamboo plugin compatibility may be added to this page in the future.

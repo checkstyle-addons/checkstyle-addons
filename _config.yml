@@ -9,7 +9,7 @@ plugins:
   - jemoji
 
 # website address
-url: http://checkstyle-addons.thomasjensen.com/
+url: https://checkstyle-addons.thomasjensen.com/
 
 # baseurl will often be '', but for a project page on gh-pages, it needs to
 # be the project name.
@@ -41,7 +41,7 @@ latest_checkstyle_tested: '8.9'
 
 # links to external websites that are used in multiple places throughout the site
 link_bintray: 'https://bintray.com/checkstyle-addons/checkstyle-addons/checkstyle-addons/view'
-link_mavencentral: 'http://search.maven.org/#search%7Cgav%7C1%7Cg%3Acom.thomasjensen.checkstyle.addons'
+link_mavencentral: 'https://search.maven.org/#search%7Cgav%7C1%7Cg%3Acom.thomasjensen.checkstyle.addons'
 
 link_cs_home: 'http://checkstyle.sourceforge.net/'
 link_cs_anttask: 'http://checkstyle.sourceforge.net/anttask.html'
@@ -58,6 +58,6 @@ link_cs_type_regexp: 'http://checkstyle.sourceforge.net/property_types.html#rege
 link_cs_type_string: 'http://checkstyle.sourceforge.net/property_types.html#string'
 link_cs_type_stringset: 'http://checkstyle.sourceforge.net/property_types.html#stringSet'
 
-link_sq_home: 'http://www.sonarqube.org/'
-link_sq_relupgradenotes: 'http://docs.sonarqube.org/display/SONAR/Upgrading#Upgrading-ReleaseUpgradeNotes'
+link_sq_home: 'https://www.sonarqube.org/'
+link_sq_relupgradenotes: 'https://docs.sonarqube.org/display/SONAR/Upgrading#Upgrading-ReleaseUpgradeNotes'
 link_sq_csplugin: 'https://github.com/checkstyle/sonar-checkstyle'
