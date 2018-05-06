@@ -37,7 +37,7 @@ public class IllegalMethodCallCheck
 {
     private Set<String> illegalMethodNames = null;
 
-    private Set<String> excludedQualifiers = new HashSet<String>();
+    private Set<String> excludedQualifiers = new HashSet<>();
 
 
 
@@ -79,7 +79,7 @@ public class IllegalMethodCallCheck
      */
     public void setIllegalMethodNames(final String... pIllegalMethodNames)
     {
-        final Set<String> methodNames = new HashSet<String>();
+        final Set<String> methodNames = new HashSet<>();
         Collections.addAll(methodNames, pIllegalMethodNames);
         illegalMethodNames = methodNames;
     }
@@ -93,7 +93,7 @@ public class IllegalMethodCallCheck
      */
     public void setExcludedQualifiers(final String... pExcludedQualifiers)
     {
-        final Set<String> newExclusions = new HashSet<String>();
+        final Set<String> newExclusions = new HashSet<>();
         Collections.addAll(newExclusions, pExcludedQualifiers);
         excludedQualifiers = newExclusions;
     }

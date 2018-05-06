@@ -33,9 +33,10 @@ import javax.annotation.Nullable;
 import com.puppycrawl.tools.checkstyle.api.AbstractCheck;
 import com.puppycrawl.tools.checkstyle.api.DetailAST;
 import com.puppycrawl.tools.checkstyle.api.TokenTypes;
+import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
+
 import com.thomasjensen.checkstyle.addons.util.CheckstyleApiFixer;
 import com.thomasjensen.checkstyle.addons.util.Util;
-import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 
 
 /**
@@ -45,7 +46,7 @@ import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 public abstract class AbstractAddonsCheck
     extends AbstractCheck
 {
-    private static final Set<Integer> TOKENS = Collections.unmodifiableSet(new HashSet<Integer>(Arrays
+    private static final Set<Integer> TOKENS = Collections.unmodifiableSet(new HashSet<>(Arrays
         .asList(TokenTypes.PACKAGE_DEF, TokenTypes.ENUM_DEF, TokenTypes.CLASS_DEF, TokenTypes.INTERFACE_DEF,
             TokenTypes.ANNOTATION_DEF)));
 
@@ -53,13 +54,13 @@ public abstract class AbstractAddonsCheck
     private BinaryName iOuterClassName = null;
 
     /** Map from binary class names to ASTs */
-    private final Map<BinaryName, DetailAST> iClassDeclarationPositions = new HashMap<BinaryName, DetailAST>();
+    private final Map<BinaryName, DetailAST> iClassDeclarationPositions = new HashMap<>();
 
     /** CLASS_DEF/IDENTs as encountered */
-    private final Deque<String> iClassDefStack = new LinkedList<String>();
+    private final Deque<String> iClassDefStack = new LinkedList<>();
 
     /** Encountered binary class names in the current Java file */
-    private final Deque<BinaryName> iBinaryNameStack = new LinkedList<BinaryName>();
+    private final Deque<BinaryName> iBinaryNameStack = new LinkedList<>();
 
     /** Package that the currently checked class resides in */
     private String iMyPackage = null;
@@ -95,7 +96,7 @@ public abstract class AbstractAddonsCheck
     @Override
     public final int[] getRequiredTokens()
     {
-        final Set<Integer> tokens = new TreeSet<Integer>();
+        final Set<Integer> tokens = new TreeSet<>();
         tokens.addAll(TOKENS);
         tokens.addAll(getRelevantTokens());
 
@@ -258,7 +259,7 @@ public abstract class AbstractAddonsCheck
         final String simpleName = Util.getFirstIdent(pAst);
         iClassDefStack.push(simpleName);
 
-        final List<String> names = new ArrayList<String>(iClassDefStack);
+        final List<String> names = new ArrayList<>(iClassDefStack);
         Collections.reverse(names);
         final BinaryName binaryName = new BinaryName(iMyPackage, names);
 

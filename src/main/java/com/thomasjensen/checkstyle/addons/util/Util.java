@@ -295,7 +295,7 @@ public final class Util
     @Nonnull
     public static <E> Set<E> union(@Nullable final Set<E> pColl1, @Nullable final Set<E> pColl2)
     {
-        final Set<E> result = new HashSet<E>();
+        final Set<E> result = new HashSet<>();
         if (pColl1 != null) {
             result.addAll(pColl1);
         }

@@ -251,7 +251,7 @@ public class LocationReferenceCheck
      */
     public void setMethodCalls(final String... pMethodCalls)
     {
-        final Set<String> newMethodCalls = new HashSet<String>();
+        final Set<String> newMethodCalls = new HashSet<>();
         Collections.addAll(newMethodCalls, pMethodCalls);
         methodCalls = Collections.unmodifiableSet(newMethodCalls);
     }
@@ -265,7 +265,7 @@ public class LocationReferenceCheck
      */
     public void setVariableNames(final String... pVariableNames)
     {
-        final Set<String> newVariableNames = new HashSet<String>();
+        final Set<String> newVariableNames = new HashSet<>();
         Collections.addAll(newVariableNames, pVariableNames);
         variableNames = Collections.unmodifiableSet(newVariableNames);
     }

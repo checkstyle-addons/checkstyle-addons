@@ -27,9 +27,10 @@ import javax.annotation.Nonnull;
 import com.puppycrawl.tools.checkstyle.DefaultConfiguration;
 import com.puppycrawl.tools.checkstyle.api.DetailAST;
 import com.puppycrawl.tools.checkstyle.api.TokenTypes;
-import com.thomasjensen.checkstyle.addons.BaseCheckTestSupport;
 import org.junit.Assert;
 import org.junit.Test;
+
+import com.thomasjensen.checkstyle.addons.BaseCheckTestSupport;
 
 
 /**
@@ -45,9 +46,9 @@ public class BinaryNameTest
     public static class Check
         extends AbstractAddonsCheck
     {
-        public static final List<BinaryName> FOUND_BINARY_NAMES = new ArrayList<BinaryName>();
+        public static final List<BinaryName> FOUND_BINARY_NAMES = new ArrayList<>();
 
-        private final Set<String> foundPositions = new HashSet<String>();
+        private final Set<String> foundPositions = new HashSet<>();
 
 
 

@@ -64,8 +64,8 @@ public class DecomposedPath
         mdlPath = pMdlPath;
         specificPath = pSpecificPath;
         simpleFilename = pSimpleFilename;
-        fileExtensions = Collections.unmodifiableSet(new HashSet<String>(pFileExtensions));
-        specificFolders = Collections.unmodifiableList(new ArrayList<String>(pSpecificFolders));
+        fileExtensions = Collections.unmodifiableSet(new HashSet<>(pFileExtensions));
+        specificFolders = Collections.unmodifiableList(new ArrayList<>(pSpecificFolders));
     }
 
 

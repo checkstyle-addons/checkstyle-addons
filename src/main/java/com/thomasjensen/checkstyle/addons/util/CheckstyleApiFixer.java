@@ -134,10 +134,7 @@ public class CheckstyleApiFixer
                 final Class<?> utilsClass = Class.forName("com.puppycrawl.tools.checkstyle.Utils");
                 getTokenName = utilsClass.getMethod("getTokenName", int.class);
             }
-            catch (ClassNotFoundException e1) {
-                throw new UnsupportedOperationException(usedClass + ".getTokenName()", e1);
-            }
-            catch (NoSuchMethodException e1) {
+            catch (ClassNotFoundException | NoSuchMethodException e1) {
                 throw new UnsupportedOperationException(usedClass + ".getTokenName()", e1);
             }
         }
@@ -146,10 +143,7 @@ public class CheckstyleApiFixer
         try {
             result = (String) getTokenName.invoke(null, pTokenId);
         }
-        catch (IllegalAccessException e) {
-            throw new UnsupportedOperationException(usedClass + ".getTokenName()", e);
-        }
-        catch (InvocationTargetException e) {
+        catch (IllegalAccessException | InvocationTargetException e) {
             throw new UnsupportedOperationException(usedClass + ".getTokenName()", e);
         }
         return result;

@@ -52,7 +52,7 @@ public final class BinaryName
     {
         pkg = pPkg;
 
-        List<String> nameList = new ArrayList<String>();
+        List<String> nameList = new ArrayList<>();
         if (pOuterCls != null) {
             nameList.add(pOuterCls);
         }
@@ -81,7 +81,7 @@ public final class BinaryName
         if (pClsNames.size() == 0) {
             throw new IllegalArgumentException("pClsNames is empty");
         }
-        cls = Collections.unmodifiableList(new ArrayList<String>(pClsNames));
+        cls = Collections.unmodifiableList(new ArrayList<>(pClsNames));
     }
 
 

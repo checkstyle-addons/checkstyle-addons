@@ -311,8 +311,8 @@ public class ModuleDirectoryLayoutCheck
         String mdlPath = null;
         String specificPath = null;
         String simpleFilename = null;
-        Set<String> fileExtensions = new HashSet<String>();
-        List<String> specificFolders = new ArrayList<String>();
+        Set<String> fileExtensions = new HashSet<>();
+        List<String> specificFolders = new ArrayList<>();
 
         if (!pFilePath.startsWith(baseDir.getPath())) {
             return null;

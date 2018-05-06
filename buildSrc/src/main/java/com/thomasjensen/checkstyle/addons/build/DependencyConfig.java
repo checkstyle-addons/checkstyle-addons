@@ -112,7 +112,7 @@ public final class DependencyConfig
         }
 
         name = pName;
-        SortedSet<String> ccv = new TreeSet<String>(new VersionComparator());
+        SortedSet<String> ccv = new TreeSet<>(new VersionComparator());
         ccv.addAll(pCompatibleCheckstyleVersions);
         compatibleCheckstyleVersions = Collections.unmodifiableSortedSet(ccv);
         javaLevel = pJavaLevel;

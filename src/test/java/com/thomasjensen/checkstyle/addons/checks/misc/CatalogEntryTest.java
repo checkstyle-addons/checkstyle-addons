@@ -30,7 +30,7 @@ import org.junit.Test;
  */
 public class CatalogEntryTest
 {
-    private static List<CatalogEntry> sTestData = new ArrayList<CatalogEntry>();
+    private static List<CatalogEntry> sTestData = new ArrayList<>();
 
 
 
@@ -64,7 +64,7 @@ public class CatalogEntryTest
     @Test
     public void testOrder()
     {
-        List<CatalogEntry> sorted = new ArrayList<CatalogEntry>(sTestData);
+        List<CatalogEntry> sorted = new ArrayList<>(sTestData);
         Collections.sort(sorted);
 
         Assert.assertEquals(sTestData.size(), sorted.size());

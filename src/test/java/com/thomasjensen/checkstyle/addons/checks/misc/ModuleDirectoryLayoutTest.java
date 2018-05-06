@@ -26,12 +26,13 @@ import java.util.Set;
 
 import com.puppycrawl.tools.checkstyle.DefaultConfiguration;
 import com.puppycrawl.tools.checkstyle.api.CheckstyleException;
-import com.thomasjensen.checkstyle.addons.BaseFileSetCheckTestSupport;
-import com.thomasjensen.checkstyle.addons.util.Util;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
+
+import com.thomasjensen.checkstyle.addons.BaseFileSetCheckTestSupport;
+import com.thomasjensen.checkstyle.addons.util.Util;
 
 
 /**
@@ -77,12 +78,12 @@ public class ModuleDirectoryLayoutTest
         Assert.assertEquals("foo" + File.separator + "bar" + File.separator + "Filename.tar.gz", dcp.getSpecificPath());
         Assert.assertEquals("Filename.tar.gz", dcp.getSimpleFilename());
 
-        Set<String> expectedExtensions = new HashSet<String>();
+        Set<String> expectedExtensions = new HashSet<>();
         expectedExtensions.add("tar.gz");
         expectedExtensions.add("gz");
         Assert.assertEquals(expectedExtensions, dcp.getFileExtensions());
 
-        List<String> expectedSpecificFolders = new ArrayList<String>();
+        List<String> expectedSpecificFolders = new ArrayList<>();
         expectedSpecificFolders.add("foo");
         expectedSpecificFolders.add("bar");
         Assert.assertEquals(expectedSpecificFolders, dcp.getSpecificFolders());
@@ -110,7 +111,7 @@ public class ModuleDirectoryLayoutTest
 
         Assert.assertEquals(Collections.emptySet(), dcp.getFileExtensions());
 
-        List<String> expectedSpecificFolders = new ArrayList<String>();
+        List<String> expectedSpecificFolders = new ArrayList<>();
         expectedSpecificFolders.add("foo");
         expectedSpecificFolders.add("bar");
         Assert.assertEquals(expectedSpecificFolders, dcp.getSpecificFolders());
@@ -136,11 +137,11 @@ public class ModuleDirectoryLayoutTest
         Assert.assertEquals("foo" + File.separator + "bar" + File.separator + ".gitignore", dcp.getSpecificPath());
         Assert.assertEquals(".gitignore", dcp.getSimpleFilename());
 
-        Set<String> expectedExtensions = new HashSet<String>();
+        Set<String> expectedExtensions = new HashSet<>();
         expectedExtensions.add("gitignore");
         Assert.assertEquals(expectedExtensions, dcp.getFileExtensions());
 
-        List<String> expectedSpecificFolders = new ArrayList<String>();
+        List<String> expectedSpecificFolders = new ArrayList<>();
         expectedSpecificFolders.add("foo");
         expectedSpecificFolders.add("bar");
         Assert.assertEquals(expectedSpecificFolders, dcp.getSpecificFolders());
@@ -166,11 +167,11 @@ public class ModuleDirectoryLayoutTest
         Assert.assertEquals("foo" + File.separator + "bar" + File.separator + "file..txt", dcp.getSpecificPath());
         Assert.assertEquals("file..txt", dcp.getSimpleFilename());
 
-        Set<String> expectedExtensions = new HashSet<String>();
+        Set<String> expectedExtensions = new HashSet<>();
         expectedExtensions.add(".txt");  // extra dot!
         Assert.assertEquals(expectedExtensions, dcp.getFileExtensions());
 
-        List<String> expectedSpecificFolders = new ArrayList<String>();
+        List<String> expectedSpecificFolders = new ArrayList<>();
         expectedSpecificFolders.add("foo");
         expectedSpecificFolders.add("bar");
         Assert.assertEquals(expectedSpecificFolders, dcp.getSpecificFolders());
@@ -196,13 +197,13 @@ public class ModuleDirectoryLayoutTest
         Assert.assertEquals("foo" + File.separator + "bar" + File.separator + "file.tar..gz", dcp.getSpecificPath());
         Assert.assertEquals("file.tar..gz", dcp.getSimpleFilename());
 
-        Set<String> expectedExtensions = new HashSet<String>();
+        Set<String> expectedExtensions = new HashSet<>();
         expectedExtensions.add("tar..gz");
         expectedExtensions.add(".gz");
         expectedExtensions.add("gz");
         Assert.assertEquals(expectedExtensions, dcp.getFileExtensions());
 
-        List<String> expectedSpecificFolders = new ArrayList<String>();
+        List<String> expectedSpecificFolders = new ArrayList<>();
         expectedSpecificFolders.add("foo");
         expectedSpecificFolders.add("bar");
         Assert.assertEquals(expectedSpecificFolders, dcp.getSpecificFolders());

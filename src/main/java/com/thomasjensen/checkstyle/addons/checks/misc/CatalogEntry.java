@@ -87,7 +87,7 @@ final class CatalogEntry
     @Override
     public int compareTo(@Nonnull final CatalogEntry pOther)
     {
-        int result = Integer.valueOf(ast.getLineNo()).compareTo(Integer.valueOf(pOther.getAst().getLineNo()));
+        int result = Integer.compare(ast.getLineNo(), pOther.getAst().getLineNo());
         if (result == 0) {
             result = constantName.compareTo(pOther.getConstantName());
         }

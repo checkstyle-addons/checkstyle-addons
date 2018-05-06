@@ -37,12 +37,12 @@ import com.thomasjensen.checkstyle.addons.util.Util;
 public abstract class AbstractMethodCallCheck
     extends AbstractAddonsCheck
 {
-    private static final Set<Integer> TOKEN_TYPES = Collections.unmodifiableSet(new HashSet<Integer>(Arrays.asList(
+    private static final Set<Integer> TOKEN_TYPES = Collections.unmodifiableSet(new HashSet<>(Arrays.asList(
         Integer.valueOf(TokenTypes.METHOD_CALL), Integer.valueOf(TokenTypes.METHOD_DEF), Integer.valueOf(
             TokenTypes.CTOR_CALL), Integer.valueOf(TokenTypes.SUPER_CTOR_CALL), Integer.valueOf(TokenTypes.CTOR_DEF),
         Integer.valueOf(TokenTypes.STATIC_INIT), Integer.valueOf(TokenTypes.INSTANCE_INIT))));
 
-    private final Deque<String> currentMethodName = new LinkedList<String>();
+    private final Deque<String> currentMethodName = new LinkedList<>();
 
 
 

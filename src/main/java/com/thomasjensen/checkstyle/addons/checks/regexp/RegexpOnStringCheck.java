@@ -210,10 +210,10 @@ public class RegexpOnStringCheck
     @Nonnull
     private List<FoundString> findAllStrings(@Nonnull final DetailAST pAst)
     {
-        final List<DetailAST> flattened = new ArrayList<DetailAST>();
+        final List<DetailAST> flattened = new ArrayList<>();
         flatten(pAst, flattened);
 
-        final List<FoundString> result = new ArrayList<FoundString>();
+        final List<FoundString> result = new ArrayList<>();
         FoundString current = null;
         for (final DetailAST a : flattened) {
             if (a.getType() == TokenTypes.STRING_LITERAL) {

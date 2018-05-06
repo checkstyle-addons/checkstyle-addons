@@ -231,7 +231,7 @@ public class PropertyCatalogCheck
     private void checkCatalog(@Nonnull final DetailAST pTypeAst, @Nonnull final Set<CatalogEntry> pEntries,
         @Nonnull final Map<String, String> pProps, @Nonnull final File pPropFile)
     {
-        final Map<String, CatalogEntry> foundKeys = new TreeMap<String, CatalogEntry>(
+        final Map<String, CatalogEntry> foundKeys = new TreeMap<>(
             caseSensitiveKeys ? null : String.CASE_INSENSITIVE_ORDER);
 
         for (CatalogEntry entry : pEntries) {
@@ -267,7 +267,7 @@ public class PropertyCatalogCheck
         }
 
         if (reportOrphans) {
-            final Set<String> orphans = new TreeSet<String>();    // The orphan list is always case sensitive.
+            final Set<String> orphans = new TreeSet<>();    // The orphan list is always case sensitive.
             for (String prop : pProps.keySet()) {
                 if (!foundKeys.containsKey(prop)) {
                     orphans.add(prop);
