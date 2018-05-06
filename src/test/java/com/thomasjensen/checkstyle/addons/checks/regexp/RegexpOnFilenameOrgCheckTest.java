@@ -20,11 +20,14 @@ import java.io.IOException;
 
 import com.puppycrawl.tools.checkstyle.DefaultConfiguration;
 import com.puppycrawl.tools.checkstyle.api.CheckstyleException;
-import com.thomasjensen.checkstyle.addons.BaseCheckTestSupport;
-import com.thomasjensen.checkstyle.addons.BaseFileSetCheckTestSupport;
 import org.junit.Assert;
+import org.junit.Assume;
 import org.junit.Before;
 import org.junit.Test;
+
+import com.thomasjensen.checkstyle.addons.BaseCheckTestSupport;
+import com.thomasjensen.checkstyle.addons.BaseFileSetCheckTestSupport;
+import com.thomasjensen.checkstyle.addons.CsVersionInfo;
 
 
 /**
@@ -300,6 +303,7 @@ public class RegexpOnFilenameOrgCheckTest
     public void testTrailingSpace()
         throws Exception
     {
+        Assume.assumeThat(CsVersionInfo.currentCsVersion(), CsVersionInfo.isLessThan("8.10"));
         File tempFile = null;
         try {
             tempFile = File.createTempFile("addons-test-", "txt ");

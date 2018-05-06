@@ -18,6 +18,7 @@ package com.thomasjensen.checkstyle.addons.build.tasks;
 import java.io.File;
 import javax.annotation.Nonnull;
 
+import groovy.lang.Closure;
 import org.gradle.api.JavaVersion;
 import org.gradle.api.Project;
 import org.gradle.api.plugins.JavaBasePlugin;
@@ -43,6 +44,8 @@ import com.thomasjensen.checkstyle.addons.build.TaskNames;
 public class TestTask
     extends Test
 {
+    public static final String CSVERSION_SYSPROP_NAME = "com.thomasjensen.checkstyle.addons.checkstyle.version";
+
     private final BuildUtil buildUtil;
 
 
@@ -100,5 +103,16 @@ public class TestTask
         if (javaLevelUtil.isOlderSupportedJava(javaLevel)) {
             setExecutable(javaLevelUtil.getJvmExecutable(javaLevel));
         }
+
+        // Make the Checkstyle version available to the test cases via a system property.
+        configure(new Closure<Void>(this)
+        {
+            @Override
+            public Void call()
+            {
+                systemProperty(CSVERSION_SYSPROP_NAME, pCsVersion);
+                return null;
+            }
+        });
     }
 }

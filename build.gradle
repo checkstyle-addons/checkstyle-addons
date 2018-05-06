@@ -45,6 +45,7 @@ import com.thomasjensen.checkstyle.addons.build.TaskCreator;
 import com.thomasjensen.checkstyle.addons.build.VersionWrapper;
 import com.thomasjensen.checkstyle.addons.build.tasks.JavadocTask;
 import com.thomasjensen.checkstyle.addons.build.tasks.SiteTask;
+import com.thomasjensen.checkstyle.addons.build.tasks.TestTask;
 import org.apache.tools.ant.filters.ReplaceTokens;
 
 
@@ -73,6 +74,7 @@ ext {
     sqPackage = 'com/thomasjensen/checkstyle/addons/sonarqube';
     checksPackage = 'com/thomasjensen/checkstyle/addons/checks';
     website = 'http://checkstyle-addons.thomasjensen.com/';
+    checkstyleBaseVersion = '8.0';
     buildUtil = new BuildUtil(project);
     gitHash = buildUtil.currentGitCommitHash();
 }
@@ -90,7 +92,7 @@ dependencies {
     generalCompileOnly group: 'com.google.code.findbugs', name: 'annotations', version: '3.0.1';
     generalCompileOnly group: 'com.google.code.findbugs', name: 'jsr305', version: '3.0.1';
 
-    api group: 'com.puppycrawl.tools', name: 'checkstyle', version: '8.0';
+    api group: 'com.puppycrawl.tools', name: 'checkstyle', version: project.ext.checkstyleBaseVersion;
     api group: 'com.fasterxml.jackson.core', name: 'jackson-databind', version: '2.7.3';
 
     sonarqubeImplementation group: 'org.codehaus.sonar', name: 'sonar-plugin-api', version: '3.0';
@@ -133,6 +135,10 @@ ext {
                         (testResult.testCount - testResult.successfulTestCount - testResult.skippedTestCount) +
                         ' failed, ' + testResult.skippedTestCount + ' skipped.');
             }
+        }
+
+        if (JavaPlugin.TEST_TASK_NAME.equals(name)) {
+            systemProperty(TestTask.CSVERSION_SYSPROP_NAME, project.ext.checkstyleBaseVersion);
         }
     }
 }
@@ -211,7 +217,7 @@ test((Closure) testConfigClosure);
 test {
     jacoco {
         append = false;
-        excludes = excludedClasses;
+        excludes = excludedClasses.toList();
     }
 }
 jacocoTestReport {
