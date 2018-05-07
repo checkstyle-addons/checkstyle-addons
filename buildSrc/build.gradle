@@ -27,7 +27,7 @@ repositories {
 sourceCompatibility = JavaVersion.VERSION_1_8;
 
 dependencies {
-    implementation group: 'com.github.jengelman.gradle.plugins', name: 'shadow', version: '1.2.4';
+    implementation group: 'com.github.jengelman.gradle.plugins', name: 'shadow', version: '2.0.4';
     implementation group: 'org.ajoberstar', name: 'grgit', version: '2.0.0';
     compileOnly group: 'com.google.code.findbugs', name: 'annotations', version: '3.0.1';
     compileOnly group: 'com.google.code.findbugs', name: 'jsr305', version: '3.0.1';
