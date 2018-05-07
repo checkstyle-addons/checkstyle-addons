@@ -306,7 +306,7 @@ public class RegexpOnFilenameOrgCheckTest
         Assume.assumeThat(CsVersionInfo.currentCsVersion(), CsVersionInfo.isLessThan("8.10"));
         File tempFile = null;
         try {
-            tempFile = File.createTempFile("addons-test-", "txt ");
+            tempFile = File.createTempFile("addons-test-", ".txt ");
             final String[] expected =
                 {"0: Filename '" + tempFile.getName() + "' contains illegal pattern '" + "^(?:\\s+.*|.*?\\s+)$" + "'."};
             verify(mCheckConfig, tempFile.getAbsolutePath(), expected);
@@ -326,7 +326,7 @@ public class RegexpOnFilenameOrgCheckTest
     {
         File tempFile = null;
         try {
-            tempFile = File.createTempFile(" addons-test-", "txt");
+            tempFile = File.createTempFile(" addons-test-", ".txt");
             final String[] expected =
                 {"0: Filename '" + tempFile.getName() + "' contains illegal pattern '" + "^(?:\\s+.*|.*?\\s+)$" + "'."};
             verify(mCheckConfig, tempFile.getAbsolutePath(), expected);
@@ -346,7 +346,7 @@ public class RegexpOnFilenameOrgCheckTest
     {
         File tempFile = null;
         try {
-            tempFile = File.createTempFile("addons-test-", "txt");
+            tempFile = File.createTempFile("addons-test-", ".txt");
             final String[] expected = {};
             verify(mCheckConfig, tempFile.getAbsolutePath(), expected);
         }
@@ -361,7 +361,6 @@ public class RegexpOnFilenameOrgCheckTest
 
     @Test
     public void testNullEmptyRegexParams_Ok()
-        throws Exception
     {
         RegexpOnFilenameOrgCheck check = new RegexpOnFilenameOrgCheck();
         check.setSelection(null);
