@@ -9,6 +9,7 @@
     {% endcomment %}
     <title>{{ site.name }} - {% if page.title | size > 0 %}{{ page.title }}{% else %}{{ site.description }}{% endif %}</title>
     <meta name="author" content="Thomas Jensen" />
+    {% include analytics.html %}
 	{% if page.sedesc %}
 	<!-- start page -->
 	<meta name="description" content="{{ site.description }}" />
