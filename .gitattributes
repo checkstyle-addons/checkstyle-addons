@@ -1,0 +1,4 @@
+/gradlew linguist-vendored
+/gradlew.bat linguist-vendored
+/gradle/wrapper/ linguist-vendored
+/project/DTDs/ linguist-vendored
