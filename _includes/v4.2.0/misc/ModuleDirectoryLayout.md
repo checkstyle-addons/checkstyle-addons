@@ -114,8 +114,8 @@ constraints, a small verification program is supplied for your convenience. Down
 [checkstyle-addons-{{ page.check_version | remove_first:'v' }}-all.jar](https://github.com/{{ site.github
 }}/releases/download/{{ page.check_version }}/checkstyle-addons-{{ page.check_version | remove_first:'v' }}-all.jar)
 and [checkstyle-{{ site.latest_version_checkstyle_java7
-}}-all.jar](https://sourceforge.net/projects/checkstyle/files/checkstyle/{{ site.latest_version_checkstyle_java7
-}}/checkstyle-{{ site.latest_version_checkstyle_java7 }}-all.jar/download) (or any other compatible version), then run the
+}}-all.jar](https://github.com/checkstyle/checkstyle/releases/download/checkstyle-{{ site.latest_version_checkstyle_java7
+}}/checkstyle-{{ site.latest_version_checkstyle_java7 }}-all.jar) (or any other compatible version), then run the
 validator from the command line:
 
     java -cp checkstyle-addons-{{ page.check_version | remove_first:'v' }}-all.jar;checkstyle-{{ site.latest_version_checkstyle_java7 }}-all.jar com.thomasjensen.checkstyle.addons.checks.misc.MdlJsonConfigValidator path/to/my/directories.json
