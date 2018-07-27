@@ -547,3 +547,18 @@ h2:hover > a, h3:hover > a, h4:hover > a, h5:hover > a {
     display: inline;
     color: inherit;
 }
+
+ul.navbar-right > li > a {
+    display: inline-block;
+}
+ul.nav > li > div.star-container {
+    height: 50px;
+    padding: 12px 0 10px;  /* top horz bottom */
+    display: inline-block;
+    position: relative;
+}
+@media (max-width: 839px) {
+    ul.nav > li > div.star-container {
+        display: none;
+    }
+}

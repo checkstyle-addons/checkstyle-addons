@@ -64,6 +64,7 @@
         }
     //-->
     </script>
+    <script async defer src="https://buttons.github.io/buttons.js"></script>
 </head>
 
 <body{% if page.longContent %} class="longContent"{% endif %}>
@@ -105,6 +106,9 @@
           </ul>
           <ul class="nav navbar-nav navbar-right">
             <li><a href="https://github.com/{{ site.github }}">GitHub</a></li>
+            <li><div class="star-container"><a class="github-button" href="https://github.com/{{ site.github }}"
+                data-icon="octicon-star" data-size="large" data-show-count="true"
+                aria-label="Star {{ site.name }} on GitHub">Star</a></div></li>
           </ul>
         </div>
       </div>
