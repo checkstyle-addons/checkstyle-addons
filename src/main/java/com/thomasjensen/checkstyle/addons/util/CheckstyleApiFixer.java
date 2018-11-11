@@ -18,6 +18,8 @@ package com.thomasjensen.checkstyle.addons.util;
 import java.io.File;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
+import java.util.Arrays;
+import java.util.List;
 import javax.annotation.CheckForNull;
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
@@ -118,25 +120,29 @@ public class CheckstyleApiFixer
      *
      * @param pTokenId the ID of the token name to get
      * @return a token name as returned by Checkstyle
+     *
      * @throws UnsupportedOperationException no known variant of <code>getTokenName()</code> could be found
      */
     @Nonnull
     public String getTokenName(final int pTokenId)
     {
-        String usedClass = "TokenTypes";
+        final List<String> searchClasses = Arrays.asList("com.puppycrawl.tools.checkstyle.utils.TokenUtil",
+            "com.puppycrawl.tools.checkstyle.utils.TokenUtils", TokenTypes.class.getName(),
+            "com.puppycrawl.tools.checkstyle.Utils");
         Method getTokenName = null;
-        try {
-            getTokenName = TokenTypes.class.getMethod("getTokenName", int.class);
-        }
-        catch (NoSuchMethodException e) {
-            usedClass = "Utils";
+
+        for (final String className : searchClasses) {
             try {
-                final Class<?> utilsClass = Class.forName("com.puppycrawl.tools.checkstyle.Utils");
+                final Class<?> utilsClass = Class.forName(className);
                 getTokenName = utilsClass.getMethod("getTokenName", int.class);
+                break;
             }
-            catch (ClassNotFoundException | NoSuchMethodException e1) {
-                throw new UnsupportedOperationException(usedClass + ".getTokenName()", e1);
+            catch (ClassNotFoundException | NoSuchMethodException e) {
+                // ignore
             }
+        }
+        if (getTokenName == null) {
+            throw new UnsupportedOperationException("getTokenName() - method not found");
         }
 
         String result = null;
@@ -144,7 +150,7 @@ public class CheckstyleApiFixer
             result = (String) getTokenName.invoke(null, pTokenId);
         }
         catch (IllegalAccessException | InvocationTargetException e) {
-            throw new UnsupportedOperationException(usedClass + ".getTokenName()", e);
+            throw new UnsupportedOperationException(getTokenName.getDeclaringClass().getName() + ".getTokenName()", e);
         }
         return result;
     }
