@@ -15,3 +15,4 @@
  */
 
 rootProject.name='checkstyle-addons';
+enableFeaturePreview('STABLE_PUBLISHING');
