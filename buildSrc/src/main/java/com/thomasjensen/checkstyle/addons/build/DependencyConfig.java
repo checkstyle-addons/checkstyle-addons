@@ -1,7 +1,7 @@
 package com.thomasjensen.checkstyle.addons.build;
 /*
  * Checkstyle-Addons - Additional Checkstyle checks
- * Copyright (C) 2015 Thomas Jensen
+ * Copyright (c) 2015-2018, Thomas Jensen and the Checkstyle Addons contributors
  *
  * This program is free software: you can redistribute it and/or modify it under the
  * terms of the GNU General Public License, version 3, as published by the Free
@@ -291,7 +291,7 @@ public final class DependencyConfig
         sb.append(", artifactVersions=");
         if (artifactVersions != null) {
             sb.append('{');
-            for (Iterator<Map.Entry<String, String>> iter = artifactVersions.entrySet().iterator(); iter.hasNext(); ) {
+            for (Iterator<Map.Entry<String, String>> iter = artifactVersions.entrySet().iterator(); iter.hasNext();) {
                 final Map.Entry<String, String> entry = iter.next();
                 sb.append(entry.getKey());
                 sb.append("->'").append(entry.getValue()).append('\'');

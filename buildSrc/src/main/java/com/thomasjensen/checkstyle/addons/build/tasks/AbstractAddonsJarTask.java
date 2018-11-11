@@ -1,7 +1,7 @@
 package com.thomasjensen.checkstyle.addons.build.tasks;
 /*
  * Checkstyle-Addons - Additional Checkstyle checks
- * Copyright (C) 2015 Thomas Jensen
+ * Copyright (c) 2015-2018, Thomas Jensen and the Checkstyle Addons contributors
  *
  * This program is free software: you can redistribute it and/or modify it under the
  * terms of the GNU General Public License, version 3, as published by the Free
@@ -19,13 +19,13 @@ import java.util.HashMap;
 import java.util.Map;
 import javax.annotation.Nonnull;
 
-import com.thomasjensen.checkstyle.addons.build.TaskCreator;
 import groovy.lang.Closure;
 import org.apache.tools.ant.filters.ReplaceTokens;
 import org.gradle.api.file.CopySpec;
 import org.gradle.api.tasks.bundling.Jar;
 
 import com.thomasjensen.checkstyle.addons.build.BuildUtil;
+import com.thomasjensen.checkstyle.addons.build.TaskCreator;
 
 
 /**
