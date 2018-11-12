@@ -102,15 +102,7 @@ distributions were used to obtain the minimum Java version.
 
 <a name="f" class="csa-offset-anchor"/>
 
-### F. Java Version of the code being analyzed
-
-This is the Java version of the code being given to Checkstyle for analysis. This can normally be any Java level.
-For example, you can analyze a Java&nbsp;10 source file using Checkstyle 5.9, as long as you have a configuration
-file that matches Checkstyle 5.9.
-
-<a name="g" class="csa-offset-anchor"/>
-
-### G. Checkstyle-IDEA
+### F. Checkstyle-IDEA
 
 The compatibility information was obtained by unpacking
 [each version](https://plugins.jetbrains.com/plugin/1065?pr=&showAllUpdates=true) of Checkstyle-IDEA and looking
@@ -122,18 +114,18 @@ called
 in the plugin sources which lists all the bundled and supported Checkstyle versions. This file is a source of truth,
 because it is also used by the plugin build process to configure the actual bundling.
 
-<a name="h" class="csa-offset-anchor"/>
+<a name="g" class="csa-offset-anchor"/>
 
-### H. Java Version required by Checkstyle-IDEA
+### G. Java Version required by Checkstyle-IDEA
 
 Checkstyle-IDEA sometimes requires a more recent Java version than Checkstyle itself. Depending on the Checkstyle-IDEA
 version, it may be required to run IntelliJ IDEA at a particular Java level, which is given in this column. The
 information was obtained by looking inside the `org.infernus.idea.checkstyle.CheckStylePlugin` class file and reading
 the version number of the class file format.
 
-<a name="i" class="csa-offset-anchor"/>
+<a name="h" class="csa-offset-anchor"/>
 
-### I. Eclipse-CS
+### H. Eclipse-CS
 
 [Eclipse-CS](http://checkstyle.org/eclipse-cs/), the Checkstyle plugin for Eclipse, was very professionally
 managed by Lars Ködderitzsch. Its version numbers are synched to the Checkstyle version numbers, and every change
@@ -142,9 +134,9 @@ the same as for Checkstyle itself.\\
 In 2018, Lars decided to put the project into the hands of the core Checkstyle team, who are looking for a new
 maintainer.
 
-<a name="j" class="csa-offset-anchor"/>
+<a name="i" class="csa-offset-anchor"/>
 
-### J. NetBeans Checkstyle
+### I. NetBeans Checkstyle
 
 The NetBeans IDE supports Checkstyle by way of the
 [Checkstyle Beans](http://plugins.netbeans.org/plugin/3413/checkstyle-beans) plugin. This plugin bundles a fixed
@@ -153,9 +145,9 @@ Checkstyle version, which is updated every once in a while. The plugin consists 
 This is how the data for this column was gathered. The historical versions of the plugin are available from the plugin
 developer's [website](https://www.sickboy.cz/repository/cz/sickboy/netbeans-checkstyle/).
 
-<a name="k" class="csa-offset-anchor"/>
+<a name="j" class="csa-offset-anchor"/>
 
-### K. Maven Checkstyle Plugin
+### J. Maven Checkstyle Plugin
 
 For the [Maven Checkstyle Plugin](https://maven.apache.org/plugins/maven-checkstyle-plugin/), its POM files were
 analyzed as found on
@@ -179,9 +171,9 @@ This column can have one of the following entries:
 TODO We may have to improve on this data by actually trying the different combinations of Maven Plugin and Checkstyle
 versions, because breaking changes are introduced and may forbid specific combinations.
 
-<a name="l" class="csa-offset-anchor"/>
+<a name="k" class="csa-offset-anchor"/>
 
-### L. Gradle
+### K. Gradle
 
 In [Gradle](https://gradle.org/) 1.0, the Gradle Checkstyle plugin was created by extracting it out of the Code Quality
 plugin which existed in Gradle&nbsp;0.9. At the same time, the `toolVersion` property was introduced to the Gradle
@@ -194,9 +186,9 @@ are willing to provide it via your own infrastructure. Because of this, the corr
 parentheses.\\
 This data was gathered by GitHub source code analysis.
 
-<a name="m" class="csa-offset-anchor"/>
+<a name="l" class="csa-offset-anchor"/>
 
-### M. Gradle Checkstyle Plugin
+### l. Gradle Checkstyle Plugin
 
 This column shows which versions of Checkstyle are used as the default version by the
 [Gradle Checkstyle Plugin](https://docs.gradle.org/current/userguide/checkstyle_plugin.html). This information was
@@ -209,9 +201,9 @@ Entries are set in parentheses when either the Checkstyle version is less than 5
 on Maven Central or Bintray jcenter), or the Gradle version is less than 1.0 (because then no Gradle Checkstyle plugin
 exists).
 
-<a name="n" class="csa-offset-anchor"/>
+<a name="m" class="csa-offset-anchor"/>
 
-### N. {{ site.name }}
+### M. {{ site.name }}
 
 {{ site.name }} features a build process that actually tries running the compiled checks against every single Checkstyle
 runtime ([example log file](https://travis-ci.org/{{ site.github }}/jobs/78284770#L353)). Since we have very [high test
@@ -219,9 +211,9 @@ coverage](https://coveralls.io/builds/3457153), the fact that all unit tests com
 runtime is significant. {{ site.name }} also includes a reflection-based component that smoothes over the API
 differences between Checkstyle versions, so that we have full compatibility with almost every recent Checkstyle version.
 
-<a name="o" class="csa-offset-anchor"/>
+<a name="n" class="csa-offset-anchor"/>
 
-### O. SevNTU Checkstyle
+### N. SevNTU Checkstyle
 
 For [SevNTU Checkstyle](https://github.com/sevntu-checkstyle/sevntu.checkstyle), source versions are tagged on GitHub
 for versions 1.8.0 and upwards, so source archives are easily available for downloading. For versions down to 1.5.x,
@@ -243,18 +235,18 @@ Checkstyle version against which a particular version of the SevNTU checks were 
 combinations (especially where the corresponding Checkstyle versions are compatible), but at least it's doable and
 we are sure the information is correct.
 
-<a name="p" class="csa-offset-anchor"/>
+<a name="o" class="csa-offset-anchor"/>
 
-### P. SonarQube Checkstyle Plugin
+### O. SonarQube Checkstyle Plugin
 
 The [SonarQube Checkstyle Plugin]({{ site.link_sq_csplugin }}) lists the Checkstyle versions it uses on its website.
 The given version of Checkstyle is bundled with the plugin and cannot be changed. The plugin has a dependency on the
 SonarQube platform and the SonarQube Java plugin. Updates to this plugin are quite rare, so only a small number of
 Checkstyle versions are supported by SonarQube.
 
-<a name="q" class="csa-offset-anchor"/>
+<a name="p" class="csa-offset-anchor"/>
 
-### Q. SonarQube Platform
+### P. SonarQube Platform
 
 This column shows the version of the SonarQube platform (a.k.a. the SonarQube version) required to run the SonarQube
 Checkstyle plugin at the given version.
