@@ -3,6 +3,7 @@
 [![Download](https://img.shields.io/github/release/checkstyle-addons/checkstyle-addons.svg?label=download&colorB=4cc61e)](https://github.com/checkstyle-addons/checkstyle-addons/releases)
 [![Maven Central](https://maven-badges.herokuapp.com/maven-central/com.thomasjensen.checkstyle.addons/checkstyle-addons/badge.svg)](http://search.maven.org/#search%7Cgav%7C1%7Cg%3Acom.thomasjensen.checkstyle.addons)
 [![OpenHub Stats](https://www.openhub.net/p/checkstyle-addons/widgets/project_thin_badge?format=gif&ref=Thin+badge)](https://www.openhub.net/p/checkstyle-addons)
+[![FOSSA Status](https://app.fossa.io/api/projects/git%2Bgithub.com%2Fcheckstyle-addons%2Fcheckstyle-addons.svg?type=shield)](https://app.fossa.io/projects/git%2Bgithub.com%2Fcheckstyle-addons%2Fcheckstyle-addons?ref=badge_shield)
 
 # Checkstyle Addons
 **Additional Checkstyle checks**
@@ -23,3 +24,6 @@ The project status is **stable** - Checkstyle Addons is ready and safe for enter
 
 Checkstyle Addons is free software under the GNU General Public License, version 3
 ([GPLv3](https://www.gnu.org/copyleft/gpl.html)).
+
+
+[![FOSSA Status](https://app.fossa.io/api/projects/git%2Bgithub.com%2Fcheckstyle-addons%2Fcheckstyle-addons.svg?type=large)](https://app.fossa.io/projects/git%2Bgithub.com%2Fcheckstyle-addons%2Fcheckstyle-addons?ref=badge_large)
