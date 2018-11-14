@@ -21,26 +21,26 @@ A more complex example would be this one:
 
     /checkstyle-compatibility-matrix.html?hl=7.8.2-7.7[g];c-d
 
-resulting in multiple rows and columns to be highlighed in differing colors:
+resulting in multiple rows and columns to be highlighted in differing colors:
 
 <div class="csa-largeImageWrapper">
-<img src="{{ site.baseurl }}/images/comp-matrix-hilite.png" alt="Highlight example" width="584" height="378" />
+<img src="{{ site.baseurl }}/images/comp-matrix-hilite.png" alt="Highlight example" width="611" height="337" />
 </div>
 
 {:.table .table-striped .csa-bordered-table}
 | Type   | Syntax  | Range       |
 |--------|---------|-------------|
 | Row    | `8.4`   | `8.4-8.0`   |
-| Column | `C`     | `C-F`       |
-| Cell   | `C8.4`  | `C8.4-F8.0` |
+| Column | `C`     | `C-G`       |
+| Cell   | `C8.4`  | `C8.4-G8.0` |
 | Multi  | `C;8.4` | `C;8.4-8.0` |
 
 The type *Multi* allows a semicolon-separated list of any of the above (row, column, or cell; either single or ranged).
 
 When specifying a range, take care that
 
-- both elements of the range are of the same type (e.g. `C-F` is good, `8.4-F` is mixed up), and
-- the element that comes first in the table comes first in the range (e.g. `C-F` or `8.4-8.0` are good, but `F-C` or `8.0-8.4` are wrong).
+- both elements of the range are of the same type (e.g. `C-G` is good, `8.4-G` is mixed up), and
+- the element that comes first in the table comes first in the range (e.g. `C-G` or `8.4-8.0` are good, but `G-C` or `8.0-8.4` are wrong).
 
 The color of each row, column, or cell (range) may be selected by appending the color in square brackets.
 
