@@ -4,7 +4,7 @@
  * Compatibility Matrix highlighting
  */
 
-var MAX_COL = 'q';   // currently the right-most column; cannot go beyond 'z'
+var MAX_COL = 'p';   // currently the right-most column; cannot go beyond 'z'
 var MAX_HILITE_CELLS = (getOffsetFromColumn(MAX_COL) + 1) * 18 - 1;   // highlight at most this many cells, mark the last one
 
 function main() {
