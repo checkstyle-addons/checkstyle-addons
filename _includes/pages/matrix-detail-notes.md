@@ -70,6 +70,8 @@ analysis of the commit history on GitHub has turned up further breaking changes:
 
 <div class="checkpage"><dl>
 <dt class="title">Checkstyle</dt><dd class="title">– Breaking Change</dd>
+<dt>8.15</dt><dd>– several command line options renamed / changed as explained
+        <a href="https://github.com/checkstyle/checkstyle/issues/6068#issuecomment-434097233">here</a></dd>
 <dt>7.7</dt><dd>– public method <code>excapeAllControlChars()</code> renamed to <code>escapeAllControlChars()</code> in
         <code>JavadocUtils</code> (commit
         <a href="https://github.com/checkstyle/checkstyle/commit/3bd3a52280388520c64ec813dd1e4ffb3a0063a2">#3bd3a52</a>)</dd>
