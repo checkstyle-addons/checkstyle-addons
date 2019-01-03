@@ -7,6 +7,7 @@ description: Additional Checkstyle Checks
 # enable emoticons
 plugins:
   - jemoji
+  - jekyll-sitemap
 
 # website address
 url: https://checkstyle-addons.thomasjensen.com/
@@ -29,6 +30,14 @@ permalink: /:year/:month/:title
 future: true
 
 exclude: ['README.md', 'LICENSE', '*.iml', 'build', 'gradle', 'out']
+
+# Exclude Javadocs from the sitemap
+defaults:
+  -
+    scope:
+      path:            "*/apidocs/"
+    values:
+      sitemap:         false
 
 # checkstyle-addons custom variables
 latest_version: '5.2.1'
