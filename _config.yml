@@ -10,7 +10,7 @@ plugins:
   - jekyll-sitemap
 
 # website address
-url: https://checkstyle-addons.thomasjensen.com/
+url: https://checkstyle-addons.thomasjensen.com
 
 # baseurl will often be '', but for a project page on gh-pages, it needs to
 # be the project name.
@@ -25,7 +25,7 @@ github: 'checkstyle-addons/checkstyle-addons'
 gaaccount: 'UA-23698164-6'
 
 
-permalink: /:year/:month/:title
+permalink: /:year/:month/:title:output_ext
 #paginate: 10
 future: true
 
