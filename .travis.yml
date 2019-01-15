@@ -12,10 +12,10 @@ before_install:
   - ./gradlew clean
 
 # Update JDK8 to latest version available for Travis
-addons:
-  apt:
-    packages:
-      - oracle-java8-installer
+#addons:
+#  apt:
+#    packages:
+#      - oracle-java8-installer
 
 env:
   global:
