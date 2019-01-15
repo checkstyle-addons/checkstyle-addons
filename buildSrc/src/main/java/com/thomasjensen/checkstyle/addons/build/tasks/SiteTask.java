@@ -21,6 +21,8 @@ import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.StandardCopyOption;
 import java.nio.file.StandardOpenOption;
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -41,6 +43,7 @@ import org.gradle.api.tasks.TaskContainer;
 import org.gradle.api.tasks.util.PatternFilterable;
 
 import com.thomasjensen.checkstyle.addons.build.BuildUtil;
+import com.thomasjensen.checkstyle.addons.build.ExtProp;
 
 
 /**
@@ -129,6 +132,7 @@ public class SiteTask
             catDocs.add(f.getAbsoluteFile());
         }
 
+        final DateFormat sdf = new SimpleDateFormat("YYYY-MM-dd HH:mm:ss ZZZZ");
         for (Map.Entry<String, List<File>> cat : rawDocs.entrySet()) {
             File mdDir = new File(includesVersionDir, cat.getKey());
             mdDir.mkdir();
@@ -169,6 +173,11 @@ public class SiteTask
                 sb.append(s);
                 sb.append("\n");
             }
+
+            // timestamp of this file's generation, for sitemap.xml
+            sb.append("last_modified_at: ");
+            sb.append(sdf.format(buildUtil.getExtraPropertyValue(ExtProp.BuildTimestamp)));
+            sb.append("\n");
             sb.append("---\n\n");
 
             final File catPage = new File(versionChecksDir, cat.getKey() + ".html");

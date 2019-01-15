@@ -266,16 +266,16 @@ task siteCopyAllChecks(type: Copy) {
     destinationDir = new File(project.buildDir, 'site');
     final File originalFile = new File(sourceSets.main.resources.srcDirs.iterator().next(),
         '/' + (String) project.ext.checksPackage + '/all_checks.html');
-    into("v${project.version}/checks") {
+    final Closure action = {
         from originalFile;
         rename { String fileName -> fileName.replace(originalFile.name, 'index.html'); }
-        filter(ReplaceTokens, tokens: [version: "v${project.version}".toString()]);
-    }
-    into('latest/checks') {
-        from originalFile;
-        rename { String fileName -> fileName.replace(originalFile.name, 'index.html'); }
-        filter(ReplaceTokens, tokens: [version: "v${project.version}".toString()]);
-    }
+        filter(ReplaceTokens, tokens: [
+            buildTimestamp: project.ext.buildTimestamp.format('YYYY-MM-dd HH:mm:ss ZZZZ'),
+            version: "v${project.version}".toString()
+        ]);
+    };
+    into("v${project.version}/checks", action);
+    into('latest/checks', action);
 }
 
 
@@ -284,14 +284,15 @@ task siteCopyDownloadGuide(type: Copy) {
 
     destinationDir = new File(project.buildDir, 'site');
     final File originalFile = new File(sourceSets.main.resources.srcDirs.iterator().next(), '/download-guide.html');
-    into("v${project.version}") {
+    final Closure action = {
         from originalFile;
-        filter(ReplaceTokens, tokens: [version: project.version]);
-    }
-    into('latest') {
-        from originalFile;
-        filter(ReplaceTokens, tokens: [version: project.version]);
-    }
+        filter(ReplaceTokens, tokens: [
+            buildTimestamp: project.ext.buildTimestamp.format('YYYY-MM-dd HH:mm:ss ZZZZ'),
+            version: project.version
+        ]);
+    };
+    into("v${project.version}", action);
+    into('latest', action);
 }
 
 task site (type: SiteTask);
