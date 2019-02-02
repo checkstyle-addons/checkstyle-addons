@@ -1,0 +1,11 @@
+/.git/
+/.gradle/
+/.idea/
+/_site/
+/_support/
+/buildSrc/
+/gradle/
+/out/
+/project/
+/src/
+.jekyll-metadata
