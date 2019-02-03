@@ -1,3 +1,4 @@
+package com.thomasjensen.checkstyle.addons.sqtest;
 /*
  * Checkstyle-Addons - Additional Checkstyle checks
  * Copyright (c) 2015-2018, Thomas Jensen and the Checkstyle Addons contributors
@@ -14,6 +15,15 @@
  * program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-rootProject.name='checkstyle-addons';
-enableFeaturePreview('STABLE_PUBLISHING');
-include ':sqtest';
+
+
+/**
+ * Class which contains issues for Checkstyle Addons to find.
+ */
+public class LocationReferenceSqDummy
+{
+    public void method1()
+    {
+        System.out.println("FLAG THIS");
+    }
+}

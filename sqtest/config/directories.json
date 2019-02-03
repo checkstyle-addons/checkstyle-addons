@@ -1,0 +1,41 @@
+{
+    "comment": "The module directory layout for the SonarQube integration test",
+    "settings": {
+        "formatVersion": 1,
+        "moduleRegex": "sqtest",
+        "excludeRegex": "^\\.idea[\\\\/](?:checkstyleidea\\.tmp[\\\\/])?csi-\\w+[\\\\/]"
+    },
+    "structure": {
+        "src/main/java": {
+            "whitelist": true,
+            "allow": [
+                {
+                    "type": "FileExtensions",
+                    "spec": "java"
+                }, {
+                    "type": "SimpleFolder",
+                    "spec": "doc-files"
+                }, {
+                    "type": "SimpleName",
+                    "spec": "overview.html"
+                }, {
+                    "type": "SimpleName",
+                    "spec": "package.html"
+                }
+            ],
+            "deny": [
+                {
+                    "type": "SimpleFolder",
+                    "spec": "META-INF"
+                }, {
+                    "type": "SimpleFolder",
+                    "spec": "WEB-INF"
+                }, {
+                    "type": "SimpleName",
+                    "spec": "RegexpOnFilenameOrgIllegal.java"
+                }
+            ]
+        },
+        "src/main/resources": {}
+    }
+}

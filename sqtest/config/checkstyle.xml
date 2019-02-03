@@ -1,0 +1,57 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+    Checkstyle-Addons - Additional Checkstyle checks
+    Copyright (c) 2015-2018, Thomas Jensen and the Checkstyle Addons contributors
+
+    This program is free software: you can redistribute it and/or modify it under the
+    terms of the GNU General Public License, version 3, as published by the Free
+    Software Foundation.
+
+    This program is distributed in the hope that it will be useful, but WITHOUT ANY
+    WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A
+    PARTICULAR PURPOSE. See the GNU General Public License for more details.
+
+    You should have received a copy of the GNU General Public License along with this
+    program.  If not, see http://www.gnu.org/licenses/.
+ -->
+<!DOCTYPE module PUBLIC "-//Checkstyle//DTD Check Configuration 1.3//EN"
+        "https://checkstyle.org/dtds/configuration_1_3.dtd">
+
+<module name="Checker">
+    <property name="severity" value="warning"/>
+    <property name="charset" value="UTF-8"/>
+
+    <module name="FileTabCharacter"/>
+
+    <module name="TreeWalker">
+        <property name="tabWidth" value="4"/>
+        <module name="FileContentsHolder"/>
+
+        <module name="LocalVariableName"/>
+
+        <!-- Checkstyle Addons Checks below this line -->
+        <module name="LostInstance"/>
+        <module name="IllegalMethodCall">
+            <property name="illegalMethodNames" value="forName, newInstance"/>
+        </module>
+        <module name="LocationReference">
+            <property name="methodCalls" value="System.out.println"/>
+        </module>
+        <module name="RegexpOnString">
+            <property name="regexp" value="flag this"/>
+        </module>
+        <module name="PropertyCatalog">
+            <property name="selection" value="PropertyCatalog"/>
+            <property name="baseDir" value="${workspace_loc}"/>
+            <property name="propertyFile" value="src/main/resources/{1}.properties"/>
+        </module>
+    </module>
+    <module name="ModuleDirectoryLayout">
+        <property name="configFile" value="${config_loc}/directories.json"/>
+    </module>
+    <module name="RegexpOnFilenameOrg">
+        <property name="regexp" value="Illegal\.java$"/>
+        <property name="simple" value="true"/>
+    </module>
+
+</module>

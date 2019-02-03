@@ -3,6 +3,8 @@
 /build/
 /buildSrc/.gradle/
 /buildSrc/build/
+/sqtest/build/
+/sqtest/.gradle/
 
 # IntelliJ IDEA control files
 *.iws

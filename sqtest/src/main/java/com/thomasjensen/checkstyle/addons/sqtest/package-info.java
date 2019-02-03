@@ -1,3 +1,4 @@
+// package-info.java
 /*
  * Checkstyle-Addons - Additional Checkstyle checks
  * Copyright (c) 2015-2018, Thomas Jensen and the Checkstyle Addons contributors
@@ -14,6 +15,7 @@
  * program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-rootProject.name='checkstyle-addons';
-enableFeaturePreview('STABLE_PUBLISHING');
-include ':sqtest';
+/**
+ * Just some dummy classes which can be analyzed by SonarQube to find problems with Checkstyle Addons.
+ */
+package com.thomasjensen.checkstyle.addons.sqtest;
