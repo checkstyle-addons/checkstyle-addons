@@ -42,8 +42,8 @@ and is distributed through Bintray jcenter and Maven Central. It is well tested 
 <div class="panel {% if post.emphasis == true %}panel-primary{% else %}panel-default{% endif %}">
   <div class="panel-heading"><h3 class="panel-title">{% if post.content contains '<!--break-->' %}<a href="{{ post.url }}">{{ headingtext }}</a>{% else %}{{ headingtext }}{% endif %}</h3></div>
   <div class="panel-body">
-    {{ post.content | split:'<!--break-->' | first }}{% if post.content contains '<!--break-->' %}
-    <a href="{{ post.url }}"><br/>... read more</a> {% endif %}{% if post.content contains '<!--break-->' %}</p>{% endif %}
+    {{ post.content | split:'<!--break-->' | first | markdownify | replace: "</p>","" }}{% if post.content contains '<!--break-->' %}
+    <br/><a href="{{ post.url }}">... read more</a> {% endif %}{% if post.content contains '<!--break-->' %}</p>{% endif %}
   </div>
   {% if post.release == true %}
   <div class="panel-links"><a href="https://github.com/{{ site.github }}/releases/tag/{{ post.title }}">Download</a>
