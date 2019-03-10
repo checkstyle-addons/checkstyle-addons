@@ -179,10 +179,7 @@ public class RegexpOnStringCheck
                 }
             }
         }
-        else if (pAst.getType() == TokenTypes.EXPR) {
-            return;
-        }
-        else {
+        else if (pAst.getType() != TokenTypes.EXPR) {
             if (pAst.getNumberOfChildren() > 0) {
                 for (DetailAST a = pAst.getFirstChild(); a != null; a = a.getNextSibling()) {
                     flatten(a, pFlattenedList);
