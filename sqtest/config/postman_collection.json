@@ -1,0 +1,357 @@
+{
+    "info": {
+        "_postman_id": "a8d25d72-baa5-48bd-8131-00019629af54",
+        "name": "SonarQube",
+        "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+    },
+    "item": [
+        {
+            "name": "List Rule Repositories",
+            "request": {
+                "method": "GET",
+                "header": [],
+                "body": {
+                    "mode": "raw",
+                    "raw": ""
+                },
+                "url": {
+                    "raw": "{{baseurl}}/api/rules/repositories",
+                    "host": [
+                        "{{baseurl}}"
+                    ],
+                    "path": [
+                        "api", "rules", "repositories"
+                    ]
+                }
+            },
+            "response": []
+        }, {
+            "name": "Login",
+            "request": {
+                "method": "POST",
+                "header": [],
+                "body": {
+                    "mode": "raw",
+                    "raw": ""
+                },
+                "url": {
+                    "raw": "{{baseurl}}/api/authentication/login?login=admin&password=admin",
+                    "host": [
+                        "{{baseurl}}"
+                    ],
+                    "path": [
+                        "api", "authentication", "login"
+                    ],
+                    "query": [
+                        {
+                            "key": "login",
+                            "value": "admin"
+                        }, {
+                            "key": "password",
+                            "value": "admin"
+                        }
+                    ]
+                }
+            },
+            "response": []
+        }, {
+            "name": "Generate Token (API)",
+            "request": {
+                "method": "POST",
+                "header": [
+                    {
+                        "key": "X-XSRF-TOKEN",
+                        "value": "vq1n3pjlsoavgl7s4pqu25o64k",
+                        "type": "text"
+                    }
+                ],
+                "body": {
+                    "mode": "raw",
+                    "raw": ""
+                },
+                "url": {
+                    "raw": "{{baseurl}}/api/user_tokens/generate?login=admin&name=api2",
+                    "host": [
+                        "{{baseurl}}"
+                    ],
+                    "path": [
+                        "api", "user_tokens", "generate"
+                    ],
+                    "query": [
+                        {
+                            "key": "login",
+                            "value": "admin"
+                        }, {
+                            "key": "name",
+                            "value": "api2"
+                        }
+                    ]
+                }
+            },
+            "response": []
+        }, {
+            "name": "Generate Token (Form)",
+            "request": {
+                "method": "POST",
+                "header": [
+                    {
+                        "key": "Content-Type",
+                        "name": "Content-Type",
+                        "value": "application/x-www-form-urlencoded",
+                        "type": "text"
+                    }, {
+                        "key": "X-XSRF-TOKEN",
+                        "value": "4uqq9p6f8svbanifk2lqqfd3qi",
+                        "type": "text"
+                    }
+                ],
+                "body": {
+                    "mode": "urlencoded",
+                    "urlencoded": [
+                        {
+                            "key": "name",
+                            "value": "api3",
+                            "type": "text"
+                        }, {
+                            "key": "login",
+                            "value": "admin",
+                            "type": "text"
+                        }
+                    ]
+                },
+                "url": {
+                    "raw": "{{baseurl}}/api/user_tokens/generate",
+                    "host": [
+                        "{{baseurl}}"
+                    ],
+                    "path": [
+                        "api", "user_tokens", "generate"
+                    ]
+                }
+            },
+            "response": []
+        }, {
+            "name": "Create Custom Rule",
+            "request": {
+                "auth": {
+                    "type": "basic",
+                    "basic": [
+                        {
+                            "key": "username",
+                            "value": "{{apitoken}}",
+                            "type": "string"
+                        }, {
+                            "key": "password",
+                            "value": "",
+                            "type": "string"
+                        }
+                    ]
+                },
+                "method": "POST",
+                "header": [],
+                "body": {
+                    "mode": "raw",
+                    "raw": ""
+                },
+                "url": {
+                    "raw": "{{baseurl}}/api/rules/create?custom_key=LocalVariableNameTester2&markdown_description=Flag an issue for the Checkstyle Addons integration test&name=LocalVariableNameTester2&severity=MINOR&template_key=checkstyle:com.puppycrawl.tools.checkstyle.checks.naming.LocalVariableNameCheck",
+                    "host": [
+                        "{{baseurl}}"
+                    ],
+                    "path": [
+                        "api", "rules", "create"
+                    ],
+                    "query": [
+                        {
+                            "key": "custom_key",
+                            "value": "LocalVariableNameTester2"
+                        }, {
+                            "key": "markdown_description",
+                            "value": "Flag an issue for the Checkstyle Addons integration test"
+                        }, {
+                            "key": "name",
+                            "value": "LocalVariableNameTester2"
+                        }, {
+                            "key": "severity",
+                            "value": "MINOR"
+                        }, {
+                            "key": "template_key",
+                            "value": "checkstyle:com.puppycrawl.tools.checkstyle.checks.naming.LocalVariableNameCheck"
+                        }, {
+                            "key": "login",
+                            "value": "admin",
+                            "disabled": true
+                        }, {
+                            "key": "password",
+                            "value": "admin",
+                            "disabled": true
+                        }
+                    ]
+                }
+            },
+            "response": []
+        }, {
+            "name": "Create Quality Profile",
+            "request": {
+                "auth": {
+                    "type": "basic",
+                    "basic": [
+                        {
+                            "key": "username",
+                            "value": "{{apitoken}}",
+                            "type": "string"
+                        }, {
+                            "key": "password",
+                            "value": "",
+                            "type": "string"
+                        }
+                    ]
+                },
+                "method": "POST",
+                "header": [],
+                "body": {
+                    "mode": "raw",
+                    "raw": ""
+                },
+                "url": {
+                    "raw": "{{baseurl}}/api/qualityprofiles/create?language=java&name=Checkstyle Addons IntTest",
+                    "host": [
+                        "{{baseurl}}"
+                    ],
+                    "path": [
+                        "api", "qualityprofiles", "create"
+                    ],
+                    "query": [
+                        {
+                            "key": "language",
+                            "value": "java"
+                        }, {
+                            "key": "name",
+                            "value": "Checkstyle Addons IntTest"
+                        }
+                    ]
+                }
+            },
+            "response": []
+        }, {
+            "name": "Activate Rule",
+            "request": {
+                "auth": {
+                    "type": "basic",
+                    "basic": [
+                        {
+                            "key": "username",
+                            "value": "{{apitoken}}",
+                            "type": "string"
+                        }, {
+                            "key": "password",
+                            "value": "",
+                            "type": "string"
+                        }
+                    ]
+                },
+                "method": "POST",
+                "header": [],
+                "body": {
+                    "mode": "raw",
+                    "raw": ""
+                },
+                "url": {
+                    "raw": "{{baseurl}}/api/qualityprofiles/activate_rule?key=AWl4pPNkSY0iiIxpOGgY&rule=checkstyle:com.thomasjensen.checkstyle.addons.checks.coding.IllegalMethodCallCheck&severity=CRITICAL&params=illegalMethodNames=forName, newInstance",
+                    "host": [
+                        "{{baseurl}}"
+                    ],
+                    "path": [
+                        "api", "qualityprofiles", "activate_rule"
+                    ],
+                    "query": [
+                        {
+                            "key": "key",
+                            "value": "AWl4pPNkSY0iiIxpOGgY"
+                        }, {
+                            "key": "rule",
+                            "value": "checkstyle:com.thomasjensen.checkstyle.addons.checks.coding.IllegalMethodCallCheck"
+                        }, {
+                            "key": "severity",
+                            "value": "CRITICAL"
+                        }, {
+                            "key": "params",
+                            "value": "illegalMethodNames=forName, newInstance"
+                        }
+                    ]
+                }
+            },
+            "response": []
+        }, {
+            "name": "List Issues in Project",
+            "request": {
+                "auth": {
+                    "type": "basic",
+                    "basic": [
+                        {
+                            "key": "username",
+                            "value": "{{apitoken}}",
+                            "type": "string"
+                        }
+                    ]
+                },
+                "method": "GET",
+                "header": [],
+                "body": {
+                    "mode": "raw",
+                    "raw": ""
+                },
+                "url": {
+                    "raw": "{{baseurl}}/api/issues/search?componentKeys=com.thomasjensen.checkstyle.addons:checkstyle-addons:sqtest",
+                    "host": [
+                        "{{baseurl}}"
+                    ],
+                    "path": [
+                        "api", "issues", "search"
+                    ],
+                    "query": [
+                        {
+                            "key": "componentKeys",
+                            "value": "com.thomasjensen.checkstyle.addons:checkstyle-addons:sqtest"
+                        }
+                    ]
+                }
+            },
+            "response": []
+        }
+    ],
+    "event": [
+        {
+            "listen": "prerequest",
+            "script": {
+                "id": "6b8928a8-0c31-49c2-9520-1e7c3718eab9",
+                "type": "text/javascript",
+                "exec": [
+                    ""
+                ]
+            }
+        }, {
+            "listen": "test",
+            "script": {
+                "id": "e2de159f-a32d-423c-a62e-c6308f38cad2",
+                "type": "text/javascript",
+                "exec": [
+                    ""
+                ]
+            }
+        }
+    ],
+    "variable": [
+        {
+            "id": "a2d8ca1a-ecf7-46c8-ab4d-e80f5afaa29a",
+            "key": "baseurl",
+            "value": "http://localhost:9000",
+            "type": "string"
+        }, {
+            "id": "73ffe8a8-707e-47d9-9dd0-0cfc2f7b017f",
+            "key": "apitoken",
+            "value": "40-char-string-with-your-actual-apitoken",
+            "type": "string"
+        }
+    ]
+}

@@ -17,6 +17,7 @@
 plugins {
     id 'java';
     id 'checkstyle';
+    id 'org.sonarqube' version '2.6';
 }
 repositories {
     jcenter()

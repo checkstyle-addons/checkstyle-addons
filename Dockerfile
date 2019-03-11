@@ -9,7 +9,7 @@ ENV BOXES=/etc/boxes/boxes-config
 USER root
 
 RUN apt-get -y update \
-    && apt-get install -y apt-utils net-tools man boxes vim \
+    && apt-get install -y apt-utils net-tools man boxes vim jq \
     && mkdir /home/sonarqube \
     && chown sonarqube:sonarqube /home/sonarqube
 
