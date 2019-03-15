@@ -15,7 +15,7 @@
 # program.  If not, see http://www.gnu.org/licenses/.
 # __________________________________________________________________________________
 #
-# Set up a blank SonarQube instance for the integration test
+# Set up a blank SonarQube instance for the integration test (runs inside the SonarQube docker container)
 #
 
 declare -r sqBaseUrl=http://localhost:9000
