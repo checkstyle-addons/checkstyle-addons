@@ -127,13 +127,13 @@ String getRunningDockerContainerId(final File pContainerIdFile)
 def waitForSonarQubeStart()
 {
     String status = 'UNKNOWN';
-    for (int count = 0; count < 30 && !'UP'.equals(status); count++) {
+    for (int count = 0; count < 30 && status != 'UP'; count++) {
         try {
             final URLConnection get = new URL("http://${sqHost}:${sqPort}/api/system/status").openConnection();
             get.setConnectTimeout(1000);
             get.setReadTimeout(2000);
             def getRC = get.getResponseCode();
-            if (getRC.equals(200)) {
+            if (getRC == 200) {
                 def map = new JsonSlurper().parseText(get.getInputStream().getText());
                 status = map.status;
             }
@@ -142,7 +142,7 @@ def waitForSonarQubeStart()
         }
         sleep(3000);
     }
-    if (!'UP'.equals(status)) {
+    if (status != 'UP') {
         throw new GradleException('SonarQube failed to start');
     }
 }

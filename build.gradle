@@ -137,7 +137,7 @@ ext {
             }
         }
 
-        if (JavaPlugin.TEST_TASK_NAME.equals(name)) {
+        if (name == JavaPlugin.TEST_TASK_NAME) {
             systemProperty(TestTask.CSVERSION_SYSPROP_NAME, project.ext.checkstyleBaseVersion);
         }
     }

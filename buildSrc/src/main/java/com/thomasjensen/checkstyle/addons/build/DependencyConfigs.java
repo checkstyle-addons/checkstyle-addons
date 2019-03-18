@@ -199,7 +199,6 @@ public class DependencyConfigs
 
 
 
-    @SuppressWarnings("unchecked")
     private SortedMap<String, DependencyConfig> readAllDependencyVersions(final FileCollection pAllDepConfigs)
     {
         final SortedMap<String, DependencyConfig> result = new TreeMap<>();
