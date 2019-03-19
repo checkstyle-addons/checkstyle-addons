@@ -1,0 +1,65 @@
+[
+    {
+        "rule": "checkstyle:com.puppycrawl.tools.checkstyle.checks.whitespace.FileTabCharacterCheck",
+        "file": "FileTabCharacterSqDummy.java",
+        "severity": "MINOR",
+        "line": 27,
+        "message": "File contains tab characters (this is the first instance)."
+    },
+    {
+        "rule": "checkstyle:LocalVariableNameTester",
+        "file": "IllegalMethodCallSqDummy.java",
+        "severity": "MINOR",
+        "line": 28,
+        "message": "Name 'current_millis' must match pattern '^[a-z][a-zA-Z0-9]*$'."
+    },
+    {
+        "rule": "checkstyle:com.thomasjensen.checkstyle.addons.checks.coding.IllegalMethodCallCheck",
+        "file": "IllegalMethodCallSqDummy.java",
+        "severity": "CRITICAL",
+        "line": 30,
+        "message": "Illegal method call: forName()"
+    },
+    {
+        "rule": "checkstyle:LocationReferenceTester",
+        "file": "LocationReferenceSqDummy.java",
+        "severity": "MAJOR",
+        "line": 27,
+        "message": "Value must reference the current method name, which is 'method1'"
+    },
+    {
+        "rule": "checkstyle:com.thomasjensen.checkstyle.addons.checks.coding.LostInstanceCheck",
+        "file": "LostInstanceSqDummy.java",
+        "severity": "CRITICAL",
+        "line": 29,
+        "message": "Instance created here is not used for anything."
+    },
+    {
+        "rule": "checkstyle:com.thomasjensen.checkstyle.addons.checks.misc.PropertyCatalogCheck",
+        "file": "PropertyCatalogSqDummy.java",
+        "severity": "MAJOR",
+        "line": 27,
+        "message": "Property 'three' not found in file: (snip)"
+    },
+    {
+        "rule": "checkstyle:com.thomasjensen.checkstyle.addons.checks.misc.ModuleDirectoryLayoutCheck",
+        "file": "RegexpOnFilenameOrgIllegal.java",
+        "severity": "CRITICAL",
+        "line": 1,
+        "message": "File is not accepted content of src/main/java: com\\thomasjensen\\checkstyle\\addons\\sqtest\\RegexpOnFilenameOrgIllegal.java"
+    },
+    {
+        "rule": "checkstyle:RegexpOnFilenameOrgTester",
+        "file": "RegexpOnFilenameOrgIllegal.java",
+        "severity": "MAJOR",
+        "line": 1,
+        "message": "Filename 'RegexpOnFilenameOrgIllegal.java' contains illegal pattern 'Illegal\\.java$'."
+    },
+    {
+        "rule": "checkstyle:RegexpOnStringTester",
+        "file": "RegexpOnStringSqDummy.java",
+        "severity": "CRITICAL",
+        "line": 25,
+        "message": "String \"flag this\" matches illegal pattern 'flag this'."
+    }
+]
