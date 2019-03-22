@@ -300,7 +300,6 @@ task integrationTest(dependsOn: fetchResultIssues) {
     tasks[it].group = 'sqtest';
 }
 
-
 project.tasks['sonarqube'].dependsOn 'fetchApiToken';
 
 sonarqube {
@@ -311,3 +310,6 @@ sonarqube {
         // sonar.login set by fetchApiToken task using value from container
     }
 }
+
+// 'build' no longer depends on 'check', so that main CSA builds don't show the integration test issues.
+build.dependsOn.remove('check');
