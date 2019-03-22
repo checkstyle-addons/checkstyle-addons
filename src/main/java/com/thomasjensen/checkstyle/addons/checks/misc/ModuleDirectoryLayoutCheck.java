@@ -145,17 +145,17 @@ public class ModuleDirectoryLayoutCheck
 
                 if (!mdlConfig.getSettings().isAllowNestedSrcFolder() && decomposedPath.getSpecificFolders().contains(
                     "src")) {
-                    log(0, "moduledirectorylayout.nestedsrcfolder", decomposedPath.getSpecificPath());
+                    log(1, "moduledirectorylayout.nestedsrcfolder", decomposedPath.getSpecificPath());
                 }
 
                 else if (!isMdlAllowedForModule(mdlSpec, decomposedPath)) {
-                    log(0, "moduledirectorylayout.notinthismodule", decomposedPath.getMdlPath(),
+                    log(1, "moduledirectorylayout.notinthismodule", decomposedPath.getMdlPath(),
                         decomposedPath.getModulePath());
                 }
 
                 else if (!isSpecificPathAllowedInMdl(mdlConfig, mdlSpec, decomposedPath)
                     || !isAllowListPostProcessingOk(mdlSpec.getAllow(), decomposedPath)) {
-                    log(0, "moduledirectorylayout.illegalcontent", decomposedPath.getMdlPath(),
+                    log(1, "moduledirectorylayout.illegalcontent", decomposedPath.getMdlPath(),
                         decomposedPath.getSpecificPath());
                 }
             }
@@ -329,7 +329,7 @@ public class ModuleDirectoryLayoutCheck
                 modulePath = cutSlashes(matcher.group(0));
             }
             else if (filePath.contains("\\") || filePath.contains("/")) {     // no error if file is in baseDir
-                log(0, "moduledirectorylayout.invalid.module", filePath, moduleRegexp.pattern());
+                log(1, "moduledirectorylayout.invalid.module", filePath, moduleRegexp.pattern());
                 return null;
             }
         }
@@ -349,7 +349,7 @@ public class ModuleDirectoryLayoutCheck
         }
         if (mdlPath == null) {
             if (filePath.indexOf(File.separatorChar) > 0) {   // no error if file is in module root
-                log(0, "moduledirectorylayout.invalid.mdlpath", filePath);
+                log(1, "moduledirectorylayout.invalid.mdlpath", filePath);
             }
             return null;
         }

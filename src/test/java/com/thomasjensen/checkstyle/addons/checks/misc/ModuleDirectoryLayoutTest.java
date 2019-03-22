@@ -252,7 +252,7 @@ public class ModuleDirectoryLayoutTest
         mCheckConfig.addAttribute("configFile", getPath("misc/ModuleDirectoryLayout/directories-multi.json"));
 
         // moduleRegex in the JSON file does not match our single-module scenario, so the module cannot be determined
-        final String[] expected = {"0: Module association could not be determined for file: " + Util.standardizeSlashes(
+        final String[] expected = {"1: Module association could not be determined for file: " + Util.standardizeSlashes(
             "src/test/resources/com/thomasjensen/checkstyle/addons/checks/misc/ModuleDirectoryLayout/"
                 + "InputModuleDirectoryLayout-empty.txt") + " - moduleRegex: ^.+?[\\\\/]module\\d+"};
 
@@ -296,7 +296,7 @@ public class ModuleDirectoryLayoutTest
         mCheckConfig.addAttribute("configFile", getPath("misc/ModuleDirectoryLayout/directories.json"));
 
         // moduleRegex in the JSON file does not match our single-module scenario, so the module cannot be determined
-        final String[] expected = {"0: 'src' may not be used as package name or subfolder: " + Util.standardizeSlashes(
+        final String[] expected = {"1: 'src' may not be used as package name or subfolder: " + Util.standardizeSlashes(
             "com/thomasjensen/checkstyle/addons/checks/misc/ModuleDirectoryLayout/scenario1/src/NestedSrcFolder.txt")};
 
         final String filepath = getPath("misc/ModuleDirectoryLayout/scenario1/src/NestedSrcFolder.txt");
@@ -313,7 +313,7 @@ public class ModuleDirectoryLayoutTest
         mCheckConfig.addAttribute("configFile", getPath("misc/ModuleDirectoryLayout/directories-scenario2.json"));
 
         // because we configured it to be valid only in 'module-x'
-        final String[] expected = {"0: Source folder 'src/main/webapp' is not allowed in module 'module1'"};
+        final String[] expected = {"1: Source folder 'src/main/webapp' is not allowed in module 'module1'"};
 
         final String filepath = getPath("misc/ModuleDirectoryLayout/scenario2/module1/src/main/webapp/file.txt");
         verify(mCheckConfig, filepath, expected);
@@ -342,7 +342,7 @@ public class ModuleDirectoryLayoutTest
         mCheckConfig.addAttribute("baseDir", getPath("misc/ModuleDirectoryLayout/default"));
         // no configFile property -> use built-in default
 
-        final String[] expected = {"0: File resides in a non-standard source folder: " + Util.standardizeSlashes(
+        final String[] expected = {"1: File resides in a non-standard source folder: " + Util.standardizeSlashes(
             "src/main/whitespace/file.ws")};
 
         final String filepath = getPath("misc/ModuleDirectoryLayout/default/src/main/whitespace/file.ws");
@@ -360,7 +360,7 @@ public class ModuleDirectoryLayoutTest
             "src/main/resources/com/thomasjensen/checkstyle/addons/checks/misc/ModuleDirectoryLayout-default.json")
             .getCanonicalPath());
 
-        final String[] expected = {"0: File is not accepted content of src/main/java: " + Util.standardizeSlashes(
+        final String[] expected = {"1: File is not accepted content of src/main/java: " + Util.standardizeSlashes(
             "a/b/illegal.txt")};
 
         final String filepath = getPath("misc/ModuleDirectoryLayout/default/src/main/java/a/b/illegal.txt");
@@ -379,7 +379,7 @@ public class ModuleDirectoryLayoutTest
             .getCanonicalPath());
 
         // .java is ok as a file extension, but the containing META-INF folder is on the deny list
-        final String[] expected = {"0: File is not accepted content of src/main/java: " + Util.standardizeSlashes(
+        final String[] expected = {"1: File is not accepted content of src/main/java: " + Util.standardizeSlashes(
             "a/META-INF/A.java")};
 
         final String filepath = getPath("misc/ModuleDirectoryLayout/default/src/main/java/a/META-INF/A.java");
@@ -397,7 +397,7 @@ public class ModuleDirectoryLayoutTest
             "src/main/resources/com/thomasjensen/checkstyle/addons/checks/misc/ModuleDirectoryLayout-default.json")
             .getCanonicalPath());
 
-        final String[] expected = {"0: File is not accepted content of src/main/resources: " + Util.standardizeSlashes(
+        final String[] expected = {"1: File is not accepted content of src/main/resources: " + Util.standardizeSlashes(
             "META-INF/META-INF/file.txt")};
 
         final String filepath = getPath(
@@ -431,7 +431,7 @@ public class ModuleDirectoryLayoutTest
             "src/main/resources/com/thomasjensen/checkstyle/addons/checks/misc/ModuleDirectoryLayout-default.json")
             .getCanonicalPath());
 
-        final String[] expected = {"0: File is not accepted content of src/main/resources: " + Util.standardizeSlashes(
+        final String[] expected = {"1: File is not accepted content of src/main/resources: " + Util.standardizeSlashes(
             "a/META-INF/file.txt")};
 
         final String filepath = getPath("misc/ModuleDirectoryLayout/default/src/main/resources/a/META-INF/file.txt");
@@ -538,7 +538,7 @@ public class ModuleDirectoryLayoutTest
         mCheckConfig.addAttribute("baseDir", getPath("misc/ModuleDirectoryLayout/default"));
         mCheckConfig.addAttribute("configFile", getPath("misc/ModuleDirectoryLayout/directories-scenario5.json"));
 
-        final String[] expected = {"0: File is not accepted content of src/main/java: " + Util.standardizeSlashes(
+        final String[] expected = {"1: File is not accepted content of src/main/java: " + Util.standardizeSlashes(
             "a/b/illegal.java")};
 
         final String filepath = getPath("misc/ModuleDirectoryLayout/default/src/main/java/a/b/illegal.java");

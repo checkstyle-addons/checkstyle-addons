@@ -122,7 +122,7 @@ public class RegexpOnFilenameOrgCheck
             final String msgKey = "regexp.filepath." + mode.toString().toLowerCase(Locale.ENGLISH);
             // Log the exact String that the regexp was applied to and the exact regexp that was
             // used. It is important to be accurate here in order to enable people to check results.
-            log(0, msgKey, filePath, regexp.pattern());
+            log(1, msgKey, filePath, regexp.pattern());
         }
     }
 

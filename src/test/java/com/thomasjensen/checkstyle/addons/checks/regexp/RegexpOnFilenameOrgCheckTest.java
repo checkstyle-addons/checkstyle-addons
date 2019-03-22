@@ -77,7 +77,7 @@ public class RegexpOnFilenameOrgCheckTest
         mCheckConfig.addAttribute("regexp", regexp);
         mCheckConfig.addAttribute("mode", "required");
         final String[] expected =
-            {"0: Filename '" + SIMPLE_FILENAME + "' does not contain required pattern '" + regexp + "'."};
+            {"1: Filename '" + SIMPLE_FILENAME + "' does not contain required pattern '" + regexp + "'."};
         verify(mCheckConfig, filepath, expected);
     }
 
@@ -93,7 +93,7 @@ public class RegexpOnFilenameOrgCheckTest
         mCheckConfig.addAttribute("regexp", regexp);
         mCheckConfig.addAttribute("mode", "required");
         final String[] expected =
-            {"0: Filename '" + SIMPLE_FILENAME + "' does not contain required pattern '" + regexp + "'."};
+            {"1: Filename '" + SIMPLE_FILENAME + "' does not contain required pattern '" + regexp + "'."};
         verify(mCheckConfig, filepath, expected);
     }
 
@@ -125,7 +125,7 @@ public class RegexpOnFilenameOrgCheckTest
         mCheckConfig.addAttribute("regexp", regexp);
         mCheckConfig.addAttribute("mode", "required");
         final String[] expected =
-            {"0: Filename '" + SIMPLE_FILENAME + "' does not contain required pattern '" + regexp + "'."};
+            {"1: Filename '" + SIMPLE_FILENAME + "' does not contain required pattern '" + regexp + "'."};
         verify(mCheckConfig, filepath, expected);
     }
 
@@ -141,7 +141,7 @@ public class RegexpOnFilenameOrgCheckTest
         mCheckConfig.addAttribute("selection", SIMPLE_FILENAME + "$");
         mCheckConfig.addAttribute("mode", "required");
         final String[] expected =
-            {"0: Filename '" + SIMPLE_FILENAME + "' does not contain required pattern '" + regexp + "'."};
+            {"1: Filename '" + SIMPLE_FILENAME + "' does not contain required pattern '" + regexp + "'."};
         verify(mCheckConfig, filepath, expected);
     }
 
@@ -183,7 +183,7 @@ public class RegexpOnFilenameOrgCheckTest
         mCheckConfig.addAttribute("regexp", regexp);
         mCheckConfig.addAttribute("simple", "false");
         mCheckConfig.addAttribute("mode", "illegal");
-        final String[] expected = {"0: Filename '" + filepath + "' contains illegal pattern '" + regexp + "'."};
+        final String[] expected = {"1: Filename '" + filepath + "' contains illegal pattern '" + regexp + "'."};
         verify(mCheckConfig, filepath, expected);
     }
 
@@ -230,7 +230,7 @@ public class RegexpOnFilenameOrgCheckTest
         mCheckConfig.addAttribute("simple", "false");
         mCheckConfig.addAttribute("mode", "required");
         final String[] expected =
-            {"0: Filename '" + filepath + "' does not contain required pattern '" + regexp + "'."};
+            {"1: Filename '" + filepath + "' does not contain required pattern '" + regexp + "'."};
         verify(mCheckConfig, filepath, expected);
     }
 
@@ -243,7 +243,7 @@ public class RegexpOnFilenameOrgCheckTest
         final String filepath = getPath(SIMPLE_FILENAME);
         final String regexp = "^" + SIMPLE_FILENAME + "$";
         mCheckConfig.addAttribute("regexp", regexp);
-        final String[] expected = {"0: Filename '" + SIMPLE_FILENAME + "' contains illegal pattern '" + regexp + "'."};
+        final String[] expected = {"1: Filename '" + SIMPLE_FILENAME + "' contains illegal pattern '" + regexp + "'."};
         verify(mCheckConfig, filepath, expected);
     }
 
@@ -308,7 +308,7 @@ public class RegexpOnFilenameOrgCheckTest
         try {
             tempFile = File.createTempFile("addons-test-", ".txt ");
             final String[] expected =
-                {"0: Filename '" + tempFile.getName() + "' contains illegal pattern '" + "^(?:\\s+.*|.*?\\s+)$" + "'."};
+                {"1: Filename '" + tempFile.getName() + "' contains illegal pattern '" + "^(?:\\s+.*|.*?\\s+)$" + "'."};
             verify(mCheckConfig, tempFile.getAbsolutePath(), expected);
         }
         finally {
@@ -328,7 +328,7 @@ public class RegexpOnFilenameOrgCheckTest
         try {
             tempFile = File.createTempFile(" addons-test-", ".txt");
             final String[] expected =
-                {"0: Filename '" + tempFile.getName() + "' contains illegal pattern '" + "^(?:\\s+.*|.*?\\s+)$" + "'."};
+                {"1: Filename '" + tempFile.getName() + "' contains illegal pattern '" + "^(?:\\s+.*|.*?\\s+)$" + "'."};
             verify(mCheckConfig, tempFile.getAbsolutePath(), expected);
         }
         finally {
