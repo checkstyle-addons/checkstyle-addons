@@ -24,11 +24,11 @@ plugins {
     id 'jacoco';
     id 'com.github.kt3k.coveralls' version '2.8.1';
     id 'checkstyle';
-    id 'findbugs';
+    id 'com.github.spotbugs';
     id 'idea';
     id 'maven-publish';
     id 'com.jfrog.bintray' version '1.8.4';
-    id 'com.dorongold.task-tree' version '1.3';
+    id 'com.dorongold.task-tree' version '1.3.1';
 }
 
 repositories {
@@ -89,7 +89,8 @@ taskCreator.establishSonarQubeSourceSet();
 taskCreator.establishGeneralCompileOnlyCfg();
 
 dependencies {
-    generalCompileOnly group: 'com.google.code.findbugs', name: 'annotations', version: '3.0.1';
+    generalCompileOnly group: 'net.jcip', name: 'jcip-annotations', version: '1.0';
+    generalCompileOnly group: 'com.github.spotbugs', name: 'spotbugs-annotations', version: '3.1.12';
     generalCompileOnly group: 'com.google.code.findbugs', name: 'jsr305', version: '3.0.1';
 
     api group: 'com.puppycrawl.tools', name: 'checkstyle', version: project.ext.checkstyleBaseVersion;
@@ -100,8 +101,7 @@ dependencies {
 
     testImplementation group: 'junit', name: 'junit', version: '4.12';
 
-    findbugs group: 'com.google.code.findbugs', name: 'findbugs', version: '3.0.1';
-    findbugs group: 'com.mebigfatguy.fb-contrib', name: 'fb-contrib', version: '6.6.1';
+    spotbugsPlugins group: 'com.mebigfatguy.fb-contrib', name: 'fb-contrib', version: '7.4.3.sb';
 }
 
 ext {
@@ -162,8 +162,8 @@ tasks.withType(JavaCompile) {
 //   FindBugs configuration
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
-findbugs {
-    toolVersion = '3.0.1';
+spotbugs {
+    toolVersion = '3.1.12';
     effort = 'max';
     reportLevel = 'low';
     ignoreFailures = false;
@@ -216,7 +216,6 @@ String[] excludedClasses = ['**/com/thomasjensen/checkstyle/addons/util/Checksty
 test((Closure) testConfigClosure);
 test {
     jacoco {
-        append = false;
         excludes = excludedClasses.toList();
     }
 }

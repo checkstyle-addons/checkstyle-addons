@@ -52,7 +52,7 @@ public class CreateFatJarTask
         final Project project = getProject();
         buildUtil = new BuildUtil(project);
         setGroup(TaskCreator.ARTIFACTS_GROUP_NAME);
-        setClassifier("all");
+        getArchiveClassifier().set("all");
     }
 
 
@@ -79,7 +79,7 @@ public class CreateFatJarTask
         // set appendix for archive name
         final String appendix = pDepConfig.getName();
         if (!pDepConfig.isDefaultConfig()) {
-            setAppendix(appendix);
+            getArchiveAppendix().set(appendix);
         }
 
         // dependency on the corresponding (thin) Jar task
@@ -91,7 +91,7 @@ public class CreateFatJarTask
 
         getManifest().inheritFrom(thinJarTask.getManifest());
 
-        from(thinJarTask.getArchivePath());
+        from(thinJarTask.getArchiveFile().get().getAsFile());
         Configuration cfg = new ClasspathBuilder(getProject()).buildMainRuntimeConfiguration(pDepConfig);
         setConfigurations(Collections.singletonList(cfg));
         exclude("META-INF/INDEX.LIST", "META-INF/*.SF", "META-INF/*.DSA", "META-INF/*.RSA", "META-INF/maven/**/*",

@@ -20,6 +20,18 @@ import java.util.Arrays;
 import java.util.Map;
 import javax.annotation.Nonnull;
 
+import com.github.spotbugs.SpotBugsTask;
+import com.thomasjensen.checkstyle.addons.build.tasks.CompileTask;
+import com.thomasjensen.checkstyle.addons.build.tasks.CreateFatJarTask;
+import com.thomasjensen.checkstyle.addons.build.tasks.CreateJarEclipseTask;
+import com.thomasjensen.checkstyle.addons.build.tasks.CreateJarJavadocTask;
+import com.thomasjensen.checkstyle.addons.build.tasks.CreateJarSonarqubeTask;
+import com.thomasjensen.checkstyle.addons.build.tasks.CreateJarSourcesTask;
+import com.thomasjensen.checkstyle.addons.build.tasks.CreateJarTask;
+import com.thomasjensen.checkstyle.addons.build.tasks.GeneratePomFileTask;
+import com.thomasjensen.checkstyle.addons.build.tasks.GeneratePomPropsTask;
+import com.thomasjensen.checkstyle.addons.build.tasks.JavadocTask;
+import com.thomasjensen.checkstyle.addons.build.tasks.TestTask;
 import groovy.lang.Closure;
 import org.gradle.api.JavaVersion;
 import org.gradle.api.Project;
@@ -32,7 +44,6 @@ import org.gradle.api.plugins.JavaBasePlugin;
 import org.gradle.api.plugins.JavaPlugin;
 import org.gradle.api.plugins.JavaPluginConvention;
 import org.gradle.api.plugins.quality.Checkstyle;
-import org.gradle.api.plugins.quality.FindBugs;
 import org.gradle.api.publish.PublishingExtension;
 import org.gradle.api.publish.maven.MavenPublication;
 import org.gradle.api.publish.maven.tasks.GenerateMavenPom;
@@ -41,18 +52,6 @@ import org.gradle.api.tasks.SourceSet;
 import org.gradle.api.tasks.SourceSetContainer;
 import org.gradle.api.tasks.TaskContainer;
 import org.gradle.language.base.plugins.LifecycleBasePlugin;
-
-import com.thomasjensen.checkstyle.addons.build.tasks.CompileTask;
-import com.thomasjensen.checkstyle.addons.build.tasks.CreateFatJarTask;
-import com.thomasjensen.checkstyle.addons.build.tasks.CreateJarEclipseTask;
-import com.thomasjensen.checkstyle.addons.build.tasks.CreateJarJavadocTask;
-import com.thomasjensen.checkstyle.addons.build.tasks.CreateJarSonarqubeTask;
-import com.thomasjensen.checkstyle.addons.build.tasks.CreateJarSourcesTask;
-import com.thomasjensen.checkstyle.addons.build.tasks.CreateJarTask;
-import com.thomasjensen.checkstyle.addons.build.tasks.GeneratePomFileTask;
-import com.thomasjensen.checkstyle.addons.build.tasks.GeneratePomPropsTask;
-import com.thomasjensen.checkstyle.addons.build.tasks.JavadocTask;
-import com.thomasjensen.checkstyle.addons.build.tasks.TestTask;
 
 
 /**
@@ -322,8 +321,8 @@ public class TaskCreator
         tasks.getByName(sqSourceSet.getCompileJavaTaskName()).setGroup(BasePlugin.BUILD_GROUP);
         tasks.getByName(JavaPlugin.COMPILE_TEST_JAVA_TASK_NAME).setGroup(BasePlugin.BUILD_GROUP);
 
-        for (final FindBugs fbTask : tasks.withType(FindBugs.class)) {
-            fbTask.setGroup(LifecycleBasePlugin.VERIFICATION_GROUP);
+        for (final SpotBugsTask sbTask : tasks.withType(SpotBugsTask.class)) {
+            sbTask.setGroup(LifecycleBasePlugin.VERIFICATION_GROUP);
         }
         for (final Checkstyle csTask : tasks.withType(Checkstyle.class)) {
             csTask.setGroup(LifecycleBasePlugin.VERIFICATION_GROUP);

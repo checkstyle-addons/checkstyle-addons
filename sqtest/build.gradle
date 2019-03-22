@@ -64,10 +64,23 @@ checkstyle {
     configProperties 'workspace_loc': projectDir;
     sourceSets = [project.sourceSets.main];
     toolVersion = '8.14';
+    showViolations = true;
 }
-tasks['checkstyleMain'].setSource(project.sourceSets.main.allSource);
-tasks['checkstyleMain'].checkstyleClasspath += rootProject.sourceSets.main.output;
-tasks.remove(tasks['checkstyleTest']);
+tasks['checkstyleMain'].enabled = false;
+
+task checkstyle(type: Checkstyle, dependsOn: classes) {
+    description = rootProject.ext.longName +
+            ': Check our integration test dummy source code with Checkstyle via Gradle (for reference only)';
+    group = 'sqtest';
+
+    source = project.sourceSets.main.allSource;
+    checkstyleClasspath += rootProject.sourceSets.main.output;
+    classpath = project.sourceSets.main.output;
+
+    doFirst {
+        logger.lifecycle('The following Checkstyle run is *expected* to produce issues:');
+    }
+}
 
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
@@ -295,8 +308,9 @@ task integrationTest(dependsOn: fetchResultIssues) {
 }
 
 
-['checkstyleMain', 'compileJava', 'compileTestJava', 'processResources', 'processTestResources', 'sonarqube', 'test',
- 'check', 'assemble', 'build', 'buildDependents', 'buildNeeded', 'classes', 'clean', 'jar', 'testClasses'].each {
+['checkstyleMain', 'checkstyleTest', 'compileJava', 'compileTestJava', 'processResources', 'processTestResources',
+ 'sonarqube', 'test', 'check', 'assemble', 'build', 'buildDependents', 'buildNeeded', 'classes', 'clean', 'jar',
+ 'testClasses'].each {
     tasks[it].group = 'sqtest';
 }
 
@@ -310,6 +324,3 @@ sonarqube {
         // sonar.login set by fetchApiToken task using value from container
     }
 }
-
-// 'build' no longer depends on 'check', so that main CSA builds don't show the integration test issues.
-build.dependsOn.remove('check');

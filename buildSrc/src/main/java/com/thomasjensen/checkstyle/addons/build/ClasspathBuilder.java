@@ -201,11 +201,18 @@ public class ClasspathBuilder
                         .get(dependency.getGroup()));
                 newDeps.add(newDep);
             }
+            else if (!pDepConfig.isDefaultConfig() && "com.github.spotbugs".equals(dependency.getGroup())) {
+                // com.github.spotbugs requires minimum JDK8, so for older depConfigs, we must replace with FindBugs.
+                // This is ok, because the annotation is only *used* by SpotBugs in the default depConfig.
+                final ModuleDependency newDep = (ModuleDependency) project.getDependencies().create(
+                    "com.google.code.findbugs:annotations:3.0.1");
+                newDeps.add(newDep);
+            }
             else {
                 newDeps.add(dependency);
             }
         }
-        return project.getConfigurations().detachedConfiguration(newDeps.toArray(new Dependency[newDeps.size()]));
+        return project.getConfigurations().detachedConfiguration(newDeps.toArray(new Dependency[0]));
     }
 
 

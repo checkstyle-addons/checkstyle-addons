@@ -76,7 +76,7 @@ public class CreateJarSonarqubeTask
         inputs.property("website", getBuildUtil().getExtraPropertyValue(ExtProp.Website));
 
         // archive name
-        setArchiveName(
+        getArchiveFileName().set(
             "sonar-" + inputs.getProperties().get("sqPluginKey") + "-" + inputs.getProperties().get(BuildUtil.VERSION)
                 + (pDepConfig.isDefaultConfig() ? "" : ("-csp" + pDepConfig.getSonarQubeMinCsPluginVersion()))
                 + ".jar");
@@ -108,7 +108,7 @@ public class CreateJarSonarqubeTask
         });
 
         final Set<File> pubLibs = CreateJarEclipseTask.getPublishedDependencyLibs(this, pDepConfig);
-        intoFrom("META-INF/lib", jarTask.getArchivePath());
+        intoFrom("META-INF/lib", jarTask.getArchiveFile().get().getAsFile());
         intoFrom("META-INF/lib", pubLibs);
 
         // Manifest
@@ -139,7 +139,7 @@ public class CreateJarSonarqubeTask
         pAttributes.put("Plugin-Class", "com.thomasjensen.checkstyle.addons.sonarqube.CheckstyleExtensionPlugin");
         pAttributes.put("Plugin-RequirePlugins", "java:" + pDepConfig.getSonarQubeMinJavaPluginVersion() //
             + ",checkstyle:" + pDepConfig.getSonarQubeMinCsPluginVersion());
-        pAttributes.put("Plugin-Dependencies", "META-INF/lib/" + jarTask.getArchiveName() //
+        pAttributes.put("Plugin-Dependencies", "META-INF/lib/" + jarTask.getArchiveFileName().get() //
             + (pPubLibs.size() > 0 ? " " : "") //
             + CreateJarEclipseTask.flattenPrefixLibs("META-INF/lib/", pPubLibs, ' '));
         pAttributes.put("Plugin-License", "GPLv3");

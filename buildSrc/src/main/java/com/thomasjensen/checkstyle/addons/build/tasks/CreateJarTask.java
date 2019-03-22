@@ -82,7 +82,7 @@ public class CreateJarTask
         // set appendix for archive name
         final String appendix = pDepConfig.getName();
         if (!pDepConfig.isDefaultConfig()) {
-            setAppendix(appendix);
+            getArchiveAppendix().set(appendix);
         }
 
         // Dependency on pom.properties generating task

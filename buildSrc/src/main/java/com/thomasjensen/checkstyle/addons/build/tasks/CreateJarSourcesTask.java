@@ -32,7 +32,7 @@ public class CreateJarSourcesTask
     public CreateJarSourcesTask()
     {
         super();
-        setClassifier("sources");
+        getArchiveClassifier().set("sources");
     }
 
 
@@ -43,7 +43,7 @@ public class CreateJarSourcesTask
         // set appendix for archive name
         if (!pDepConfig.isDefaultConfig()) {
             final String appendix = pDepConfig.getName();
-            setAppendix(appendix);
+            getArchiveAppendix().set(appendix);
         }
         setDescription(
             getBuildUtil().getLongName() + ": Build the source JAR for dependency configuration '" + pDepConfig

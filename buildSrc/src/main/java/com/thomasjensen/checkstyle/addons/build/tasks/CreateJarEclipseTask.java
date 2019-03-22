@@ -53,7 +53,7 @@ public class CreateJarEclipseTask
     public CreateJarEclipseTask()
     {
         super();
-        setAppendix("eclipse");
+        getArchiveAppendix().set("eclipse");
     }
 
 
@@ -125,7 +125,7 @@ public class CreateJarEclipseTask
         // adjust archive name
         if (!pDepConfig.isDefaultConfig()) {
             final String pubSuffix = pDepConfig.getName();
-            setAppendix(pubSuffix + '-' + getAppendix());
+            getArchiveAppendix().set(pubSuffix + '-' + getArchiveAppendix().get());
         }
 
         // Dependency on 'classes' task (compile and resources)

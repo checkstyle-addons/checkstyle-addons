@@ -32,7 +32,7 @@ public class CreateJarJavadocTask
     public CreateJarJavadocTask()
     {
         super();
-        setClassifier("javadoc");
+        getArchiveClassifier().set("javadoc");
     }
 
 
@@ -43,7 +43,7 @@ public class CreateJarJavadocTask
         // set appendix for archive name
         if (!pDepConfig.isDefaultConfig()) {
             final String appendix = pDepConfig.getName();
-            setAppendix(appendix);
+            getArchiveAppendix().set(appendix);
         }
         setDescription(
             getBuildUtil().getLongName() + ": Build the javadoc JAR for dependency configuration '" + pDepConfig
