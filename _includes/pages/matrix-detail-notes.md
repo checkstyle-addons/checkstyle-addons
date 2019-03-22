@@ -72,6 +72,12 @@ analysis of the commit history on GitHub has turned up further breaking changes:
 <dt class="title">Checkstyle</dt><dd class="title">– Breaking Change</dd>
 <dt>8.15</dt><dd>– several command line options renamed / changed as explained
         <a href="https://github.com/checkstyle/checkstyle/issues/6068#issuecomment-434097233">here</a></dd>
+<dt>8.13</dt><dd>– FileSetChecks which flag an entire file rather than a piece of code now need to report their issues
+        on line 1 instead of line 0. This is a semantic change introduced with
+		<a href="https://github.com/checkstyle/checkstyle/issues/6000">checkstyle/checkstyle#6000</a>. Custom checks
+		which still report their issues on line 0 may run into problems when interacting with other tools, for example
+		sonar-checkstyle would crash before 4.19 (<a
+		href="https://github.com/checkstyle/sonar-checkstyle/issues/199">checkstyle/sonar-checkstyle#199</a>).</dd>
 <dt>7.7</dt><dd>– public method <code>excapeAllControlChars()</code> renamed to <code>escapeAllControlChars()</code> in
         <code>JavadocUtils</code> (commit
         <a href="https://github.com/checkstyle/checkstyle/commit/3bd3a52280388520c64ec813dd1e4ffb3a0063a2">#3bd3a52</a>)</dd>
