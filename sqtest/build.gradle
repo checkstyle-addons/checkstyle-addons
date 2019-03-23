@@ -69,8 +69,7 @@ checkstyle {
 tasks['checkstyleMain'].enabled = false;
 
 task checkstyle(type: Checkstyle, dependsOn: classes) {
-    description = rootProject.ext.longName +
-            ': Check our integration test dummy source code with Checkstyle via Gradle (for reference only)';
+    description = 'Check our integration test dummy source code with Checkstyle via Gradle (for reference only)';
     group = 'sqtest';
 
     source = project.sourceSets.main.allSource;
@@ -100,8 +99,7 @@ String getDockerImageId()
 
 
 task buildDockerImage(type: Exec, dependsOn: rootProject.tasks['jarSonarqubeDefault']) {
-    description = rootProject.ext.longName + ': Build the docker image for the ' + rootProject.ext.longName +
-        ' integration test';
+    description = 'Build the docker image for the ' + rootProject.ext.longName + ' integration test';
     group = 'sqtest';
 
     final File imageIdFile = new File(getTemporaryDir(), "docker-image-id.txt");
@@ -162,8 +160,7 @@ def waitForSonarQubeStart()
 
 
 task startDockerContainer(type: Exec, dependsOn: buildDockerImage) {
-    description = rootProject.ext.longName + ': Start the SonarQube docker container for the ' +
-        rootProject.ext.longName + ' integration test';
+    description = 'Start the SonarQube docker container for the ' + rootProject.ext.longName + ' integration test';
     group = 'sqtest';
 
     final File containerIdFile = new File(getTemporaryDir(), 'container-id.txt');
@@ -190,8 +187,8 @@ task startDockerContainer(type: Exec, dependsOn: buildDockerImage) {
 
 
 task initDockerContainer(type: Exec, dependsOn: startDockerContainer) {
-    description = rootProject.ext.longName + ': Initialize a newly started SonarQube docker container for the ' +
-        rootProject.ext.longName + ' integration test';
+    description = 'Initialize a newly started SonarQube docker container for the ' + rootProject.ext.longName +
+        ' integration test';
     group = 'sqtest';
 
     workingDir = rootProject.projectDir;
@@ -204,7 +201,7 @@ task initDockerContainer(type: Exec, dependsOn: startDockerContainer) {
 
 
 task fetchApiToken(type: Exec, dependsOn: initDockerContainer) {
-    description = rootProject.ext.longName + ': Read the SonarQube API token from the initialized container';
+    description = 'Read the SonarQube API token from the initialized container';
     group = 'sqtest';
 
     doFirst {
@@ -226,7 +223,7 @@ task fetchApiToken(type: Exec, dependsOn: initDockerContainer) {
 
 
 task fetchResultIssues(dependsOn: tasks['sonarqube']) {
-    description = rootProject.ext.longName + ': Fetch the issues created by the SonarQube analysis from the server';
+    description = 'Fetch the issues created by the SonarQube analysis from the server';
     group = 'sqtest';
 
     final File resultFile = new File(getTemporaryDir(), 'sonarqube-result.json');
@@ -269,7 +266,7 @@ task fetchResultIssues(dependsOn: tasks['sonarqube']) {
 
 
 task integrationTest(dependsOn: fetchResultIssues) {
-    description = rootProject.ext.longName + ': Fetch the issues created by the SonarQube analysis from the server';
+    description = 'Fetch the issues created by the SonarQube analysis from the server';
     group = 'sqtest';
 
     final File expectedFile = file('config/expected.json');

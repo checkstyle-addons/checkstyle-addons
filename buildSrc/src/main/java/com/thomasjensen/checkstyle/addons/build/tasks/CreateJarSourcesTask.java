@@ -45,9 +45,7 @@ public class CreateJarSourcesTask
             final String appendix = pDepConfig.getName();
             getArchiveAppendix().set(appendix);
         }
-        setDescription(
-            getBuildUtil().getLongName() + ": Build the source JAR for dependency configuration '" + pDepConfig
-                .getName() + "'");
+        setDescription("Build the source JAR for dependency configuration '" + pDepConfig.getName() + "'");
 
         // SourceSet that fits the dependency configuration
         final SourceSet mainSourceSet = getBuildUtil().getSourceSet(SourceSet.MAIN_SOURCE_SET_NAME);

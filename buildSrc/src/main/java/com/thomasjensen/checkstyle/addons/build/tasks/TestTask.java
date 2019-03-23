@@ -69,12 +69,13 @@ public class TestTask
 
         if (baseCsVersion.equals(pCsVersion)) {
             setDescription(
-                buildUtil.getLongName() + ": Run the unit tests using dependency configuration '" + pDepConfig.getName()
-                    + "' (Checkstyle " + baseCsVersion + ", Java level: " + javaLevel + ")");
+                "Run the unit tests using dependency configuration '" + pDepConfig.getName() + "' (Checkstyle "
+                    + baseCsVersion + ", Java level: " + javaLevel + ")");
         }
         else {
-            setDescription(buildUtil.getLongName() + ": Run the unit tests compiled for Checkstyle " + baseCsVersion
-                + " against a Checkstyle " + pCsVersion + " runtime (Java level: " + javaLevel + ")");
+            setDescription(
+                "Run the unit tests compiled for Checkstyle " + baseCsVersion + " against a Checkstyle " + pCsVersion
+                    + " runtime (Java level: " + javaLevel + ")");
         }
 
         dependsOn(TaskNames.testClasses.getName(pDepConfig));

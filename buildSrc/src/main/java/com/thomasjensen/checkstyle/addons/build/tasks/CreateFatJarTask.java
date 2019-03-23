@@ -86,7 +86,7 @@ public class CreateFatJarTask
         final Jar thinJarTask = (Jar) buildUtil.getTask(TaskNames.jar, pDepConfig);
         dependsOn(thinJarTask);
 
-        setDescription(buildUtil.getLongName() + ": Create a combined JAR of project and runtime dependencies of '"
+        setDescription("Create a combined JAR of project and runtime dependencies of '"
             + SourceSet.MAIN_SOURCE_SET_NAME + "' for dependency configuration '" + pDepConfig.getName() + "'");
 
         getManifest().inheritFrom(thinJarTask.getManifest());

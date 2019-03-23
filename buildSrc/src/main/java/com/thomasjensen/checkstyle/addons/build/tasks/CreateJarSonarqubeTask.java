@@ -56,16 +56,14 @@ public class CreateJarSonarqubeTask
     public void configureFor(@Nonnull final DependencyConfig pDepConfig)
     {
         final Project project = getProject();
-        final String longName = getBuildUtil().getLongName();
 
-        setDescription(
-            longName + ": Assembles the SonarQube plugin for dependency configuration '" + pDepConfig.getName() + "'");
+        setDescription("Assembles the SonarQube plugin for dependency configuration '" + pDepConfig.getName() + "'");
 
         // Inputs for up-to-date checking
         TaskInputs inputs = getInputs();
         inputs.property(BuildUtil.GROUP_ID, project.getGroup());
         inputs.property(BuildUtil.VERSION, project.getVersion());
-        inputs.property("name", longName);
+        inputs.property("name", getBuildUtil().getLongName());
         inputs.property("description", project.getDescription());
         inputs.property("authorName", getBuildUtil().getExtraPropertyValue(ExtProp.AuthorName));
         inputs.property("sqPluginKey", getBuildUtil().getExtraPropertyValue(ExtProp.SqPluginKey));

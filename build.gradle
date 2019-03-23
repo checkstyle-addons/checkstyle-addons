@@ -240,7 +240,7 @@ tasks.jacocoTestReport.dependsOn tasks.test;
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
 task siteCopyJavadoc(type: Copy, dependsOn: javadoc) {
-    setDescription((String) project.ext.longName + ': Copy Javadoc to site directory');
+    setDescription('Copy Javadoc to site directory');
     setGroup(SiteTask.SITE_GROUP);
 
     destinationDir = new File(project.buildDir, 'site');
@@ -261,7 +261,7 @@ task siteCopyJavadoc(type: Copy, dependsOn: javadoc) {
 
 
 task siteCopyAllChecks(type: Copy) {
-    setDescription((String) project.ext.longName + ': Copy list of all checks to site directory');
+    setDescription('Copy list of all checks to site directory');
     setGroup(SiteTask.SITE_GROUP);
 
     destinationDir = new File(project.buildDir, 'site');
@@ -281,7 +281,7 @@ task siteCopyAllChecks(type: Copy) {
 
 
 task siteCopyDownloadGuide(type: Copy) {
-    setDescription((String) project.ext.longName + ': Copy download guide frontmatter stub to site directory');
+    setDescription('Copy download guide frontmatter stub to site directory');
     setGroup(SiteTask.SITE_GROUP);
 
     destinationDir = new File(project.buildDir, 'site');
@@ -308,7 +308,7 @@ taskCreator.setupArtifactTasks();
 taskCreator.rewirePublishingTasks(this);
 
 task checkProperties {
-    setDescription((String) project.ext.longName + ': Ensure that all properties required for bintray upload are set');
+    setDescription('Ensure that all properties required for bintray upload are set');
     setGroup(PublishingPlugin.PUBLISH_TASK_GROUP);
     doLast {
         ['bintray.user', 'bintray.apikey', 'bintray.gpg.passphrase', 'sonatype.user', 'sonatype.password'].each {

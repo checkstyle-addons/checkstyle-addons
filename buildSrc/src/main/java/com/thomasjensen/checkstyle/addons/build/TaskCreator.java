@@ -21,17 +21,6 @@ import java.util.Map;
 import javax.annotation.Nonnull;
 
 import com.github.spotbugs.SpotBugsTask;
-import com.thomasjensen.checkstyle.addons.build.tasks.CompileTask;
-import com.thomasjensen.checkstyle.addons.build.tasks.CreateFatJarTask;
-import com.thomasjensen.checkstyle.addons.build.tasks.CreateJarEclipseTask;
-import com.thomasjensen.checkstyle.addons.build.tasks.CreateJarJavadocTask;
-import com.thomasjensen.checkstyle.addons.build.tasks.CreateJarSonarqubeTask;
-import com.thomasjensen.checkstyle.addons.build.tasks.CreateJarSourcesTask;
-import com.thomasjensen.checkstyle.addons.build.tasks.CreateJarTask;
-import com.thomasjensen.checkstyle.addons.build.tasks.GeneratePomFileTask;
-import com.thomasjensen.checkstyle.addons.build.tasks.GeneratePomPropsTask;
-import com.thomasjensen.checkstyle.addons.build.tasks.JavadocTask;
-import com.thomasjensen.checkstyle.addons.build.tasks.TestTask;
 import groovy.lang.Closure;
 import org.gradle.api.JavaVersion;
 import org.gradle.api.Project;
@@ -52,6 +41,18 @@ import org.gradle.api.tasks.SourceSet;
 import org.gradle.api.tasks.SourceSetContainer;
 import org.gradle.api.tasks.TaskContainer;
 import org.gradle.language.base.plugins.LifecycleBasePlugin;
+
+import com.thomasjensen.checkstyle.addons.build.tasks.CompileTask;
+import com.thomasjensen.checkstyle.addons.build.tasks.CreateFatJarTask;
+import com.thomasjensen.checkstyle.addons.build.tasks.CreateJarEclipseTask;
+import com.thomasjensen.checkstyle.addons.build.tasks.CreateJarJavadocTask;
+import com.thomasjensen.checkstyle.addons.build.tasks.CreateJarSonarqubeTask;
+import com.thomasjensen.checkstyle.addons.build.tasks.CreateJarSourcesTask;
+import com.thomasjensen.checkstyle.addons.build.tasks.CreateJarTask;
+import com.thomasjensen.checkstyle.addons.build.tasks.GeneratePomFileTask;
+import com.thomasjensen.checkstyle.addons.build.tasks.GeneratePomPropsTask;
+import com.thomasjensen.checkstyle.addons.build.tasks.JavadocTask;
+import com.thomasjensen.checkstyle.addons.build.tasks.TestTask;
 
 
 /**
@@ -168,8 +169,7 @@ public class TaskCreator
         compileTask.configureFor(pDepConfig, sourceSet, isTest);
 
         final Task classesTask = tasks.create(pClassesTaskName.getName(pDepConfig));
-        classesTask.setDescription(
-            buildUtil.getLongName() + ": Assembles '" + pSourceSetName + "' classes for dependency configuration '"
+        classesTask.setDescription("Assembles '" + pSourceSetName + "' classes for dependency configuration '"
                 + pDepConfig.getName() + "'");
         classesTask.setGroup(BasePlugin.BUILD_GROUP);
         classesTask.dependsOn(compileTask, tasks.getByName(sourceSet.getProcessResourcesTaskName()));
@@ -188,8 +188,7 @@ public class TaskCreator
 
         final Task xtest = tasks.create(XTEST_TASK_NAME);
         xtest.setGroup(XTEST_GROUP_NAME);
-        xtest.setDescription(
-            buildUtil.getLongName() + ": Run the unit tests against all supported Checkstyle runtimes");
+        xtest.setDescription("Run the unit tests against all supported Checkstyle runtimes");
         tasks.getByName(JavaBasePlugin.BUILD_TASK_NAME).dependsOn(xtest);
 
         for (final DependencyConfig depConfig : buildUtil.getDepConfigs().getAll().values()) {
@@ -204,8 +203,7 @@ public class TaskCreator
                     TestTask.class);
                 testTask.configureFor(depConfig, csRuntimeVersion);
                 testTask.setGroup(XTEST_GROUP_NAME);
-                testTask.setDescription(
-                    buildUtil.getLongName() + ": Run the unit tests compiled for Checkstyle " + csBaseVersion
+                testTask.setDescription("Run the unit tests compiled for Checkstyle " + csBaseVersion
                         + " against a Checkstyle " + csRuntimeVersion + " runtime (Java level: " + javaLevel + ")");
                 testTask.getReports().getHtml().setEnabled(false);
                 xtest.dependsOn(testTask);
@@ -283,8 +281,7 @@ public class TaskCreator
             Task assembleTask = tasks.getByName(BasePlugin.ASSEMBLE_TASK_NAME);
             if (!depConfig.isDefaultConfig()) {
                 assembleTask = tasks.create(TaskNames.assemble.getName(depConfig));
-                assembleTask.setDescription(
-                    buildUtil.getLongName() + ": Assembles the artifacts belonging to dependency configuration '"
+                assembleTask.setDescription("Assembles the artifacts belonging to dependency configuration '"
                         + depConfig.getName() + "'");
                 final Task buildTask = tasks.getByName(LifecycleBasePlugin.BUILD_TASK_NAME);
                 buildTask.dependsOn(assembleTask);

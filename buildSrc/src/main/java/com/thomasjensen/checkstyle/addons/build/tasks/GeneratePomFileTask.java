@@ -186,8 +186,8 @@ public class GeneratePomFileTask
         }
 
         setDescription(
-            buildUtil.getLongName() + ": Generates the Maven POM file for publication " + "'checkstyleAddons' (" + (
-                pDepConfig.isDefaultConfig() ? "no appendix" : "appendix: " + appendix) + ").");
+            "Generates the Maven POM file for publication " + "'checkstyleAddons' (" + (pDepConfig.isDefaultConfig()
+                ? "no appendix" : "appendix: " + appendix) + ").");
     }
 
 

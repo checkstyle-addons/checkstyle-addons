@@ -42,8 +42,6 @@ public class GeneratePomPropsTask
 
     private String appendix = null;
 
-    private final BuildUtil buildUtil;
-
 
 
     /**
@@ -55,7 +53,6 @@ public class GeneratePomPropsTask
         setGroup(BasePlugin.BUILD_GROUP);
 
         final Project project = getProject();
-        buildUtil = new BuildUtil(project);
 
         // Task Inputs: the property values identifying the artifact
         final TaskInputs inputs = getInputs();
@@ -117,15 +114,14 @@ public class GeneratePomPropsTask
     public void setAppendix(final String pAppendix)
     {
         appendix = pAppendix;
-        final String longName = buildUtil.getLongName();
         if (pAppendix != null && pAppendix.length() > 0) {
             getInputs().property("appendix", pAppendix);
-            setDescription(longName + ": Create file '" + pluginPomProps.getName() //
-                + "' for use in JAR (appendix: " + pAppendix + ")");
+            setDescription(
+                "Create file '" + pluginPomProps.getName() + "' for use in JAR (appendix: " + pAppendix + ")");
         }
         else {
             getInputs().getProperties().remove("appendix");
-            setDescription(longName + ": Create file '" + pluginPomProps.getName() + "' for use in JAR (no appendix)");
+            setDescription("Create file '" + pluginPomProps.getName() + "' for use in JAR (no appendix)");
         }
     }
 

@@ -45,9 +45,7 @@ public class CreateJarJavadocTask
             final String appendix = pDepConfig.getName();
             getArchiveAppendix().set(appendix);
         }
-        setDescription(
-            getBuildUtil().getLongName() + ": Build the javadoc JAR for dependency configuration '" + pDepConfig
-                .getName() + "'");
+        setDescription("Build the javadoc JAR for dependency configuration '" + pDepConfig.getName() + "'");
 
         // Dependency on javadoc generating task
         final Javadoc javadocTask = (Javadoc) getBuildUtil().getTask(TaskNames.javadoc, pDepConfig);

@@ -60,9 +60,9 @@ public class CompileTask
     {
         final Project project = getProject();
         final JavaVersion javaLevel = pDepConfig.getJavaLevel();
-        setDescription(buildUtil.getLongName() + ": Compile sources from '" + pSourceSetToCompile.getName()
-            + "' source set using dependency configuration '" + pDepConfig.getName() + "' (Java level: " + javaLevel
-            + ")");
+        setDescription(
+            "Compile sources from '" + pSourceSetToCompile.getName() + "' source set using dependency configuration '"
+                + pDepConfig.getName() + "' (Java level: " + javaLevel + ")");
 
         // Additional Task Input: the dependency configuration file
         getInputs().file(pDepConfig.getConfigFile());

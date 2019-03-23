@@ -60,9 +60,8 @@ public class JavadocTask
         final Project project = getProject();
         final JavaVersion javaLevel = pDepConfig.getJavaLevel();
 
-        setDescription(
-            buildUtil.getLongName() + ": Generate Javadoc API documentation for dependency configuration '" + pDepConfig
-                .getName() + "' (Java level: " + javaLevel + ")");
+        setDescription("Generate Javadoc API documentation for dependency configuration '" + pDepConfig.getName()
+            + "' (Java level: " + javaLevel + ")");
         dependsOn(buildUtil.getTask(TaskNames.compileJava, pDepConfig));
 
         final JavaPluginConvention javaConvention = project.getConvention().getPlugin(JavaPluginConvention.class);

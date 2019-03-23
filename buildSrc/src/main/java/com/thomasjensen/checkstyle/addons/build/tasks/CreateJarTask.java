@@ -75,8 +75,7 @@ public class CreateJarTask
     {
         final Project project = getProject();
 
-        setDescription(
-            getBuildUtil().getLongName() + ": Assembles a jar archive containing the '" + SourceSet.MAIN_SOURCE_SET_NAME
+        setDescription("Assembles a jar archive containing the '" + SourceSet.MAIN_SOURCE_SET_NAME
                 + "' classes for dependency configuration '" + pDepConfig.getName() + "'");
 
         // set appendix for archive name

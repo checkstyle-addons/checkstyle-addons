@@ -117,10 +117,8 @@ public class CreateJarEclipseTask
         final Project project = getProject();
         final String baseCsVersion = pDepConfig.getCheckstyleBaseVersion();
         final String myJavaLevel = pDepConfig.getJavaLevel().toString();
-        final String longName = getBuildUtil().getLongName();
 
-        setDescription(
-            longName + ": Assembles the Eclipse-CS plugin for dependency configuration '" + pDepConfig.getName() + "'");
+        setDescription("Assembles the Eclipse-CS plugin for dependency configuration '" + pDepConfig.getName() + "'");
 
         // adjust archive name
         if (!pDepConfig.isDefaultConfig()) {
@@ -135,7 +133,7 @@ public class CreateJarEclipseTask
         final TaskInputs inputs = getInputs();
         inputs.property(BuildUtil.GROUP_ID, project.getGroup());
         inputs.property(BuildUtil.VERSION, project.getVersion());
-        inputs.property("name", longName);
+        inputs.property("name", getBuildUtil().getLongName());
         inputs.property("authorName", getBuildUtil().getExtraPropertyValue(ExtProp.AuthorName));
 
         // Configuration of JAR file contents
