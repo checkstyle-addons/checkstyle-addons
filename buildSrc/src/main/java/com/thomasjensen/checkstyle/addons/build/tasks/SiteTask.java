@@ -53,6 +53,8 @@ import com.thomasjensen.checkstyle.addons.build.ExtProp;
 public class SiteTask
     extends DefaultTask
 {
+    public static final String SITE_GROUP = "site";
+
     private final BuildUtil buildUtil;
 
 
@@ -66,6 +68,7 @@ public class SiteTask
         final Project project = getProject();
         buildUtil = new BuildUtil(project);
         setDescription(buildUtil.getLongName() + ": Package documentation for publication on the website");
+        setGroup(SITE_GROUP);
 
         final TaskContainer tasks = project.getTasks();
         for (final String predecTaskName : new String[]{//

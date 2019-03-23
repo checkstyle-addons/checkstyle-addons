@@ -241,6 +241,7 @@ tasks.jacocoTestReport.dependsOn tasks.test;
 
 task siteCopyJavadoc(type: Copy, dependsOn: javadoc) {
     setDescription((String) project.ext.longName + ': Copy Javadoc to site directory');
+    setGroup(SiteTask.SITE_GROUP);
 
     destinationDir = new File(project.buildDir, 'site');
     into("v${project.version}/apidocs") {
@@ -261,6 +262,7 @@ task siteCopyJavadoc(type: Copy, dependsOn: javadoc) {
 
 task siteCopyAllChecks(type: Copy) {
     setDescription((String) project.ext.longName + ': Copy list of all checks to site directory');
+    setGroup(SiteTask.SITE_GROUP);
 
     destinationDir = new File(project.buildDir, 'site');
     final File originalFile = new File(sourceSets.main.resources.srcDirs.iterator().next(),
@@ -280,6 +282,7 @@ task siteCopyAllChecks(type: Copy) {
 
 task siteCopyDownloadGuide(type: Copy) {
     setDescription((String) project.ext.longName + ': Copy download guide frontmatter stub to site directory');
+    setGroup(SiteTask.SITE_GROUP);
 
     destinationDir = new File(project.buildDir, 'site');
     final File originalFile = new File(sourceSets.main.resources.srcDirs.iterator().next(), '/download-guide.html');
