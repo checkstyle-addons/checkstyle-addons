@@ -47,8 +47,8 @@ dependencies {
 }
 
 ext {
-    dockerSonarqubeVersion = '7.4';
-    dockerSonarCheckstyleVersion = '4.17';
+    dockerSonarqubeVersion = '7.7';
+    dockerSonarCheckstyleVersion = '4.18';
     dockerImage = "sonarqube:${dockerSonarqubeVersion}-${dockerSonarCheckstyleVersion}-checkstyle-addons-intTest";
     sqHost = 'localhost';
     sqPort = 9000;
