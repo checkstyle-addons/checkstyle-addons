@@ -182,83 +182,45 @@ The {{ site.name }} version offered by the above download button is compatible w
 
 In [SonarQube]({{ site.link_sq_home }}){:target="_blank"}, {{ site.name }} runs as an extension of the SonarQube
 Checkstyle Plugin ([download]({{ site.link_sq_csplugin }}/releases),
-[legacy download](https://github.com/checkstyle-addons/sonar-checkstyle/releases)). {{ site.name }} currently supports
-the SonarQube Checkstyle Plugin versions 3.1 or later (<span style="color: #75ccf7;">blue columns</span>). Up to
-{{ site.name }} v4.2.0, the <span style="color: #bbbb00;">yellow columns</span> were also supported,
-and even the <span style="color: #ff5555;">red column</span> was supported with the
-[legacy plugin](https://github.com/{{ site.github }}/releases/download/v4.2.0/sonar-checkstyleaddons-4.2.0-csp2.2.jar).
-Make sure your SonarQube installation is configured accordingly:
+[legacy download](https://github.com/checkstyle-addons/sonar-checkstyle/releases)). Choose your download of
+{{ site.name }} for SonarQube depending on the version of the SonarQube Checkstyle Plugin you are using:
 
 <div class="csa-largeImageWrapper">
 <table class="table table-striped csa-version-table" style="width:auto;">
+  <thead>
+    <tr>
+      <th>SonarQube Checkstyle<br>Plugin Version</th>
+      <th>Download Link</th>
+    </tr>
+  </thead>
   <tbody>
     <tr>
-      <td><a href="{{ site.link_sq_csplugin }}" target="_blank">SQ Checkstyle Plugin</a></td>
-      <td>2.0</td>
-      <td>2.1</td>
-      <td>2.1.1</td>
-      <td class="danger"><b>2.2</b></td>
-      <td class="warning"><b>2.3</b></td>
-      <td class="warning"><b>2.4</b></td>
-      <td class="info"><b>3.1 - 3.3</b></td>
-      <td class="info"><b>3.4&nbsp;- 3.6.1</b></td>
-      <td class="info"><b>3.7&nbsp;- 4.16</b></td>
-      <td class="info"><b>4.17</b></td>
-      <td class="info"><b>&ge;&nbsp;4.18</b></td>
+      <td>&ge;&nbsp;3.1</td>
+      <td><a href="https://github.com/{{ site.github }}/releases/download/v{{ site.latest_version
+          }}/sonar-checkstyleaddons-{{ site.latest_version }}.jar" class="btn btn-primary">Download SonarQube Plugin
+          (v{{ site.latest_version }})</a></td>
     </tr>
     <tr>
-      <td><a href="{{ site.link_sq_relupgradenotes }}" target="_blank">SQ Platform</a></td>
-      <td>3.6 - 4.1.2</td>
-      <td colspan="3" class="danger" style="text-align:center;">4.2 - 4.4</td>
-      <td class="warning">4.5.2&nbsp; - ?</td>
-      <td class="warning">4.5.2&nbsp; - ?</td>
-      <td class="info">4.5.2&nbsp; - ?</td>
-      <td class="info">5.6.4&nbsp;- 7.2.1</td>
-      <td class="info">5.6.6&nbsp;- 7.2.1</td>
-      <td class="info">6.7&nbsp;- 7.5</td>
-      <td class="info">&ge;&nbsp;6.7</td>
+      <td>2.3 or 2.4</td>
+      <td><a href="https://github.com/{{ site.github
+          }}/releases/download/v4.2.0/sonar-checkstyleaddons-4.2.0-csp2.3.jar" class="btn btn-warning btn-sm">Download
+          Legacy Plugin (v4.2.0-csp2.3)</a></td>
     </tr>
     <tr>
-      <td><a href="{{ site.link_cs_releasenotes }}" target="_blank">Checkstyle</a> (by plugin)</td>
-      <td>5.6</td>
-      <td>5.6</td>
-      <td>5.6</td>
-      <td class="danger">6.1</td>
-      <td class="warning">6.4.1</td>
-      <td class="warning">6.12.1</td>
-      <td class="info">7.1 - 7.3</td>
-      <td class="info">7.4&nbsp;- 7.6.1</td>
-      <td class="info">7.7&nbsp;- 8.16</td>
-      <td class="info">8.17</td>
-      <td class="info">&ge;&nbsp;8.18</td>
-    </tr>
-    <tr>
-      <td>Java (analysis process)</td>
-      <td>&ge; 6</td>
-      <td>&ge; 6</td>
-      <td>&ge; 6</td>
-      <td class="danger">&ge; 6</td>
-      <td class="warning">&ge; 7</td>
-      <td class="warning">&ge; 7</td>
-      <td class="info">&ge; 8</td>
-      <td class="info">&ge; 8</td>
-      <td class="info">&ge; 8</td>
-      <td class="info">&ge; 8</td>
-      <td class="info">&ge; 8</td>
+      <td>2.2</td>
+      <td><a href="https://github.com/{{ site.github
+          }}/releases/download/v4.2.0/sonar-checkstyleaddons-4.2.0-csp2.2.jar" class="btn btn-warning btn-sm">Download
+          Legacy Plugin (v4.2.0-csp2.2)</a></td>
     </tr>
   </tbody>
 </table>
 </div>
 
-The Checkstyle version is directly determined by the version of the SonarQube Checkstyle plugin, so you don't need to check that explicitly.
-Starting with Checkstyle 7.1, the Checkstyle team release a matching SonarQube plugin every time. (Let's hope they keep this up!)
+The SonarQube rules provided by {{ site.name }} are tagged with `checkstyle-addons`, which is useful to filter them
+from the overall list of Checkstyle rules.
 
-The SonarQube rules provided by {{ site.name }} are tagged with `checkstyle-addons`, which is useful to filter them from the overall list of Checkstyle rules.
-
-<p><a href="https://github.com/{{ site.github }}/releases/download/v{{ site.latest_version }}/sonar-checkstyleaddons-{{ site.latest_version }}.jar" class="btn btn-primary">Download SonarQube Plugin</a></p>
-
-**Installation:** Drop the downloaded plugin into the *extensions/plugins* folder of your SonarQube installation (where all the other plugins are).
-Double-check the version of the SonarQube Checkstyle plugin according to the above table. Upgrade that if necessary. Restart SonarQube.
+**Installation:** Drop the downloaded plugin into the *extensions/plugins* folder of your SonarQube installation (where
+all the other plugins are). Restart SonarQube.
 
 
 <!-- ======================================================================================= -->
