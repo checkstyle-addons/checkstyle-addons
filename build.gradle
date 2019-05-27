@@ -227,9 +227,9 @@ jacocoTestReport {
     }
     sourceSets(sourceSets.main, sourceSets.sonarqube);
     doFirst {
-        setClassDirectories((FileCollection)
+        classDirectories.setFrom((FileCollection)
             fileTree(dir: sourceSets.main.output.classesDirs.first()).exclude(excludedClasses));
-        additionalClassDirs = fileTree(dir: sourceSets.sonarqube.output.classesDirs.first());
+        additionalClassDirs.setFrom(fileTree(dir: sourceSets.sonarqube.output.classesDirs.first()));
     }
 }
 tasks.jacocoTestReport.dependsOn tasks.test;
