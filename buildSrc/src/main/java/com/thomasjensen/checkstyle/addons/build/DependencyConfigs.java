@@ -133,9 +133,8 @@ public class DependencyConfigs
         DependencyConfig result = new DependencyConfig(name, compatibles,
             JavaVersion.toVersion(props.getProperty("JavaLevel")), javadocLinks,
             Boolean.parseBoolean(props.getProperty("SonarQubeSupport")),
-            props.getProperty("SonarQubeMinPlatformVersion"), props.getProperty("SonarQubeMinJavaPlugin"),
-            props.getProperty("SonarQubeMinCheckstylePlugin"), artifactVersions, DEFAULT_NAME.equals(name),
-            pDepConfigFile);
+            props.getProperty("SonarQubeMinPlatformVersion"), props.getProperty("SonarQubeMinCheckstylePlugin"),
+            artifactVersions, DEFAULT_NAME.equals(name), pDepConfigFile);
         return result;
     }
 

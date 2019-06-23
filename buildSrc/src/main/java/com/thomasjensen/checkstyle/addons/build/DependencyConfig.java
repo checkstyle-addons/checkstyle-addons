@@ -58,8 +58,6 @@ public final class DependencyConfig
 
     private final String sonarQubeMinPlatformVersion;
 
-    private final String sonarQubeMinJavaPluginVersion;
-
     private final String sonarQubeMinCsPluginVersion;
 
     private final Map<String, String> artifactVersions;
@@ -79,7 +77,6 @@ public final class DependencyConfig
      * @param pJavadocLinks list of URLs to be passed to Javadoc for linking to external apidocs
      * @param pSonarQubeSupport flag if SonarQube is supported
      * @param pSonarQubeMinPlatformVersion minimum SonarQube platform version (for use in manifest)
-     * @param pSonarQubeMinJavaPluginVersion minimum SonarQube Java plugin version
      * @param pSonarQubeMinCsPluginVersion minimum SonarQube Checkstyle plugin version
      * @param pArtifactVersions versions of certain artifact dependencies
      * @param pDefaultConfig flag if this is the default dependency configuration
@@ -88,9 +85,8 @@ public final class DependencyConfig
     public DependencyConfig(@Nonnull final String pName, @Nonnull final Set<String> pCompatibleCheckstyleVersions,
         @Nonnull final JavaVersion pJavaLevel, @Nonnull final List<String> pJavadocLinks,
         final boolean pSonarQubeSupport, @Nullable final String pSonarQubeMinPlatformVersion,
-        @Nullable final String pSonarQubeMinJavaPluginVersion, @Nullable final String pSonarQubeMinCsPluginVersion,
-        @Nonnull final Map<String, String> pArtifactVersions, final boolean pDefaultConfig,
-        @Nonnull final File pConfigFile)
+        @Nullable final String pSonarQubeMinCsPluginVersion, @Nonnull final Map<String, String> pArtifactVersions,
+        final boolean pDefaultConfig, @Nonnull final File pConfigFile)
     {
         if (pName == null) {
             throw new IllegalArgumentException("pName is null");
@@ -119,7 +115,6 @@ public final class DependencyConfig
         javadocLinks = Collections.unmodifiableList(pJavadocLinks);
         sonarQubeSupport = pSonarQubeSupport;
         sonarQubeMinPlatformVersion = pSonarQubeMinPlatformVersion;
-        sonarQubeMinJavaPluginVersion = pSonarQubeMinJavaPluginVersion;
         sonarQubeMinCsPluginVersion = pSonarQubeMinCsPluginVersion;
         artifactVersions = pArtifactVersions;
         defaultConfig = pDefaultConfig;
@@ -223,19 +218,6 @@ public final class DependencyConfig
     /**
      * Getter.
      *
-     * @return The minimum required runtime version of the SonarQube Java plugin. This will be declared in the manifest.
-     */
-    @CheckForNull
-    public String getSonarQubeMinJavaPluginVersion()
-    {
-        return sonarQubeMinJavaPluginVersion;
-    }
-
-
-
-    /**
-     * Getter.
-     *
      * @return The minimum required runtime version of the SonarQube Checkstyle plugin. This will be declared in the
      * manifest.
      */
@@ -307,7 +289,6 @@ public final class DependencyConfig
         sb.append(", compatibleCheckstyleVersions=").append(compatibleCheckstyleVersions);
         sb.append(", sonarQubeSupport=").append(sonarQubeSupport);
         sb.append(", sonarQubeMinPlatformVersion='").append(sonarQubeMinPlatformVersion).append('\'');
-        sb.append(", sonarQubeMinJavaPluginVersion='").append(sonarQubeMinJavaPluginVersion).append('\'');
         sb.append(", sonarQubeMinCsPluginVersion='").append(sonarQubeMinCsPluginVersion).append('\'');
         sb.append(", configFile=").append(configFile);
         sb.append(", javadocLinks=").append(javadocLinks);

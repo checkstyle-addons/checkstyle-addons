@@ -135,8 +135,7 @@ public class CreateJarSonarqubeTask
         pAttributes.put("Plugin-SourcesUrl", "https://github.com/checkstyle-addons/checkstyle-addons");
         pAttributes.put("Plugin-IssueTrackerUrl", inputProps.get("issueTrackerUrl"));
         pAttributes.put("Plugin-Class", "com.thomasjensen.checkstyle.addons.sonarqube.CheckstyleExtensionPlugin");
-        pAttributes.put("Plugin-RequirePlugins", "java:" + pDepConfig.getSonarQubeMinJavaPluginVersion() //
-            + ",checkstyle:" + pDepConfig.getSonarQubeMinCsPluginVersion());
+        pAttributes.put("Plugin-RequirePlugins", "checkstyle:" + pDepConfig.getSonarQubeMinCsPluginVersion());
         pAttributes.put("Plugin-Dependencies", "META-INF/lib/" + jarTask.getArchiveFileName().get() //
             + (pPubLibs.size() > 0 ? " " : "") //
             + CreateJarEclipseTask.flattenPrefixLibs("META-INF/lib/", pPubLibs, ' '));
