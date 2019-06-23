@@ -40,14 +40,14 @@ import com.thomasjensen.checkstyle.addons.util.Util;
 // @formatter:on
 public abstract class BaseCheckTestSupport
 {
-    /** A brief logger that only display info about errors. */
+    /** A brief logger that only displays info about errors. */
     protected static class BriefLogger
         extends DefaultLogger
     {
+        @SuppressWarnings("deprecation")
         public BriefLogger(final OutputStream pOut)
-            throws UnsupportedEncodingException
         {
-            super(pOut, true);
+            super(pOut, true /*OutputStreamOptions.CLOSE*/);
         }
 
 

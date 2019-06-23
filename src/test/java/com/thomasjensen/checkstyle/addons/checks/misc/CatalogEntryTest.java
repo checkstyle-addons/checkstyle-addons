@@ -23,6 +23,7 @@ import com.puppycrawl.tools.checkstyle.api.DetailAST;
 import org.junit.Assert;
 import org.junit.BeforeClass;
 import org.junit.Test;
+import org.mockito.Mockito;
 
 
 /**
@@ -34,13 +35,34 @@ public class CatalogEntryTest
 
 
 
+    public static DetailAST createAstForLineCol(final int pLineNo, final int pColumnNo)
+    {
+        DetailAST ast = null;
+        if (DetailAST.class.isInterface()) {
+            ast = Mockito.mock(DetailAST.class);
+            Mockito.when(ast.getLineNo()).thenReturn(pLineNo);
+            Mockito.when(ast.getColumnNo()).thenReturn(pColumnNo);
+        }
+        else {
+            try {
+                ast = DetailAST.class.newInstance();
+                ast.setLineNo(pLineNo);
+                ast.setColumnNo(pColumnNo);
+            }
+            catch (ReflectiveOperationException e) {
+                Assert.fail("unexpected error: " + e.getMessage());
+            }
+        }
+        return ast;
+    }
+
+
+
     @BeforeClass
     public static void createTestData()
     {
         for (int i = 10, j = 0; i <= 30; i++, j++) {
-            DetailAST ast = new DetailAST();
-            ast.setLineNo(i);
-            ast.setColumnNo(0);
+            DetailAST ast = createAstForLineCol(i, 0);
             String key = String.valueOf((char) ('z' - j));
             if ((j + 1) % 6 == 0) {
                 i--;  // some should be on the same line
@@ -89,17 +111,13 @@ public class CatalogEntryTest
         final int line = 1;
         final String constName = "A";
 
-        DetailAST ast1 = new DetailAST();
-        ast1.setLineNo(line);
-        ast1.setColumnNo(0);
+        DetailAST ast1 = createAstForLineCol(line, 0);
         CatalogEntry entry1 = new CatalogEntry(constName, "a", ast1);
 
-        DetailAST ast2 = new DetailAST();
-        ast2.setLineNo(line);
-        ast2.setColumnNo(0);
+        DetailAST ast2 = createAstForLineCol(line, 0);
         CatalogEntry entry2 = new CatalogEntry(constName, "b", ast2);
 
-        Assert.assertTrue(entry1.equals(entry2));
+        Assert.assertEquals(entry1, entry2);
         Assert.assertEquals(entry1.hashCode(), entry2.hashCode());
     }
 
@@ -110,17 +128,13 @@ public class CatalogEntryTest
     {
         final String constName = "A";
 
-        DetailAST ast1 = new DetailAST();
-        ast1.setLineNo(1);
-        ast1.setColumnNo(0);
+        DetailAST ast1 = createAstForLineCol(1, 0);
         CatalogEntry entry1 = new CatalogEntry(constName, "a", ast1);
 
-        DetailAST ast2 = new DetailAST();
-        ast2.setLineNo(2);
-        ast2.setColumnNo(0);
+        DetailAST ast2 = createAstForLineCol(2, 0);
         CatalogEntry entry2 = new CatalogEntry(constName, "b", ast2);
 
-        Assert.assertFalse(entry1.equals(entry2));
+        Assert.assertNotEquals(entry1, entry2);
         Assert.assertNotEquals(entry1.hashCode(), entry2.hashCode());
     }
 
@@ -131,17 +145,13 @@ public class CatalogEntryTest
     {
         final int line = 1;
 
-        DetailAST ast1 = new DetailAST();
-        ast1.setLineNo(line);
-        ast1.setColumnNo(0);
+        DetailAST ast1 = createAstForLineCol(line, 0);
         CatalogEntry entry1 = new CatalogEntry("A", "a", ast1);
 
-        DetailAST ast2 = new DetailAST();
-        ast2.setLineNo(line);
-        ast2.setColumnNo(0);
+        DetailAST ast2 = createAstForLineCol(line, 0);
         CatalogEntry entry2 = new CatalogEntry("a", "b", ast2);
 
-        Assert.assertFalse(entry1.equals(entry2));
+        Assert.assertNotEquals(entry1, entry2);
         Assert.assertNotEquals(entry1.hashCode(), entry2.hashCode());
     }
 
@@ -150,9 +160,7 @@ public class CatalogEntryTest
     @Test
     public void testEqualsCornerCases()
     {
-        DetailAST ast = new DetailAST();
-        ast.setLineNo(42);
-        ast.setColumnNo(9);
+        DetailAST ast = createAstForLineCol(42, 9);
         CatalogEntry entry = new CatalogEntry("a", "b", ast);
 
         Assert.assertNotEquals(entry, "somethingElse");
@@ -165,9 +173,7 @@ public class CatalogEntryTest
     @Test
     public void testToString()
     {
-        DetailAST ast = new DetailAST();
-        ast.setLineNo(42);
-        ast.setColumnNo(9);
+        DetailAST ast = createAstForLineCol(42, 9);
         CatalogEntry entry = new CatalogEntry("a", "b", ast);
 
         Assert.assertEquals("CatalogEntry{42:9, key=\"b\", constantName=\"a\"}", entry.toString());
@@ -178,9 +184,7 @@ public class CatalogEntryTest
     @Test
     public void testGetters()
     {
-        DetailAST ast = new DetailAST();
-        ast.setLineNo(42);
-        ast.setColumnNo(9);
+        DetailAST ast = createAstForLineCol(42, 9);
         CatalogEntry entry = new CatalogEntry("a", "b", ast);
 
         Assert.assertEquals("a", entry.getConstantName());

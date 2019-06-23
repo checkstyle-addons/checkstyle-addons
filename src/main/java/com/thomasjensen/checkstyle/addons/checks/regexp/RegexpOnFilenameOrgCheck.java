@@ -99,7 +99,6 @@ public class RegexpOnFilenameOrgCheck
 
 
 
-    @Override
     protected void processFiltered(final File pFile, final List<String> pLines)
     {
         String filePath = null;

@@ -132,7 +132,6 @@ public class ModuleDirectoryLayoutCheck
 
 
 
-    @Override
     protected void processFiltered(final File pFile, final List<String> pLines)
     {
         final MdlConfig wrapper = getMdlConfig();

@@ -27,6 +27,7 @@ import org.junit.Assert;
 import org.junit.Test;
 
 import com.thomasjensen.checkstyle.addons.BaseCheckTestSupport;
+import com.thomasjensen.checkstyle.addons.checks.misc.CatalogEntryTest;
 
 
 /**
@@ -53,9 +54,7 @@ public class UtilTest
     @Test
     public void testGetFullIdentNull()
     {
-        DetailAST ast = new DetailAST();
-        ast.setLineNo(1);
-        ast.setColumnNo(0);
+        DetailAST ast = CatalogEntryTest.createAstForLineCol(1, 0);
         ast.setText("foo");
         Assert.assertNull(Util.getFullIdent(ast));
     }
@@ -65,9 +64,7 @@ public class UtilTest
     @Test
     public void testGetFirstIdentNull()
     {
-        DetailAST ast = new DetailAST();
-        ast.setLineNo(1);
-        ast.setColumnNo(0);
+        DetailAST ast = CatalogEntryTest.createAstForLineCol(1, 0);
         ast.setText("foo");
         Assert.assertNull(Util.getFirstIdent(ast));
     }
