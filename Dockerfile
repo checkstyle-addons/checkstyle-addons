@@ -5,6 +5,7 @@ ARG SQ_VERSION
 FROM sonarqube:${SQ_VERSION}-community
 
 ARG CS_SQPLUGIN_VERSION
+ARG CS_ADDONS_VERSION_EXT
 ENV BOXES=/etc/boxes/boxes-config
 
 USER root
@@ -17,7 +18,7 @@ RUN apt-get -y update \
 USER sonarqube
 
 COPY --chown=sonarqube:sonarqube sqtest/config/sq-setup.sh /home/sonarqube/
-RUN curl -sSLR --output /opt/sonarqube/extensions/plugins/checkstyle-sonar-plugin-$CS_SQPLUGIN_VERSION.jar \
-    https://github.com/checkstyle/sonar-checkstyle/releases/download/$CS_SQPLUGIN_VERSION/checkstyle-sonar-plugin-$CS_SQPLUGIN_VERSION.jar
-COPY --chown=sonarqube:sonarqube build/libs/sonar-checkstyleaddons-* /opt/sonarqube/extensions/plugins/
+RUN curl -sSLR --output /opt/sonarqube/extensions/plugins/checkstyle-sonar-plugin-${CS_SQPLUGIN_VERSION}.jar \
+    https://github.com/checkstyle/sonar-checkstyle/releases/download/${CS_SQPLUGIN_VERSION}/checkstyle-sonar-plugin-${CS_SQPLUGIN_VERSION}.jar
+COPY --chown=sonarqube:sonarqube build/libs/sonar-checkstyleaddons-${CS_ADDONS_VERSION_EXT}.jar /opt/sonarqube/extensions/plugins/
 RUN chmod 644 /opt/sonarqube/extensions/plugins/sonar-checkstyleaddons-*

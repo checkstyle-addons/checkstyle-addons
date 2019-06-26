@@ -47,8 +47,9 @@ dependencies {
 }
 
 ext {
-    dockerSonarqubeVersion = '7.7';
-    dockerSonarCheckstyleVersion = '4.18';
+    dockerSonarqubeVersion = '7.8';
+    dockerSonarCheckstyleVersion = '4.21';
+    dockerCheckstyleAddonsDepConfig = ''; // or, for example, 'csp3.1'
     dockerImage = "sonarqube:${dockerSonarqubeVersion}-${dockerSonarCheckstyleVersion}-checkstyle-addons-intTest";
     sqHost = 'localhost';
     sqPort = 9000;
@@ -107,11 +108,19 @@ task buildDockerImage(type: Exec, dependsOn: rootProject.tasks['jarSonarqubeDefa
     outputs.upToDateWhen { !getDockerImageId().isEmpty() }
 
     workingDir = rootProject.projectDir;
+    String versionExt = rootProject.getVersion().toString();
+    if (project.ext.dockerCheckstyleAddonsDepConfig?.trim()) {
+        versionExt += '-' + project.ext.dockerCheckstyleAddonsDepConfig;
+    }
     commandLine = ['docker', 'build',
         '--build-arg', "SQ_VERSION=${project.ext.dockerSonarqubeVersion}",
         '--build-arg', "CS_SQPLUGIN_VERSION=${project.ext.dockerSonarCheckstyleVersion}",
+        '--build-arg', "CS_ADDONS_VERSION_EXT=${versionExt}",
         '-t', project.ext.dockerImage, '.'];
 
+    doFirst {
+        getLogger().lifecycle('Executing: ' + String.join(' ', getCommandLine()));
+    }
     doLast {
         imageIdFile.write(getDockerImageId());
     }
@@ -175,6 +184,9 @@ task startDockerContainer(type: Exec, dependsOn: buildDockerImage) {
     }
     ext.containerIdFile = containerIdFile;
 
+    doFirst {
+        getLogger().lifecycle('Executing: ' + String.join(' ', getCommandLine()));
+    }
     doLast {
         final String containerId = output();
         if (containerId.isEmpty()) {
@@ -196,6 +208,7 @@ task initDockerContainer(type: Exec, dependsOn: startDockerContainer) {
         final String containerId = tasks['startDockerContainer'].containerIdFile.text;
         commandLine = ['docker', 'exec', '--user', 'sonarqube', '--workdir', '/home/sonarqube', containerId,
                        './sq-setup.sh'];
+        getLogger().lifecycle('Executing: ' + String.join(' ', getCommandLine()));
     }
 }
 
@@ -207,6 +220,7 @@ task fetchApiToken(type: Exec, dependsOn: initDockerContainer) {
     doFirst {
         final String containerId = tasks['startDockerContainer'].containerIdFile.text;
         commandLine = ['docker', 'exec', containerId, 'cat', '/home/sonarqube/api-token.txt'];
+        getLogger().lifecycle('Executing: ' + String.join(' ', getCommandLine()));
     }
     // extension method fetchApiToken.output() can be used to obtain the output:
     standardOutput = new ByteArrayOutputStream();
@@ -232,6 +246,7 @@ task fetchResultIssues(dependsOn: tasks['sonarqube']) {
 
 
     doLast {
+        Thread.sleep(10000);
         final String compKey = "${rootProject.group}:${rootProject.name}:${project.name}";
         final URLConnection get =
                 new URL("http://${sqHost}:${sqPort}/api/issues/search?componentKeys=${compKey}").openConnection();

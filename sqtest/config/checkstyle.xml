@@ -25,7 +25,6 @@
 
     <module name="TreeWalker">
         <property name="tabWidth" value="4"/>
-        <module name="FileContentsHolder"/>
 
         <module name="LocalVariableName"/>
 
