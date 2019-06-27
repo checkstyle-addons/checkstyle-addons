@@ -3,7 +3,7 @@ layout: post
 title: "Checkstyle 8.21 Compatibility"
 date: 2019-05-27 22:01:00 +0100
 release: false
-emphasis: true
+emphasis: false
 ---
 
 With [recent changes](https://github.com/checkstyle/checkstyle/issues/3417) in Checkstyle 8.21, the API for custom
