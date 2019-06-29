@@ -10,20 +10,26 @@ last_modified_at: 2018-05-02 13:06:00 +0200
 
 Here's how to use {{ site.name }} with your standard software.
 
-{{ site.name }} is distributed via [Maven Central]({{ site.link_mavencentral }}) and [Bintray jcenter]({{ site.link_bintray }}), so major build tools can automatically access it.
+{{ site.name }} is distributed via [Maven Central]({{ site.link_mavencentral }}) and
+[Bintray jcenter]({{ site.link_bintray }}), so major build tools can automatically access it.
 
-{{ site.name }} is compatible with all Checkstyle versions starting from 6.16.1. ({{ site.name }} v4.2.0 and earlier were also compatible with Checkstyle 6.0 - 6.15.)
+{{ site.name }} is compatible with all Checkstyle versions starting from 6.16.1. ({{ site.name }} v4.2.0 and earlier
+were also compatible with Checkstyle 6.0 - 6.15.)
 
-{{ site.name }} uses [semantic versioning](https://semver.org/){:target="_blank"}, so you can always use the latest within a major version, but you should try things out before moving to a higher major version.
+{{ site.name }} uses [semantic versioning](https://semver.org/){:target="_blank"}, so you can always use the latest
+within a major version, but you should try things out before moving to a higher major version.
 
 
 <!-- ======================================================================================= -->
 <a name="run-gradle" class="csa-offset-anchor"/>
 <h2>Gradle<a href="#run-gradle"><span class="glyphicon glyphicon-link" aria-hidden="true"></span></a></h2>
 
-{{ site.name }} is available on [Maven Central]({{ site.link_mavencentral }}) and [jcenter]({{ site.link_bintray }}), so you can just use it in your Gradle build.
-In Gradle, {{ site.name }} runs as part of the [Gradle Checkstyle Plugin](https://gradle.org/docs/current/userguide/checkstyle_plugin.html){:target="_blank"}.
-The classpath is extended to include {{ site.name }}. Note that the Checkstyle tool version must be specified.
+{{ site.name }} is available on [Maven Central]({{ site.link_mavencentral }}) and [jcenter]({{ site.link_bintray }}),
+so you can just use it in your Gradle build.\\
+In Gradle, {{ site.name }} runs as part of the [Gradle Checkstyle
+Plugin](https://gradle.org/docs/current/userguide/checkstyle_plugin.html){:target="_blank"}. The classpath is extended
+to include {{ site.name }}.\\
+Note that the Checkstyle tool version must be specified.
 
 {% highlight groovy %}
 plugins {
@@ -31,27 +37,43 @@ plugins {
 }
 dependencies {
     checkstyle group: 'com.thomasjensen.checkstyle.addons', name: 'checkstyle-addons', version: '{{ site.latest_version }}'
+    //checkstyle group: 'com.thomasjensen.checkstyle.addons', name: 'checkstyle-addons-java8a', version: '{{ site.latest_version }}'
 }
 checkstyle {
     configFile file('your-checkstyle.xml')
-    toolVersion '{{ site.latest_version_checkstyle }}'   // set Checkstyle version here
+    toolVersion '{{ site.latest_version_checkstyle }}'             // set Checkstyle version here
+    //toolVersion '{{ site.latest_version_checkstyle_java8a }}'      // set Checkstyle version here
 }
 {% endhighlight %}
 
-For the `checkstyle-addons` dependency, you may also use the version notation `version: '{{ site.latest_major }}.+'` in order to always get the latest compatible version.
+For the `checkstyle-addons` dependency, you may also use the version notation `version: '{{ site.latest_major }}.+'` in
+order to always get the latest compatible version.
 
-The example above has been tested with Checkstyle `toolVersion` set to 7.0 - {{ site.latest_checkstyle_tested }}. The Gradle build must use Java&nbsp;8.
-The older Checkstyle versions 6.16.1 - 6.19 which can run on Java&nbsp;7 are also supported, but if you set `toolVersion` to these,
-you must depend on `checkstyle-addons-java7` instead of `checkstyle-addons` (even if you use Java&nbsp;8 or higher).
+<div class="alert alert-warning">
+  <h4 class="alert-heading">Compatibility Notice</h4>
+  <p class="mb-0">The above example is for Checkstyle 8.21 and up. If you are using Checkstyle 7.0 - 8.20, you must
+  instead use the <code>java8a</code> variant of {{ site.name }} as shown in the commented-out lines of code in the
+  example.</p>
+</div>
+
+The example above has been tested with Checkstyle `toolVersion` values up to {{ site.latest_checkstyle_tested }}. The
+Gradle build must use at least Java&nbsp;8.\\
+The older Checkstyle versions 6.16.1 - 6.19 which can run on Java&nbsp;7, are also supported, but if you set
+`toolVersion` to these, you must depend on `checkstyle-addons-java7` instead of `checkstyle-addons` (even if you use
+Java&nbsp;8 or higher).
 
 
 <!-- ======================================================================================= -->
 <a name="run-maven" class="csa-offset-anchor"/>
 <h2>Maven<a href="#run-maven"><span class="glyphicon glyphicon-link" aria-hidden="true"></span></a></h2>
 
-{{ site.name }} is available on [Maven Central]({{ site.link_mavencentral }}), so you can just use it in your Maven build.
-In Maven, {{ site.name }} runs as part of the [Maven Checkstyle Plugin](https://maven.apache.org/plugins/maven-checkstyle-plugin/){:target="_blank"}.
-The classpath is extended to include {{ site.name }}. Note that the explicit dependency on Checkstyle itself must also be specified in order to set the correct Checkstyle version.
+{{ site.name }} is available on [Maven Central]({{ site.link_mavencentral }}), so you can just use it in your Maven
+build.\\
+In Maven, {{ site.name }} runs as part of the [Maven Checkstyle
+Plugin](https://maven.apache.org/plugins/maven-checkstyle-plugin/){:target="_blank"}. The classpath is extended to
+include {{ site.name }}.\\
+Note that the explicit dependency on Checkstyle itself must also be specified in order to set the correct Checkstyle
+version.
 
 {% highlight xml %}
 <project>
@@ -70,10 +92,12 @@ The classpath is extended to include {{ site.name }}. Note that the explicit dep
         <groupId>com.puppycrawl.tools</groupId>
         <artifactId>checkstyle</artifactId>
         <version>{{ site.latest_version_checkstyle }}</version>    <!-- set Checkstyle version here -->
+        <!-- <version>{{ site.latest_version_checkstyle_java8a }}</version> -->
       </dependency>
       <dependency>
         <groupId>com.thomasjensen.checkstyle.addons</groupId>
         <artifactId>checkstyle-addons</artifactId>
+        <!-- <artifactId>checkstyle-addons-java8a</artifactId> -->
         <version>{{ site.latest_version }}</version>
       </dependency>
     </dependencies>
@@ -81,8 +105,17 @@ The classpath is extended to include {{ site.name }}. Note that the explicit dep
 </project>
 {% endhighlight %}
 
-The example above has been tested with the Checkstyle dependency set to 7.0 - {{ site.latest_checkstyle_tested }}. Maven must run on Java&nbsp;8.
-The older Checkstyle versions 6.16.1 - 6.19 which can run on Java&nbsp;7 are also supported, but if you use these,
+The example above has been tested with the Checkstyle dependency set to a version up to
+{{ site.latest_checkstyle_tested }}. Maven must run at least on Java&nbsp;8.
+
+<div class="alert alert-warning">
+  <h4 class="alert-heading">Compatibility Notice</h4>
+  <p class="mb-0">The above example is for Checkstyle 8.21 and up. If you are using Checkstyle 7.0 - 8.20, you must
+  instead use the <code>java8a</code> variant of {{ site.name }} as shown in the commented-out lines of XML in the
+  example.</p>
+</div>
+
+The older Checkstyle versions 6.16.1 - 6.19 which can run on Java&nbsp;7, are also supported, but if you use these,
 you must depend on `checkstyle-addons-java7` instead of `checkstyle-addons` (even if you use Java&nbsp;8 or higher).
 
 
@@ -90,13 +123,14 @@ you must depend on `checkstyle-addons-java7` instead of `checkstyle-addons` (eve
 <a name="run-ant" class="csa-offset-anchor"/>
 <h2>Ant<a href="#run-ant"><span class="glyphicon glyphicon-link" aria-hidden="true"></span></a></h2>
 
-In Ant, we must add {{ site.name }} to the classpath of the [Checkstyle Ant Task]({{ site.link_cs_anttask }}){:target="_blank"}.
-The Ant task is part of the standard Checkstyle distribution. We need **at least Checkstyle 7.0** (currently tested up to {{ site.latest_checkstyle_tested }}), and the {{ site.name }} FatJAR:
+In Ant, we must add {{ site.name }} to the classpath of the [Checkstyle Ant
+Task]({{ site.link_cs_anttask }}){:target="_blank"}. The Ant task is part of the standard Checkstyle distribution.
+In order to integrate {{ site.name }}, the {{ site.name }} FatJAR is put on the Ant classpath.
 
-<p><a href="https://github.com/{{ site.github }}/releases/download/v{{ site.latest_version }}/checkstyle-addons-{{ site.latest_version }}-all.jar" class="btn btn-primary">Download FatJAR</a></p>
+<p><a href="https://github.com/{{ site.github }}/releases/download/v{{ site.latest_version }}/checkstyle-addons-{{
+site.latest_version }}-all.jar" class="btn btn-primary">Download FatJAR</a></p>
 
-The FatJAR (some people say "UberJAR") is simply a JAR which includes {{ site.name }} along with all its dependencies
-except Checkstyle itself.
+The FatJAR is simply a JAR which includes {{ site.name }} along with all its dependencies except Checkstyle itself.
 
 Then, in our Ant *build.xml*, we declare the Checkstyle task as follows:
 
@@ -105,6 +139,17 @@ Then, in our Ant *build.xml*, we declare the Checkstyle task as follows:
     <classpath>
         <pathelement location="lib/checkstyle-{{ site.latest_version_checkstyle }}-all.jar"/>
         <pathelement location="lib/checkstyle-addons-{{ site.latest_version }}-all.jar"/>
+    </classpath>
+</taskdef>
+{% endhighlight %}
+
+The above example is for Checkstyle 8.21 and up. If you are using Checkstyle 7.0 - 8.20, use these lines instead:
+
+{% highlight xml %}
+<taskdef resource="com/puppycrawl/tools/checkstyle/ant/checkstyle-ant-task.properties">
+    <classpath>
+        <pathelement location="lib/checkstyle-{{ site.latest_version_checkstyle_java8a }}-all.jar"/>
+        <pathelement location="lib/checkstyle-addons-java8a-{{ site.latest_version }}-all.jar"/>
     </classpath>
 </taskdef>
 {% endhighlight %}
@@ -121,21 +166,30 @@ the Checkstyle task is standard Ant:
 </checkstyle>
 {% endhighlight %}
 
-For more information on Checkstyle Ant task configuration, please refer to its [website]({{ site.link_cs_anttask }}){:target="_blank"}.
+For more information on Checkstyle Ant task configuration, please refer to its
+[website]({{ site.link_cs_anttask }}){:target="_blank"}.
 
 As with Maven and Gradle, you may use a Java&nbsp;7 compatible version of {{ site.name }} by using the `-java7` FatJAR
-([download](https://github.com/{{ site.github }}/releases/download/v{{ site.latest_version }}/checkstyle-addons-java7-{{ site.latest_version }}-all.jar)) and Checkstyle 6.16.1 -&nbsp;6.19.
+([download](https://github.com/{{ site.github }}/releases/download/v{{ site.latest_version }}/checkstyle-addons-java7-{{
+site.latest_version }}-all.jar)) and Checkstyle 6.16.1 -&nbsp;6.19. Checkstyle 7.0 -&nbsp;8.20 are supported via the
+[java8a-FatJAR](https://github.com/{{ site.github }}/releases/download/v{{ site.latest_version
+}}/checkstyle-addons-java8a-{{ site.latest_version }}-all.jar).
 
-If you use Ivy for dependency management in Ant, you can take advantage of the fact that {{ site.name }} is on Maven Central.
+If you use Ivy for dependency management in Ant, you can take advantage of the fact that {{ site.name }} is on Maven
+Central.
 
 
 <!-- ======================================================================================= -->
 <a name="run-intellij" class="csa-offset-anchor"/>
-<h2>IntelliJ IDEA / Android Studio<a href="#run-intellij"><span class="glyphicon glyphicon-link" aria-hidden="true"></span></a></h2>
+<h2>IntelliJ IDEA / Android Studio<a href="#run-intellij"><span class="glyphicon glyphicon-link"
+aria-hidden="true"></span></a></h2>
 
-In IntelliJ IDEA or Android Studio, {{ site.name }} runs as a third-party addon to the [Checkstyle-IDEA plugin](https://plugins.jetbrains.com/plugin/1065){:target="_blank"}. So first make sure you've got Checkstyle-IDEA. If not, install via *File &rarr; Settings... &rarr; Plugins &rarr; Browse Repostories*.
+In IntelliJ IDEA or Android Studio, {{ site.name }} runs as a third-party addon to the [Checkstyle-IDEA
+plugin](https://plugins.jetbrains.com/plugin/1065){:target="_blank"}. So first make sure you've got Checkstyle-IDEA. If
+not, install via *File &rarr; Settings... &rarr; Plugins &rarr; Browse Repostories*.
 
-<p><a href="https://github.com/{{ site.github }}/releases/download/v{{ site.latest_version }}/checkstyle-addons-{{ site.latest_version }}-all.jar" class="btn btn-primary">Download Plugin</a></p>
+<p><a href="https://github.com/{{ site.github }}/releases/download/v{{ site.latest_version }}/checkstyle-addons-{{
+site.latest_version }}-all.jar" class="btn btn-primary">Download FatJAR</a></p>
 
 After that, you can add {{ site.name }} to the third-party checks:
 
@@ -143,12 +197,19 @@ After that, you can add {{ site.name }} to the third-party checks:
 <img src="{{ site.baseurl }}/images/run-intellij.png" alt="{{ site.name }} in IntelliJ IDEA" width="785" height="510" />
 </div>
 
-Checkstyle-IDEA does not offer a visual editor, so you'll have to activate the {{ site.name }} checks by modifying your *checkstyle.xml* directly.
+Checkstyle-IDEA does not offer a visual editor, so you'll have to activate the {{ site.name }} checks by modifying your
+*checkstyle.xml* directly.
 
-The {{ site.name }} version offered by the above download button is compatible with Checkstyle 7.0 - {{ site.latest_checkstyle_tested }} (which means Checkstyle-IDEA 4.30.0 and up).
-If you are using the older Checkstyle versions 6.16.1 - 6.19, you must use a special, compatible version of {{ site.name }} instead:
+The {{ site.name }} version offered by the above download button is compatible with Checkstyle 8.21 and up.
+If you are using Checkstyle 7.0 - 8.20, use the `java8a` variant of {{ site.name }}. If you are using the older
+Checkstyle versions 6.16.1 - 6.19, use {{ site.name }} in the `java7` variant.
 
-<p><a href="https://github.com/{{ site.github }}/releases/download/v{{ site.latest_version }}/checkstyle-addons-java7-{{ site.latest_version }}-all.jar" class="btn btn-warning btn-sm">Download Legacy Plugin</a></p>
+<p>
+<a href="https://github.com/{{ site.github }}/releases/download/v{{ site.latest_version }}/checkstyle-addons-java8a-{{
+site.latest_version }}-all.jar" class="btn btn-warning btn-sm">Download "java8a" FatJAR</a> &nbsp;
+<a href="https://github.com/{{ site.github }}/releases/download/v{{ site.latest_version }}/checkstyle-addons-java7-{{
+site.latest_version }}-all.jar" class="btn btn-warning btn-sm">Download "java7" FatJAR</a>
+</p>
 
 
 <!-- ======================================================================================= -->
@@ -156,24 +217,33 @@ If you are using the older Checkstyle versions 6.16.1 - 6.19, you must use a spe
 <h2>Eclipse<a href="#run-eclipse"><span class="glyphicon glyphicon-link" aria-hidden="true"></span></a></h2>
 
 In Eclipse, {{ site.name }} runs as an addon to [Eclipse-CS](http://checkstyle.org/eclipse-cs/){:target="_blank"}.
-So first make sure you've got Eclipse-CS [installed](http://checkstyle.org/eclipse-cs/#!/install){:target="_blank"} at version 7.2.0 or higher.
-(Eclipse-CS 6.16.0 and 6.19.x are also supported with the legacy plugin, see below.) Then:
+So first make sure you've got Eclipse-CS [installed](http://checkstyle.org/eclipse-cs/#!/install){:target="_blank"} at
+version 7.2.0 or higher. Then:
 
-<p><a href="https://github.com/{{ site.github }}/releases/download/v{{ site.latest_version }}/checkstyle-addons-eclipse-{{ site.latest_version }}.jar" class="btn btn-primary">Download Eclipse Plugin</a></p>
+<p><a href="https://github.com/{{ site.github }}/releases/download/v{{ site.latest_version }}/checkstyle-addons-eclipse-{{
+site.latest_version }}.jar" class="btn btn-primary">Download Eclipse Plugin</a></p>
 
-**Installation:** Drop the downloaded plugin JAR into the *dropins* folder of your Eclipse installation and restart Eclipse.
+**Installation:** Drop the downloaded plugin JAR into the *dropins* folder of your Eclipse installation and restart
+Eclipse.
 
-In order to verify that {{ site.name }} was installed correctly, open the Checkstyle configuration dialog and you should see a new module category
-named '{{ site.name }}'. {{ site.name }} fully supports the visual Checkstyle configuration editor of Eclipse-CS:
+In order to verify that {{ site.name }} was installed correctly, open the Checkstyle configuration dialog and you should
+see a new module category named '{{ site.name }}'. {{ site.name }} fully supports the visual Checkstyle configuration
+editor of Eclipse-CS:
 
 <div class="csa-largeImageWrapper">
 <img src="{{ site.baseurl }}/images/run-eclipse.png" alt="{{ site.name }} in Eclipse" width="549" height="368" />
 </div>
 
-The {{ site.name }} version offered by the above download button is compatible with Checkstyle 7.0 - {{ site.latest_checkstyle_tested }}
-(which means Eclipse-CS 7.2.0 and up). If you are using the older Checkstyle versions 6.16.1 - 6.19, you must use a special, compatible version of {{ site.name }} instead:
+The {{ site.name }} version offered by the above download button is compatible with Checkstyle 8.21 and up. If you are
+using Checkstyle 7.0 -&nbsp;8.20, use the `java8a` variant of {{ site.name }}. If you are using the older Checkstyle
+versions 6.16.1 -&nbsp;6.19, use {{ site.name }} in the `java7` variant.
 
-<p><a href="https://github.com/{{ site.github }}/releases/download/v{{ site.latest_version }}/checkstyle-addons-java7-eclipse-{{ site.latest_version }}.jar" class="btn btn-warning btn-sm">Download Legacy Plugin</a></p>
+<p>
+<a href="https://github.com/{{ site.github }}/releases/download/v{{ site.latest_version }}/checkstyle-addons-java8a-eclipse-{{
+site.latest_version }}.jar" class="btn btn-warning btn-sm">Download "java8a" Plugin</a> &nbsp;
+<a href="https://github.com/{{ site.github }}/releases/download/v{{ site.latest_version }}/checkstyle-addons-java7-eclipse-{{
+site.latest_version }}.jar" class="btn btn-warning btn-sm">Download "java7" Plugin</a>
+</p>
 
 
 <!-- ======================================================================================= -->
@@ -195,10 +265,16 @@ Checkstyle Plugin ([download]({{ site.link_sq_csplugin }}/releases),
   </thead>
   <tbody>
     <tr>
-      <td>&ge;&nbsp;3.1</td>
+      <td>&ge;&nbsp;4.21</td>
       <td><a href="https://github.com/{{ site.github }}/releases/download/v{{ site.latest_version
           }}/sonar-checkstyleaddons-{{ site.latest_version }}.jar" class="btn btn-primary">Download SonarQube Plugin
           (v{{ site.latest_version }})</a></td>
+    </tr>
+    <tr>
+      <td>3.1 -&nbsp;4.20</td>
+      <td><a href="https://github.com/{{ site.github }}/releases/download/v{{ site.latest_version
+          }}/sonar-checkstyleaddons-{{ site.latest_version }}-csp3.1.jar" class="btn btn-warning btn-sm">Download
+          SonarQube Plugin (v{{ site.latest_version }}-csp3.1)</a></td>
     </tr>
     <tr>
       <td>2.3 or 2.4</td>
@@ -228,12 +304,19 @@ all the other plugins are). Restart SonarQube.
 <h2>Command Line<a href="#run-command-line"><span class="glyphicon glyphicon-link" aria-hidden="true"></span></a></h2>
 
 Checkstyle can also be run [from the command line](http://checkstyle.sourceforge.net/cmdline.html){:target="_blank"}.
-{{ site.name }} is included by simply adding its FatJAR to the classpath.
-If you are using at least Java&nbsp;8, and at least Checkstyle 7.0 (tested up to {{ site.latest_checkstyle_tested }}), you may use the regular JAR.
-If you are using Checkstyle 6.16.1 - 6.19, you must use the legacy JAR. The code you're analyzing can be anything up to Java&nbsp;8.
+{{ site.name }} is included by simply adding its FatJAR to the classpath.\\
+The regular JAR is compatible with Checkstyle 8.21 and up (tested up to {{ site.latest_checkstyle_tested }}). If you
+are using Checkstyle 7.0 -&nbsp;8.20, you must use the `java8a` variant of {{ site.name }}. If you are using Checkstyle
+6.16.1 -&nbsp;6.19, you must use the `java7` variant.
 
-<p><a href="https://github.com/{{ site.github }}/releases/download/v{{ site.latest_version }}/checkstyle-addons-{{ site.latest_version }}-all.jar" class="btn btn-primary">Download regular JAR</a> &nbsp; &nbsp; &nbsp;
-<a href="https://github.com/{{ site.github }}/releases/download/v{{ site.latest_version }}/checkstyle-addons-java7-{{ site.latest_version }}-all.jar" class="btn btn-warning btn-sm">Download legacy JAR</a></p>
+<p>
+<a href="https://github.com/{{ site.github }}/releases/download/v{{ site.latest_version }}/checkstyle-addons-{{
+site.latest_version }}-all.jar" class="btn btn-primary">Download regular FatJAR</a> &nbsp;
+<a href="https://github.com/{{ site.github }}/releases/download/v{{ site.latest_version }}/checkstyle-addons-java8a-{{
+site.latest_version }}-all.jar" class="btn btn-warning btn-sm">Download "java8a" FatJAR</a> &nbsp;
+<a href="https://github.com/{{ site.github }}/releases/download/v{{ site.latest_version }}/checkstyle-addons-java7-{{
+site.latest_version }}-all.jar" class="btn btn-warning btn-sm">Download "java7" FatJAR</a>
+</p>
 
 Now you can run Checkstyle with {{ site.name }} like this (example for regular JAR):
 
@@ -241,4 +324,5 @@ Now you can run Checkstyle with {{ site.name }} like this (example for regular J
 java -cp checkstyle-addons-{{ site.latest_version }}-all.jar;checkstyle-{{ site.latest_version_checkstyle }}-all.jar com.puppycrawl.tools.checkstyle.Main -c your-checkstyle.xml src
 ```
 
-The above assumes that your sources are in a subdirectory *src*, and that the required JARs and your configuration file are in the current directory.
+The above assumes that your sources are in a subdirectory *src*, and that the required JARs and your configuration file
+are in the current directory.
