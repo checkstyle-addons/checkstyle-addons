@@ -219,6 +219,13 @@ coverage](https://coveralls.io/builds/3457153), the fact that all unit tests com
 runtime is significant. {{ site.name }} also includes a reflection-based component that smoothes over the API
 differences between Checkstyle versions, so that we have full compatibility with almost every recent Checkstyle version.
 
+However, at times the core Checkstyle API for custom checks is so thoroughly broken that we can't make up for it. In
+those cases, we ship *variants* of {{ site.name }} in order to compensate. The name in parentheses (e.g. `(java7)`)
+indicates that the most recent version of {{ site.name }} would need to be used in that variant in order to be
+compatible with the Checkstyle version in that row. Naturally, earlier versions of {{ site.name }} exist which do not
+require a special variant.
+
+
 <a name="n" class="csa-offset-anchor"/>
 
 ### N. SevNTU Checkstyle
@@ -227,7 +234,10 @@ For [SevNTU Checkstyle](https://github.com/sevntu-checkstyle/sevntu.checkstyle),
 for versions 1.8.0 and upwards, so source archives are easily available for downloading. For versions down to 1.5.x,
 POM files could still be found with the
 [binaries](https://github.com/sevntu-checkstyle/sevntu.checkstyle/tree/gh-pages/maven2/com/github/sevntu/checkstyle/sevntu-checks)
-which give information on the Checkstyle version for which that version of SevNTU Checkstyle was built.\\
+which give information on the Checkstyle version for which that version of SevNTU Checkstyle was built. Starting from
+SevNTU Checkstyle version 1.24.0, binaries are distributed via [Maven
+Central](https://search.maven.org/search?q=g:com.github.sevntu-checkstyle%20AND%20a:sevntu-checks&core=gav).
+
 For versions 1.8.0 - 1.22.0, SevNTU Checkstyle was compiled and the unit tests were executed against the different
 Checkstyle runtimes in order to simply try if it works. When all tests passed without errors, the versions were
 considered compatible. Versions declared in the POM files were *always* considered compatible (and proved to be so
