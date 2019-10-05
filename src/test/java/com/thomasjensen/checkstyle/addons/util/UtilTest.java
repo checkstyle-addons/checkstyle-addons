@@ -25,6 +25,7 @@ import java.util.Set;
 import com.puppycrawl.tools.checkstyle.api.DetailAST;
 import org.junit.Assert;
 import org.junit.Test;
+import org.mockito.Mockito;
 
 import com.thomasjensen.checkstyle.addons.BaseCheckTestSupport;
 import com.thomasjensen.checkstyle.addons.checks.misc.CatalogEntryTest;
@@ -55,7 +56,7 @@ public class UtilTest
     public void testGetFullIdentNull()
     {
         DetailAST ast = CatalogEntryTest.createAstForLineCol(1, 0);
-        ast.setText("foo");
+        astSetText(ast, "foo");
         Assert.assertNull(Util.getFullIdent(ast));
     }
 
@@ -65,8 +66,20 @@ public class UtilTest
     public void testGetFirstIdentNull()
     {
         DetailAST ast = CatalogEntryTest.createAstForLineCol(1, 0);
-        ast.setText("foo");
+        astSetText(ast, "bar");
         Assert.assertNull(Util.getFirstIdent(ast));
+    }
+
+
+
+    private void astSetText(final DetailAST pAst, final String pText)
+    {
+        if (DetailAST.class.isInterface()) {
+            Mockito.when(pAst.getText()).thenReturn(pText);
+        }
+        else {
+            pAst.setText(pText);
+        }
     }
 
 

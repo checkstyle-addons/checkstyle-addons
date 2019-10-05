@@ -17,7 +17,6 @@ package com.thomasjensen.checkstyle.addons.checks;
 
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Collection;
 import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
@@ -149,10 +148,11 @@ public class BinaryNameTest
 
 
     @Test
+    @SuppressWarnings("ConstantConditions")
     public void testIllegalNulls()
     {
         try {
-            new BinaryName("com.foo", (Collection<String>) null);
+            new BinaryName("com.foo", null);
             Assert.fail("Expected exception was not thrown");
         }
         catch (NullPointerException e) {
@@ -160,7 +160,7 @@ public class BinaryNameTest
         }
 
         try {
-            new BinaryName("com.foo", (String) null, (String[]) null);
+            new BinaryName("com.foo", null, (String[]) null);
             Assert.fail("Expected exception was not thrown");
         }
         catch (IllegalArgumentException e) {

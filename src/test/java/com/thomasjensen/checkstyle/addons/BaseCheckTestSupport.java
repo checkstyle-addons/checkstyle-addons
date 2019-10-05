@@ -9,6 +9,7 @@ import java.io.LineNumberReader;
 import java.io.OutputStream;
 import java.io.PrintStream;
 import java.io.UnsupportedEncodingException;
+import java.lang.reflect.Constructor;
 import java.util.Collections;
 import java.util.List;
 import java.util.Locale;
@@ -21,7 +22,9 @@ import com.puppycrawl.tools.checkstyle.DefaultConfiguration;
 import com.puppycrawl.tools.checkstyle.DefaultLogger;
 import com.puppycrawl.tools.checkstyle.TreeWalker;
 import com.puppycrawl.tools.checkstyle.api.AuditEvent;
+import com.puppycrawl.tools.checkstyle.api.AuditListener;
 import com.puppycrawl.tools.checkstyle.api.Configuration;
+import junit.framework.AssertionFailedError;
 import org.junit.Assert;
 
 import com.thomasjensen.checkstyle.addons.util.Util;
@@ -42,12 +45,38 @@ public abstract class BaseCheckTestSupport
 {
     /** A brief logger that only displays info about errors. */
     protected static class BriefLogger
-        extends DefaultLogger
+        implements AuditListener
     {
-        @SuppressWarnings("deprecation")
+        private DefaultLogger delegate;
+
+
+
+        @SuppressWarnings({"JavaReflectionInvocation", "JavaReflectionMemberAccess", "RedundantSuppression"})
         public BriefLogger(final OutputStream pOut)
         {
-            super(pOut, true /*OutputStreamOptions.CLOSE*/);
+            try {
+                Constructor<DefaultLogger> constructor;
+                try {
+                    constructor = DefaultLogger.class.getConstructor(OutputStream.class, boolean.class);
+                    delegate = constructor.newInstance(pOut, Boolean.TRUE);
+                }
+                catch (NoSuchMethodException e) {
+                    // this is normal for Checkstyle << 8.25
+                    Class<?> osoClass = Class.forName(
+                        "com.puppycrawl.tools.checkstyle.api.AutomaticBean$OutputStreamOptions");
+                    Object enumConstant = osoClass.getEnumConstants()[0]; // CLOSE
+                    try {
+                        constructor = DefaultLogger.class.getConstructor(OutputStream.class, osoClass);
+                        delegate = constructor.newInstance(pOut, enumConstant);
+                    }
+                    catch (NoSuchMethodException pE) {
+                        throw new AssertionFailedError(e.getMessage());
+                    }
+                }
+            }
+            catch (ReflectiveOperationException | RuntimeException e) {
+                throw new AssertionFailedError(e.getMessage());
+            }
         }
 
 
@@ -61,9 +90,33 @@ public abstract class BaseCheckTestSupport
 
 
         @Override
+        public void auditFinished(final AuditEvent pEvent)
+        {
+            delegate.auditFinished(pEvent);
+        }
+
+
+
+        @Override
         public void fileFinished(final AuditEvent pEvent)
         {
             // empty
+        }
+
+
+
+        @Override
+        public void addError(final AuditEvent pEvent)
+        {
+            delegate.addError(pEvent);
+        }
+
+
+
+        @Override
+        public void addException(final AuditEvent pEvent, final Throwable pThrowable)
+        {
+            delegate.addException(pEvent, pThrowable);
         }
 
 

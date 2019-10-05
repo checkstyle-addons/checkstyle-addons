@@ -607,6 +607,7 @@ public class ModuleDirectoryLayoutTest
 
 
 
+    @SuppressWarnings("ConstantConditions")
     @Test(expected = NullPointerException.class)
     public void testCutSlashesNPE()
     {
