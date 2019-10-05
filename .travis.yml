@@ -3,26 +3,25 @@ language: java
 sudo: false
 
 before_install:
-  - 'ls -a'
-  - 'pwd'
-  - 'curl -JORL https://cdn.azul.com/zulu/bin/zulu7.31.0.5-ca-jdk7.0.232-linux_x64.tar.gz'
-  - 'curl -JORL https://github.com/AdoptOpenJDK/openjdk8-binaries/releases/download/jdk8u222-b10/OpenJDK8U-jdk_x64_linux_hotspot_8u222b10.tar.gz'
-  - 'tar -xf zulu7.31.0.5-ca-jdk7.0.232-linux_x64.tar.gz'
-  - 'tar -xf OpenJDK8U-jdk_x64_linux_hotspot_8u222b10.tar.gz'
+  - 'curl -JORL https://cdn.azul.com/zulu/bin/${jdk7file}.tar.gz'
+  - 'curl -JORL https://github.com/AdoptOpenJDK/openjdk8-binaries/releases/download/jdk8u222-b10/${jdk8file}.tar.gz'
+  - 'tar -xf ${jdk7file}.tar.gz'
+  - 'tar -xf ${jdk8file}.tar.gz'
   - 'ls -lF'
-  - 'export JAVA_HOME=$PWD/jdk8u222-b10'
-  - 'echo JAVA_HOME=$JAVA_HOME'
-  - 'export PATH=$JAVA_HOME/bin:$PATH'
+  - 'export JAVA_HOME=${PWD}/jdk8u222-b10'
+  - 'echo JAVA_HOME=${JAVA_HOME}'
+  - 'export PATH=${JAVA_HOME}/bin:${PATH}'
   - 'java -version'
-  - 'ls -l $checkstyleaddons_jdk7_java'
-#  - 'sudo update-alternatives --config java'
+  - 'ls -l ${checkstyleaddons_jdk7_java}'
   - './gradlew clean'
 
 env:
   global:
-  - checkstyleaddons_jdk7_java=/home/travis/build/checkstyle-addons/checkstyle-addons/zulu7.31.0.5-ca-jdk7.0.232-linux_x64/bin/java
-  - checkstyleaddons_jdk7_javac=/home/travis/build/checkstyle-addons/checkstyle-addons/zulu7.31.0.5-ca-jdk7.0.232-linux_x64/bin/javac
-  - checkstyleaddons_jdk7_javadoc=/home/travis/build/checkstyle-addons/checkstyle-addons/zulu7.31.0.5-ca-jdk7.0.232-linux_x64/bin/javadoc
+  - jdk7file=zulu7.31.0.5-ca-jdk7.0.232-linux_x64
+  - jdk8file=OpenJDK8U-jdk_x64_linux_hotspot_8u222b10
+  - checkstyleaddons_jdk7_java=${TRAVIS_BUILD_DIR}/${jdk7file}/bin/java
+  - checkstyleaddons_jdk7_javac=${TRAVIS_BUILD_DIR}/${jdk7file}/bin/javac
+  - checkstyleaddons_jdk7_javadoc=${TRAVIS_BUILD_DIR}/${jdk7file}/bin/javadoc
 
 install: true
 script:
