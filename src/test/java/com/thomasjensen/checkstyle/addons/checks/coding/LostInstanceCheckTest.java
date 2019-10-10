@@ -16,8 +16,9 @@ package com.thomasjensen.checkstyle.addons.checks.coding;
  */
 
 import com.puppycrawl.tools.checkstyle.DefaultConfiguration;
-import com.thomasjensen.checkstyle.addons.BaseCheckTestSupport;
 import org.junit.Test;
+
+import com.thomasjensen.checkstyle.addons.BaseCheckTestSupport;
 
 
 /**

@@ -105,4 +105,17 @@ public class InputLostInstance
             }
         };
     }
+
+
+
+    // reproduces https://github.com/checkstyle-addons/checkstyle-addons/issues/2
+    public void issue2() {
+        byte[] buffer = new byte[42];
+        int readBytes = 0;
+        String leftOverText = "";
+        leftOverText += new String(buffer, 0, readBytes);
+
+        readBytes += new Integer(2);
+        readBytes *= (new Integer(20));
+    }
 }

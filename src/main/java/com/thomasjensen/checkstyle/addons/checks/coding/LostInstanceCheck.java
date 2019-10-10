@@ -23,6 +23,7 @@ import javax.annotation.Nullable;
 
 import com.puppycrawl.tools.checkstyle.api.DetailAST;
 import com.puppycrawl.tools.checkstyle.api.TokenTypes;
+
 import com.thomasjensen.checkstyle.addons.checks.AbstractAddonsCheck;
 import com.thomasjensen.checkstyle.addons.checks.BinaryName;
 
@@ -41,7 +42,10 @@ public class LostInstanceCheck
      * alone.
      */
     private static final int[] GOOD_PARENTS =
-        new int[]{TokenTypes.ASSIGN, TokenTypes.ANNOTATION_MEMBER_VALUE_PAIR, TokenTypes.ARRAY_INIT, TokenTypes.ELIST,
+        new int[]{TokenTypes.ASSIGN, TokenTypes.PLUS_ASSIGN, TokenTypes.MINUS_ASSIGN, TokenTypes.STAR_ASSIGN,
+            TokenTypes.DIV_ASSIGN, TokenTypes.MOD_ASSIGN, TokenTypes.SR_ASSIGN, TokenTypes.BSR_ASSIGN,
+            TokenTypes.SL_ASSIGN, TokenTypes.BAND_ASSIGN, TokenTypes.BXOR_ASSIGN, TokenTypes.BOR_ASSIGN,
+            TokenTypes.ANNOTATION_MEMBER_VALUE_PAIR, TokenTypes.ARRAY_INIT, TokenTypes.ELIST,
             TokenTypes.FOR_EACH_CLAUSE, TokenTypes.LITERAL_RETURN, TokenTypes.LITERAL_THROW};
 
     /**
@@ -115,7 +119,8 @@ public class LostInstanceCheck
 
         final DetailAST parent = pLiteralNew.getParent();
         if (parent.getType() == TokenTypes.DOT && (pLiteralNew.getNextSibling() != null
-            || parent.getParent().getType() == TokenTypes.DOT)) {
+            || parent.getParent().getType() == TokenTypes.DOT))
+        {
             result = true;
         }
         return result;
