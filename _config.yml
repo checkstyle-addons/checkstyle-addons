@@ -40,14 +40,14 @@ defaults:
       sitemap: false
 
 # checkstyle-addons custom variables
-latest_version: '6.0.0'
+latest_version: '6.0.1'
 latest_major: '6'
 # next line gives the Checkstyle version used by the default depconfig
 latest_version_checkstyle: '8.21'
 latest_version_checkstyle_java8a: '8.0'
 latest_version_checkstyle_java7: '6.4.1'
 # next line is the highest Checkstyle version tested by the unit tests
-latest_checkstyle_tested: '8.22'
+latest_checkstyle_tested: '8.25'
 
 # links to external websites that are used in multiple places throughout the site
 link_bintray: 'https://bintray.com/checkstyle-addons/checkstyle-addons/checkstyle-addons/view'
