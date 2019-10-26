@@ -42,6 +42,7 @@ import com.thomasjensen.checkstyle.addons.build.ClasspathBuilder;
 import com.thomasjensen.checkstyle.addons.build.DependencyConfig;
 import com.thomasjensen.checkstyle.addons.build.ExtProp;
 import com.thomasjensen.checkstyle.addons.build.PomXml;
+import com.thomasjensen.checkstyle.addons.build.VersionWrapper;
 
 
 /**
@@ -140,9 +141,7 @@ public class GeneratePomFileTask
         pom.setDependencies(dependencies);
 
         pom.setInceptionYear("2015");
-
-        pom.setLicenses(Collections.singletonList(
-            new PomXml.LicenseXml("GNU General Public License, Version 3", "https://www.gnu.org/copyleft/gpl.html")));
+        pom.setLicenses(Collections.singletonList(new PomXml.LicenseXml("GPL-3.0-only", getLicenseUrl())));
         pom.setDevelopers(Collections.singletonList(
             new PomXml.DeveloperXml((String) inputs.getProperties().get("authorName"), "checkstyle@thomasjensen.com")));
         pom.setOrganization(new PomXml.OrganizationXml((String) inputs.getProperties().get("orgName"),
@@ -151,6 +150,17 @@ public class GeneratePomFileTask
             "scm:git:git@github.com:" + inputs.getProperties().get("github") + ".git",
             "git@github.com:" + inputs.getProperties().get("github") + ".git"));
         return pom;
+    }
+
+
+
+    private String getLicenseUrl()
+    {
+        VersionWrapper version = new VersionWrapper(getProject());
+        String github = (String) getInputs().getProperties().get("github");
+        boolean isRelease = !version.isSnapshot();
+        String versionStr = isRelease ? ("v" + version.toString()) : "master";
+        return "https://raw.githubusercontent.com/" + github + "/" + versionStr + "/LICENSE";
     }
 
 
