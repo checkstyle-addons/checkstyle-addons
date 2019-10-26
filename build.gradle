@@ -94,7 +94,7 @@ dependencies {
     generalCompileOnly group: 'com.google.code.findbugs', name: 'jsr305', version: '3.0.1';
 
     api group: 'com.puppycrawl.tools', name: 'checkstyle', version: project.ext.checkstyleBaseVersion;
-    api group: 'com.fasterxml.jackson.core', name: 'jackson-databind', version: '2.7.3';
+    api group: 'com.fasterxml.jackson.core', name: 'jackson-databind', version: '2.10.0';
 
     sonarqubeImplementation group: 'org.codehaus.sonar', name: 'sonar-plugin-api', version: '3.0';
     sonarqubeRuntimeOnly group: 'org.slf4j', name: 'slf4j-nop', version: '1.6.2';
