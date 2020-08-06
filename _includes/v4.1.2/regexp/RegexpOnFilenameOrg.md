@@ -8,7 +8,7 @@ Depending on the configuration, a warning is logged if a required match is not f
   honored! Sadly, even though {{ site.name }} is admittedly their inspiration, and we published 10 months ahead of
   them, the fact goes unmentioned.
   <img class="emoji" width="20" height="20" align="absmiddle"
-       src="https://assets.github.com/images/icons/emoji/unicode/1f44e.png" alt=":-1:" title=":-1:"><br/>
+       src="https://github.githubassets.com/images/icons/emoji/unicode/1f44e.png" alt=":-1:" title=":-1:"><br/>
   In order to avoid name collisions with our original, we had to rename this check from <i>RegexpOnFilename</i> to
   <i>RegexpOnFilenameOrg</i>.</p>
 </div>
