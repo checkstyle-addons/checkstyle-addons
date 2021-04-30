@@ -23,6 +23,7 @@ Desktop.ini
 
 # Jekyll stuff
 .jekyll-metadata
+/.jekyll-cache/
 _site/
 _cache/
 _support/
