@@ -11,7 +11,7 @@
 [additional detectors](https://checkstyle-addons.thomasjensen.com/latest/checks/) for the
 [Checkstyle](http://checkstyle.org/) static code analysis tool for Java.  
 It [integrates](https://checkstyle-addons.thomasjensen.com/run.html) with a large number of standard software
-and is distributed through Bintray jcenter and Maven Central.
+and is distributed through Maven Central.
 
 For more information, please visit [the website](https://checkstyle-addons.thomasjensen.com/).
 

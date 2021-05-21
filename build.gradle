@@ -16,7 +16,7 @@
 
 buildscript {
     repositories {
-        jcenter()
+        mavenCentral()
     }
 }
 plugins {
@@ -28,11 +28,11 @@ plugins {
     id 'idea';
     id 'maven-publish';
     id 'com.jfrog.bintray' version '1.8.4';
-    id 'org.barfuin.gradle.taskinfo' version '1.0.4';
+    id 'org.barfuin.gradle.taskinfo' version '1.1.0';
 }
 
 repositories {
-    jcenter()
+    mavenCentral()
 }
 
 

@@ -23,7 +23,7 @@ import java.util.regex.Pattern;
 
 buildscript {
     repositories {
-        jcenter();
+        mavenCentral();
     }
     dependencies {
         classpath group: 'io.github.java-diff-utils', name: 'java-diff-utils', version: '4.0'
@@ -36,7 +36,7 @@ plugins {
     id 'org.sonarqube' version '2.6';
 }
 repositories {
-    jcenter();
+    mavenCentral();
 }
 
 description = 'Sources to analyze for SonarQube integration test';
