@@ -27,9 +27,11 @@ Desktop.ini
 
 # Jekyll stuff
 .jekyll-metadata
-_site/
+/.jekyll-cache/
+/_site/
 _cache/
-_support/
+/_posts/
+/_support/
 
 # Others
 bin/
