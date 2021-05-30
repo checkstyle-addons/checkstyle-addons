@@ -1,0 +1,56 @@
+name: build
+
+on: [push, pull_request, workflow_dispatch]
+
+jobs:
+    build:
+        runs-on: ubuntu-latest
+        container:
+            image: gradle:5.6.4-jdk8
+            env:
+                DEBIAN_FRONTEND: noninteractive
+                ZULU_HOME: /usr/lib/jvm/zulu7
+                checkstyleaddons_jdk7_java: /usr/lib/jvm/zulu7/bin/java
+                checkstyleaddons_jdk7_javac: /usr/lib/jvm/zulu7/bin/javac
+                checkstyleaddons_jdk7_javadoc: /usr/lib/jvm/zulu7/bin/javadoc
+        steps:
+            - name: upgrade-git
+              run: |
+                  apt-get update -y
+                  apt-get install -y software-properties-common
+                  add-apt-repository -y ppa:git-core/ppa
+                  apt-get update
+                  apt-get install -y git
+
+            - name: add-jdk7
+              run: |
+                  apt-get -y install gnupg
+                  apt-key adv --keyserver hkp://keyserver.ubuntu.com:80 --recv-keys 0xB1998361219BD9C9
+                  curl -LO https://cdn.azul.com/zulu/bin/zulu-repo_1.0.0-2_all.deb
+                  apt-get install ./zulu-repo_1.0.0-2_all.deb
+                  apt-get update
+                  apt-get install -y zulu7-jdk
+
+            - name: versions
+              run: |
+                  echo PATH=${PATH}
+                  git --version
+                  echo JAVA_HOME=${JAVA_HOME}
+                  ls -l ${JAVA_HOME}/bin/java
+                  java -version
+                  echo ZULU_HOME=${ZULU_HOME}
+                  ls -l ${checkstyleaddons_jdk7_java}
+                  ${ZULU_HOME}/bin/java -version
+
+            - uses: actions/checkout@v2
+
+            - name: build
+              run: |
+                  gradle clean
+                  gradle build site
+                  gradle jacocoTestReport
+
+            - name: coveralls
+              env:
+                  COVERALLS_REPO_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+              run: gradle coveralls
