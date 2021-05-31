@@ -22,7 +22,6 @@ buildscript {
 plugins {
     id 'java-library';
     id 'jacoco';
-    id 'com.github.kt3k.coveralls' version '2.12.0';
     id 'checkstyle';
     id 'com.github.spotbugs';
     id 'idea';
@@ -225,7 +224,7 @@ test {
 jacocoTestReport {
     reports {
         html.enabled = true;
-        xml.enabled = true;     // coveralls plugin depends on xml format report
+        xml.enabled = true;
         csv.enabled = false;
     }
     sourceSets(sourceSets.main, sourceSets.sonarqube);
