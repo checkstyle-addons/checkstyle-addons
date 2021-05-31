@@ -1,5 +1,5 @@
-[![Build Status](https://travis-ci.org/checkstyle-addons/checkstyle-addons.svg?branch=master)](https://travis-ci.org/checkstyle-addons/checkstyle-addons)
-[![Coverage Status](https://coveralls.io/repos/checkstyle-addons/checkstyle-addons/badge.svg?branch=master)](https://coveralls.io/r/checkstyle-addons/checkstyle-addons?branch=master)
+[![Build Status](https://github.com/checkstyle-addons/checkstyle-addons/actions/workflows/build.yml/badge.svg)](https://github.com/checkstyle-addons/checkstyle-addons/actions/workflows/build.yml)
+[![Coverage Status](https://codecov.io/gh/checkstyle-addons/checkstyle-addons/branch/master/graph/badge.svg)](https://codecov.io/gh/checkstyle-addons/checkstyle-addons)
 [![Download](https://img.shields.io/github/release/checkstyle-addons/checkstyle-addons.svg?label=download&colorB=4cc61e)](https://github.com/checkstyle-addons/checkstyle-addons/releases)
 [![Maven Central](https://maven-badges.herokuapp.com/maven-central/com.thomasjensen.checkstyle.addons/checkstyle-addons/badge.svg)](http://search.maven.org/#search%7Cgav%7C1%7Cg%3Acom.thomasjensen.checkstyle.addons)
 [![OpenHub Stats](https://www.openhub.net/p/checkstyle-addons/widgets/project_thin_badge?format=gif&ref=Thin+badge)](https://www.openhub.net/p/checkstyle-addons)
