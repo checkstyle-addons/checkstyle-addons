@@ -16,11 +16,11 @@ all kinds of improvements, including improvements to the website.
 
 ## Current Status
 
-{{ site.name }} is using the [Travis](https://travis-ci.org/checkstyle-addons/checkstyle-addons) Continuous Integration
-system. Every push to *master* and every pull request are automatically built by Travis-CI. If the Travis status is
-*passing*{:style="color:#468847;"}, then it was successfully built with different Checkstyle versions, and all unit
-tests were successful.\\
-Test coverage is measured by [Coveralls](https://coveralls.io/r/checkstyle-addons/checkstyle-addons). The badge below
+{{ site.name }} is using the [GitHub Actions](https://github.com/{{ site.github }}/actions/workflows/build.yml)
+continuous integration system. Every push to *master* and every pull request are automatically built by GitHub Actions.
+If the GitHub Actions status is *passing*{:style="color:#468847;"}, then it was successfully built with different
+Checkstyle versions, and all unit tests were successful.\\
+Test coverage is measured by [Codecov](https://app.codecov.io/gh/checkstyle-addons/checkstyle-addons). The badge below
 shows the current coverage, which is recomputed upon every successful build. Also, the coverage is calculated for every
 pull request, and reported on the pull request's discussion page.
 
@@ -29,11 +29,11 @@ pull request, and reported on the pull request's discussion page.
     <h3 id="travis-status-title" class="panel-title">Build Status</h3>
   </div>
   <div class="panel-body">
-    <a href="https://travis-ci.org/checkstyle-addons/checkstyle-addons"><img
-       src="https://travis-ci.org/checkstyle-addons/checkstyle-addons.svg?branch=master"
+    <a href="https://github.com/{{ site.github }}/actions/workflows/build.yml"><img
+       src="https://github.com/{{ site.github }}/actions/workflows/build.yml/badge.svg"
        alt="Build Status" height="20" /></a>
-    <a href="https://coveralls.io/r/checkstyle-addons/checkstyle-addons?branch=master"><img
-       src="https://coveralls.io/repos/checkstyle-addons/checkstyle-addons/badge.svg?branch=master"
+    <a href="https://codecov.io/gh/checkstyle-addons/checkstyle-addons"><img
+       src="https://codecov.io/gh/{{ site.github }}/branch/master/graph/badge.svg"
        alt="Coverage Status" height="20" /></a><br/>
     <a href="https://www.openhub.net/p/checkstyle-addons" target="_blank"><img style="margin-top: 15px;"
        src="https://www.openhub.net/p/checkstyle-addons/widgets/project_thin_badge?format=gif&ref=Thin+badge"
@@ -44,10 +44,11 @@ pull request, and reported on the pull request's discussion page.
 
 ## Collaboration Model
 
-{{ site.name }} follows a *Fork &amp; Pull* collaboration model, which means that all changes go through
-[pull requests](https://help.github.com/articles/using-pull-requests/).\\
+{{ site.name }} follows a *Fork &amp; Pull* collaboration model, which means that all changes go through [pull
+requests](https://docs.github.com/en/github/collaborating-with-pull-requests/proposing-changes-to-your-work-with-pull-requests/about-pull-requests).\\
 Please feel free to suggest anything that's good. If you are going to expend a lot of work, it may make sense to
-[open an issue](https://help.github.com/articles/creating-an-issue/) about it first, so we can discuss your plans.
+[open an issue](https://docs.github.com/en/issues/tracking-your-work-with-issues/creating-issues/creating-an-issue)
+about it first, so we can discuss your plans.
 
 
 <a name="setup" class="csa-offset-anchor"/>
@@ -60,7 +61,7 @@ In order to build {{ site.name }} yourself, follow these steps:
    - [Git](https://git-scm.com/){:target="_blank"}
    - [Java 8 SDK](https://adoptopenjdk.net/){:target="_blank"},
      which must be used to run the build process
-   - [Java 7 SDK](http://www.oracle.com/technetwork/java/javase/downloads/java-archive-downloads-javase7-521261.html){:target="_blank"}
+   - [Java 7 SDK](https://www.azul.com/downloads/?version=java-7-lts&package=jdk#download-openjdk){:target="_blank"}
 
     In order to do a full build of {{ site.name }}, we actually need both JDKs at the same time. It's no problem
     to have them all installed as long as each has its own distinct directory. The build process itself *must* run on

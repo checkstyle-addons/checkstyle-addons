@@ -214,10 +214,10 @@ exists).
 ### M. {{ site.name }}
 
 {{ site.name }} features a build process that actually tries running the compiled checks against every single Checkstyle
-runtime ([example log file](https://travis-ci.org/{{ site.github }}/jobs/78284770#L353)). Since we have very [high test
-coverage](https://coveralls.io/builds/3457153), the fact that all unit tests complete successfully against a Checkstyle
-runtime is significant. {{ site.name }} also includes a reflection-based component that smoothes over the API
-differences between Checkstyle versions, so that we have full compatibility with almost every recent Checkstyle version.
+runtime. Since we have very [high test coverage](https://app.codecov.io/gh/checkstyle-addons/checkstyle-addons), the
+fact that all unit tests complete successfully against a Checkstyle runtime is significant. {{ site.name }} also
+includes a reflection-based component that smoothes over the API differences between Checkstyle versions, so that we
+have full compatibility with almost every recent Checkstyle version.
 
 However, at times the core Checkstyle API for custom checks is so thoroughly broken that we can't make up for it. In
 those cases, we ship *variants* of {{ site.name }} in order to compensate. The name in parentheses (e.g. `(java7)`)

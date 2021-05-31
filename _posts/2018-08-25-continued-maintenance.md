@@ -15,10 +15,9 @@ is present in the relevant commits
 Normally, {{ site.name }} is compatible with the new Checkstyle version, so you'd have no problems even if there
 was no commit message for it. But the commit adds it to the automatic build, so that when changes are made in the
 future, we can be sure that the version stays supported. The automatic build actually runs all unit tests against
-every supported version of Checkstyle
-([example on Travis CI](https://travis-ci.org/checkstyle-addons/checkstyle-addons/jobs/415118474#L1131)). Since we
-have [99% test coverage](https://coveralls.io/github/{{ site.github }}), this makes us very confident about
-compatibility.
+every supported version of Checkstyle ([example on GitHub
+Actions](https://github.com/{{ site.github }}/runs/2713062225?check_suite_focus=true#step:7:281)). Since we have
+[high test coverage](https://app.codecov.io/gh/{{ site.github }}), this makes us quite confident about compatibility.
 
 Just wanted to let you know! {{ site.name }} is stable and not much is happening in terms of new development
 at the moment. But what's there can be relied upon.
