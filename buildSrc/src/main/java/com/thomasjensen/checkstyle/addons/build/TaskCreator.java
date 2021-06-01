@@ -170,7 +170,7 @@ public class TaskCreator
 
         final Task classesTask = tasks.create(pClassesTaskName.getName(pDepConfig));
         classesTask.setDescription("Assembles '" + pSourceSetName + "' classes for dependency configuration '"
-                + pDepConfig.getName() + "'");
+            + pDepConfig.getName() + "'");
         classesTask.setGroup(BasePlugin.BUILD_GROUP);
         classesTask.dependsOn(compileTask, tasks.getByName(sourceSet.getProcessResourcesTaskName()));
     }
@@ -204,8 +204,8 @@ public class TaskCreator
                 testTask.configureFor(depConfig, csRuntimeVersion);
                 testTask.setGroup(XTEST_GROUP_NAME);
                 testTask.setDescription("Run the unit tests compiled for Checkstyle " + csBaseVersion
-                        + " against a Checkstyle " + csRuntimeVersion + " runtime (Java level: " + javaLevel + ")");
-                testTask.getReports().getHtml().setEnabled(false);
+                    + " against a Checkstyle " + csRuntimeVersion + " runtime (Java level: " + javaLevel + ")");
+                testTask.getReports().getHtml().setEnabled(false);  // no test report needed in build/reports/tests
                 xtest.dependsOn(testTask);
             }
         }
@@ -282,7 +282,7 @@ public class TaskCreator
             if (!depConfig.isDefaultConfig()) {
                 assembleTask = tasks.create(TaskNames.assemble.getName(depConfig));
                 assembleTask.setDescription("Assembles the artifacts belonging to dependency configuration '"
-                        + depConfig.getName() + "'");
+                    + depConfig.getName() + "'");
                 final Task buildTask = tasks.getByName(LifecycleBasePlugin.BUILD_TASK_NAME);
                 buildTask.dependsOn(assembleTask);
             }

@@ -176,8 +176,6 @@ spotbugs {
 //   IntelliJ IDEA
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
-// TODO set file encoding to UTF-8
-// example: http://mrhaki.blogspot.de/2012/09/gradle-goodness-customize-idea-project.html
 idea.module {
     downloadSources = true;
     downloadJavadoc = true;
@@ -213,12 +211,11 @@ checkstyle {
 //   JaCoCo
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
-String[] excludedClasses = ['**/com/thomasjensen/checkstyle/addons/util/CheckstyleApiFixer*',
-                            '**/com/thomasjensen/checkstyle/addons/checks/misc/MdlJsonConfigValidator*'];
+def excludedClasses = ['CheckstyleApiFixer', 'MdlJsonConfigValidator'];
 test((Closure) testConfigClosure);
 test {
     jacoco {
-        excludes = excludedClasses.toList();
+        excludes = excludedClasses;
     }
 }
 jacocoTestReport {
@@ -228,11 +225,9 @@ jacocoTestReport {
         csv.enabled = false;
     }
     sourceSets(sourceSets.main, sourceSets.sonarqube);
-    doFirst {
-        classDirectories.setFrom((FileCollection)
-            fileTree(dir: sourceSets.main.output.classesDirs.first()).exclude(excludedClasses));
-        additionalClassDirs.setFrom(fileTree(dir: sourceSets.sonarqube.output.classesDirs.first()));
-    }
+    classDirectories.setFrom((FileCollection) fileTree(
+        dir: sourceSets.main.output.classesDirs.first()).exclude(excludedClasses.collect{"**/$it*"}));
+    additionalClassDirs.setFrom(fileTree(dir: sourceSets.sonarqube.output.classesDirs.first()));
 }
 tasks.jacocoTestReport.dependsOn tasks.test;
 
