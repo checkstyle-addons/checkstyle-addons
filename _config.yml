@@ -47,7 +47,7 @@ latest_version_checkstyle: '8.21'
 latest_version_checkstyle_java8a: '8.0'
 latest_version_checkstyle_java7: '6.4.1'
 # next line is the highest Checkstyle version tested by the unit tests
-latest_checkstyle_tested: '8.35'
+latest_checkstyle_tested: '9.0.1'
 
 # links to external websites that are used in multiple places throughout the site
 link_mavencentral: 'https://search.maven.org/#search%7Cgav%7C1%7Cg%3Acom.thomasjensen.checkstyle.addons'
