@@ -26,8 +26,8 @@ descriptions here. The most important factor is the **Checkstyle version** that 
   and command line.
 - [checkstyle-addons-{{ page.csa_version }}.jar](https://github.com/{{ site.github }}/releases/download/v{{
   page.csa_version }}/checkstyle-addons-{{ page.csa_version }}.jar) —
-  Just {{ site.name }}, excluding external dependencies. Normally, this file is pulled via Maven Central or Bintray
-  jcenter, so you don't need to download it here.
+  Just {{ site.name }}, excluding external dependencies. Normally, this file is pulled via Maven Central, so you don't
+  need to download it here.
 - [checkstyle-addons-{{ page.csa_version }}-javadoc.jar](https://github.com/{{ site.github }}/releases/download/v{{
   page.csa_version }}/checkstyle-addons-{{ page.csa_version }}-javadoc.jar) —
   The Javadoc in Java&nbsp;8 format.
@@ -48,8 +48,8 @@ descriptions here. The most important factor is the **Checkstyle version** that 
   and command line.
 - [checkstyle-addons-java8a-{{ page.csa_version }}.jar](https://github.com/{{ site.github }}/releases/download/v{{
   page.csa_version }}/checkstyle-addons-java8a-{{ page.csa_version }}.jar) —
-  Just {{ site.name }}, excluding external dependencies. Normally, this file is pulled via Maven Central or Bintray
-  jcenter, so you don't need to download it here.
+  Just {{ site.name }}, excluding external dependencies. Normally, this file is pulled via Maven Central, so you don't
+  need to download it here.
 - [checkstyle-addons-java8a-{{ page.csa_version }}-javadoc.jar](https://github.com/{{ site.github }}/releases/download/v{{
   page.csa_version }}/checkstyle-addons-java8a-{{ page.csa_version }}-javadoc.jar) —
   The Javadoc in Java&nbsp;8 format.
@@ -70,8 +70,8 @@ descriptions here. The most important factor is the **Checkstyle version** that 
   and command line.
 - [checkstyle-addons-java7-{{ page.csa_version }}.jar](https://github.com/{{ site.github }}/releases/download/v{{
   page.csa_version }}/checkstyle-addons-java7-{{ page.csa_version }}.jar) —
-  Just {{ site.name }}, excluding external dependencies. Normally, this file is pulled via Maven Central or Bintray
-  jcenter, so you don't need to download it here.
+  Just {{ site.name }}, excluding external dependencies. Normally, this file is pulled via Maven Central, so you don't
+  need to download it here.
 - [checkstyle-addons-java7-{{ page.csa_version }}-javadoc.jar](https://github.com/{{ site.github }}/releases/download/v{{
   page.csa_version }}/checkstyle-addons-java7-{{ page.csa_version }}-javadoc.jar) —
   The Javadoc in Java&nbsp;7 format.

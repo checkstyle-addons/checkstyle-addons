@@ -18,10 +18,10 @@ descriptions here. The most important factor is the *Checkstyle version* that yo
    A fatjar containing {{ site.name }} including all its dependencies; useful for IntelliJ IDEA, Android Studio, Ant,
    and command line.
  - [checkstyle-addons-{{ page.csa_version }}.jar](https://github.com/{{ site.github }}/releases/download/v{{ page.csa_version }}/checkstyle-addons-{{ page.csa_version }}.jar) —
-   Just {{ site.name }}, excluding external dependencies. Normally, this file is pulled via Maven Central or Bintray
-   jcenter, so you don't need to download it here.{% else %}
+   Just {{ site.name }}, excluding external dependencies. Normally, this file is pulled via Maven Central, so you don't
+   need to download it here.{% else %}
  - [checkstyle-addons-{{ page.csa_version }}.jar](https://github.com/{{ site.github }}/releases/download/v{{ page.csa_version }}/checkstyle-addons-{{ page.csa_version }}.jar) —
-   The main {{ site.name }} Jar. Gradle, Maven, and Ivy will download this file from Maven Central or Bintray jcenter,
+   The main {{ site.name }} Jar. Gradle, Maven, and Ivy will download this file from Maven Central,
    but this download is also useful for IntelliJ IDEA, Android Studio, Ant, and command line.{% endif %}
  - [checkstyle-addons-{{ page.csa_version }}-javadoc.jar](https://github.com/{{ site.github }}/releases/download/v{{ page.csa_version }}/checkstyle-addons-{{ page.csa_version }}-javadoc.jar) —
    The Javadoc in Java&nbsp;8 format.
@@ -38,10 +38,10 @@ descriptions here. The most important factor is the *Checkstyle version* that yo
    A fatjar containing {{ site.name }} including all its dependencies; useful for IntelliJ IDEA, Android Studio, Ant,
    and command line.
  - [checkstyle-addons{% if page.show_java8 %}-java7{% endif %}-{{ page.csa_version }}.jar](https://github.com/{{ site.github }}/releases/download/v{{ page.csa_version }}/checkstyle-addons{% if page.show_java8 %}-java7{% endif %}-{{ page.csa_version }}.jar) —
-   Just {{ site.name }}, excluding external dependencies. Normally, this file is pulled via Maven Central or Bintray
-   jcenter, so you don't need to download it here. {% else %}
+   Just {{ site.name }}, excluding external dependencies. Normally, this file is pulled via Maven Central, so you don't
+   need to download it here. {% else %}
  - [checkstyle-addons{% if page.show_java8 %}-java7{% endif %}-{{ page.csa_version }}.jar](https://github.com/{{ site.github }}/releases/download/v{{ page.csa_version }}/checkstyle-addons{% if page.show_java8 %}-java7{% endif %}-{{ page.csa_version }}.jar) —
-   The main {{ site.name }} Jar. Gradle, Maven, and Ivy will download this file from Maven Central or Bintray jcenter,
+   The main {{ site.name }} Jar. Gradle, Maven, and Ivy will download this file from Maven Central,
    but this download is also useful for IntelliJ IDEA, Android Studio, Ant, and command line.{% endif %}
  - [checkstyle-addons{% if page.show_java8 %}-java7{% endif %}-{{ page.csa_version }}-javadoc.jar](https://github.com/{{ site.github }}/releases/download/v{{ page.csa_version }}/checkstyle-addons{% if page.show_java8 %}-java7{% endif %}-{{ page.csa_version }}-javadoc.jar) —
    The Javadoc in Java&nbsp;7 format.
@@ -59,10 +59,10 @@ descriptions here. The most important factor is the *Checkstyle version* that yo
    A fatjar containing {{ site.name }} including all its dependencies; useful for IntelliJ IDEA, Android Studio, Ant,
    and command line.
  - [checkstyle-addons-java6-{{ page.csa_version }}.jar](https://github.com/{{ site.github }}/releases/download/v{{ page.csa_version }}/checkstyle-addons-java6-{{ page.csa_version }}.jar) —
-   Just {{ site.name }}, excluding external dependencies. Normally, this file is pulled via Maven Central or Bintray
-   jcenter, so you don't need to download it here. {% else %}
+   Just {{ site.name }}, excluding external dependencies. Normally, this file is pulled via Maven Central, so you don't
+   need to download it here. {% else %}
  - [checkstyle-addons-java6-{{ page.csa_version }}.jar](https://github.com/{{ site.github }}/releases/download/v{{ page.csa_version }}/checkstyle-addons-java6-{{ page.csa_version }}.jar) —
-   The main {{ site.name }} Jar. Gradle, Maven, and Ivy will download this file from Maven Central or Bintray jcenter,
+   The main {{ site.name }} Jar. Gradle, Maven, and Ivy will download this file from Maven Central,
    but this download is also useful for IntelliJ IDEA, Android Studio, Ant, and command line.{% endif %}
  - [checkstyle-addons-java6-{{ page.csa_version }}-javadoc.jar](https://github.com/{{ site.github }}/releases/download/v{{ page.csa_version }}/checkstyle-addons-java6-{{ page.csa_version }}-javadoc.jar) —
    The Javadoc in Java&nbsp;6 format.

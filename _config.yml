@@ -50,7 +50,6 @@ latest_version_checkstyle_java7: '6.4.1'
 latest_checkstyle_tested: '8.35'
 
 # links to external websites that are used in multiple places throughout the site
-link_bintray: 'https://bintray.com/checkstyle-addons/checkstyle-addons/checkstyle-addons/view'
 link_mavencentral: 'https://search.maven.org/#search%7Cgav%7C1%7Cg%3Acom.thomasjensen.checkstyle.addons'
 
 link_cs_home: 'https://checkstyle.org/'

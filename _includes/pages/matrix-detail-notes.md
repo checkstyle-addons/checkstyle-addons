@@ -188,7 +188,7 @@ plugin which existed in Gradle&nbsp;0.9. At the same time, the `toolVersion` pro
 Checkstyle plugin, which allows choosing the Checkstyle version to run. Previous versions of Gradle used hardcoded
 Checkstyle versions, which is why they are not included in our matrix.\\
 Up to a breaking change in Checkstyle 6.8 (Checkstyle issue [#1108](https://github.com/checkstyle/checkstyle/issues/1108)),
-Gradle was compatible with all versions of Checkstyle that are available on Maven Central or Bintray jcenter.
+Gradle was compatible with all versions of Checkstyle that are available on Maven Central.
 Checkstyle 5.2 is the oldest version available there, so it is also the oldest you can use with Gradle, unless you
 are willing to provide it via your own infrastructure. Because of this, the corresponding entries are set in
 parentheses.\\
@@ -206,7 +206,7 @@ on GitHub. The default version gets used when `toolVersion` is not set. A checkm
 version is available via `toolVersion`, but not by default. The bottom line is that one should *always* set
 `toolVersion`.\\
 Entries are set in parentheses when either the Checkstyle version is less than 5.2 (because then it is not available
-on Maven Central or Bintray jcenter), or the Gradle version is less than 1.0 (because then no Gradle Checkstyle plugin
+on Maven Central), or the Gradle version is less than 1.0 (because then no Gradle Checkstyle plugin
 exists).
 
 <a name="m" class="csa-offset-anchor"/>
