@@ -14,16 +14,16 @@
  * program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-import com.github.difflib.text.DiffRow;
-import com.github.difflib.text.DiffRowGenerator;
-import groovy.json.JsonOutput;
-import groovy.json.JsonSlurper;
-import java.nio.file.Files;
-import java.util.regex.Pattern;
+import com.github.difflib.text.DiffRow
+import com.github.difflib.text.DiffRowGenerator
+import groovy.json.JsonOutput
+import groovy.json.JsonSlurper
+import java.nio.file.Files
+import java.util.regex.Pattern
 
 buildscript {
     repositories {
-        mavenCentral();
+        mavenCentral()
     }
     dependencies {
         classpath group: 'io.github.java-diff-utils', name: 'java-diff-utils', version: '4.0'
@@ -31,28 +31,28 @@ buildscript {
 }
 
 plugins {
-    id 'java';
-    id 'checkstyle';
-    id 'org.sonarqube' version '2.6';
+    id 'java'
+    id 'checkstyle'
+    id 'org.sonarqube' version '2.6'
 }
 repositories {
-    mavenCentral();
+    mavenCentral()
 }
 
-description = 'Sources to analyze for SonarQube integration test';
-sourceCompatibility = JavaVersion.VERSION_1_8;
+description = 'Sources to analyze for SonarQube integration test'
+sourceCompatibility = JavaVersion.VERSION_1_8
 
 dependencies {
-    checkstyle rootProject;
+    checkstyle rootProject
 }
 
 ext {
-    dockerSonarqubeVersion = '7.8';
-    dockerSonarCheckstyleVersion = '4.21';
-    dockerCheckstyleAddonsDepConfig = ''; // or, for example, 'csp3.1'
-    dockerImage = "sonarqube:${dockerSonarqubeVersion}-${dockerSonarCheckstyleVersion}-checkstyle-addons-intTest";
-    sqHost = 'localhost';
-    sqPort = 9000;
+    dockerSonarqubeVersion = '7.8'
+    dockerSonarCheckstyleVersion = '4.21'
+    dockerCheckstyleAddonsDepConfig = '' // or, for example, 'csp3.1'
+    dockerImage = "sonarqube:${dockerSonarqubeVersion}-${dockerSonarCheckstyleVersion}-checkstyle-addons-intTest"
+    sqHost = 'localhost'
+    sqPort = 9000
 }
 
 
@@ -61,24 +61,24 @@ ext {
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
 checkstyle {
-    configDir = file('config');
-    configProperties 'workspace_loc': projectDir;
-    sourceSets = [project.sourceSets.main];
-    toolVersion = '8.14';
-    showViolations = true;
+    configDir = file('config')
+    configProperties 'workspace_loc': projectDir
+    sourceSets = [project.sourceSets.main]
+    toolVersion = '8.14'
+    showViolations = true
 }
-tasks['checkstyleMain'].enabled = false;
+tasks['checkstyleMain'].enabled = false
 
 task checkstyle(type: Checkstyle, dependsOn: classes) {
-    description = 'Check our integration test dummy source code with Checkstyle via Gradle (for reference only)';
-    group = 'sqtest';
+    description = 'Check our integration test dummy source code with Checkstyle via Gradle (for reference only)'
+    group = 'sqtest'
 
-    source = project.sourceSets.main.allSource;
-    checkstyleClasspath += rootProject.sourceSets.main.output;
-    classpath = project.sourceSets.main.output;
+    source = project.sourceSets.main.allSource
+    checkstyleClasspath += rootProject.sourceSets.main.output
+    classpath = project.sourceSets.main.output
 
     doFirst {
-        logger.lifecycle('The following Checkstyle run is *expected* to produce issues:');
+        logger.lifecycle('The following Checkstyle run is *expected* to produce issues:')
     }
 }
 
@@ -89,181 +89,181 @@ task checkstyle(type: Checkstyle, dependsOn: classes) {
 
 String getDockerImageId()
 {
-    String id = "docker images -q ${project.ext.dockerImage}".execute().text.trim();
+    String id = "docker images -q ${project.ext.dockerImage}".execute().text.trim()
     if (id.isEmpty()) {
-        logger.info("Docker image with name '${project.ext.dockerImage}' does not exist");
+        logger.info("Docker image with name '${project.ext.dockerImage}' does not exist")
     } else {
-        logger.info("Docker image with name '${project.ext.dockerImage}' found. ID: ${id}");
+        logger.info("Docker image with name '${project.ext.dockerImage}' found. ID: ${id}")
     }
-    return id;
+    return id
 }
 
 
 task buildDockerImage(type: Exec, dependsOn: rootProject.tasks['jarSonarqubeDefault']) {
-    description = 'Build the docker image for the ' + rootProject.ext.longName + ' integration test';
-    group = 'sqtest';
+    description = 'Build the docker image for the ' + rootProject.ext.longName + ' integration test'
+    group = 'sqtest'
 
-    final File imageIdFile = new File(getTemporaryDir(), "docker-image-id.txt");
-    outputs.file(imageIdFile);
+    final File imageIdFile = new File(getTemporaryDir(), "docker-image-id.txt")
+    outputs.file(imageIdFile)
     outputs.upToDateWhen { !getDockerImageId().isEmpty() }
 
-    workingDir = rootProject.projectDir;
-    String versionExt = rootProject.getVersion().toString();
+    workingDir = rootProject.projectDir
+    String versionExt = rootProject.getVersion().toString()
     if (project.ext.dockerCheckstyleAddonsDepConfig?.trim()) {
-        versionExt += '-' + project.ext.dockerCheckstyleAddonsDepConfig;
+        versionExt += '-' + project.ext.dockerCheckstyleAddonsDepConfig
     }
     commandLine = ['docker', 'build',
         '--build-arg', "SQ_VERSION=${project.ext.dockerSonarqubeVersion}",
         '--build-arg', "CS_SQPLUGIN_VERSION=${project.ext.dockerSonarCheckstyleVersion}",
         '--build-arg', "CS_ADDONS_VERSION_EXT=${versionExt}",
-        '-t', project.ext.dockerImage, '.'];
+        '-t', project.ext.dockerImage, '.']
 
     doFirst {
-        getLogger().lifecycle('Executing: ' + String.join(' ', getCommandLine()));
+        getLogger().lifecycle('Executing: ' + String.join(' ', getCommandLine()))
     }
     doLast {
-        imageIdFile.write(getDockerImageId());
+        imageIdFile.write(getDockerImageId())
     }
 }
 
 
 String getRunningDockerContainerId(final File pContainerIdFile)
 {
-    String result = "";
+    String result = ""
     if (pContainerIdFile.canRead()) {
-        final String idFromFile = pContainerIdFile.text;
-        String id = "docker ps -q --no-trunc --filter ID=${idFromFile}".execute().text.trim();
+        final String idFromFile = pContainerIdFile.text
+        String id = "docker ps -q --no-trunc --filter ID=${idFromFile}".execute().text.trim()
         if (id.isEmpty()) {
-            logger.info("Docker container with ID '${idFromFile}' is NOT currently running.");
+            logger.info("Docker container with ID '${idFromFile}' is NOT currently running.")
         } else {
-            result = idFromFile;
-            logger.info("Docker container with ID '${idFromFile}' is running.");
+            result = idFromFile
+            logger.info("Docker container with ID '${idFromFile}' is running.")
         }
     }
-    return result;
+    return result
 }
 
 
 def waitForSonarQubeStart()
 {
-    String status = 'UNKNOWN';
+    String status = 'UNKNOWN'
     for (int count = 0; count < 30 && status != 'UP'; count++) {
         try {
-            final URLConnection get = new URL("http://${sqHost}:${sqPort}/api/system/status").openConnection();
-            get.setConnectTimeout(1000);
-            get.setReadTimeout(2000);
-            def getRC = get.getResponseCode();
+            final URLConnection get = new URL("http://${sqHost}:${sqPort}/api/system/status").openConnection()
+            get.setConnectTimeout(1000)
+            get.setReadTimeout(2000)
+            def getRC = get.getResponseCode()
             if (getRC == 200) {
-                def map = new JsonSlurper().parseText(get.getInputStream().getText());
-                status = map.status;
+                def map = new JsonSlurper().parseText(get.getInputStream().getText())
+                status = map.status
             }
         } catch (Exception ignored) {
             // ignore
         }
-        sleep(3000);
+        sleep(3000)
     }
     if (status != 'UP') {
-        throw new GradleException('SonarQube failed to start');
+        throw new GradleException('SonarQube failed to start')
     }
 }
 
 
 task startDockerContainer(type: Exec, dependsOn: buildDockerImage) {
-    description = 'Start the SonarQube docker container for the ' + rootProject.ext.longName + ' integration test';
-    group = 'sqtest';
+    description = 'Start the SonarQube docker container for the ' + rootProject.ext.longName + ' integration test'
+    group = 'sqtest'
 
-    final File containerIdFile = new File(getTemporaryDir(), 'container-id.txt');
-    outputs.file(containerIdFile);
+    final File containerIdFile = new File(getTemporaryDir(), 'container-id.txt')
+    outputs.file(containerIdFile)
     outputs.upToDateWhen { !getRunningDockerContainerId(containerIdFile).isEmpty() }
 
-    workingDir = rootProject.projectDir;
-    commandLine = ['docker', 'run', '--detach', '-p', "${sqPort}:9000", project.ext.dockerImage];
-    standardOutput = new ByteArrayOutputStream();
+    workingDir = rootProject.projectDir
+    commandLine = ['docker', 'run', '--detach', '-p', "${sqPort}:9000", project.ext.dockerImage]
+    standardOutput = new ByteArrayOutputStream()
     ext.output = {
-        return standardOutput.toString().trim();
+        return standardOutput.toString().trim()
     }
-    ext.containerIdFile = containerIdFile;
+    ext.containerIdFile = containerIdFile
 
     doFirst {
-        getLogger().lifecycle('Executing: ' + String.join(' ', getCommandLine()));
+        getLogger().lifecycle('Executing: ' + String.join(' ', getCommandLine()))
     }
     doLast {
-        final String containerId = output();
+        final String containerId = output()
         if (containerId.isEmpty()) {
-            throw new GradleException('Container start failed for image: ' + project.ext.dockerImage);
+            throw new GradleException('Container start failed for image: ' + project.ext.dockerImage)
         }
-        waitForSonarQubeStart();
-        containerIdFile.write(containerId);
+        waitForSonarQubeStart()
+        containerIdFile.write(containerId)
     }
 }
 
 
 task initDockerContainer(type: Exec, dependsOn: startDockerContainer) {
     description = 'Initialize a newly started SonarQube docker container for the ' + rootProject.ext.longName +
-        ' integration test';
-    group = 'sqtest';
+        ' integration test'
+    group = 'sqtest'
 
-    workingDir = rootProject.projectDir;
+    workingDir = rootProject.projectDir
     doFirst {
-        final String containerId = tasks['startDockerContainer'].containerIdFile.text;
+        final String containerId = tasks['startDockerContainer'].containerIdFile.text
         commandLine = ['docker', 'exec', '--user', 'sonarqube', '--workdir', '/home/sonarqube', containerId,
-                       './sq-setup.sh'];
-        getLogger().lifecycle('Executing: ' + String.join(' ', getCommandLine()));
+                       './sq-setup.sh']
+        getLogger().lifecycle('Executing: ' + String.join(' ', getCommandLine()))
     }
 }
 
 
 task fetchApiToken(type: Exec, dependsOn: initDockerContainer) {
-    description = 'Read the SonarQube API token from the initialized container';
-    group = 'sqtest';
+    description = 'Read the SonarQube API token from the initialized container'
+    group = 'sqtest'
 
     doFirst {
-        final String containerId = tasks['startDockerContainer'].containerIdFile.text;
-        commandLine = ['docker', 'exec', containerId, 'cat', '/home/sonarqube/api-token.txt'];
-        getLogger().lifecycle('Executing: ' + String.join(' ', getCommandLine()));
+        final String containerId = tasks['startDockerContainer'].containerIdFile.text
+        commandLine = ['docker', 'exec', containerId, 'cat', '/home/sonarqube/api-token.txt']
+        getLogger().lifecycle('Executing: ' + String.join(' ', getCommandLine()))
     }
     // extension method fetchApiToken.output() can be used to obtain the output:
-    standardOutput = new ByteArrayOutputStream();
+    standardOutput = new ByteArrayOutputStream()
     ext.output = {
-        return standardOutput.toString().trim();
+        return standardOutput.toString().trim()
     }
 
     doLast {
         project.extensions.findByName('sonarqube').properties({
-            it.property('sonar.login', ext.output());
-        });
+            it.property('sonar.login', ext.output())
+        })
     }
 }
 
 
 task fetchResultIssues(dependsOn: tasks['sonarqube']) {
-    description = 'Fetch the issues created by the SonarQube analysis from the server';
-    group = 'sqtest';
+    description = 'Fetch the issues created by the SonarQube analysis from the server'
+    group = 'sqtest'
 
-    final File resultFile = new File(getTemporaryDir(), 'sonarqube-result.json');
-    //outputs.file(resultFile);   // do not register, so that this task always runs
-    ext.resultFile = resultFile;
+    final File resultFile = new File(getTemporaryDir(), 'sonarqube-result.json')
+    //outputs.file(resultFile)   // do not register, so that this task always runs
+    ext.resultFile = resultFile
 
 
     doLast {
-        Thread.sleep(10000);
-        final String compKey = "${rootProject.group}:${rootProject.name}:${project.name}";
+        Thread.sleep(10000)
+        final String compKey = "${rootProject.group}:${rootProject.name}:${project.name}"
         final URLConnection get =
-                new URL("http://${sqHost}:${sqPort}/api/issues/search?componentKeys=${compKey}").openConnection();
-        get.setConnectTimeout(1000);
-        get.setReadTimeout(3000);
-        def getRC = get.getResponseCode();
+                new URL("http://${sqHost}:${sqPort}/api/issues/search?componentKeys=${compKey}").openConnection()
+        get.setConnectTimeout(1000)
+        get.setReadTimeout(3000)
+        def getRC = get.getResponseCode()
         if (getRC != 200) {
-            throw new GradleException('Failed to retrieve issues from server: ' + getRC);
+            throw new GradleException('Failed to retrieve issues from server: ' + getRC)
         }
 
-        def result = [];
-        final Pattern filePattern = Pattern.compile('^.*?[/\\\\]([^/\\\\]+)$');
-        def issues = new JsonSlurper().parseText(get.getInputStream().getText()).issues;
+        def result = []
+        final Pattern filePattern = Pattern.compile('^.*?[/\\\\]([^/\\\\]+)$')
+        def issues = new JsonSlurper().parseText(get.getInputStream().getText()).issues
         issues.each {
-            String msg = it.message;
+            String msg = it.message
             if (msg.contains(' not found in file: ')) {
-                msg = msg.substring(0, msg.indexOf(':')) + ': (snip)';
+                msg = msg.substring(0, msg.indexOf(':')) + ': (snip)'
             }
             def issue = [
                 'rule': it.rule,
@@ -271,23 +271,23 @@ task fetchResultIssues(dependsOn: tasks['sonarqube']) {
                 'severity': it.severity,
                 'line': it.line,
                 'message': msg
-            ];
-            result.add(issue);
+            ]
+            result.add(issue)
         }
-        result = result.sort { it.file };
-        resultFile.write(JsonOutput.prettyPrint(JsonOutput.toJson(result)));
+        result = result.sort { it.file }
+        resultFile.write(JsonOutput.prettyPrint(JsonOutput.toJson(result)))
     }
 }
 
 
 task integrationTest(dependsOn: fetchResultIssues) {
-    description = 'Fetch the issues created by the SonarQube analysis from the server';
-    group = 'sqtest';
+    description = 'Fetch the issues created by the SonarQube analysis from the server'
+    group = 'sqtest'
 
-    final File expectedFile = file('config/expected.json');
-    final File resultFile = tasks['fetchResultIssues'].resultFile;
-    inputs.file(expectedFile);
-    inputs.file(resultFile);
+    final File expectedFile = file('config/expected.json')
+    final File resultFile = tasks['fetchResultIssues'].resultFile
+    inputs.file(expectedFile)
+    inputs.file(resultFile)
 
     doLast {
         DiffRowGenerator generator = DiffRowGenerator.create()
@@ -296,25 +296,25 @@ task integrationTest(dependsOn: fetchResultIssues) {
                 .inlineDiffByWord(true)
                 .oldTag({f -> f ? '{' : '' })
                 .newTag({f -> f ? '->' : '}' })
-                .build();
+                .build()
 
-        final List<String> expectedLines = Files.readAllLines(expectedFile.toPath());
-        final List<String> actualLines = Files.readAllLines(resultFile.toPath());
-        final List<DiffRow> rows = generator.generateDiffRows(expectedLines, actualLines);
+        final List<String> expectedLines = Files.readAllLines(expectedFile.toPath())
+        final List<String> actualLines = Files.readAllLines(resultFile.toPath())
+        final List<DiffRow> rows = generator.generateDiffRows(expectedLines, actualLines)
 
-        boolean green = true;
+        boolean green = true
         for (final DiffRow row : rows) {
-            green = green && (row.tag == DiffRow.Tag.EQUAL);
+            green = green && (row.tag == DiffRow.Tag.EQUAL)
             if (row.tag == DiffRow.Tag.INSERT) {
-                logger.error('(+) ' + row.newLine);
+                logger.error('(+) ' + row.newLine)
             } else if (row.tag == DiffRow.Tag.DELETE) {
-                logger.error('(-) ' + row.oldLine.substring(1));
+                logger.error('(-) ' + row.oldLine.substring(1))
             } else if (row.tag == DiffRow.Tag.CHANGE) {
-                logger.error('(/) ' + row.oldLine);
+                logger.error('(/) ' + row.oldLine)
             }
         }
         if (!green) {
-            throw new GradleException('Integration test results do not match expectations.');
+            throw new GradleException('Integration test results do not match expectations.')
         }
     }
 }
@@ -323,10 +323,10 @@ task integrationTest(dependsOn: fetchResultIssues) {
 ['checkstyleMain', 'checkstyleTest', 'compileJava', 'compileTestJava', 'processResources', 'processTestResources',
  'sonarqube', 'test', 'check', 'assemble', 'build', 'buildDependents', 'buildNeeded', 'classes', 'clean', 'jar',
  'testClasses'].each {
-    tasks[it].group = 'sqtest';
+    tasks[it].group = 'sqtest'
 }
 
-project.tasks['sonarqube'].dependsOn 'fetchApiToken';
+project.tasks['sonarqube'].dependsOn 'fetchApiToken'
 
 sonarqube {
     properties {

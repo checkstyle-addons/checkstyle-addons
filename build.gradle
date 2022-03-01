@@ -20,14 +20,14 @@ buildscript {
     }
 }
 plugins {
-    id 'java-library';
-    id 'jacoco';
-    id 'checkstyle';
-    id 'com.github.spotbugs';
-    id 'idea';
-    id 'maven-publish';
-    id 'com.jfrog.bintray' version '1.8.4';
-    id 'org.barfuin.gradle.taskinfo' version '1.1.1';
+    id 'java-library'
+    id 'jacoco'
+    id 'checkstyle'
+    id 'com.github.spotbugs'
+    id 'idea'
+    id 'maven-publish'
+    id 'com.jfrog.bintray' version '1.8.4'
+    id 'org.barfuin.gradle.taskinfo' version '1.1.1'
 }
 
 repositories {
@@ -35,47 +35,47 @@ repositories {
 }
 
 
-import com.thomasjensen.checkstyle.addons.build.BuildUtil;
-import com.thomasjensen.checkstyle.addons.build.ClasspathBuilder;
-import com.thomasjensen.checkstyle.addons.build.DependencyConfig;
-import com.thomasjensen.checkstyle.addons.build.DependencyConfigs;
-import com.thomasjensen.checkstyle.addons.build.JavaLevelUtil;
-import com.thomasjensen.checkstyle.addons.build.TaskCreator;
-import com.thomasjensen.checkstyle.addons.build.VersionWrapper;
-import com.thomasjensen.checkstyle.addons.build.tasks.JavadocTask;
-import com.thomasjensen.checkstyle.addons.build.tasks.SiteTask;
-import com.thomasjensen.checkstyle.addons.build.tasks.TestTask;
-import org.apache.tools.ant.filters.ReplaceTokens;
+import com.thomasjensen.checkstyle.addons.build.BuildUtil
+import com.thomasjensen.checkstyle.addons.build.ClasspathBuilder
+import com.thomasjensen.checkstyle.addons.build.DependencyConfig
+import com.thomasjensen.checkstyle.addons.build.DependencyConfigs
+import com.thomasjensen.checkstyle.addons.build.JavaLevelUtil
+import com.thomasjensen.checkstyle.addons.build.TaskCreator
+import com.thomasjensen.checkstyle.addons.build.VersionWrapper
+import com.thomasjensen.checkstyle.addons.build.tasks.JavadocTask
+import com.thomasjensen.checkstyle.addons.build.tasks.SiteTask
+import com.thomasjensen.checkstyle.addons.build.tasks.TestTask
+import org.apache.tools.ant.filters.ReplaceTokens
 
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 //   Project metadata
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
-group = 'com.thomasjensen.checkstyle.addons';
-description = 'Additional Checkstyle Checks';
-version = new VersionWrapper(project).toString();
-ClasspathBuilder.clearConfigCache();
-new JavaLevelUtil(project).analyzeJavaLevels();
-sourceCompatibility = JavaVersion.VERSION_1_7;
+group = 'com.thomasjensen.checkstyle.addons'
+description = 'Additional Checkstyle Checks'
+version = new VersionWrapper(project).toString()
+ClasspathBuilder.clearConfigCache()
+new JavaLevelUtil(project).analyzeJavaLevels()
+sourceCompatibility = JavaVersion.VERSION_1_7
 
 ext {
     // keep these in sync with the ExtProp enum
-    defaultPublication = 'checkstyleAddons';   // name of the default Gradle publication
-    authorName = 'Thomas Jensen';
-    longName = 'Checkstyle Addons';
-    orgName = 'Checkstyle Addons';
-    orgUrl = 'https://github.com/checkstyle-addons';
-    github = 'checkstyle-addons/checkstyle-addons';
-    issueTrackerUrl = "https://github.com/${github}/issues";
-    buildTimestamp = new Date();
-    sqPluginKey = 'checkstyleaddons';
-    sqPackage = 'com/thomasjensen/checkstyle/addons/sonarqube';
-    checksPackage = 'com/thomasjensen/checkstyle/addons/checks';
-    website = 'https://checkstyle-addons.thomasjensen.com/';
-    checkstyleBaseVersion = '8.21';
-    buildUtil = new BuildUtil(project);
-    gitHash = buildUtil.currentGitCommitHash();
+    defaultPublication = 'checkstyleAddons'   // name of the default Gradle publication
+    authorName = 'Thomas Jensen'
+    longName = 'Checkstyle Addons'
+    orgName = 'Checkstyle Addons'
+    orgUrl = 'https://github.com/checkstyle-addons'
+    github = 'checkstyle-addons/checkstyle-addons'
+    issueTrackerUrl = "https://github.com/${github}/issues"
+    buildTimestamp = new Date()
+    sqPluginKey = 'checkstyleaddons'
+    sqPackage = 'com/thomasjensen/checkstyle/addons/sonarqube'
+    checksPackage = 'com/thomasjensen/checkstyle/addons/checks'
+    website = 'https://checkstyle-addons.thomasjensen.com/'
+    checkstyleBaseVersion = '8.21'
+    buildUtil = new BuildUtil(project)
+    gitHash = buildUtil.currentGitCommitHash()
 }
 
 
@@ -83,29 +83,29 @@ ext {
 //   Dependencies of the 'default' dependency configuration, which is also used by the IDE
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
-final TaskCreator taskCreator = new TaskCreator(project);
-taskCreator.establishSonarQubeSourceSet();
-taskCreator.establishGeneralCompileOnlyCfg();
+final TaskCreator taskCreator = new TaskCreator(project)
+taskCreator.establishSonarQubeSourceSet()
+taskCreator.establishGeneralCompileOnlyCfg()
 
 dependencies {
-    generalCompileOnly group: 'net.jcip', name: 'jcip-annotations', version: '1.0';
-    generalCompileOnly group: 'com.github.spotbugs', name: 'spotbugs-annotations', version: '3.1.12';
-    generalCompileOnly group: 'com.google.code.findbugs', name: 'jsr305', version: '3.0.1';
+    generalCompileOnly group: 'net.jcip', name: 'jcip-annotations', version: '1.0'
+    generalCompileOnly group: 'com.github.spotbugs', name: 'spotbugs-annotations', version: '3.1.12'
+    generalCompileOnly group: 'com.google.code.findbugs', name: 'jsr305', version: '3.0.1'
 
-    api group: 'com.puppycrawl.tools', name: 'checkstyle', version: project.ext.checkstyleBaseVersion;
-    api group: 'com.fasterxml.jackson.core', name: 'jackson-databind', version: '2.10.0';
+    api group: 'com.puppycrawl.tools', name: 'checkstyle', version: project.ext.checkstyleBaseVersion
+    api group: 'com.fasterxml.jackson.core', name: 'jackson-databind', version: '2.10.0'
 
-    sonarqubeImplementation group: 'org.codehaus.sonar', name: 'sonar-plugin-api', version: '3.0';
-    sonarqubeRuntimeOnly group: 'org.slf4j', name: 'slf4j-nop', version: '1.6.2';
+    sonarqubeImplementation group: 'org.codehaus.sonar', name: 'sonar-plugin-api', version: '3.0'
+    sonarqubeRuntimeOnly group: 'org.slf4j', name: 'slf4j-nop', version: '1.6.2'
 
-    testImplementation group: 'junit', name: 'junit', version: '4.12';
+    testImplementation group: 'junit', name: 'junit', version: '4.12'
     testImplementation group: 'org.mockito', name: 'mockito-core', version: '2.27.0'
 
-    spotbugsPlugins group: 'com.mebigfatguy.sb-contrib', name: 'sb-contrib', version: '7.4.6';
+    spotbugsPlugins group: 'com.mebigfatguy.sb-contrib', name: 'sb-contrib', version: '7.4.6'
 }
 
 ext {
-    depConfigs = new DependencyConfigs(project);
+    depConfigs = new DependencyConfigs(project)
 }
 
 
@@ -116,16 +116,16 @@ ext {
 ext {
     testConfigClosure = {
         testLogging {
-            events 'failed';
-            showStackTraces = true;
-            showExceptions = true;
-            showCauses = true;
-            exceptionFormat 'full';
+            events 'failed'
+            showStackTraces = true
+            showExceptions = true
+            showCauses = true
+            exceptionFormat 'full'
         }
         onOutput { final TestDescriptor descriptor, final TestOutputEvent event ->
             if (descriptor.className != 'com.thomasjensen.checkstyle.addons.checks.misc.MdlJsonConfigValidatorTest' ||
                     event.getDestination() == TestOutputEvent.Destination.StdErr) {
-                logger.lifecycle(event.message);
+                logger.lifecycle(event.message)
             }
         }
         afterSuite { final TestDescriptor descriptor, final TestResult testResult ->
@@ -133,27 +133,27 @@ ext {
                 logger.lifecycle('\r\t' + testResult.testCount + ' tests executed, ' +
                         testResult.successfulTestCount + ' successful, ' +
                         (testResult.testCount - testResult.successfulTestCount - testResult.skippedTestCount) +
-                        ' failed, ' + testResult.skippedTestCount + ' skipped.');
+                        ' failed, ' + testResult.skippedTestCount + ' skipped.')
             }
         }
 
         if (name == JavaPlugin.TEST_TASK_NAME) {
-            systemProperty(TestTask.CSVERSION_SYSPROP_NAME, project.ext.checkstyleBaseVersion);
+            systemProperty(TestTask.CSVERSION_SYSPROP_NAME, project.ext.checkstyleBaseVersion)
         }
     }
 }
 
 project.ext.depConfigs.getAll().findAll{ !it.value.isDefaultConfig() }.each {
-    final Map.Entry<String, DependencyConfig> entry -> taskCreator.setupBuildTasks(entry.getValue());
+    final Map.Entry<String, DependencyConfig> entry -> taskCreator.setupBuildTasks(entry.getValue())
 }
-taskCreator.setupCrossCheckTasks();
-taskCreator.adjustTaskGroupAssignments();
+taskCreator.setupCrossCheckTasks()
+taskCreator.adjustTaskGroupAssignments()
 
 tasks.withType(JavaCompile) {
-    options.encoding = 'UTF-8';
-    options.compilerArgs << '-Xlint:unchecked';
+    options.encoding = 'UTF-8'
+    options.compilerArgs << '-Xlint:unchecked'
     if (it.name != JavaPlugin.COMPILE_JAVA_TASK_NAME) {
-        options.compilerArgs << '-Xlint:deprecation';
+        options.compilerArgs << '-Xlint:deprecation'
     }
 }
 
@@ -163,12 +163,12 @@ tasks.withType(JavaCompile) {
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
 spotbugs {
-    toolVersion = '3.1.12';
-    effort = 'max';
-    reportLevel = 'low';
-    ignoreFailures = false;
-    includeFilter = file('project/findbugs.xml');
-    excludeFilter = file('project/findbugs-excludes.xml');
+    toolVersion = '3.1.12'
+    effort = 'max'
+    reportLevel = 'low'
+    ignoreFailures = false
+    includeFilter = file('project/findbugs.xml')
+    excludeFilter = file('project/findbugs-excludes.xml')
 }
 
 
@@ -177,13 +177,13 @@ spotbugs {
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
 idea.module {
-    downloadSources = true;
-    downloadJavadoc = true;
-    excludeDirs += file('.idea');
-    excludeDirs += file('.jekyll-cache');
-    excludeDirs += file('_posts');
-    excludeDirs += file('_site');
-    excludeDirs += file('_support');
+    downloadSources = true
+    downloadJavadoc = true
+    excludeDirs += file('.idea')
+    excludeDirs += file('.jekyll-cache')
+    excludeDirs += file('_posts')
+    excludeDirs += file('_site')
+    excludeDirs += file('_support')
 }
 
 
@@ -191,7 +191,7 @@ idea.module {
 //   Javadoc
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
-JavadocTask.configureJavadocTask((Javadoc) tasks.javadoc, (DependencyConfig) project.ext.depConfigs.getDefault());
+JavadocTask.configureJavadocTask((Javadoc) tasks.javadoc, (DependencyConfig) project.ext.depConfigs.getDefault())
 
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
@@ -199,11 +199,11 @@ JavadocTask.configureJavadocTask((Javadoc) tasks.javadoc, (DependencyConfig) pro
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
 checkstyle {
-    configFile file('project/checkstyle.xml');
-    configProperties 'workspace_loc': project.projectDir;
-    toolVersion '7.1.2';    // depends on our checkstyle.xml; has nothing to do with the CS version used for building
-    showViolations = true;
-    ignoreFailures = false;
+    configFile file('project/checkstyle.xml')
+    configProperties 'workspace_loc': project.projectDir
+    toolVersion '7.1.2'    // depends on our checkstyle.xml; has nothing to do with the CS version used for building
+    showViolations = true
+    ignoreFailures = false
 }
 
 
@@ -211,25 +211,25 @@ checkstyle {
 //   JaCoCo
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
-def excludedClasses = ['CheckstyleApiFixer', 'MdlJsonConfigValidator'];
-test((Closure) testConfigClosure);
+def excludedClasses = ['CheckstyleApiFixer', 'MdlJsonConfigValidator']
+test((Closure) testConfigClosure)
 test {
     jacoco {
-        excludes = excludedClasses;
+        excludes = excludedClasses
     }
 }
 jacocoTestReport {
     reports {
-        html.enabled = true;
-        xml.enabled = true;
-        csv.enabled = false;
+        html.enabled = true
+        xml.enabled = true
+        csv.enabled = false
     }
-    sourceSets(sourceSets.main, sourceSets.sonarqube);
+    sourceSets(sourceSets.main, sourceSets.sonarqube)
     classDirectories.setFrom((FileCollection) fileTree(
-        dir: sourceSets.main.output.classesDirs.first()).exclude(excludedClasses.collect{"**/$it*"}));
-    additionalClassDirs.setFrom(fileTree(dir: sourceSets.sonarqube.output.classesDirs.first()));
+        dir: sourceSets.main.output.classesDirs.first()).exclude(excludedClasses.collect{"**/$it*"}))
+    additionalClassDirs.setFrom(fileTree(dir: sourceSets.sonarqube.output.classesDirs.first()))
 }
-tasks.jacocoTestReport.dependsOn tasks.test;
+tasks.jacocoTestReport.dependsOn tasks.test
 
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
@@ -237,82 +237,82 @@ tasks.jacocoTestReport.dependsOn tasks.test;
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
 task siteCopyJavadoc(type: Copy, dependsOn: javadoc) {
-    setDescription('Copy Javadoc to site directory');
-    setGroup(SiteTask.SITE_GROUP);
+    setDescription('Copy Javadoc to site directory')
+    setGroup(SiteTask.SITE_GROUP)
 
-    destinationDir = new File(project.buildDir, 'site');
+    destinationDir = new File(project.buildDir, 'site')
     into("v${project.version}/apidocs") {
-        from fileTree(dir: javadoc.destinationDir);
+        from fileTree(dir: javadoc.destinationDir)
         filter { String line ->
             line.contains("${project.ext.website}latest/checks/") ? line.replace("${project.ext.website}latest/checks/",
-                "${project.ext.website}v${project.version}/checks/") : line;
+                "${project.ext.website}v${project.version}/checks/") : line
         }
     }
     into("v${project.version}/apidocs/resources") {
-        from fileTree(dir: new File(javadoc.destinationDir, 'resources'));
+        from fileTree(dir: new File(javadoc.destinationDir, 'resources'))
     }
     into('latest/apidocs') {
-        from fileTree(dir: javadoc.destinationDir);
+        from fileTree(dir: javadoc.destinationDir)
     }
 }
 
 
 task siteCopyAllChecks(type: Copy) {
-    setDescription('Copy list of all checks to site directory');
-    setGroup(SiteTask.SITE_GROUP);
+    setDescription('Copy list of all checks to site directory')
+    setGroup(SiteTask.SITE_GROUP)
 
-    destinationDir = new File(project.buildDir, 'site');
+    destinationDir = new File(project.buildDir, 'site')
     final File originalFile = new File(sourceSets.main.resources.srcDirs.iterator().next(),
-        '/' + (String) project.ext.checksPackage + '/all_checks.html');
+        '/' + (String) project.ext.checksPackage + '/all_checks.html')
     final Closure action = {
-        from originalFile;
-        rename { String fileName -> fileName.replace(originalFile.name, 'index.html'); }
+        from originalFile
+        rename { String fileName -> fileName.replace(originalFile.name, 'index.html') }
         filter(ReplaceTokens, tokens: [
             buildTimestamp: project.ext.buildTimestamp.format('YYYY-MM-dd HH:mm:ss ZZZZ'),
             version: "v${project.version}".toString()
-        ]);
-    };
-    into("v${project.version}/checks", action);
-    into('latest/checks', action);
+        ])
+    }
+    into("v${project.version}/checks", action)
+    into('latest/checks', action)
 }
 
 
 task siteCopyDownloadGuide(type: Copy) {
-    setDescription('Copy download guide frontmatter stub to site directory');
-    setGroup(SiteTask.SITE_GROUP);
+    setDescription('Copy download guide frontmatter stub to site directory')
+    setGroup(SiteTask.SITE_GROUP)
 
-    destinationDir = new File(project.buildDir, 'site');
-    final File originalFile = new File(sourceSets.main.resources.srcDirs.iterator().next(), '/download-guide.html');
+    destinationDir = new File(project.buildDir, 'site')
+    final File originalFile = new File(sourceSets.main.resources.srcDirs.iterator().next(), '/download-guide.html')
     final Closure action = {
-        from originalFile;
+        from originalFile
         filter(ReplaceTokens, tokens: [
             buildTimestamp: project.ext.buildTimestamp.format('YYYY-MM-dd HH:mm:ss ZZZZ'),
             version: project.version
-        ]);
-    };
-    into("v${project.version}", action);
-    into('latest', action);
+        ])
+    }
+    into("v${project.version}", action)
+    into('latest', action)
 }
 
-task site (type: SiteTask);
+task site (type: SiteTask)
 
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 //   Publishing of artifacts
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
-taskCreator.setupArtifactTasks();
-taskCreator.rewirePublishingTasks(this);
+taskCreator.setupArtifactTasks()
+taskCreator.rewirePublishingTasks(this)
 
 task checkProperties {
-    setDescription('Ensure that all properties required for bintray upload are set');
-    setGroup(PublishingPlugin.PUBLISH_TASK_GROUP);
+    setDescription('Ensure that all properties required for bintray upload are set')
+    setGroup(PublishingPlugin.PUBLISH_TASK_GROUP)
     doLast {
         ['bintray.user', 'bintray.apikey', 'bintray.gpg.passphrase', 'sonatype.user', 'sonatype.password'].each {
             final String prp ->
                 if (!project.hasProperty(prp)) {
                     throw new GradleException("Could not find property \'${prp}\'. " +
-                        'Did you forget to specify it in ~/.gradle/gradle.properties?');
+                        'Did you forget to specify it in ~/.gradle/gradle.properties?')
                 }
         }
     }
@@ -323,39 +323,39 @@ bintray {
         && project.hasProperty('bintray.gpg.passphrase') && project.hasProperty('sonatype.user')
         && project.hasProperty('sonatype.password'))
     {
-        user = project.property('bintray.user');
-        key = project.property('bintray.apikey');
+        user = project.property('bintray.user')
+        key = project.property('bintray.apikey')
 
-        Set<String> pubNames = project.ext.depConfigs.publications.keySet();
-        publications = pubNames.toArray(new String[pubNames.size()]);
-        publish = true;
-        dryRun = true;   // comment out for actual release deployment
+        Set<String> pubNames = project.ext.depConfigs.publications.keySet()
+        publications = pubNames.toArray(new String[pubNames.size()])
+        publish = true
+        dryRun = true   // comment out for actual release deployment
         pkg {
             repo = 'checkstyle-addons'
-            userOrg = 'checkstyle-addons';
-            name = project.name;
-            desc = project.description;
-            websiteUrl = project.ext.website;
-            issueTrackerUrl = project.ext.issueTrackerUrl;
-            vcsUrl = "https://github.com/${project.ext.github}.git";
-            licenses = ['GPL-3.0'];
-            publicDownloadNumbers = true;
+            userOrg = 'checkstyle-addons'
+            name = project.name
+            desc = project.description
+            websiteUrl = project.ext.website
+            issueTrackerUrl = project.ext.issueTrackerUrl
+            vcsUrl = "https://github.com/${project.ext.github}.git"
+            licenses = ['GPL-3.0']
+            publicDownloadNumbers = true
             version {
-                name = project.version;  // Bintray logical version name
-                desc = project.description;
-                released = project.ext.buildTimestamp;
-                vcsTag = 'v' + project.version;
+                name = project.version  // Bintray logical version name
+                desc = project.description
+                released = project.ext.buildTimestamp
+                vcsTag = 'v' + project.version
                 gpg {
-                    sign = true;
-                    passphrase = project.property('bintray.gpg.passphrase');
+                    sign = true
+                    passphrase = project.property('bintray.gpg.passphrase')
                 }
                 mavenCentralSync {
-                    sync = true;
-                    user = project.property('sonatype.user');
-                    password = project.property('sonatype.password');
+                    sync = true
+                    user = project.property('sonatype.user')
+                    password = project.property('sonatype.password')
                 }
             }
         }
     }
 }
-tasks['bintrayUpload'].dependsOn('checkProperties');
+tasks['bintrayUpload'].dependsOn('checkProperties')
