@@ -25,6 +25,8 @@ import org.junit.BeforeClass;
 import org.junit.Test;
 import org.mockito.Mockito;
 
+import com.thomasjensen.checkstyle.addons.Helpers;
+
 
 /**
  * Unit tests of {@link CatalogEntry}.
@@ -35,6 +37,7 @@ public class CatalogEntryTest
 
 
 
+    @SuppressWarnings("deprecation")
     public static DetailAST createAstForLineCol(final int pLineNo, final int pColumnNo)
     {
         DetailAST ast = null;
@@ -46,8 +49,8 @@ public class CatalogEntryTest
         else {
             try {
                 ast = DetailAST.class.newInstance();
-                ast.setLineNo(pLineNo);
-                ast.setColumnNo(pColumnNo);
+                Helpers.callAstMethod(ast, "setLineNo", int.class, pLineNo);
+                Helpers.callAstMethod(ast, "setColumnNo", int.class, pColumnNo);
             }
             catch (ReflectiveOperationException e) {
                 Assert.fail("unexpected error: " + e.getMessage());
@@ -158,6 +161,7 @@ public class CatalogEntryTest
 
 
     @Test
+    @SuppressWarnings("AssertBetweenInconvertibleTypes")
     public void testEqualsCornerCases()
     {
         DetailAST ast = createAstForLineCol(42, 9);

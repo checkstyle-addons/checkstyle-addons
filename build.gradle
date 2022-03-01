@@ -73,7 +73,7 @@ ext {
     sqPackage = 'com/thomasjensen/checkstyle/addons/sonarqube'
     checksPackage = 'com/thomasjensen/checkstyle/addons/checks'
     website = 'https://checkstyle-addons.thomasjensen.com/'
-    checkstyleBaseVersion = '8.21'
+    checkstyleBaseVersion = '10.0'
     buildUtil = new BuildUtil(project)
     gitHash = buildUtil.currentGitCommitHash()
 }

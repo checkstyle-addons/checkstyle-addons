@@ -6,13 +6,15 @@ jobs:
     build:
         runs-on: ubuntu-latest
         container:
-            image: gradle:5.6.4-jdk8
+            image: gradle:5.6.4-jdk11
             env:
                 DEBIAN_FRONTEND: noninteractive
-                ZULU_HOME: /usr/lib/jvm/zulu7
                 checkstyleaddons_jdk7_java: /usr/lib/jvm/zulu7/bin/java
                 checkstyleaddons_jdk7_javac: /usr/lib/jvm/zulu7/bin/javac
                 checkstyleaddons_jdk7_javadoc: /usr/lib/jvm/zulu7/bin/javadoc
+                checkstyleaddons_jdk8_java: /usr/lib/jvm/zulu8/bin/java
+                checkstyleaddons_jdk8_javac: /usr/lib/jvm/zulu8/bin/javac
+                checkstyleaddons_jdk8_javadoc: /usr/lib/jvm/zulu8/bin/javadoc
         steps:
             - name: upgrade-git
               run: |
@@ -26,10 +28,14 @@ jobs:
               run: |
                   apt-get -y install gnupg
                   apt-key adv --keyserver hkp://keyserver.ubuntu.com:80 --recv-keys 0xB1998361219BD9C9
-                  curl -LO https://cdn.azul.com/zulu/bin/zulu-repo_1.0.0-2_all.deb
-                  apt-get install ./zulu-repo_1.0.0-2_all.deb
+                  curl -LO https://cdn.azul.com/zulu/bin/zulu-repo_1.0.0-3_all.deb
+                  apt-get install ./zulu-repo_1.0.0-3_all.deb
                   apt-get update
                   apt-get install -y zulu7-jdk
+
+            - name: add-jdk8
+              run: |
+                  apt-get install -y zulu8-jdk
 
             - name: versions
               run: |
@@ -38,9 +44,10 @@ jobs:
                   echo JAVA_HOME=${JAVA_HOME}
                   ls -l ${JAVA_HOME}/bin/java
                   java -version
-                  echo ZULU_HOME=${ZULU_HOME}
                   ls -l ${checkstyleaddons_jdk7_java}
-                  ${ZULU_HOME}/bin/java -version
+                  ${checkstyleaddons_jdk7_java} -version
+                  ls -l ${checkstyleaddons_jdk8_java}
+                  ${checkstyleaddons_jdk8_java} -version
 
             - uses: actions/checkout@v2
 

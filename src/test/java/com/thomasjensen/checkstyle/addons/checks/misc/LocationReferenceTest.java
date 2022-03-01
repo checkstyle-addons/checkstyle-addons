@@ -19,6 +19,7 @@ import com.puppycrawl.tools.checkstyle.DefaultConfiguration;
 import org.junit.Test;
 
 import com.thomasjensen.checkstyle.addons.BaseCheckTestSupport;
+import com.thomasjensen.checkstyle.addons.Helpers;
 
 
 /**
@@ -39,8 +40,8 @@ public class LocationReferenceTest
         throws Exception
     {
         final DefaultConfiguration checkConfig = createCheckConfig(LocationReferenceCheck.class);
-        checkConfig.addAttribute("methodCalls", "checkedCall1");
-        checkConfig.addAttribute("variableNames", "checkedVar1, checkedVar1a");
+        Helpers.addConfigProperty(checkConfig, "methodCalls", "checkedCall1");
+        Helpers.addConfigProperty(checkConfig, "variableNames", "checkedVar1, checkedVar1a");
 
         final String[] expected = {//
             "163:22: Value must reference the current method name, which is '<init>'", //
@@ -57,9 +58,9 @@ public class LocationReferenceTest
         throws Exception
     {
         final DefaultConfiguration checkConfig = createCheckConfig(LocationReferenceCheck.class);
-        checkConfig.addAttribute("methodCalls", "checkedCall2");
-        checkConfig.addAttribute("variableNames", "checkedVar2, checkedVar2a, checkedVar2b");
-        checkConfig.addAttribute("location", "classobject");
+        Helpers.addConfigProperty(checkConfig, "methodCalls", "checkedCall2");
+        Helpers.addConfigProperty(checkConfig, "variableNames", "checkedVar2, checkedVar2a, checkedVar2b");
+        Helpers.addConfigProperty(checkConfig, "location", "classobject");
 
         final String[] expected = {//
             "25:39: Value must reference the simple class object of the current type, which is 'InputLocationReference"
@@ -85,9 +86,10 @@ public class LocationReferenceTest
         throws Exception
     {
         final DefaultConfiguration checkConfig = createCheckConfig(LocationReferenceCheck.class);
-        checkConfig.addAttribute("methodCalls", "checkedCall3, checkedCall3a");
-        checkConfig.addAttribute("variableNames", "checkedVar3, checkedVar3a, checkedVar3b, checkedVar3c");
-        checkConfig.addAttribute("location", "simpleclass");
+        Helpers.addConfigProperty(checkConfig, "methodCalls", "checkedCall3, checkedCall3a");
+        Helpers.addConfigProperty(checkConfig, "variableNames",
+                "checkedVar3, checkedVar3a, checkedVar3b, checkedVar3c");
+        Helpers.addConfigProperty(checkConfig, "location", "simpleclass");
 
         final String[] expected = {//
             "36:37: Value must reference the simple name of the current type, which is 'InputLocationReference'", //
@@ -104,9 +106,10 @@ public class LocationReferenceTest
         throws Exception
     {
         final DefaultConfiguration checkConfig = createCheckConfig(LocationReferenceCheck.class);
-        checkConfig.addAttribute("methodCalls", "checkedCall4, checkedCall4a");
-        checkConfig.addAttribute("variableNames", "checkedVar4, checkedVar4a, checkedVar4b, checkedVar4c");
-        checkConfig.addAttribute("location", "fullclass");
+        Helpers.addConfigProperty(checkConfig, "methodCalls", "checkedCall4, checkedCall4a");
+        Helpers.addConfigProperty(checkConfig, "variableNames",
+                "checkedVar4, checkedVar4a, checkedVar4b, checkedVar4c");
+        Helpers.addConfigProperty(checkConfig, "location", "fullclass");
 
         final String[] expected = {//
             "50:37: Value must reference the fully qualified name of the current type, which is 'com.foo"
@@ -134,8 +137,8 @@ public class LocationReferenceTest
         throws Exception
     {
         final DefaultConfiguration checkConfig = createCheckConfig(LocationReferenceCheck.class);
-        checkConfig.addAttribute("methodCalls", "");
-        checkConfig.addAttribute("variableNames", "");
+        Helpers.addConfigProperty(checkConfig, "methodCalls", "");
+        Helpers.addConfigProperty(checkConfig, "variableNames", "");
         verify(checkConfig, getPath("misc/InputLocationReference.java"), new String[0]);
     }
 
@@ -146,8 +149,8 @@ public class LocationReferenceTest
         throws Exception
     {
         final DefaultConfiguration checkConfig = createCheckConfig(LocationReferenceCheck.class);
-        checkConfig.addAttribute("methodCalls", "checkedCall5");
-        checkConfig.addAttribute("variableNames", "checkedVar5, checkedVar5a");
+        Helpers.addConfigProperty(checkConfig, "methodCalls", "checkedCall5");
+        Helpers.addConfigProperty(checkConfig, "variableNames", "checkedVar5, checkedVar5a");
 
         final String[] expected = {//
             "71:53: Value must reference the current method name, which is 'innerMethod'", //
@@ -163,9 +166,9 @@ public class LocationReferenceTest
         throws Exception
     {
         final DefaultConfiguration checkConfig = createCheckConfig(LocationReferenceCheck.class);
-        checkConfig.addAttribute("methodCalls", "checkedCall6");
-        checkConfig.addAttribute("variableNames", "checkedVar6, checkedVar6a");
-        checkConfig.addAttribute("location", "simpleclass");
+        Helpers.addConfigProperty(checkConfig, "methodCalls", "checkedCall6");
+        Helpers.addConfigProperty(checkConfig, "variableNames", "checkedVar6, checkedVar6a");
+        Helpers.addConfigProperty(checkConfig, "location", "simpleclass");
 
         final String[] expected = {//
             "79:53: Value must reference the simple name of the current type, which is 'Inner4'", //
@@ -181,9 +184,9 @@ public class LocationReferenceTest
         throws Exception
     {
         final DefaultConfiguration checkConfig = createCheckConfig(LocationReferenceCheck.class);
-        checkConfig.addAttribute("methodCalls", "checkedCall7");
-        checkConfig.addAttribute("variableNames", "checkedVar7, checkedVar7a");
-        checkConfig.addAttribute("location", "fullclass");
+        Helpers.addConfigProperty(checkConfig, "methodCalls", "checkedCall7");
+        Helpers.addConfigProperty(checkConfig, "variableNames", "checkedVar7, checkedVar7a");
+        Helpers.addConfigProperty(checkConfig, "location", "fullclass");
 
         final String[] expected = {//
             "87:53: Value must reference the fully qualified name of the current type, which is 'com.foo"
@@ -201,9 +204,9 @@ public class LocationReferenceTest
         throws Exception
     {
         final DefaultConfiguration checkConfig = createCheckConfig(LocationReferenceCheck.class);
-        checkConfig.addAttribute("methodCalls", "checkedCall8");
-        checkConfig.addAttribute("variableNames", "checkedVar8, checkedVar8a");
-        checkConfig.addAttribute("location", "classobject");
+        Helpers.addConfigProperty(checkConfig, "methodCalls", "checkedCall8");
+        Helpers.addConfigProperty(checkConfig, "variableNames", "checkedVar8, checkedVar8a");
+        Helpers.addConfigProperty(checkConfig, "location", "classobject");
 
         final String[] expected = {//
             "95:60: Value must reference the simple class object of the current type, which is 'Inner4.class'", //
@@ -219,9 +222,9 @@ public class LocationReferenceTest
         throws Exception
     {
         final DefaultConfiguration checkConfig = createCheckConfig(LocationReferenceCheck.class);
-        checkConfig.addAttribute("methodCalls", "checkedCall9");
-        checkConfig.addAttribute("variableNames", "checkedVar9, checkedVar9a");
-        checkConfig.addAttribute("location", "method");
+        Helpers.addConfigProperty(checkConfig, "methodCalls", "checkedCall9");
+        Helpers.addConfigProperty(checkConfig, "variableNames", "checkedVar9, checkedVar9a");
+        Helpers.addConfigProperty(checkConfig, "location", "method");
 
         final String[] expected = {//
             "113:45: Value must reference the current method name, which is 'compare'", //
@@ -237,9 +240,9 @@ public class LocationReferenceTest
         throws Exception
     {
         final DefaultConfiguration checkConfig = createCheckConfig(LocationReferenceCheck.class);
-        checkConfig.addAttribute("methodCalls", "checkedCall10");
-        checkConfig.addAttribute("variableNames", "checkedVar10, checkedVar10a");
-        checkConfig.addAttribute("location", "simpleclass");
+        Helpers.addConfigProperty(checkConfig, "methodCalls", "checkedCall10");
+        Helpers.addConfigProperty(checkConfig, "variableNames", "checkedVar10, checkedVar10a");
+        Helpers.addConfigProperty(checkConfig, "location", "simpleclass");
 
         final String[] expected = {//
             "125:46: Value must reference the simple name of the current type, which is 'InputLocationReference'", //
@@ -255,8 +258,8 @@ public class LocationReferenceTest
         throws Exception
     {
         final DefaultConfiguration checkConfig = createCheckConfig(LocationReferenceCheck.class);
-        checkConfig.addAttribute("methodCalls", "checkedCall11");
-        checkConfig.addAttribute("argumentPosition", "-1");
+        Helpers.addConfigProperty(checkConfig, "methodCalls", "checkedCall11");
+        Helpers.addConfigProperty(checkConfig, "argumentPosition", "-1");
 
         final String[] expected = {//
             "139:57: Value must reference the current method name, which is 'argPositionsMinus1'", //
@@ -271,8 +274,8 @@ public class LocationReferenceTest
         throws Exception
     {
         final DefaultConfiguration checkConfig = createCheckConfig(LocationReferenceCheck.class);
-        checkConfig.addAttribute("methodCalls", "checkedCall12");
-        checkConfig.addAttribute("argumentPosition", "-2");
+        Helpers.addConfigProperty(checkConfig, "methodCalls", "checkedCall12");
+        Helpers.addConfigProperty(checkConfig, "argumentPosition", "-2");
 
         final String[] expected = {//
             "145:51: Value must reference the current method name, which is 'argPositionsMinus2'", //
@@ -287,8 +290,9 @@ public class LocationReferenceTest
         throws Exception
     {
         final DefaultConfiguration checkConfig = createCheckConfig(LocationReferenceCheck.class);
-        checkConfig.addAttribute("methodCalls", "checkedCall12");
-        checkConfig.addAttribute("argumentPosition", "2");   // in a 4-element list, this must be the same as -2
+        Helpers.addConfigProperty(checkConfig, "methodCalls", "checkedCall12");
+        // In a 4-element list, this must be the same as -2:
+        Helpers.addConfigProperty(checkConfig, "argumentPosition", "2");
 
         final String[] expected = {//
             "145:51: Value must reference the current method name, which is 'argPositionsMinus2'", //
@@ -303,12 +307,12 @@ public class LocationReferenceTest
         throws Exception
     {
         final DefaultConfiguration checkConfig = createCheckConfig(LocationReferenceCheck.class);
-        checkConfig.addAttribute("methodCalls", "checkedCall13");
+        Helpers.addConfigProperty(checkConfig, "methodCalls", "checkedCall13");
         if (isJava6()) {
-            checkConfig.addAttribute("argumentPosition", "1");
+            Helpers.addConfigProperty(checkConfig, "argumentPosition", "1");
         }
         else {
-            checkConfig.addAttribute("argumentPosition", "+1");
+            Helpers.addConfigProperty(checkConfig, "argumentPosition", "+1");
         }
 
         final String[] expected = {//
@@ -324,7 +328,7 @@ public class LocationReferenceTest
         throws Exception
     {
         final DefaultConfiguration checkConfig = createCheckConfig(LocationReferenceCheck.class);
-        checkConfig.addAttribute("methodCalls", "this");
+        Helpers.addConfigProperty(checkConfig, "methodCalls", "this");
 
         final String[] expected = {//
             "189:14: Value must reference the current method name, which is '<init>'", //
@@ -339,8 +343,8 @@ public class LocationReferenceTest
         throws Exception
     {
         final DefaultConfiguration checkConfig = createCheckConfig(LocationReferenceCheck.class);
-        checkConfig.addAttribute("methodCalls", "this");
-        checkConfig.addAttribute("location", "classobject");
+        Helpers.addConfigProperty(checkConfig, "methodCalls", "this");
+        Helpers.addConfigProperty(checkConfig, "location", "classobject");
 
         final String[] expected = {//
             "194:14: Value must reference the simple class object of the current type, which is "
@@ -356,8 +360,8 @@ public class LocationReferenceTest
         throws Exception
     {
         final DefaultConfiguration checkConfig = createCheckConfig(LocationReferenceCheck.class);
-        checkConfig.addAttribute("methodCalls", "Inner5.checkedCall15");
-        checkConfig.addAttribute("location", "classobject");
+        Helpers.addConfigProperty(checkConfig, "methodCalls", "Inner5.checkedCall15");
+        Helpers.addConfigProperty(checkConfig, "location", "classobject");
 
         final String[] expected = {//
             "204:66: Value must reference the simple class object of the current type, which is "
@@ -373,8 +377,8 @@ public class LocationReferenceTest
         throws Exception
     {
         final DefaultConfiguration checkConfig = createCheckConfig(LocationReferenceCheck.class);
-        checkConfig.addAttribute("variableNames", "field4");
-        checkConfig.addAttribute("location", "classobject");
+        Helpers.addConfigProperty(checkConfig, "variableNames", "field4");
+        Helpers.addConfigProperty(checkConfig, "location", "classobject");
 
         verify(checkConfig, getPath("misc/InputLocationReference.java"), new String[0]);
     }

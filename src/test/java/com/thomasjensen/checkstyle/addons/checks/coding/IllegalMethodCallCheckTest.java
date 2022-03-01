@@ -18,9 +18,11 @@ package com.thomasjensen.checkstyle.addons.checks.coding;
 import java.io.IOException;
 
 import com.puppycrawl.tools.checkstyle.DefaultConfiguration;
-import com.thomasjensen.checkstyle.addons.BaseCheckTestSupport;
 import org.junit.BeforeClass;
 import org.junit.Test;
+
+import com.thomasjensen.checkstyle.addons.BaseCheckTestSupport;
+import com.thomasjensen.checkstyle.addons.Helpers;
 
 
 /**
@@ -54,7 +56,7 @@ public class IllegalMethodCallCheckTest
         throws Exception
     {
         final DefaultConfiguration checkConfig = createCheckConfig(IllegalMethodCallCheck.class);
-        checkConfig.addAttribute("illegalMethodNames", "doesNotOccur, forName");
+        Helpers.addConfigProperty(checkConfig, "illegalMethodNames", "doesNotOccur, forName");
         final String[] expected = {
             "6:49: Illegal method call: forName()",
             "9:15: Illegal method call: forName()",
@@ -88,7 +90,7 @@ public class IllegalMethodCallCheckTest
         throws Exception
     {
         final DefaultConfiguration checkConfig = createCheckConfig(IllegalMethodCallCheck.class);
-        checkConfig.addAttribute("illegalMethodNames", "");
+        Helpers.addConfigProperty(checkConfig, "illegalMethodNames", "");
         final String[] expected = {};
         verify(checkConfig, sInputFilePath, expected);
     }
@@ -100,8 +102,8 @@ public class IllegalMethodCallCheckTest
         throws Exception
     {
         final DefaultConfiguration checkConfig = createCheckConfig(IllegalMethodCallCheck.class);
-        checkConfig.addAttribute("illegalMethodNames", "forName");
-        checkConfig.addAttribute("excludedQualifiers", "Inner1");
+        Helpers.addConfigProperty(checkConfig, "illegalMethodNames", "forName");
+        Helpers.addConfigProperty(checkConfig, "excludedQualifiers", "Inner1");
         final String[] expected = {
             "6:49: Illegal method call: forName()",
             "9:15: Illegal method call: forName()",
@@ -123,8 +125,8 @@ public class IllegalMethodCallCheckTest
         throws Exception
     {
         final DefaultConfiguration checkConfig = createCheckConfig(IllegalMethodCallCheck.class);
-        checkConfig.addAttribute("illegalMethodNames", "forName");
-        checkConfig.addAttribute("excludedQualifiers", "Inner1, Inner1.Inner2");
+        Helpers.addConfigProperty(checkConfig, "illegalMethodNames", "forName");
+        Helpers.addConfigProperty(checkConfig, "excludedQualifiers", "Inner1, Inner1.Inner2");
         final String[] expected = {
             "6:49: Illegal method call: forName()",
             "9:15: Illegal method call: forName()",
@@ -145,7 +147,7 @@ public class IllegalMethodCallCheckTest
         throws Exception
     {
         final DefaultConfiguration checkConfig = createCheckConfig(IllegalMethodCallCheck.class);
-        checkConfig.addAttribute("illegalMethodNames", "method1");
+        Helpers.addConfigProperty(checkConfig, "illegalMethodNames", "method1");
         final String[] expected = {
             "48:29: Illegal method call: method1()",
             "49:24: Illegal method call: method1()",
@@ -160,10 +162,9 @@ public class IllegalMethodCallCheckTest
         throws Exception
     {
         final DefaultConfiguration checkConfig = createCheckConfig(IllegalMethodCallCheck.class);
-        checkConfig.addAttribute("illegalMethodNames", "method1");
-        checkConfig.addAttribute("excludedQualifiers", "inner1");
+        Helpers.addConfigProperty(checkConfig, "illegalMethodNames", "method1");
+        Helpers.addConfigProperty(checkConfig, "excludedQualifiers", "inner1");
         final String[] expected = {};
         verify(checkConfig, sInputFilePath, expected);
     }
 }
-

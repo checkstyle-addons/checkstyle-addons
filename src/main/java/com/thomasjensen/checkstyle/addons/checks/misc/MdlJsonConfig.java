@@ -26,6 +26,7 @@ import javax.annotation.Nullable;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
+
 import com.thomasjensen.checkstyle.addons.util.Util;
 
 
@@ -110,7 +111,7 @@ public class MdlJsonConfig
 
     /**
      * An MDL Spec specifies the characteristics of one directory in the module directory layout, for example
-     * <tt>src/main/java</tt>.
+     * <code>src/main/java</code>.
      */
     public static class MdlSpec
         implements SelfValidating

@@ -28,6 +28,7 @@ import org.junit.Test;
 import com.thomasjensen.checkstyle.addons.BaseCheckTestSupport;
 import com.thomasjensen.checkstyle.addons.BaseFileSetCheckTestSupport;
 import com.thomasjensen.checkstyle.addons.CsVersionInfo;
+import com.thomasjensen.checkstyle.addons.Helpers;
 
 
 /**
@@ -73,9 +74,9 @@ public class RegexpOnFilenameOrgCheckTest
     {
         final String filepath = getPath(SIMPLE_FILENAME);
         final String regexp = "no_match";
-        mCheckConfig.addAttribute("fileExtensions", "java, " + REAL_EXT);
-        mCheckConfig.addAttribute("regexp", regexp);
-        mCheckConfig.addAttribute("mode", "required");
+        Helpers.addConfigProperty(mCheckConfig, "fileExtensions", "java, " + REAL_EXT);
+        Helpers.addConfigProperty(mCheckConfig, "regexp", regexp);
+        Helpers.addConfigProperty(mCheckConfig, "mode", "required");
         final String[] expected =
             {"1: Filename '" + SIMPLE_FILENAME + "' does not contain required pattern '" + regexp + "'."};
         verify(mCheckConfig, filepath, expected);
@@ -89,9 +90,9 @@ public class RegexpOnFilenameOrgCheckTest
     {
         final String filepath = getPath(SIMPLE_FILENAME);
         final String regexp = "no_match";
-        mCheckConfig.addAttribute("fileExtensions", REAL_EXT);
-        mCheckConfig.addAttribute("regexp", regexp);
-        mCheckConfig.addAttribute("mode", "required");
+        Helpers.addConfigProperty(mCheckConfig, "fileExtensions", REAL_EXT);
+        Helpers.addConfigProperty(mCheckConfig, "regexp", regexp);
+        Helpers.addConfigProperty(mCheckConfig, "mode", "required");
         final String[] expected =
             {"1: Filename '" + SIMPLE_FILENAME + "' does not contain required pattern '" + regexp + "'."};
         verify(mCheckConfig, filepath, expected);
@@ -105,9 +106,9 @@ public class RegexpOnFilenameOrgCheckTest
     {
         final String filepath = getPath(SIMPLE_FILENAME);
         final String regexp = "no_match";
-        mCheckConfig.addAttribute("fileExtensions", "noMatch");
-        mCheckConfig.addAttribute("regexp", regexp);
-        mCheckConfig.addAttribute("simple", "false");
+        Helpers.addConfigProperty(mCheckConfig, "fileExtensions", "noMatch");
+        Helpers.addConfigProperty(mCheckConfig, "regexp", regexp);
+        Helpers.addConfigProperty(mCheckConfig, "simple", "false");
         final String[] expected = {};
         verify(mCheckConfig, filepath, expected);
     }
@@ -120,10 +121,10 @@ public class RegexpOnFilenameOrgCheckTest
     {
         final String filepath = getPath(SIMPLE_FILENAME);
         final String regexp = "no_match";
-        mCheckConfig.addAttribute("fileExtensions", REAL_EXT);
-        mCheckConfig.addAttribute("selection", SIMPLE_FILENAME + "$");
-        mCheckConfig.addAttribute("regexp", regexp);
-        mCheckConfig.addAttribute("mode", "required");
+        Helpers.addConfigProperty(mCheckConfig, "fileExtensions", REAL_EXT);
+        Helpers.addConfigProperty(mCheckConfig, "selection", SIMPLE_FILENAME + "$");
+        Helpers.addConfigProperty(mCheckConfig, "regexp", regexp);
+        Helpers.addConfigProperty(mCheckConfig, "mode", "required");
         final String[] expected =
             {"1: Filename '" + SIMPLE_FILENAME + "' does not contain required pattern '" + regexp + "'."};
         verify(mCheckConfig, filepath, expected);
@@ -137,9 +138,9 @@ public class RegexpOnFilenameOrgCheckTest
     {
         final String filepath = getPath(SIMPLE_FILENAME);
         final String regexp = "no_match";
-        mCheckConfig.addAttribute("regexp", regexp);
-        mCheckConfig.addAttribute("selection", SIMPLE_FILENAME + "$");
-        mCheckConfig.addAttribute("mode", "required");
+        Helpers.addConfigProperty(mCheckConfig, "regexp", regexp);
+        Helpers.addConfigProperty(mCheckConfig, "selection", SIMPLE_FILENAME + "$");
+        Helpers.addConfigProperty(mCheckConfig, "mode", "required");
         final String[] expected =
             {"1: Filename '" + SIMPLE_FILENAME + "' does not contain required pattern '" + regexp + "'."};
         verify(mCheckConfig, filepath, expected);
@@ -153,9 +154,9 @@ public class RegexpOnFilenameOrgCheckTest
     {
         final String filepath = getPath(SIMPLE_FILENAME);
         final String regexp = "no_match";
-        mCheckConfig.addAttribute("regexp", regexp);
-        mCheckConfig.addAttribute("selection", "^no_match");
-        mCheckConfig.addAttribute("mode", "required");
+        Helpers.addConfigProperty(mCheckConfig, "regexp", regexp);
+        Helpers.addConfigProperty(mCheckConfig, "selection", "^no_match");
+        Helpers.addConfigProperty(mCheckConfig, "mode", "required");
         final String[] expected = {};
         verify(mCheckConfig, filepath, expected);
     }
@@ -180,9 +181,9 @@ public class RegexpOnFilenameOrgCheckTest
         final String filepath = getPath(SIMPLE_FILENAME);
         final String slash = "[\\\\/]";
         final String regexp = slash + getClass().getPackage().getName().replace(".", slash) + slash;
-        mCheckConfig.addAttribute("regexp", regexp);
-        mCheckConfig.addAttribute("simple", "false");
-        mCheckConfig.addAttribute("mode", "illegal");
+        Helpers.addConfigProperty(mCheckConfig, "regexp", regexp);
+        Helpers.addConfigProperty(mCheckConfig, "simple", "false");
+        Helpers.addConfigProperty(mCheckConfig, "mode", "illegal");
         final String[] expected = {"1: Filename '" + filepath + "' contains illegal pattern '" + regexp + "'."};
         verify(mCheckConfig, filepath, expected);
     }
@@ -196,9 +197,9 @@ public class RegexpOnFilenameOrgCheckTest
         final String filepath = getPath(SIMPLE_FILENAME);
         final String slash = "[\\\\/]";
         final String regexp = slash + getClass().getPackage().getName().replace(".", slash) + slash;
-        mCheckConfig.addAttribute("regexp", regexp);
-        mCheckConfig.addAttribute("simple", "false");
-        mCheckConfig.addAttribute("mode", "required");
+        Helpers.addConfigProperty(mCheckConfig, "regexp", regexp);
+        Helpers.addConfigProperty(mCheckConfig, "simple", "false");
+        Helpers.addConfigProperty(mCheckConfig, "mode", "required");
         final String[] expected = {};
         verify(mCheckConfig, filepath, expected);
     }
@@ -211,9 +212,9 @@ public class RegexpOnFilenameOrgCheckTest
     {
         final String filepath = getPath(SIMPLE_FILENAME);
         final String regexp = "no_match";
-        mCheckConfig.addAttribute("regexp", regexp);
-        mCheckConfig.addAttribute("simple", "false");
-        mCheckConfig.addAttribute("mode", "illegal");
+        Helpers.addConfigProperty(mCheckConfig, "regexp", regexp);
+        Helpers.addConfigProperty(mCheckConfig, "simple", "false");
+        Helpers.addConfigProperty(mCheckConfig, "mode", "illegal");
         final String[] expected = {};
         verify(mCheckConfig, filepath, expected);
     }
@@ -226,9 +227,9 @@ public class RegexpOnFilenameOrgCheckTest
     {
         final String filepath = getPath(SIMPLE_FILENAME);
         final String regexp = "no_match";
-        mCheckConfig.addAttribute("regexp", regexp);
-        mCheckConfig.addAttribute("simple", "false");
-        mCheckConfig.addAttribute("mode", "required");
+        Helpers.addConfigProperty(mCheckConfig, "regexp", regexp);
+        Helpers.addConfigProperty(mCheckConfig, "simple", "false");
+        Helpers.addConfigProperty(mCheckConfig, "mode", "required");
         final String[] expected =
             {"1: Filename '" + filepath + "' does not contain required pattern '" + regexp + "'."};
         verify(mCheckConfig, filepath, expected);
@@ -242,7 +243,7 @@ public class RegexpOnFilenameOrgCheckTest
     {
         final String filepath = getPath(SIMPLE_FILENAME);
         final String regexp = "^" + SIMPLE_FILENAME + "$";
-        mCheckConfig.addAttribute("regexp", regexp);
+        Helpers.addConfigProperty(mCheckConfig, "regexp", regexp);
         final String[] expected = {"1: Filename '" + SIMPLE_FILENAME + "' contains illegal pattern '" + regexp + "'."};
         verify(mCheckConfig, filepath, expected);
     }
@@ -255,8 +256,8 @@ public class RegexpOnFilenameOrgCheckTest
     {
         final String filepath = getPath(SIMPLE_FILENAME);
         final String regexp = "^" + SIMPLE_FILENAME + "$";
-        mCheckConfig.addAttribute("regexp", regexp);
-        mCheckConfig.addAttribute("mode", "required");
+        Helpers.addConfigProperty(mCheckConfig, "regexp", regexp);
+        Helpers.addConfigProperty(mCheckConfig, "mode", "required");
         final String[] expected = {};
         verify(mCheckConfig, filepath, expected);
     }
@@ -269,8 +270,8 @@ public class RegexpOnFilenameOrgCheckTest
     {
         final String filepath = getPath(SIMPLE_FILENAME);
         final String illegal = "*$"; // incorrect syntax
-        mCheckConfig.addAttribute("regexp", illegal);
-        mCheckConfig.addAttribute("simple", "false");
+        Helpers.addConfigProperty(mCheckConfig, "regexp", illegal);
+        Helpers.addConfigProperty(mCheckConfig, "simple", "false");
         try {
             verify(mCheckConfig, filepath, new String[]{});
             Assert.fail("CheckstyleException was not thrown");
@@ -287,7 +288,7 @@ public class RegexpOnFilenameOrgCheckTest
         throws Exception
     {
         final String filepath = getPath(SIMPLE_FILENAME);
-        mCheckConfig.addAttribute("mode", "unknownMode");
+        Helpers.addConfigProperty(mCheckConfig, "mode", "unknownMode");
         try {
             verify(mCheckConfig, filepath, new String[]{});
             Assert.fail("CheckstyleException was not thrown");

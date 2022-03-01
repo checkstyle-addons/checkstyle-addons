@@ -32,6 +32,7 @@ import org.junit.Before;
 import org.junit.Test;
 
 import com.thomasjensen.checkstyle.addons.BaseFileSetCheckTestSupport;
+import com.thomasjensen.checkstyle.addons.Helpers;
 import com.thomasjensen.checkstyle.addons.util.Util;
 
 
@@ -39,17 +40,15 @@ import com.thomasjensen.checkstyle.addons.util.Util;
  * Unit tests of {@link ModuleDirectoryLayoutCheck}.
  */
 public class ModuleDirectoryLayoutTest
-    extends BaseFileSetCheckTestSupport
+        extends BaseFileSetCheckTestSupport
 {
     private DefaultConfiguration mCheckConfig;
-
 
 
     public ModuleDirectoryLayoutTest()
     {
         setCheckShortname(ModuleDirectoryLayoutCheck.class);
     }
-
 
 
     @Before
@@ -59,11 +58,10 @@ public class ModuleDirectoryLayoutTest
     }
 
 
-
     @Test
     @SuppressFBWarnings(value = "DMI_HARDCODED_ABSOLUTE_FILENAME", justification = "These are fictional absolute paths")
     public void testDecomposePath1()
-        throws IOException
+            throws IOException
     {
         ModuleDirectoryLayoutCheck check = new ModuleDirectoryLayoutCheck();
         check.setBaseDir("D:/Projects/project1");
@@ -90,11 +88,10 @@ public class ModuleDirectoryLayoutTest
     }
 
 
-
     @Test
     @SuppressFBWarnings(value = "DMI_HARDCODED_ABSOLUTE_FILENAME", justification = "These are fictional absolute paths")
     public void testDecomposePathNoExtension()
-        throws IOException
+            throws IOException
     {
         ModuleDirectoryLayoutCheck check = new ModuleDirectoryLayoutCheck();
         check.setBaseDir("D:/Projects/project1");
@@ -118,11 +115,10 @@ public class ModuleDirectoryLayoutTest
     }
 
 
-
     @Test
     @SuppressFBWarnings(value = "DMI_HARDCODED_ABSOLUTE_FILENAME", justification = "These are fictional absolute paths")
     public void testDecomposePathExtensionLeadingDot()
-        throws IOException
+            throws IOException
     {
         ModuleDirectoryLayoutCheck check = new ModuleDirectoryLayoutCheck();
         check.setBaseDir("D:/Projects/project1");
@@ -148,11 +144,10 @@ public class ModuleDirectoryLayoutTest
     }
 
 
-
     @Test
     @SuppressFBWarnings(value = "DMI_HARDCODED_ABSOLUTE_FILENAME", justification = "These are fictional absolute paths")
     public void testDecomposePathExtensionLeadingDoubleDot()
-        throws IOException
+            throws IOException
     {
         ModuleDirectoryLayoutCheck check = new ModuleDirectoryLayoutCheck();
         check.setBaseDir("D:/Projects/project1");
@@ -178,11 +173,10 @@ public class ModuleDirectoryLayoutTest
     }
 
 
-
     @Test
     @SuppressFBWarnings(value = "DMI_HARDCODED_ABSOLUTE_FILENAME", justification = "These are fictional absolute paths")
     public void testDecomposePathExtensionEmbeddedDoubleDot()
-        throws IOException
+            throws IOException
     {
         ModuleDirectoryLayoutCheck check = new ModuleDirectoryLayoutCheck();
         check.setBaseDir("D:/Projects/project1");
@@ -210,11 +204,10 @@ public class ModuleDirectoryLayoutTest
     }
 
 
-
     @Test
     @SuppressFBWarnings(value = "DMI_HARDCODED_ABSOLUTE_FILENAME", justification = "These are fictional absolute paths")
     public void testDecomposePathWrongBasedir()
-        throws IOException
+            throws IOException
     {
         ModuleDirectoryLayoutCheck check = new ModuleDirectoryLayoutCheck();
         check.setBaseDir("D:/wrong/path");
@@ -227,11 +220,10 @@ public class ModuleDirectoryLayoutTest
     }
 
 
-
     @Test
     @SuppressFBWarnings(value = "DMI_HARDCODED_ABSOLUTE_FILENAME", justification = "These are fictional absolute paths")
     public void testDecomposePathFileInModuleRoot()
-        throws IOException
+            throws IOException
     {
         ModuleDirectoryLayoutCheck check = new ModuleDirectoryLayoutCheck();
         check.setBaseDir("D:/Projects/project1");
@@ -244,73 +236,71 @@ public class ModuleDirectoryLayoutTest
     }
 
 
-
     @Test
     public void testDecomposePathUnknownModule()
-        throws Exception
+            throws Exception
     {
-        mCheckConfig.addAttribute("configFile", getPath("misc/ModuleDirectoryLayout/directories-multi.json"));
+        Helpers.addConfigProperty(mCheckConfig, "configFile",
+                getPath("misc/ModuleDirectoryLayout/directories-multi.json"));
 
         // moduleRegex in the JSON file does not match our single-module scenario, so the module cannot be determined
         final String[] expected = {"1: Module association could not be determined for file: " + Util.standardizeSlashes(
-            "src/test/resources/com/thomasjensen/checkstyle/addons/checks/misc/ModuleDirectoryLayout/"
-                + "InputModuleDirectoryLayout-empty.txt") + " - moduleRegex: ^.+?[\\\\/]module\\d+"};
+                "src/test/resources/com/thomasjensen/checkstyle/addons/checks/misc/ModuleDirectoryLayout/"
+                        + "InputModuleDirectoryLayout-empty.txt") + " - moduleRegex: ^.+?[\\\\/]module\\d+"};
 
         final String filepath = getPath("misc/ModuleDirectoryLayout/InputModuleDirectoryLayout-empty.txt");
         verify(mCheckConfig, filepath, expected);
     }
 
 
-
     @Test
     public void testSunnyDay()
-        throws Exception
+            throws Exception
     {
-        mCheckConfig.addAttribute("configFile", getPath("misc/ModuleDirectoryLayout/directories.json"));
+        Helpers.addConfigProperty(mCheckConfig, "configFile", getPath("misc/ModuleDirectoryLayout/directories.json"));
 
         final String filepath = getPath("misc/ModuleDirectoryLayout/InputModuleDirectoryLayout-empty.txt");
         verify(mCheckConfig, filepath, new String[0]);
     }
 
 
-
     @Test
     public void testFileInBaseDir()
-        throws Exception
+            throws Exception
     {
-        mCheckConfig.addAttribute("baseDir", getPath("misc/ModuleDirectoryLayout/default"));
-        mCheckConfig.addAttribute("configFile", new File(
-            "src/main/resources/com/thomasjensen/checkstyle/addons/checks/misc/ModuleDirectoryLayout-default.json")
-            .getCanonicalPath());
+        Helpers.addConfigProperty(mCheckConfig, "baseDir", getPath("misc/ModuleDirectoryLayout/default"));
+        Helpers.addConfigProperty(mCheckConfig, "configFile", new File(
+                "src/main/resources/com/thomasjensen/checkstyle/addons/checks/misc/ModuleDirectoryLayout-default.json")
+                .getCanonicalPath());
 
         final String filepath = getPath("misc/ModuleDirectoryLayout/default/file.txt");
         verify(mCheckConfig, filepath, new String[0]);
     }
 
 
-
     @Test
     public void testNestedSrcFolder()
-        throws Exception
+            throws Exception
     {
-        mCheckConfig.addAttribute("configFile", getPath("misc/ModuleDirectoryLayout/directories.json"));
+        Helpers.addConfigProperty(mCheckConfig, "configFile", getPath("misc/ModuleDirectoryLayout/directories.json"));
 
         // moduleRegex in the JSON file does not match our single-module scenario, so the module cannot be determined
         final String[] expected = {"1: 'src' may not be used as package name or subfolder: " + Util.standardizeSlashes(
-            "com/thomasjensen/checkstyle/addons/checks/misc/ModuleDirectoryLayout/scenario1/src/NestedSrcFolder.txt")};
+                "com/thomasjensen/checkstyle/addons/checks/misc/ModuleDirectoryLayout/scenario1/src/NestedSrcFolder"
+                        + ".txt")};
 
         final String filepath = getPath("misc/ModuleDirectoryLayout/scenario1/src/NestedSrcFolder.txt");
         verify(mCheckConfig, filepath, expected);
     }
 
 
-
     @Test
     public void testMdlNotAllowedInModule()
-        throws Exception
+            throws Exception
     {
-        mCheckConfig.addAttribute("baseDir", getPath("misc/ModuleDirectoryLayout/scenario2"));
-        mCheckConfig.addAttribute("configFile", getPath("misc/ModuleDirectoryLayout/directories-scenario2.json"));
+        Helpers.addConfigProperty(mCheckConfig, "baseDir", getPath("misc/ModuleDirectoryLayout/scenario2"));
+        Helpers.addConfigProperty(mCheckConfig, "configFile",
+                getPath("misc/ModuleDirectoryLayout/directories-scenario2.json"));
 
         // because we configured it to be valid only in 'module-x'
         final String[] expected = {"1: Source folder 'src/main/webapp' is not allowed in module 'module1'"};
@@ -320,13 +310,13 @@ public class ModuleDirectoryLayoutTest
     }
 
 
-
     @Test
     public void testMdlNotAllowedInModule2()
-        throws Exception
+            throws Exception
     {
-        mCheckConfig.addAttribute("baseDir", getPath("misc/ModuleDirectoryLayout/scenario3"));
-        mCheckConfig.addAttribute("configFile", getPath("misc/ModuleDirectoryLayout/directories-scenario3.json"));
+        Helpers.addConfigProperty(mCheckConfig, "baseDir", getPath("misc/ModuleDirectoryLayout/scenario3"));
+        Helpers.addConfigProperty(mCheckConfig, "configFile",
+                getPath("misc/ModuleDirectoryLayout/directories-scenario3.json"));
 
         // Scenario 3 defines no modules, so the module restriction placed upon src/main/webapp does not hold
         final String filepath = getPath("misc/ModuleDirectoryLayout/scenario3/src/main/webapp/file.txt");
@@ -334,118 +324,112 @@ public class ModuleDirectoryLayoutTest
     }
 
 
-
     @Test
     public void testUnknownMdlPath()
-        throws Exception
+            throws Exception
     {
-        mCheckConfig.addAttribute("baseDir", getPath("misc/ModuleDirectoryLayout/default"));
+        Helpers.addConfigProperty(mCheckConfig, "baseDir", getPath("misc/ModuleDirectoryLayout/default"));
         // no configFile property -> use built-in default
 
         final String[] expected = {"1: File resides in a non-standard source folder: " + Util.standardizeSlashes(
-            "src/main/whitespace/file.ws")};
+                "src/main/whitespace/file.ws")};
 
         final String filepath = getPath("misc/ModuleDirectoryLayout/default/src/main/whitespace/file.ws");
         verify(mCheckConfig, filepath, expected);
     }
 
 
-
     @Test
     public void testIllegalContent1()
-        throws Exception
+            throws Exception
     {
-        mCheckConfig.addAttribute("baseDir", getPath("misc/ModuleDirectoryLayout/default"));
-        mCheckConfig.addAttribute("configFile", new File(
-            "src/main/resources/com/thomasjensen/checkstyle/addons/checks/misc/ModuleDirectoryLayout-default.json")
-            .getCanonicalPath());
+        Helpers.addConfigProperty(mCheckConfig, "baseDir", getPath("misc/ModuleDirectoryLayout/default"));
+        Helpers.addConfigProperty(mCheckConfig, "configFile", new File(
+                "src/main/resources/com/thomasjensen/checkstyle/addons/checks/misc/ModuleDirectoryLayout-default.json")
+                .getCanonicalPath());
 
         final String[] expected = {"1: File is not accepted content of src/main/java: " + Util.standardizeSlashes(
-            "a/b/illegal.txt")};
+                "a/b/illegal.txt")};
 
         final String filepath = getPath("misc/ModuleDirectoryLayout/default/src/main/java/a/b/illegal.txt");
         verify(mCheckConfig, filepath, expected);
     }
 
 
-
     @Test
     public void testIllegalContent2()
-        throws Exception
+            throws Exception
     {
-        mCheckConfig.addAttribute("baseDir", getPath("misc/ModuleDirectoryLayout/default"));
-        mCheckConfig.addAttribute("configFile", new File(
-            "src/main/resources/com/thomasjensen/checkstyle/addons/checks/misc/ModuleDirectoryLayout-default.json")
-            .getCanonicalPath());
+        Helpers.addConfigProperty(mCheckConfig, "baseDir", getPath("misc/ModuleDirectoryLayout/default"));
+        Helpers.addConfigProperty(mCheckConfig, "configFile", new File(
+                "src/main/resources/com/thomasjensen/checkstyle/addons/checks/misc/ModuleDirectoryLayout-default.json")
+                .getCanonicalPath());
 
         // .java is ok as a file extension, but the containing META-INF folder is on the deny list
         final String[] expected = {"1: File is not accepted content of src/main/java: " + Util.standardizeSlashes(
-            "a/META-INF/A.java")};
+                "a/META-INF/A.java")};
 
         final String filepath = getPath("misc/ModuleDirectoryLayout/default/src/main/java/a/META-INF/A.java");
         verify(mCheckConfig, filepath, expected);
     }
 
 
-
     @Test
     public void testIllegalContent3()
-        throws Exception
+            throws Exception
     {
-        mCheckConfig.addAttribute("baseDir", getPath("misc/ModuleDirectoryLayout/default"));
-        mCheckConfig.addAttribute("configFile", new File(
-            "src/main/resources/com/thomasjensen/checkstyle/addons/checks/misc/ModuleDirectoryLayout-default.json")
-            .getCanonicalPath());
+        Helpers.addConfigProperty(mCheckConfig, "baseDir", getPath("misc/ModuleDirectoryLayout/default"));
+        Helpers.addConfigProperty(mCheckConfig, "configFile", new File(
+                "src/main/resources/com/thomasjensen/checkstyle/addons/checks/misc/ModuleDirectoryLayout-default.json")
+                .getCanonicalPath());
 
         final String[] expected = {"1: File is not accepted content of src/main/resources: " + Util.standardizeSlashes(
-            "META-INF/META-INF/file.txt")};
+                "META-INF/META-INF/file.txt")};
 
         final String filepath = getPath(
-            "misc/ModuleDirectoryLayout/default/src/main/resources/META-INF/META-INF/file.txt");
+                "misc/ModuleDirectoryLayout/default/src/main/resources/META-INF/META-INF/file.txt");
         verify(mCheckConfig, filepath, expected);
     }
 
 
-
     @Test
     public void testGoodContent1()
-        throws Exception
+            throws Exception
     {
-        mCheckConfig.addAttribute("baseDir", getPath("misc/ModuleDirectoryLayout/default"));
-        mCheckConfig.addAttribute("configFile", new File(
-            "src/main/resources/com/thomasjensen/checkstyle/addons/checks/misc/ModuleDirectoryLayout-default.json")
-            .getCanonicalPath());
+        Helpers.addConfigProperty(mCheckConfig, "baseDir", getPath("misc/ModuleDirectoryLayout/default"));
+        Helpers.addConfigProperty(mCheckConfig, "configFile", new File(
+                "src/main/resources/com/thomasjensen/checkstyle/addons/checks/misc/ModuleDirectoryLayout-default.json")
+                .getCanonicalPath());
 
         final String filepath = getPath("misc/ModuleDirectoryLayout/default/src/main/resources/META-INF/file.txt");
         verify(mCheckConfig, filepath, new String[0]);
     }
 
 
-
     @Test
     public void testIllegalContent4()
-        throws Exception
+            throws Exception
     {
-        mCheckConfig.addAttribute("baseDir", getPath("misc/ModuleDirectoryLayout/default"));
-        mCheckConfig.addAttribute("configFile", new File(
-            "src/main/resources/com/thomasjensen/checkstyle/addons/checks/misc/ModuleDirectoryLayout-default.json")
-            .getCanonicalPath());
+        Helpers.addConfigProperty(mCheckConfig, "baseDir", getPath("misc/ModuleDirectoryLayout/default"));
+        Helpers.addConfigProperty(mCheckConfig, "configFile", new File(
+                "src/main/resources/com/thomasjensen/checkstyle/addons/checks/misc/ModuleDirectoryLayout-default.json")
+                .getCanonicalPath());
 
         final String[] expected = {"1: File is not accepted content of src/main/resources: " + Util.standardizeSlashes(
-            "a/META-INF/file.txt")};
+                "a/META-INF/file.txt")};
 
         final String filepath = getPath("misc/ModuleDirectoryLayout/default/src/main/resources/a/META-INF/file.txt");
         verify(mCheckConfig, filepath, expected);
     }
 
 
-
     @Test
     public void testGoodContent2()
-        throws Exception
+            throws Exception
     {
-        mCheckConfig.addAttribute("baseDir", getPath("misc/ModuleDirectoryLayout/default"));
-        mCheckConfig.addAttribute("configFile", getPath("misc/ModuleDirectoryLayout/directories-scenario4.json"));
+        Helpers.addConfigProperty(mCheckConfig, "baseDir", getPath("misc/ModuleDirectoryLayout/default"));
+        Helpers.addConfigProperty(mCheckConfig, "configFile",
+                getPath("misc/ModuleDirectoryLayout/directories-scenario4.json"));
 
         // Two top-level folders defined in whitelist, our file is in one of them
         final String filepath = getPath("misc/ModuleDirectoryLayout/default/src/main/resources/META-INF/file.txt");
@@ -453,13 +437,13 @@ public class ModuleDirectoryLayoutTest
     }
 
 
-
     @Test
     public void testGoodContent2a()
-        throws Exception
+            throws Exception
     {
-        mCheckConfig.addAttribute("baseDir", getPath("misc/ModuleDirectoryLayout/default"));
-        mCheckConfig.addAttribute("configFile", getPath("misc/ModuleDirectoryLayout/directories-scenario4.json"));
+        Helpers.addConfigProperty(mCheckConfig, "baseDir", getPath("misc/ModuleDirectoryLayout/default"));
+        Helpers.addConfigProperty(mCheckConfig, "configFile",
+                getPath("misc/ModuleDirectoryLayout/directories-scenario4.json"));
 
         // Two top-level folders defined in whitelist, our file is in one of them
         final String filepath = getPath("misc/ModuleDirectoryLayout/default/src/main/resources/a/file.txt");
@@ -467,45 +451,43 @@ public class ModuleDirectoryLayoutTest
     }
 
 
-
     @Test
     public void testGoodContent2b()
-        throws Exception
+            throws Exception
     {
-        mCheckConfig.addAttribute("baseDir", getPath("misc/ModuleDirectoryLayout/default"));
-        mCheckConfig.addAttribute("configFile", getPath("misc/ModuleDirectoryLayout/directories-scenario6.json"));
+        Helpers.addConfigProperty(mCheckConfig, "baseDir", getPath("misc/ModuleDirectoryLayout/default"));
+        Helpers.addConfigProperty(mCheckConfig, "configFile",
+                getPath("misc/ModuleDirectoryLayout/directories-scenario6.json"));
 
         final String filepath = getPath("misc/ModuleDirectoryLayout/default/src/main/resources/a/file.txt");
         verify(mCheckConfig, filepath, new String[0]);
     }
 
 
-
     @Test
     public void testGoodContent3()
-        throws Exception
+            throws Exception
     {
-        mCheckConfig.addAttribute("baseDir", getPath("misc/ModuleDirectoryLayout/default"));
-        mCheckConfig.addAttribute("configFile", new File(
-            "src/main/resources/com/thomasjensen/checkstyle/addons/checks/misc/ModuleDirectoryLayout-default.json")
-            .getCanonicalPath());
+        Helpers.addConfigProperty(mCheckConfig, "baseDir", getPath("misc/ModuleDirectoryLayout/default"));
+        Helpers.addConfigProperty(mCheckConfig, "configFile", new File(
+                "src/main/resources/com/thomasjensen/checkstyle/addons/checks/misc/ModuleDirectoryLayout-default.json")
+                .getCanonicalPath());
 
         final String filepath = getPath("misc/ModuleDirectoryLayout/default/src/main/java/a/b/file.java");
         verify(mCheckConfig, filepath, new String[0]);
     }
 
 
-
     @Test
     public void testBrokenConfigs()
-        throws Exception
+            throws Exception
     {
         for (int i = 1; i <= 18; i++) {
             setUp();
-            mCheckConfig.addAttribute("baseDir", getPath("misc/ModuleDirectoryLayout/default"));
-            mCheckConfig.addAttribute("configFile",
-                getPath("misc/ModuleDirectoryLayout/directories-broken" + i + ".json"));
-            mCheckConfig.addAttribute("failQuietly", "true");  // flag must not have any effect!
+            Helpers.addConfigProperty(mCheckConfig, "baseDir", getPath("misc/ModuleDirectoryLayout/default"));
+            Helpers.addConfigProperty(mCheckConfig, "configFile",
+                    getPath("misc/ModuleDirectoryLayout/directories-broken" + i + ".json"));
+            Helpers.addConfigProperty(mCheckConfig, "failQuietly", "true");  // flag must not have any effect!
 
             Throwable expectedException = null;
             try {
@@ -523,36 +505,35 @@ public class ModuleDirectoryLayoutTest
             }
             Assert.assertTrue(expectedException instanceof IllegalArgumentException);
             Assert.assertTrue(expectedException.getMessage().contains(//
-                "Could not read or parse the module directory layout configFile") //
-                || expectedException.getMessage().contains(//
-                "Module directory layout configFile contains invalid configuration"));
+                    "Could not read or parse the module directory layout configFile") //
+                    || expectedException.getMessage().contains(//
+                    "Module directory layout configFile contains invalid configuration"));
         }
     }
 
 
-
     @Test
     public void testDenyBySpecificPathRegex()
-        throws Exception
+            throws Exception
     {
-        mCheckConfig.addAttribute("baseDir", getPath("misc/ModuleDirectoryLayout/default"));
-        mCheckConfig.addAttribute("configFile", getPath("misc/ModuleDirectoryLayout/directories-scenario5.json"));
+        Helpers.addConfigProperty(mCheckConfig, "baseDir", getPath("misc/ModuleDirectoryLayout/default"));
+        Helpers.addConfigProperty(mCheckConfig, "configFile",
+                getPath("misc/ModuleDirectoryLayout/directories-scenario5.json"));
 
         final String[] expected = {"1: File is not accepted content of src/main/java: " + Util.standardizeSlashes(
-            "a/b/illegal.java")};
+                "a/b/illegal.java")};
 
         final String filepath = getPath("misc/ModuleDirectoryLayout/default/src/main/java/a/b/illegal.java");
         verify(mCheckConfig, filepath, expected);
     }
 
 
-
     @Test
     public void testConfigFileNotFound()
-        throws Exception
+            throws Exception
     {
-        mCheckConfig.addAttribute("baseDir", getPath("misc/ModuleDirectoryLayout/default"));
-        mCheckConfig.addAttribute("configFile", "non/existent/file.json");
+        Helpers.addConfigProperty(mCheckConfig, "baseDir", getPath("misc/ModuleDirectoryLayout/default"));
+        Helpers.addConfigProperty(mCheckConfig, "configFile", "non/existent/file.json");
 
         Throwable expectedException = null;
         try {
@@ -574,20 +555,18 @@ public class ModuleDirectoryLayoutTest
     }
 
 
-
     @Test
     public void testConfigFileNotFoundFailQuietly()
-        throws Exception
+            throws Exception
     {
-        mCheckConfig.addAttribute("baseDir", getPath("misc/ModuleDirectoryLayout/default"));
-        mCheckConfig.addAttribute("configFile", "non/existent/file.json");
-        mCheckConfig.addAttribute("failQuietly", "true");
+        Helpers.addConfigProperty(mCheckConfig, "baseDir", getPath("misc/ModuleDirectoryLayout/default"));
+        Helpers.addConfigProperty(mCheckConfig, "configFile", "non/existent/file.json");
+        Helpers.addConfigProperty(mCheckConfig, "failQuietly", "true");
 
         final String filepath = getPath("misc/ModuleDirectoryLayout/default/src/main/java/a/b/illegal.txt");
         // The check should be disabled because the json could not be found.
         verify(mCheckConfig, filepath, new String[0]);
     }
-
 
 
     @Test
@@ -606,14 +585,12 @@ public class ModuleDirectoryLayoutTest
     }
 
 
-
     @SuppressWarnings("ConstantConditions")
     @Test(expected = NullPointerException.class)
     public void testCutSlashesNPE()
     {
         new ModuleDirectoryLayoutCheck().cutSlashes(null);
     }
-
 
 
     /**
@@ -623,18 +600,18 @@ public class ModuleDirectoryLayoutTest
      */
     @Test
     public void testRootFilesWhenModuleRegexGivenOk()
-        throws Exception
+            throws Exception
     {
-        mCheckConfig.addAttribute("baseDir", getPath("misc/ModuleDirectoryLayout/scenario7"));
-        mCheckConfig.addAttribute("configFile", getPath("misc/ModuleDirectoryLayout/directories-scenario7.json"));
+        Helpers.addConfigProperty(mCheckConfig, "baseDir", getPath("misc/ModuleDirectoryLayout/scenario7"));
+        Helpers.addConfigProperty(mCheckConfig, "configFile",
+                getPath("misc/ModuleDirectoryLayout/directories-scenario7.json"));
 
         final File[] filesToCheck = new File[]{//
-            new File(getPath("misc/ModuleDirectoryLayout/scenario7/module/src/file.txt")), //
-            new File(getPath("misc/ModuleDirectoryLayout/scenario7/module/moduleRootFile.txt")), //
-            new File(getPath("misc/ModuleDirectoryLayout/scenario7/rootFile.txt"))};
+                new File(getPath("misc/ModuleDirectoryLayout/scenario7/module/src/file.txt")), //
+                new File(getPath("misc/ModuleDirectoryLayout/scenario7/module/moduleRootFile.txt")), //
+                new File(getPath("misc/ModuleDirectoryLayout/scenario7/rootFile.txt"))};
         verify(createChecker(mCheckConfig), filesToCheck, "unused", new String[0]);
     }
-
 
 
     /**
@@ -645,30 +622,30 @@ public class ModuleDirectoryLayoutTest
      */
     @Test
     public void testOneFilenameStartsWithMdlPathName()
-        throws Exception
+            throws Exception
     {
-        mCheckConfig.addAttribute("baseDir", getPath("misc/ModuleDirectoryLayout/scenario8"));
-        mCheckConfig.addAttribute("configFile", getPath("misc/ModuleDirectoryLayout/directories-scenario8.json"));
+        Helpers.addConfigProperty(mCheckConfig, "baseDir", getPath("misc/ModuleDirectoryLayout/scenario8"));
+        Helpers.addConfigProperty(mCheckConfig, "configFile",
+                getPath("misc/ModuleDirectoryLayout/directories-scenario8.json"));
 
         final File[] filesToCheck = new File[]{//
-            new File(getPath("misc/ModuleDirectoryLayout/scenario8/module1/a/allowed.txt")), //
-            new File(getPath("misc/ModuleDirectoryLayout/scenario8/module1/a/module1-allowed.txt")), //
-            new File(getPath("misc/ModuleDirectoryLayout/scenario8/module1/allowed.txt")), //
-            new File(getPath("misc/ModuleDirectoryLayout/scenario8/module1/module1-allowed.txt"))};
+                new File(getPath("misc/ModuleDirectoryLayout/scenario8/module1/a/allowed.txt")), //
+                new File(getPath("misc/ModuleDirectoryLayout/scenario8/module1/a/module1-allowed.txt")), //
+                new File(getPath("misc/ModuleDirectoryLayout/scenario8/module1/allowed.txt")), //
+                new File(getPath("misc/ModuleDirectoryLayout/scenario8/module1/module1-allowed.txt"))};
 
         verify(createChecker(mCheckConfig), filesToCheck, "unused", new String[0]);
     }
 
 
-
     @Test
     public void testExcludeRegex()
-        throws Exception
+            throws Exception
     {
-        mCheckConfig.addAttribute("baseDir", getPath("misc/ModuleDirectoryLayout/default"));
-        mCheckConfig.addAttribute("configFile", new File(
-            "src/main/resources/com/thomasjensen/checkstyle/addons/checks/misc/ModuleDirectoryLayout-default.json")
-            .getCanonicalPath());
+        Helpers.addConfigProperty(mCheckConfig, "baseDir", getPath("misc/ModuleDirectoryLayout/default"));
+        Helpers.addConfigProperty(mCheckConfig, "configFile", new File(
+                "src/main/resources/com/thomasjensen/checkstyle/addons/checks/misc/ModuleDirectoryLayout-default.json")
+                .getCanonicalPath());
 
         final String filepath = getPath("misc/ModuleDirectoryLayout/default/.idea/csi-007/ignore_this.txt");
         verify(mCheckConfig, filepath, new String[0]);

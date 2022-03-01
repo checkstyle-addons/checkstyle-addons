@@ -81,7 +81,7 @@ public class LostInstanceCheck
         boolean isLost = false;
 
         if (!isBeingDereferenced(pAst)) {
-            for (DetailAST a = pAst.getParent(); a.getType() != TokenTypes.EOF; a = a.getParent()) {
+            for (DetailAST a = pAst.getParent(); !getApiFixer().isRootToken(a.getType()); a = a.getParent()) {
                 if (a.getType() == TokenTypes.ELIST) {
                     final int parentType = a.getParent().getType();
                     if (parentType == TokenTypes.FOR_INIT || parentType == TokenTypes.FOR_ITERATOR) {

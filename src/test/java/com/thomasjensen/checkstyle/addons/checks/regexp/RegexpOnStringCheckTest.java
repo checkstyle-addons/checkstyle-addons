@@ -16,8 +16,10 @@ package com.thomasjensen.checkstyle.addons.checks.regexp;
  */
 
 import com.puppycrawl.tools.checkstyle.DefaultConfiguration;
-import com.thomasjensen.checkstyle.addons.BaseCheckTestSupport;
 import org.junit.Test;
+
+import com.thomasjensen.checkstyle.addons.BaseCheckTestSupport;
+import com.thomasjensen.checkstyle.addons.Helpers;
 
 
 /**
@@ -38,7 +40,7 @@ public class RegexpOnStringCheckTest
         throws Exception
     {
         final DefaultConfiguration checkConfig = createCheckConfig(RegexpOnStringCheck.class);
-        checkConfig.addAttribute("regexp", "oo");
+        Helpers.addConfigProperty(checkConfig, "regexp", "oo");
 
         final String[] expected = {//
             "10:25: String \"foo\" matches illegal pattern 'oo'.", //
@@ -64,7 +66,7 @@ public class RegexpOnStringCheckTest
         throws Exception
     {
         final DefaultConfiguration checkConfig = createCheckConfig(RegexpOnStringCheck.class);
-        checkConfig.addAttribute("regexp", "^literal1$");
+        Helpers.addConfigProperty(checkConfig, "regexp", "^literal1$");
 
         final String[] expected = {//
             "14:35: String \"literal1\" matches illegal pattern '^literal1$'.", //
@@ -79,7 +81,7 @@ public class RegexpOnStringCheckTest
         throws Exception
     {
         final DefaultConfiguration checkConfig = createCheckConfig(RegexpOnStringCheck.class);
-        checkConfig.addAttribute("regexp", "^literal3$");
+        Helpers.addConfigProperty(checkConfig, "regexp", "^literal3$");
 
         final String[] expected = {//
             "79:26: String \"literal3\" matches illegal pattern '^literal3$'.", //
@@ -94,7 +96,7 @@ public class RegexpOnStringCheckTest
         throws Exception
     {
         final DefaultConfiguration checkConfig = createCheckConfig(RegexpOnStringCheck.class);
-        checkConfig.addAttribute("regexp", "^$");
+        Helpers.addConfigProperty(checkConfig, "regexp", "^$");
 
         final String[] expected = {//
             "46:28: String \"\" matches illegal pattern '^$'.", //
@@ -109,7 +111,7 @@ public class RegexpOnStringCheckTest
         throws Exception
     {
         final DefaultConfiguration checkConfig = createCheckConfig(RegexpOnStringCheck.class);
-        checkConfig.addAttribute("regexp", "abcde");
+        Helpers.addConfigProperty(checkConfig, "regexp", "abcde");
 
         final String[] expected = {//
             "41:21: String \"abcdefghi\" matches illegal pattern 'abcde'.", //
@@ -138,7 +140,7 @@ public class RegexpOnStringCheckTest
         throws Exception
     {
         final DefaultConfiguration checkConfig = createCheckConfig(RegexpOnStringCheck.class);
-        checkConfig.addAttribute("regexp", "zzz");
+        Helpers.addConfigProperty(checkConfig, "regexp", "zzz");
 
         final String[] expected = {//
             "68:25: String \"aaazzz\" matches illegal pattern 'zzz'.", //
@@ -153,7 +155,7 @@ public class RegexpOnStringCheckTest
         throws Exception
     {
         final DefaultConfiguration checkConfig = createCheckConfig(RegexpOnStringCheck.class);
-        checkConfig.addAttribute("regexp", "defghi");
+        Helpers.addConfigProperty(checkConfig, "regexp", "defghi");
 
         final String[] expected = {//
             "41:21: String \"abcdefghi\" matches illegal pattern 'defghi'.", //
@@ -172,7 +174,7 @@ public class RegexpOnStringCheckTest
         throws Exception
     {
         final DefaultConfiguration checkConfig = createCheckConfig(RegexpOnStringCheck.class);
-        checkConfig.addAttribute("regexp", "eee");
+        Helpers.addConfigProperty(checkConfig, "regexp", "eee");
 
         final String[] expected = {//
             "71:33: String \"aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa...\" "

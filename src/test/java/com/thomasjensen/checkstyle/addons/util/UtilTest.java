@@ -28,6 +28,7 @@ import org.junit.Test;
 import org.mockito.Mockito;
 
 import com.thomasjensen.checkstyle.addons.BaseCheckTestSupport;
+import com.thomasjensen.checkstyle.addons.Helpers;
 import com.thomasjensen.checkstyle.addons.checks.misc.CatalogEntryTest;
 
 
@@ -78,7 +79,7 @@ public class UtilTest
             Mockito.when(pAst.getText()).thenReturn(pText);
         }
         else {
-            pAst.setText(pText);
+            Helpers.callAstMethod(pAst, "setText", String.class, pText);
         }
     }
 

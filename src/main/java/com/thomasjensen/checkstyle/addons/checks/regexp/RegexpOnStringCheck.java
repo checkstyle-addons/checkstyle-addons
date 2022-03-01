@@ -180,7 +180,7 @@ public class RegexpOnStringCheck
             }
         }
         else if (pAst.getType() != TokenTypes.EXPR) {
-            if (pAst.getNumberOfChildren() > 0) {
+            if (pAst.getChildCount() > 0) {
                 for (DetailAST a = pAst.getFirstChild(); a != null; a = a.getNextSibling()) {
                     flatten(a, pFlattenedList);
                     if (a != pAst.getLastChild()) {

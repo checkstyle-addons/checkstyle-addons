@@ -1,4 +1,19 @@
 package com.thomasjensen.checkstyle.addons;
+/*
+ * Checkstyle-Addons - Additional Checkstyle checks
+ * Copyright (c) 2015-2020, the Checkstyle Addons contributors
+ *
+ * This program is free software: you can redistribute it and/or modify it under the
+ * terms of the GNU General Public License, version 3, as published by the Free
+ * Software Foundation.
+ *
+ * This program is distributed in the hope that it will be useful, but WITHOUT ANY
+ * WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A
+ * PARTICULAR PURPOSE. See the GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License along with this
+ * program.  If not, see <http://www.gnu.org/licenses/>.
+ */
 
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
@@ -192,7 +207,7 @@ public abstract class BaseCheckTestSupport
         final DefaultConfiguration dc = new DefaultConfiguration("configuration");
         final DefaultConfiguration twConf = createCheckConfig(TreeWalker.class);
         // make sure that the tests always run with this charset
-        dc.addAttribute("charset", "UTF-8");
+        Helpers.addConfigProperty(dc, "charset", "UTF-8");
         dc.addChild(twConf);
         twConf.addChild(pConfig);
         return dc;

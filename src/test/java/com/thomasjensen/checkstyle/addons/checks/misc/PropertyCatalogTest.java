@@ -24,6 +24,7 @@ import org.junit.Assert;
 import org.junit.Test;
 
 import com.thomasjensen.checkstyle.addons.BaseCheckTestSupport;
+import com.thomasjensen.checkstyle.addons.Helpers;
 import com.thomasjensen.checkstyle.addons.checks.BinaryName;
 import com.thomasjensen.checkstyle.addons.util.Util;
 
@@ -32,7 +33,7 @@ import com.thomasjensen.checkstyle.addons.util.Util;
  * Unit test of {@link PropertyCatalogCheck}.
  */
 public class PropertyCatalogTest
-    extends BaseCheckTestSupport
+        extends BaseCheckTestSupport
 {
     public PropertyCatalogTest()
     {
@@ -40,38 +41,36 @@ public class PropertyCatalogTest
     }
 
 
-
     @Test
     public void testPropertyFileTemplate()
-        throws IOException
+            throws IOException
     {
         PropertyCatalogCheck check = new PropertyCatalogCheck(getPath("misc/InputPropertyCatalog1.java"));
         check.setPropertyFile("|{0}|{1}|{2}|{3}|{4}|{5}|{6}|{7}|{8}|{9}|{10}|{11}|{12}|");
 
         String s = check.buildPropertyFilePath(new BinaryName("com.foo", "Bar", "Inner"), 0, true);
         Assert.assertEquals("|com.foo.Bar$Inner|com/foo/Bar/Inner|com.foo.Bar|com/foo/Bar|../../..|com/foo|Bar|Inner|"
-            + "src|test|resources|||", s);
+                + "src|test|resources|||", s);
 
         s = check.buildPropertyFilePath(new BinaryName("com.foo", "Bar", "Inner1", "Inner2"), 1, true);
         Assert.assertEquals(
-            "|com.foo.Bar$Inner1$Inner2|com/foo/Bar/Inner1/Inner2|com.foo.Bar|com/foo/Bar|../../..|com/foo|Bar|Inner2|"
-                + "src|test|resources|src/||", s);
+                "|com.foo.Bar$Inner1$Inner2|com/foo/Bar/Inner1/Inner2|com.foo.Bar|com/foo/Bar|../../."
+                        + ".|com/foo|Bar|Inner2|src|test|resources|src/||", s);
 
         s = check.buildPropertyFilePath(new BinaryName("com.foo", "Bar"), 2, true);
         Assert.assertEquals("|com.foo.Bar|com/foo/Bar|com.foo.Bar|com/foo/Bar|../../..|com/foo|Bar|null|"
-            + "src|test|resources|src/test/||", s);
+                + "src|test|resources|src/test/||", s);
 
         s = check.buildPropertyFilePath(new BinaryName(null, "Bar"), 3, true);
         s = s.replaceAll(Pattern.quote("\\"), "/");
         Assert.assertEquals("|Bar|Bar|Bar|Bar|..||Bar|null|src|test|resources|src/test/resources/|src/test"
-            + "/resources/com/thomasjensen/checkstyle/addons/checks/misc|", s);
+                + "/resources/com/thomasjensen/checkstyle/addons/checks/misc|", s);
     }
-
 
 
     @Test(expected = ArrayIndexOutOfBoundsException.class)
     public void testPropertyFileTemplateTooManyDirs()
-        throws IOException
+            throws IOException
     {
         PropertyCatalogCheck check = new PropertyCatalogCheck(getPath("misc/InputPropertyCatalog1.java"));
         check.buildPropertyFilePath(new BinaryName(null, "Foo"), PropertyCatalogCheck.NUM_SUBDIRS + 1, true);
@@ -79,10 +78,9 @@ public class PropertyCatalogTest
     }
 
 
-
     @Test
     public void testPropertyFileTemplateBasedir()
-        throws IOException
+            throws IOException
     {
         PropertyCatalogCheck check = new PropertyCatalogCheck(getPath("misc/InputPropertyCatalog1.java"));
         check.setBaseDir("src");
@@ -90,24 +88,23 @@ public class PropertyCatalogTest
 
         String s = check.buildPropertyFilePath(new BinaryName("com.foo", "Bar", "Inner"), 0, true);
         Assert.assertEquals("|com.foo.Bar$Inner|com/foo/Bar/Inner|com.foo.Bar|com/foo/Bar|../../..|com/foo|Bar|Inner|"
-            + "test|resources|com|||", s);
+                + "test|resources|com|||", s);
 
         check.setBaseDir("src/test");   // forward slash
         s = check.buildPropertyFilePath(new BinaryName("com.foo", "Bar", "Inner"), 0, true);
         Assert.assertEquals("|com.foo.Bar$Inner|com/foo/Bar/Inner|com.foo.Bar|com/foo/Bar|../../..|com/foo|Bar|Inner|"
-            + "resources|com|thomasjensen|||", s);
+                + "resources|com|thomasjensen|||", s);
 
         check.setBaseDir("src\\test");   // backslash
         s = check.buildPropertyFilePath(new BinaryName("com.foo", "Bar", "Inner"), 0, true);
         Assert.assertEquals("|com.foo.Bar$Inner|com/foo/Bar/Inner|com.foo.Bar|com/foo/Bar|../../..|com/foo|Bar|Inner|"
-            + "resources|com|thomasjensen|||", s);
+                + "resources|com|thomasjensen|||", s);
     }
-
 
 
     @Test
     public void testPropertyFileTemplateParent()
-        throws IOException
+            throws IOException
     {
         PropertyCatalogCheck check = new PropertyCatalogCheck(getPath("misc/InputPropertyCatalog1.java"));
         check.setPropertyFile("{8}");
@@ -118,474 +115,460 @@ public class PropertyCatalogTest
     }
 
 
-
     @Test
     public void testPropertyFileTemplateParentDynamic()
-        throws Exception
+            throws Exception
     {
         final DefaultConfiguration checkConfig = createCheckConfig(PropertyCatalogCheck.class);
-        checkConfig.addAttribute("selection", "foo\\.InputPropertyCatalog1");
-        checkConfig.addAttribute("propertyFile",
-            new File("{11}resources/com/thomasjensen/checkstyle/addons/checks/misc/{6}.properties").getCanonicalPath());
+        Helpers.addConfigProperty(checkConfig, "selection", "foo\\.InputPropertyCatalog1");
+        Helpers.addConfigProperty(checkConfig, "propertyFile", new File(
+                "{11}resources/com/thomasjensen/checkstyle/addons/checks/misc/{6}.properties").getCanonicalPath());
         // If {11} should be resolved as "src/test/", the file is found and we get no error.
 
         verify(checkConfig, getPath("misc/InputPropertyCatalog1.java"), new String[0]);
     }
 
 
-
     @Test
     public void testPropertyFileTemplateParentDynamicNonExistent()
-        throws Exception
+            throws Exception
     {
         final DefaultConfiguration checkConfig = createCheckConfig(PropertyCatalogCheck.class);
-        checkConfig.addAttribute("selection", "foo\\.InputPropertyCatalog1");
-        checkConfig.addAttribute("propertyFile",
-            new File("{11}resources/nonexistent/{6}.properties").getCanonicalPath());
+        Helpers.addConfigProperty(checkConfig, "selection", "foo\\.InputPropertyCatalog1");
+        Helpers.addConfigProperty(checkConfig, "propertyFile",
+                new File("{11}resources/nonexistent/{6}.properties").getCanonicalPath());
 
-        final String[] expected = {//
-            "4:20: Could not load property file for catalog 'com.foo.InputPropertyCatalog1': " + new File(
-                "{11}resources" + File.separator + "nonexistent" + File.separator + "InputPropertyCatalog1.properties")
-                .getCanonicalPath() + ", where '{11}' was successively replaced with all leading fragments of "
-                + "'src/test/resources/', including the empty String", //
+        final String[] expected = {
+                "4:20: Could not load property file for catalog 'com.foo.InputPropertyCatalog1': "
+                        + new File("{11}resources" + File.separator + "nonexistent" + File.separator
+                        + "InputPropertyCatalog1.properties").getCanonicalPath()
+                        + ", where '{11}' was successively replaced with all leading fragments of "
+                        + "'src/test/resources/', including the empty String"
         };
         verify(checkConfig, getPath("misc/InputPropertyCatalog1.java"), expected);
     }
 
 
-
     @Test
     public void testSunnyDayConstantsInt()
-        throws Exception
+            throws Exception
     {
         final DefaultConfiguration checkConfig = createCheckConfig(PropertyCatalogCheck.class);
-        checkConfig.addAttribute("selection", "foo\\.InputPropertyCatalog1");
-        checkConfig.addAttribute("propertyFile", getPath("misc/{6}.properties"));
+        Helpers.addConfigProperty(checkConfig, "selection", "foo\\.InputPropertyCatalog1");
+        Helpers.addConfigProperty(checkConfig, "propertyFile", getPath("misc/{6}.properties"));
 
         verify(checkConfig, getPath("misc/InputPropertyCatalog1.java"), new String[0]);
     }
 
 
-
     @Test
     public void testSunnyDayConstantsString()
-        throws Exception
+            throws Exception
     {
         final DefaultConfiguration checkConfig = createCheckConfig(PropertyCatalogCheck.class);
-        checkConfig.addAttribute("selection", "foo\\.InputPropertyCatalog");
-        checkConfig.addAttribute("propertyFile", getPath("misc/{6}.properties"));
+        Helpers.addConfigProperty(checkConfig, "selection", "foo\\.InputPropertyCatalog");
+        Helpers.addConfigProperty(checkConfig, "propertyFile", getPath("misc/{6}.properties"));
 
         verify(checkConfig, getPath("misc/InputPropertyCatalog2.java"), new String[0]);
     }
 
 
-
     @Test
     public void testSunnyDayEnumConstants()
-        throws Exception
+            throws Exception
     {
         final DefaultConfiguration checkConfig = createCheckConfig(PropertyCatalogCheck.class);
-        checkConfig.addAttribute("selection", "foo\\.InputPropertyCatalog");
-        checkConfig.addAttribute("propertyFile", getPath("misc/{6}.properties"));
+        Helpers.addConfigProperty(checkConfig, "selection", "foo\\.InputPropertyCatalog");
+        Helpers.addConfigProperty(checkConfig, "propertyFile", getPath("misc/{6}.properties"));
 
         verify(checkConfig, getPath("misc/InputPropertyCatalog3.java"), new String[0]);
     }
 
 
-
     @Test
     public void testSunnyDayEnumConstantParamsIgnored()
-        throws Exception
+            throws Exception
     {
         final DefaultConfiguration checkConfig = createCheckConfig(PropertyCatalogCheck.class);
-        checkConfig.addAttribute("selection", "foo\\.InputPropertyCatalog");
-        checkConfig.addAttribute("propertyFile", getPath("misc/InputPropertyCatalog3.properties"));
+        Helpers.addConfigProperty(checkConfig, "selection", "foo\\.InputPropertyCatalog");
+        Helpers.addConfigProperty(checkConfig, "propertyFile", getPath("misc/InputPropertyCatalog3.properties"));
 
         verify(checkConfig, getPath("misc/InputPropertyCatalog4.java"), new String[0]);
     }
-
 
 
     @Test
     public void testEnumArgumentInt()
-        throws Exception
+            throws Exception
     {
         final DefaultConfiguration checkConfig = createCheckConfig(PropertyCatalogCheck.class);
-        checkConfig.addAttribute("selection", "foo\\.InputPropertyCatalog");
-        checkConfig.addAttribute("propertyFile", getPath("misc/InputPropertyCatalog1.properties"));
-        checkConfig.addAttribute("enumArgument", "true");
+        Helpers.addConfigProperty(checkConfig, "selection", "foo\\.InputPropertyCatalog");
+        Helpers.addConfigProperty(checkConfig, "propertyFile", getPath("misc/InputPropertyCatalog1.properties"));
+        Helpers.addConfigProperty(checkConfig, "enumArgument", "true");
 
         verify(checkConfig, getPath("misc/InputPropertyCatalog4.java"), new String[0]);
     }
 
 
-
     @Test
     public void testEnumArgumentString()
-        throws Exception
+            throws Exception
     {
         final DefaultConfiguration checkConfig = createCheckConfig(PropertyCatalogCheck.class);
-        checkConfig.addAttribute("selection", "foo\\.InputPropertyCatalog");
-        checkConfig.addAttribute("propertyFile", getPath("misc/InputPropertyCatalog2.properties"));
-        checkConfig.addAttribute("enumArgument", "true");
+        Helpers.addConfigProperty(checkConfig, "selection", "foo\\.InputPropertyCatalog");
+        Helpers.addConfigProperty(checkConfig, "propertyFile", getPath("misc/InputPropertyCatalog2.properties"));
+        Helpers.addConfigProperty(checkConfig, "enumArgument", "true");
 
         verify(checkConfig, getPath("misc/InputPropertyCatalog5.java"), new String[0]);
     }
 
 
-
     @Test
     public void testInterfaceConstants()
-        throws Exception
+            throws Exception
     {
         final DefaultConfiguration checkConfig = createCheckConfig(PropertyCatalogCheck.class);
-        checkConfig.addAttribute("selection", "foo\\.InputPropertyCatalog.$");
-        checkConfig.addAttribute("propertyFile", getPath("misc/InputPropertyCatalog1.properties"));
-        checkConfig.addAttribute("enumArgument", "true");  // ignored
+        Helpers.addConfigProperty(checkConfig, "selection", "foo\\.InputPropertyCatalog.$");
+        Helpers.addConfigProperty(checkConfig, "propertyFile", getPath("misc/InputPropertyCatalog1.properties"));
+        Helpers.addConfigProperty(checkConfig, "enumArgument", "true");  // ignored
 
         verify(checkConfig, getPath("misc/InputPropertyCatalog6.java"), new String[0]);
     }
-
 
 
     @Test
     public void testInnerClass()
-        throws Exception
+            throws Exception
     {
         final DefaultConfiguration checkConfig = createCheckConfig(PropertyCatalogCheck.class);
-        checkConfig.addAttribute("selection", "Catalog6\\$Foo");
-        checkConfig.addAttribute("propertyFile", getPath("misc/InputPropertyCatalog1.properties"));
+        Helpers.addConfigProperty(checkConfig, "selection", "Catalog6\\$Foo");
+        Helpers.addConfigProperty(checkConfig, "propertyFile", getPath("misc/InputPropertyCatalog1.properties"));
 
         verify(checkConfig, getPath("misc/InputPropertyCatalog6.java"), new String[0]);
     }
 
 
-
     @Test
     public void testPropertyFileNotFound()
-        throws Exception
+            throws Exception
     {
         final DefaultConfiguration checkConfig = createCheckConfig(PropertyCatalogCheck.class);
-        checkConfig.addAttribute("selection", "Catalog1$");
-        checkConfig.addAttribute("propertyFile", "notfound");
+        Helpers.addConfigProperty(checkConfig, "selection", "Catalog1$");
+        Helpers.addConfigProperty(checkConfig, "propertyFile", "notfound");
 
-        final String[] expected = {//
-            "4:20: Could not load property file for catalog 'com.foo.InputPropertyCatalog1': " + new File("notfound")
-                .getCanonicalPath(), //
+        final String[] expected = {
+                "4:20: Could not load property file for catalog 'com.foo.InputPropertyCatalog1': "
+                        + new File("notfound").getCanonicalPath()
         };
         verify(checkConfig, getPath("misc/InputPropertyCatalog1.java"), expected);
     }
 
 
-
     @Test
     public void testOrphaned1()
-        throws Exception
+            throws Exception
     {
         final DefaultConfiguration checkConfig = createCheckConfig(PropertyCatalogCheck.class);
-        checkConfig.addAttribute("selection", "Catalog6\\$Orphaned1");
-        checkConfig.addAttribute("propertyFile", getPath("misc/InputPropertyCatalog1.properties"));
+        Helpers.addConfigProperty(checkConfig, "selection", "Catalog6\\$Orphaned1");
+        Helpers.addConfigProperty(checkConfig, "propertyFile", getPath("misc/InputPropertyCatalog1.properties"));
 
         final String[] expected = {//
-            "21:25: Orphaned property '1' in file: " + new File(getPath("misc/InputPropertyCatalog1.properties"))
-                .getCanonicalPath(), //
+                "21:25: Orphaned property '1' in file: " + new File(getPath("misc/InputPropertyCatalog1.properties"))
+                        .getCanonicalPath(), //
         };
         verify(checkConfig, getPath("misc/InputPropertyCatalog6.java"), expected);
     }
-
 
 
     @Test
     public void testOrphaned2()
-        throws Exception
+            throws Exception
     {
         final DefaultConfiguration checkConfig = createCheckConfig(PropertyCatalogCheck.class);
-        checkConfig.addAttribute("selection", "Catalog6\\$Orphaned2");
-        checkConfig.addAttribute("propertyFile", getPath("misc/InputPropertyCatalog1.properties"));
+        Helpers.addConfigProperty(checkConfig, "selection", "Catalog6\\$Orphaned2");
+        Helpers.addConfigProperty(checkConfig, "propertyFile", getPath("misc/InputPropertyCatalog1.properties"));
 
-        final String[] expected = {//
-            "33:25: Orphaned properties [1, 2] in file: " + new File(getPath("misc/InputPropertyCatalog1.properties"))
-                .getCanonicalPath(), //
+        final String[] expected = {
+                "33:25: Orphaned properties [1, 2] in file: "
+                        + new File(getPath("misc/InputPropertyCatalog1.properties")).getCanonicalPath()
         };
         verify(checkConfig, getPath("misc/InputPropertyCatalog6.java"), expected);
     }
 
 
-
     @Test
     public void testOrphansIgnored()
-        throws Exception
+            throws Exception
     {
         final DefaultConfiguration checkConfig = createCheckConfig(PropertyCatalogCheck.class);
-        checkConfig.addAttribute("selection", "Catalog6\\$Orphaned2");
-        checkConfig.addAttribute("propertyFile", getPath("misc/InputPropertyCatalog1.properties"));
-        checkConfig.addAttribute("reportOrphans", "false");
+        Helpers.addConfigProperty(checkConfig, "selection", "Catalog6\\$Orphaned2");
+        Helpers.addConfigProperty(checkConfig, "propertyFile", getPath("misc/InputPropertyCatalog1.properties"));
+        Helpers.addConfigProperty(checkConfig, "reportOrphans", "false");
 
         verify(checkConfig, getPath("misc/InputPropertyCatalog6.java"), new String[0]);
     }
 
 
-
     @Test
     public void testMissing1()
-        throws Exception
+            throws Exception
     {
         final DefaultConfiguration checkConfig = createCheckConfig(PropertyCatalogCheck.class);
-        checkConfig.addAttribute("selection", "Catalog6$");
-        checkConfig.addAttribute("propertyFile", getPath("misc/InputPropertyCatalog1-missing1.properties"));
+        Helpers.addConfigProperty(checkConfig, "selection", "Catalog6$");
+        Helpers.addConfigProperty(checkConfig, "propertyFile",
+                getPath("misc/InputPropertyCatalog1-missing1.properties"));
 
         final String[] expected = {//
-            "8:16: Catalog entry 'KEY2' refers to missing property '1' in file: " + new File(
-                getPath("misc/InputPropertyCatalog1-missing1.properties")).getCanonicalPath(), //
+                "8:16: Catalog entry 'KEY2' refers to missing property '1' in file: " + new File(
+                        getPath("misc/InputPropertyCatalog1-missing1.properties")).getCanonicalPath(), //
         };
         verify(checkConfig, getPath("misc/InputPropertyCatalog6.java"), expected);
     }
-
 
 
     @Test
     public void testMissing2()
-        throws Exception
+            throws Exception
     {
         final DefaultConfiguration checkConfig = createCheckConfig(PropertyCatalogCheck.class);
-        checkConfig.addAttribute("selection", "Catalog6$");
-        checkConfig.addAttribute("propertyFile", getPath("misc/InputPropertyCatalog1-missing2.properties"));
+        Helpers.addConfigProperty(checkConfig, "selection", "Catalog6$");
+        Helpers.addConfigProperty(checkConfig, "propertyFile",
+                getPath("misc/InputPropertyCatalog1-missing2.properties"));
 
         final String expectedFilePath = new File(getPath("misc/InputPropertyCatalog1-missing2.properties"))
-            .getCanonicalPath();
+                .getCanonicalPath();
         final String[] expected = {//
-            "8:16: Catalog entry 'KEY2' refers to missing property '1' in file: " + expectedFilePath,
-            "29:16: Catalog entry 'KEY3' refers to missing property '2' in file: " + expectedFilePath, //
+                "8:16: Catalog entry 'KEY2' refers to missing property '1' in file: " + expectedFilePath,
+                "29:16: Catalog entry 'KEY3' refers to missing property '2' in file: " + expectedFilePath, //
         };
         verify(checkConfig, getPath("misc/InputPropertyCatalog6.java"), expected);
     }
 
 
-
     @Test
     public void testDuplicateProperty()
-        throws Exception
+            throws Exception
     {
         final DefaultConfiguration checkConfig = createCheckConfig(PropertyCatalogCheck.class);
-        checkConfig.addAttribute("selection", "Catalog7Dup$");
-        checkConfig.addAttribute("propertyFile", getPath("misc/InputPropertyCatalog1-missing1.properties"));
+        Helpers.addConfigProperty(checkConfig, "selection", "Catalog7Dup$");
+        Helpers.addConfigProperty(checkConfig, "propertyFile",
+                getPath("misc/InputPropertyCatalog1-missing1.properties"));
 
         final String[] expected = {"8:39: Catalog entry 'KEY3' refers to the same property as 'KEY2' on line 7"};
         verify(checkConfig, getPath("misc/InputPropertyCatalog7Dup.java"), expected);
     }
 
 
-
     @Test
     public void testDuplicatePropertySuppressed()
-        throws Exception
+            throws Exception
     {
         final DefaultConfiguration checkConfig = createCheckConfig(PropertyCatalogCheck.class);
-        checkConfig.addAttribute("selection", ".");
-        checkConfig.addAttribute("propertyFile", getPath("misc/InputPropertyCatalog1-missing1.properties"));
-        checkConfig.addAttribute("reportDuplicates", "false");
+        Helpers.addConfigProperty(checkConfig, "selection", ".");
+        Helpers.addConfigProperty(checkConfig, "propertyFile",
+                getPath("misc/InputPropertyCatalog1-missing1.properties"));
+        Helpers.addConfigProperty(checkConfig, "reportDuplicates", "false");
 
         verify(checkConfig, getPath("misc/InputPropertyCatalog7Dup.java"), new String[0]);
     }
 
 
-
     @Test
     public void testDuplicatePropertyDouble()
-        throws Exception
+            throws Exception
     {
         final DefaultConfiguration checkConfig = createCheckConfig(PropertyCatalogCheck.class);
-        checkConfig.addAttribute("selection", ".");
-        checkConfig.addAttribute("propertyFile", getPath("misc/InputPropertyCatalog1-missing2.properties"));
+        Helpers.addConfigProperty(checkConfig, "selection", ".");
+        Helpers.addConfigProperty(checkConfig, "propertyFile",
+                getPath("misc/InputPropertyCatalog1-missing2.properties"));
 
         final String[] expected = {//
-            "7:36: Catalog entry 'KEY2' refers to the same property as 'KEY1' on line 6",
-            "8:39: Catalog entry 'KEY3' refers to the same property as 'KEY1' on line 6",  //
+                "7:36: Catalog entry 'KEY2' refers to the same property as 'KEY1' on line 6",
+                "8:39: Catalog entry 'KEY3' refers to the same property as 'KEY1' on line 6",  //
         };
         verify(checkConfig, getPath("misc/InputPropertyCatalog8Dup.java"), expected);
     }
 
 
-
     @Test
     public void testExclusionOfFields()
-        throws Exception
+            throws Exception
     {
         final DefaultConfiguration checkConfig = createCheckConfig(PropertyCatalogCheck.class);
-        checkConfig.addAttribute("selection", ".");
-        checkConfig.addAttribute("propertyFile", getPath("misc/InputPropertyCatalog1.properties"));
-        checkConfig.addAttribute("excludedFields", "(?:LOG|^EXCLUDE_.*)");
+        Helpers.addConfigProperty(checkConfig, "selection", ".");
+        Helpers.addConfigProperty(checkConfig, "propertyFile", getPath("misc/InputPropertyCatalog1.properties"));
+        Helpers.addConfigProperty(checkConfig, "excludedFields", "(?:LOG|^EXCLUDE_.*)");
 
         verify(checkConfig, getPath("misc/InputPropertyCatalog9Excl.java"), new String[0]);
     }
 
 
-
     @Test
     public void testUnclearConstants()
-        throws Exception
+            throws Exception
     {
         final DefaultConfiguration checkConfig = createCheckConfig(PropertyCatalogCheck.class);
-        checkConfig.addAttribute("selection", ".");
-        checkConfig.addAttribute("propertyFile", getPath("misc/InputPropertyCatalog1-missing2.properties"));
+        Helpers.addConfigProperty(checkConfig, "selection", ".");
+        Helpers.addConfigProperty(checkConfig, "propertyFile",
+                getPath("misc/InputPropertyCatalog1-missing2.properties"));
 
-        final String[] expected =
-            {"8:29: Keys in a property catalog must be simple literals of type String, int, long, or boolean.",
+        final String[] expected = {
+                "8:29: Keys in a property catalog must be simple literals of type String, int, long, or boolean.",
                 "10:29: Keys in a property catalog must be simple literals of type String, int, long, or boolean.",
                 "12:32: Keys in a property catalog must be simple literals of type String, int, long, or boolean.",
-                "14:32: Keys in a property catalog must be simple literals of type String, int, long, or boolean."};
+                "14:32: Keys in a property catalog must be simple literals of type String, int, long, or boolean."
+        };
         verify(checkConfig, getPath("misc/InputPropertyCatalog10Unclear.java"), expected);
     }
 
 
-
     @Test
     public void testUnclearEnumParam()
-        throws Exception
+            throws Exception
     {
         final DefaultConfiguration checkConfig = createCheckConfig(PropertyCatalogCheck.class);
-        checkConfig.addAttribute("selection", ".");
-        checkConfig.addAttribute("enumArgument", "true");
-        checkConfig.addAttribute("propertyFile", getPath("misc/InputPropertyCatalog1-missing2.properties"));
+        Helpers.addConfigProperty(checkConfig, "selection", ".");
+        Helpers.addConfigProperty(checkConfig, "enumArgument", "true");
+        Helpers.addConfigProperty(checkConfig, "propertyFile",
+                getPath("misc/InputPropertyCatalog1-missing2.properties"));
 
-        final String[] expected =
-            {"8:5: Enum constant of the property catalog is not parameterized, or the first parameter of the "
-                + "enum constant's constructor is not a simple literal of type String, int, long, or boolean.",
-                "10:5: Enum constant of the property catalog is not parameterized, or the first parameter of the "
-                    + "enum constant's constructor is not a simple literal of type String, int, long, or boolean.",
-                "12:5: Enum constant of the property catalog is not parameterized, or the first parameter of the "
-                    + "enum constant's constructor is not a simple literal of type String, int, long, or boolean.",
-                "14:5: Enum constant of the property catalog is not parameterized, or the first parameter of the "
-                    + "enum constant's constructor is not a simple literal of type String, int, long, or boolean.",
-                "16:5: Enum constant of the property catalog is not parameterized, or the first parameter of the "
-                    + "enum constant's constructor is not a simple literal of type String, int, long, or boolean."};
+        final String[] expected = {
+                "8:5: Enum constant of the property catalog is not parameterized, or the first parameter of the "
+                        + "enum constant's constructor is not a simple literal of type String, int, long, or boolean.",
+                "10:5: Enum constant of the property catalog is not parameterized, or the first parameter of "
+                        + "the enum constant's constructor is not a simple literal of type String, int, long, or "
+                        + "boolean.",
+                "12:5: Enum constant of the property catalog is not parameterized, or the first parameter of "
+                        + "the enum constant's constructor is not a simple literal of type String, int, long, or "
+                        + "boolean.",
+                "14:5: Enum constant of the property catalog is not parameterized, or the first parameter of "
+                        + "the enum constant's constructor is not a simple literal of type String, int, long, or "
+                        + "boolean.",
+                "16:5: Enum constant of the property catalog is not parameterized, or the first parameter of "
+                        + "the enum constant's constructor is not a simple literal of type String, int, long, or "
+                        + "boolean."
+        };
         verify(checkConfig, getPath("misc/InputPropertyCatalog11Unclear.java"), expected);
     }
 
 
-
     @Test
     public void testCaseSensitivity()
-        throws Exception
+            throws Exception
     {
         final DefaultConfiguration checkConfig = createCheckConfig(PropertyCatalogCheck.class);
-        checkConfig.addAttribute("selection", ".");
-        checkConfig.addAttribute("propertyFile", getPath("misc/InputPropertyCatalog2.properties"));
-        checkConfig.addAttribute("caseSensitive", "true");
+        Helpers.addConfigProperty(checkConfig, "selection", ".");
+        Helpers.addConfigProperty(checkConfig, "propertyFile", getPath("misc/InputPropertyCatalog2.properties"));
+        Helpers.addConfigProperty(checkConfig, "caseSensitive", "true");
 
         final String expectedFilePath = new File(getPath("misc/InputPropertyCatalog2.properties")).getCanonicalPath();
         final String[] expected = {//
-            "4:20: Orphaned properties [one, two, zero] in file: " + expectedFilePath,
-            "6:39: Catalog entry 'KEY1' refers to missing property 'ZERO' in file: " + expectedFilePath,
-            "8:39: Catalog entry 'KEY2' refers to missing property 'oNe' in file: " + expectedFilePath,
-            "10:39: Catalog entry 'KEY3' refers to missing property 'Two' in file: " + expectedFilePath, //
+                "4:20: Orphaned properties [one, two, zero] in file: " + expectedFilePath,
+                "6:39: Catalog entry 'KEY1' refers to missing property 'ZERO' in file: " + expectedFilePath,
+                "8:39: Catalog entry 'KEY2' refers to missing property 'oNe' in file: " + expectedFilePath,
+                "10:39: Catalog entry 'KEY3' refers to missing property 'Two' in file: " + expectedFilePath, //
         };
         verify(checkConfig, getPath("misc/InputPropertyCatalog12Case.java"), expected);
 
         final DefaultConfiguration checkConfigNoCase = createCheckConfig(PropertyCatalogCheck.class);
-        checkConfigNoCase.addAttribute("selection", ".");
-        checkConfigNoCase.addAttribute("propertyFile", getPath("misc/InputPropertyCatalog2.properties"));
-        checkConfigNoCase.addAttribute("caseSensitive", "false");
+        Helpers.addConfigProperty(checkConfigNoCase, "selection", ".");
+        Helpers.addConfigProperty(checkConfigNoCase, "propertyFile", getPath("misc/InputPropertyCatalog2.properties"));
+        Helpers.addConfigProperty(checkConfigNoCase, "caseSensitive", "false");
         verify(checkConfigNoCase, getPath("misc/InputPropertyCatalog12Case.java"), new String[0]);
     }
 
 
-
     @Test
     public void testCaseSensitivity2()
-        throws Exception
+            throws Exception
     {
         final DefaultConfiguration checkConfig = createCheckConfig(PropertyCatalogCheck.class);
-        checkConfig.addAttribute("selection", ".");
-        checkConfig.addAttribute("propertyFile", getPath("misc/InputPropertyCatalog12.properties"));
-        checkConfig.addAttribute("caseSensitive", "true");
+        Helpers.addConfigProperty(checkConfig, "selection", ".");
+        Helpers.addConfigProperty(checkConfig, "propertyFile", getPath("misc/InputPropertyCatalog12.properties"));
+        Helpers.addConfigProperty(checkConfig, "caseSensitive", "true");
 
         final String expectedFilePath = new File(getPath("misc/InputPropertyCatalog12.properties")).getCanonicalPath();
         final String[] expected = {//
-            "6:20: Orphaned properties [Two, ZERO, oNe] in file: " + expectedFilePath,
-            "8:39: Catalog entry 'KEY1' refers to missing property 'zero' in file: " + expectedFilePath,
-            "9:39: Catalog entry 'KEY2' refers to missing property 'one' in file: " + expectedFilePath,
-            "11:39: Catalog entry 'KEY3' refers to missing property 'two' in file: " + expectedFilePath,  //
+                "6:20: Orphaned properties [Two, ZERO, oNe] in file: " + expectedFilePath,
+                "8:39: Catalog entry 'KEY1' refers to missing property 'zero' in file: " + expectedFilePath,
+                "9:39: Catalog entry 'KEY2' refers to missing property 'one' in file: " + expectedFilePath,
+                "11:39: Catalog entry 'KEY3' refers to missing property 'two' in file: " + expectedFilePath,  //
         };
         verify(checkConfig, getPath("misc/InputPropertyCatalog2.java"), expected);
 
         final DefaultConfiguration checkConfigNoCase = createCheckConfig(PropertyCatalogCheck.class);
-        checkConfigNoCase.addAttribute("selection", ".");
-        checkConfigNoCase.addAttribute("propertyFile", getPath("misc/InputPropertyCatalog12.properties"));
-        checkConfigNoCase.addAttribute("caseSensitive", "false");
+        Helpers.addConfigProperty(checkConfigNoCase, "selection", ".");
+        Helpers.addConfigProperty(checkConfigNoCase, "propertyFile", getPath("misc/InputPropertyCatalog12.properties"));
+        Helpers.addConfigProperty(checkConfigNoCase, "caseSensitive", "false");
         verify(checkConfigNoCase, getPath("misc/InputPropertyCatalog2.java"), new String[0]);
     }
 
 
-
     @Test
     public void testCaseSensitivity3Ok()
-        throws Exception
+            throws Exception
     {
         final DefaultConfiguration checkConfig = createCheckConfig(PropertyCatalogCheck.class);
-        checkConfig.addAttribute("selection", ".");
-        checkConfig.addAttribute("propertyFile", getPath("misc/InputPropertyCatalog13.properties"));
-        checkConfig.addAttribute("caseSensitive", "true");
+        Helpers.addConfigProperty(checkConfig, "selection", ".");
+        Helpers.addConfigProperty(checkConfig, "propertyFile", getPath("misc/InputPropertyCatalog13.properties"));
+        Helpers.addConfigProperty(checkConfig, "caseSensitive", "true");
 
         verify(checkConfig, getPath("misc/InputPropertyCatalog13Case.java"), new String[0]);
     }
 
 
-
     @Test
     public void testCaseSensitivity3Duplicate()
-        throws Exception
+            throws Exception
     {
         final DefaultConfiguration checkConfig = createCheckConfig(PropertyCatalogCheck.class);
-        checkConfig.addAttribute("selection", ".");
-        checkConfig.addAttribute("propertyFile", getPath("misc/InputPropertyCatalog13.properties"));
-        checkConfig.addAttribute("caseSensitive", "false");
+        Helpers.addConfigProperty(checkConfig, "selection", ".");
+        Helpers.addConfigProperty(checkConfig, "propertyFile", getPath("misc/InputPropertyCatalog13.properties"));
+        Helpers.addConfigProperty(checkConfig, "caseSensitive", "false");
 
         String[] expected = {"8:39: Catalog entry 'KEY2' refers to the same property as 'KEY1' on line 6"};
         verify(checkConfig, getPath("misc/InputPropertyCatalog13Case.java"), expected);
     }
 
 
-
     @Test
     public void testMissing14Missing()
-        throws Exception
+            throws Exception
     {
         final DefaultConfiguration checkConfig = createCheckConfig(PropertyCatalogCheck.class);
-        checkConfig.addAttribute("selection", ".");
-        checkConfig.addAttribute("propertyFile", getPath("misc/InputPropertyCatalog14-missing.properties"));
+        Helpers.addConfigProperty(checkConfig, "selection", ".");
+        Helpers.addConfigProperty(checkConfig, "propertyFile",
+                getPath("misc/InputPropertyCatalog14-missing.properties"));
 
         final String expectedFilePath = new File(getPath("misc/InputPropertyCatalog14-missing.properties"))
-            .getCanonicalPath();
+                .getCanonicalPath();
         final String[] expected = {"6:11: Property 'one' not found in file: " + expectedFilePath};
         verify(checkConfig, getPath("misc/InputPropertyCatalog14Missing.java"), expected);
     }
 
 
-
     @Test
     public void testMissing15EncodingUtf8()
-        throws Exception
+            throws Exception
     {
         final DefaultConfiguration checkConfig = createCheckConfig(PropertyCatalogCheck.class);
-        checkConfig.addAttribute("selection", ".");
-        checkConfig.addAttribute("propertyFile", getPath("misc/InputPropertyCatalog15-UTF8.properties"));
+        Helpers.addConfigProperty(checkConfig, "selection", ".");
+        Helpers.addConfigProperty(checkConfig, "propertyFile", getPath("misc/InputPropertyCatalog15-UTF8.properties"));
         verify(checkConfig, getPath("misc/InputPropertyCatalog15Encoding.java"), new String[0]);
     }
-
 
 
     @Test
     public void testMissing15EncodingIso8859()
-        throws Exception
+            throws Exception
     {
         final DefaultConfiguration checkConfig = createCheckConfig(PropertyCatalogCheck.class);
-        checkConfig.addAttribute("selection", ".");
-        checkConfig.addAttribute("propertyFile", getPath("misc/InputPropertyCatalog15-iso8859.properties"));
-        checkConfig.addAttribute("propertyFileEncoding", "ISO-8859-1");
+        Helpers.addConfigProperty(checkConfig, "selection", ".");
+        Helpers.addConfigProperty(checkConfig, "propertyFile",
+                getPath("misc/InputPropertyCatalog15-iso8859.properties"));
+        Helpers.addConfigProperty(checkConfig, "propertyFileEncoding", "ISO-8859-1");
         verify(checkConfig, getPath("misc/InputPropertyCatalog15Encoding.java"), new String[0]);
     }
-
 
 
     /**
@@ -596,15 +579,14 @@ public class PropertyCatalogTest
      */
     @Test
     public void testMissing16EnumConstantsMixed()
-        throws Exception
+            throws Exception
     {
         final DefaultConfiguration checkConfig = createCheckConfig(PropertyCatalogCheck.class);
-        checkConfig.addAttribute("selection", ".");
-        checkConfig.addAttribute("propertyFile", getPath("misc/InputPropertyCatalog3.properties"));
+        Helpers.addConfigProperty(checkConfig, "selection", ".");
+        Helpers.addConfigProperty(checkConfig, "propertyFile", getPath("misc/InputPropertyCatalog3.properties"));
 
         verify(checkConfig, getPath("misc/InputPropertyCatalog16EnumConstantsMixed.java"), new String[0]);
     }
-
 
 
     /**
@@ -614,49 +596,49 @@ public class PropertyCatalogTest
      */
     @Test
     public void testMissing17DefaultPackage()
-        throws Exception
+            throws Exception
     {
         final DefaultConfiguration checkConfig = createCheckConfig(PropertyCatalogCheck.class);
-        checkConfig.addAttribute("selection", ".");
-        checkConfig.addAttribute("propertyFile", getPath("misc/InputPropertyCatalog1.properties"));
+        Helpers.addConfigProperty(checkConfig, "selection", ".");
+        Helpers.addConfigProperty(checkConfig, "propertyFile", getPath("misc/InputPropertyCatalog1.properties"));
 
         verify(checkConfig, getPath("misc/InputPropertyCatalog17DefaultPackage.java"), new String[0]);
     }
 
 
-
     @Test
     public void testMultipleSourceSets()
-        throws Exception
+            throws Exception
     {
         final DefaultConfiguration checkConfig = createCheckConfig(PropertyCatalogCheck.class);
         final File baseDir = Util.canonize(
-            new File(new File(getPath("misc/InputPropertyCatalog1.properties")).getParentFile(), "PropertyCatalog"));
-        checkConfig.addAttribute("baseDir", baseDir.getAbsolutePath());
-        checkConfig.addAttribute("selection", "Messages$");
-        checkConfig.addAttribute("propertyFile", "{12}/../resources/{1}.properties");
+                new File(new File(getPath("misc/InputPropertyCatalog1.properties")).getParentFile(),
+                        "PropertyCatalog"));
+        Helpers.addConfigProperty(checkConfig, "baseDir", baseDir.getAbsolutePath());
+        Helpers.addConfigProperty(checkConfig, "selection", "Messages$");
+        Helpers.addConfigProperty(checkConfig, "propertyFile", "{12}/../resources/{1}.properties");
 
         final File[] filesToCheck = new File[]{//
-            new File(getPath("misc/PropertyCatalog/subsys/module/src/it/java/com/foo/FooMessages.java")),  //
-            new File(getPath("misc/PropertyCatalog/subsys/module/src/main/java/com/foo/BarMessages.java")) //
+                new File(getPath("misc/PropertyCatalog/subsys/module/src/it/java/com/foo/FooMessages.java")),  //
+                new File(getPath("misc/PropertyCatalog/subsys/module/src/main/java/com/foo/BarMessages.java")) //
         };
         verify(createChecker(checkConfig), filesToCheck, "doesNotMatter", new String[0]);
     }
 
 
-
     @Test
     public void testFileExclusion()
-        throws Exception
+            throws Exception
     {
         final DefaultConfiguration checkConfig = createCheckConfig(PropertyCatalogCheck.class);
-        checkConfig.addAttribute("selection", ".");
-        checkConfig.addAttribute("fileExludes", "InputPropertyCatalog14Missing");
-        checkConfig.addAttribute("propertyFile", getPath("misc/InputPropertyCatalog14-missing.properties"));
+        Helpers.addConfigProperty(checkConfig, "selection", ".");
+        Helpers.addConfigProperty(checkConfig, "fileExludes", "InputPropertyCatalog14Missing");
+        Helpers.addConfigProperty(checkConfig, "propertyFile",
+                getPath("misc/InputPropertyCatalog14-missing.properties"));
 
         final File[] filesToCheck = new File[]{//
-            new File(getPath("misc/InputPropertyCatalog14.java")), //
-            new File(getPath("misc/InputPropertyCatalog14Missing.java")),   // has the error, but suppressed
+                new File(getPath("misc/InputPropertyCatalog14.java")), //
+                new File(getPath("misc/InputPropertyCatalog14Missing.java")),   // has the error, but suppressed
         };
         verify(createChecker(checkConfig), filesToCheck, "doesNotMatter", new String[0]);
     }

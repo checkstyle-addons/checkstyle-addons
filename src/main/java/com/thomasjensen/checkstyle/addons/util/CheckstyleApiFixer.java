@@ -16,6 +16,7 @@ package com.thomasjensen.checkstyle.addons.util;
  */
 
 import java.io.File;
+import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.util.Arrays;
@@ -77,6 +78,7 @@ public class CheckstyleApiFixer
      * @throws UnsupportedOperationException no known variant of <code>FileContents.getFileName()</code> could be found
      */
     @CheckForNull
+    @SuppressWarnings({"JavaReflectionMemberAccess", "deprecation"})
     public File getCurrentFileName()
     {
         if (currentFileNameMockFile != null) {
@@ -100,13 +102,11 @@ public class CheckstyleApiFixer
         }
 
         String filename = null;
-        if (getFilename != null) {
-            try {
-                filename = (String) getFilename.invoke(fileContents);
-            }
-            catch (IllegalAccessException | InvocationTargetException e) {
-                throw new UnsupportedOperationException("FileContents.getFilename()", e);
-            }
+        try {
+            filename = (String) getFilename.invoke(fileContents);
+        }
+        catch (IllegalAccessException | InvocationTargetException e) {
+            throw new UnsupportedOperationException("FileContents.getFilename()", e);
         }
 
         File result = filename != null ? new File(filename) : null;
@@ -153,5 +153,40 @@ public class CheckstyleApiFixer
             throw new UnsupportedOperationException(getTokenName.getDeclaringClass().getName() + ".getTokenName()", e);
         }
         return result;
+    }
+
+
+
+    /**
+     * Determine if the given token is the root token of Checkstyle's AST. This means it's either an <code>EOF</code>
+     * token or a <code>COMPILATION_UNIT</code> token. This must be performed reflectively, because in Checkstyle 9.0,
+     * the <code>EOF</code> token was replaced with <code>COMPILATION_UNIT</code>.
+     * @param pToken the token to check
+     * @return flag indicating root token
+     * @throws IllegalStateException TokenTypes class has neither an <code>EOF</code> nor a
+     *      <code>COMPILATION_UNIT</code> field
+     */
+    @SuppressWarnings("JavaReflectionMemberAccess")
+    public boolean isRootToken(final int pToken)
+    {
+        try {
+            Field field = TokenTypes.class.getField("COMPILATION_UNIT");
+            return ((Integer) field.get(null)).intValue() == pToken;
+        }
+        catch (NoSuchFieldException e) {
+            try {
+                Field field = TokenTypes.class.getField("EOF");
+                return ((Integer) field.get(null)).intValue() == pToken;
+            }
+            catch (NoSuchFieldException ex) {
+                throw new IllegalStateException("TokenTypes class has no EOF or COMPILATION_UNIT field", ex);
+            }
+            catch (IllegalAccessException ex) {
+                throw new IllegalStateException(e);
+            }
+        }
+        catch (IllegalAccessException e) {
+            throw new IllegalStateException(e);
+        }
     }
 }

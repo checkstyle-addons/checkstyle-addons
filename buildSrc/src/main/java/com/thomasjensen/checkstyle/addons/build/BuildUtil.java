@@ -224,7 +224,7 @@ public final class BuildUtil
      */
     public String currentGitCommitHash()
     {
-        try (Grgit gitRepo = Grgit.open()) {
+        try (Grgit gitRepo = Grgit.open(project.getRootProject().getProjectDir())) {
             return gitRepo.head().getId();
         }
     }
