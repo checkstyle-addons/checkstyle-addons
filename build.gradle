@@ -23,7 +23,7 @@ plugins {
     id 'java-library'
     id 'jacoco'
     id 'checkstyle'
-    id 'com.github.spotbugs'
+//    id 'com.github.spotbugs'
     id 'idea'
     id 'maven-publish'
     id 'com.jfrog.bintray' version '1.8.4'
@@ -101,7 +101,7 @@ dependencies {
     testImplementation group: 'junit', name: 'junit', version: '4.13.2'
     testImplementation group: 'org.mockito', name: 'mockito-core', version: '2.27.0'
 
-    spotbugsPlugins group: 'com.mebigfatguy.sb-contrib', name: 'sb-contrib', version: '7.4.6'
+    /* spotbugsPlugins group: 'com.mebigfatguy.sb-contrib', name: 'sb-contrib', version: '7.4.6' */
 }
 
 ext {
@@ -161,16 +161,20 @@ tasks.withType(JavaCompile) {
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 //   FindBugs configuration
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-
+/*
 spotbugs {
-    toolVersion = '3.1.12'
+    toolVersion = '4.5.3'
+//    reports {
+//        xml.enabled = false
+//        html.enabled = true
+//    }
     effort = 'max'
     reportLevel = 'low'
     ignoreFailures = false
     includeFilter = file('project/findbugs.xml')
     excludeFilter = file('project/findbugs-excludes.xml')
 }
-
+*/
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 //   IntelliJ IDEA

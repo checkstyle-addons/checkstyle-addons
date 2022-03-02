@@ -6,7 +6,7 @@ jobs:
     build:
         runs-on: ubuntu-latest
         container:
-            image: gradle:5.6.4-jdk11
+            image: gradle:7.4.1-jdk11
             env:
                 DEBIAN_FRONTEND: noninteractive
                 checkstyleaddons_jdk7_java: /usr/lib/jvm/zulu7/bin/java

@@ -39,7 +39,7 @@ dependencies {
     implementation group: 'org.ajoberstar', name: 'grgit', version: '1.7.2'
     implementation group: 'gradle.plugin.com.github.spotbugs', name: 'spotbugs-gradle-plugin', version: '1.6.9'
     implementation group: 'jakarta.xml.bind', name: 'jakarta.xml.bind-api', version: '3.0.1'
-    runtime group: 'com.sun.xml.bind', name: 'jaxb-impl', version: '3.0.2'
+    runtimeClasspath group: 'com.sun.xml.bind', name: 'jaxb-impl', version: '3.0.2'
 
     testImplementation group: 'junit', name: 'junit', version: '4.13.2'
 }
