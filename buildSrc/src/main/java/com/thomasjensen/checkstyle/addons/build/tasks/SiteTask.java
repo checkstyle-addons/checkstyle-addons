@@ -30,20 +30,19 @@ import java.util.SortedMap;
 import java.util.SortedSet;
 import java.util.TreeMap;
 import java.util.TreeSet;
-import javax.annotation.Nonnull;
 
-import groovy.lang.Closure;
 import org.gradle.api.DefaultTask;
 import org.gradle.api.GradleException;
 import org.gradle.api.Project;
 import org.gradle.api.file.FileTree;
+import org.gradle.api.provider.Provider;
+import org.gradle.api.tasks.InputFiles;
+import org.gradle.api.tasks.OutputDirectory;
 import org.gradle.api.tasks.SourceSet;
-import org.gradle.api.tasks.SourceSetContainer;
+import org.gradle.api.tasks.TaskAction;
 import org.gradle.api.tasks.TaskContainer;
-import org.gradle.api.tasks.util.PatternFilterable;
 
 import com.thomasjensen.checkstyle.addons.build.BuildUtil;
-import com.thomasjensen.checkstyle.addons.build.ExtProp;
 
 
 /**
@@ -55,87 +54,74 @@ public class SiteTask
 {
     public static final String SITE_GROUP = "site";
 
-    private final BuildUtil buildUtil;
+    private Provider<FileTree> markdownFiles;
+
+    private Provider<File> siteDir;
 
 
 
-    /**
-     * Constructor.
-     */
-    public SiteTask()
+    public void configureTask()
     {
-        super();
         final Project project = getProject();
-        buildUtil = new BuildUtil(project);
+        final BuildUtil buildUtil = new BuildUtil(project);
         setDescription("Package documentation for publication on the website");
         setGroup(SITE_GROUP);
 
         final TaskContainer tasks = project.getTasks();
-        for (final String predecTaskName : new String[]{//
-            "processResources", "siteCopyAllChecks", "siteCopyJavadoc", "siteCopyDownloadGuide"}) {
-            dependsOn(tasks.getByName(predecTaskName));
+        for (final String predecTaskName : new String[]{
+            "processResources", "siteCopyAllChecks", "siteCopyJavadoc", "siteCopyDownloadGuide"})//
+        {
+            dependsOn(tasks.named(predecTaskName));
         }
 
-        // Task Inputs: The markdown description files of our checks
-        final SourceSetContainer sourceSets = (SourceSetContainer) project.getProperties().get("sourceSets");
-        final SourceSet mainSourceSet = sourceSets.getByName(SourceSet.MAIN_SOURCE_SET_NAME);
-        final FileTree tree = project.fileTree(mainSourceSet.getResources().getSrcDirs().iterator().next(),
-            new Closure<Void>(this)
-            {
-                @Override
-                public Void call(final Object... pArgs)
-                {
-                    PatternFilterable ft = (PatternFilterable) getDelegate();
-                    ft.include("**/*.md");
-                    return null;
-                }
-            });
-        getInputs().files(tree.getFiles());
-
-        // Task Outputs: the contents of the 'site' directory
-        final File siteDir = new File(project.getBuildDir(), "site");
-        getOutputs().dir(siteDir);
-
-        // perform the collection of files in execution phase
-        doLast(new Closure<Void>(this)
-        {
-            @Override
-            public Void call()
-            {
-                try {
-                    collect(tree, siteDir);
-                }
-                catch (IOException e) {
-                    throw new GradleException("error executing 'site' task", e);
-                }
-                return null;
-            }
+        markdownFiles = project.provider(() -> {
+            SourceSet mainSourceSet = buildUtil.getSourceSet(SourceSet.MAIN_SOURCE_SET_NAME);
+            return project.fileTree(
+                mainSourceSet.getResources().getSrcDirs().iterator().next(), ft -> ft.include("**/*.md"));
         });
+
+        siteDir = project.provider(() -> new File(project.getBuildDir(), "site"));
+    }
+
+
+
+    @TaskAction
+    public void runCollect()
+    {
+        try {
+            collect();
+        }
+        catch (IOException e) {
+            throw new GradleException("failed to run task '" + getName() + "'", e);
+        }
     }
 
 
 
     @SuppressWarnings("ResultOfMethodCallIgnored")
-    private void collect(@Nonnull final FileTree pMdFiles, @Nonnull final File pSiteDir)
+    private void collect()
         throws IOException
     {
         final Project project = getProject();
-        File includesVersionDir = new File(pSiteDir, "_includes/v" + project.getVersion());
+        final BuildUtil buildUtil = new BuildUtil(project);
+        final FileTree mdFiles = getMarkdownFiles().get();
+        final File siteDir = getSiteDir().get();
+        File includesVersionDir = new File(siteDir, "_includes/v" + project.getVersion());
         includesVersionDir.mkdirs();
 
-        File versionChecksDir = new File(pSiteDir, "v" + project.getVersion() + "/checks");
+        File versionChecksDir = new File(siteDir, "v" + project.getVersion() + "/checks");
         versionChecksDir.mkdirs();
-        File latestChecksDir = new File(pSiteDir, "latest/checks");
+        File latestChecksDir = new File(siteDir, "latest/checks");
         latestChecksDir.mkdirs();
 
         SortedMap<String, List<File>> rawDocs = new TreeMap<>(String.CASE_INSENSITIVE_ORDER);
-        for (final File f : pMdFiles.getFiles()) {
+        for (final File f : mdFiles.getFiles()) {
             String cat = f.getAbsoluteFile().getParentFile().getName();
             List<File> catDocs = rawDocs.computeIfAbsent(cat, k -> new ArrayList<>());
             catDocs.add(f.getAbsoluteFile());
         }
 
-        final DateFormat sdf = new SimpleDateFormat("YYYY-MM-dd HH:mm:ss ZZZZ");
+        final DateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss ZZZZ");
         for (Map.Entry<String, List<File>> cat : rawDocs.entrySet()) {
             File mdDir = new File(includesVersionDir, cat.getKey());
             mdDir.mkdir();
@@ -153,7 +139,7 @@ public class SiteTask
 
             // current version
             sb.append("check_version: v");
-            sb.append(project.getVersion().toString());
+            sb.append(project.getVersion());
             sb.append("\n");
 
             // current check category
@@ -179,7 +165,7 @@ public class SiteTask
 
             // timestamp of this file's generation, for sitemap.xml
             sb.append("last_modified_at: ");
-            sb.append(sdf.format(buildUtil.getExtraPropertyValue(ExtProp.BuildTimestamp)));
+            sb.append(sdf.format(buildUtil.getBuildConfig().getBuildTimestamp()));
             sb.append("\n");
             sb.append("---\n\n");
 
@@ -189,5 +175,21 @@ public class SiteTask
             Files.copy(catPage.toPath(), new File(latestChecksDir, catPage.getName()).toPath(),
                 StandardCopyOption.REPLACE_EXISTING, StandardCopyOption.COPY_ATTRIBUTES);
         }
+    }
+
+
+
+    @InputFiles
+    public Provider<FileTree> getMarkdownFiles()
+    {
+        return markdownFiles;
+    }
+
+
+
+    @OutputDirectory
+    public Provider<File> getSiteDir()
+    {
+        return siteDir;
     }
 }

@@ -25,6 +25,7 @@ import org.gradle.api.Task;
 import org.gradle.api.file.FileCollection;
 import org.gradle.api.plugins.BasePlugin;
 import org.gradle.api.tasks.SourceSet;
+import org.gradle.api.tasks.TaskProvider;
 import org.gradle.api.tasks.compile.CompileOptions;
 import org.gradle.api.tasks.compile.JavaCompile;
 
@@ -36,21 +37,18 @@ import com.thomasjensen.checkstyle.addons.build.TaskNames;
 
 
 /**
- * Compile the sources with the settings specified in the given dependency configuration.
+ * Configure a compilation task to compile the sources with settings from the given dependency configuration.
  */
-public class CompileTask
-    extends JavaCompile
+public class CompileTaskConfigurer
 {
-    private final BuildUtil buildUtil;
+    private final JavaCompile compileTask;
 
 
 
-    public CompileTask()
+    public CompileTaskConfigurer(final JavaCompile pCompileTask)
     {
         super();
-        final Project project = getProject();
-        buildUtil = new BuildUtil(project);
-        setGroup(BasePlugin.BUILD_GROUP);
+        compileTask = pCompileTask;
     }
 
 
@@ -58,22 +56,26 @@ public class CompileTask
     public void configureFor(@Nonnull final DependencyConfig pDepConfig, @Nonnull final SourceSet pSourceSetToCompile,
         final boolean pIsTest)
     {
-        final Project project = getProject();
+        if (compileTask.getLogger().isInfoEnabled()) {
+            compileTask.getLogger().info("Configuring task '" + compileTask.getPath() + "' for depConfig '"
+                + pDepConfig.getName() + "' and sourceSet '" + pSourceSetToCompile.getName() + "' (isTest = "
+                + pIsTest + ")");
+        }
+        final Project project = compileTask.getProject();
+        final BuildUtil buildUtil = new BuildUtil(project);
         final JavaVersion javaLevel = pDepConfig.getJavaLevel();
-        setDescription(
-            "Compile sources from '" + pSourceSetToCompile.getName() + "' source set using dependency configuration '"
-                + pDepConfig.getName() + "' (Java level: " + javaLevel + ")");
+
+        compileTask.setGroup(BasePlugin.BUILD_GROUP);
+        compileTask.setDescription("Compile sources from '" + pSourceSetToCompile.getName()
+            + "' source set using dependency configuration '" + pDepConfig.getName() + "' (Java level: " + javaLevel
+            + ")");
 
         // Additional Task Input: the dependency configuration file
-        getInputs().file(pDepConfig.getConfigFile());
+        compileTask.getInputs().file(pDepConfig.getConfigFile());
 
-        final CompileOptions options = getOptions();
+        final CompileOptions options = compileTask.getOptions();
         options.setEncoding(StandardCharsets.UTF_8.toString());
-        options.setDeprecation(true);
-
-        // The warning "Supported source version 'RELEASE_6' from annotation processor 'org.antlr.v4.runtime.misc.
-        // NullUsageProcessor' less than -source '1.7'" is okay and may be ignored. It goes away when Checkstyle
-        // updates to ANTLR 4.5: https://github.com/antlr/antlr4/issues/487 (which they did in version 6.5)
+        options.setDeprecation(true);  // show deprecation warnings in compiler output
 
         final JavaLevelUtil javaLevelUtil = new JavaLevelUtil(project);
         if (javaLevelUtil.isOlderSupportedJava(javaLevel)) {
@@ -82,12 +84,11 @@ public class CompileTask
         }
 
         final File destDir = calculateDestDirFromSourceSet(pSourceSetToCompile, pDepConfig.getName());
+        compileTask.setSource(pSourceSetToCompile.getJava());
+        compileTask.getDestinationDirectory().set(destDir);
+        compileTask.setSourceCompatibility(javaLevel.toString());
+        compileTask.setTargetCompatibility(javaLevel.toString());
 
-        setSource(pSourceSetToCompile.getJava());
-        setDestinationDir(destDir);
-        setSourceCompatibility(javaLevel.toString());
-        setTargetCompatibility(javaLevel.toString());
-        //setDependencyCacheDir(new File(project.getBuildDir(), "dependency-cache"));
         FileCollection cp = null;
         if (pIsTest) {
             cp = new ClasspathBuilder(project).buildClassPath(pDepConfig, null, false, pSourceSetToCompile,
@@ -97,12 +98,14 @@ public class CompileTask
         else {
             cp = new ClasspathBuilder(project).buildClassPath(pDepConfig, null, false, pSourceSetToCompile);
         }
-        setClasspath(cp);
+        compileTask.setClasspath(cp);
 
         if (pIsTest) {
-            Task mainClassesTask = buildUtil.getTask(TaskNames.mainClasses, pDepConfig);
-            Task sqClassesTask = buildUtil.getTask(TaskNames.sonarqubeClasses, pDepConfig);
-            dependsOn(mainClassesTask, sqClassesTask);
+            TaskProvider<Task> mainClasses =
+                buildUtil.getTaskProvider(TaskNames.mainClasses, Task.class, pDepConfig);
+            TaskProvider<Task> sonarqubeClasses =
+                buildUtil.getTaskProvider(TaskNames.sonarqubeClasses, Task.class, pDepConfig);
+            compileTask.dependsOn(mainClasses, sonarqubeClasses);
         }
     }
 
@@ -115,8 +118,8 @@ public class CompileTask
         final FileCollection sourceSetClassesDirs = pSourceSetToCompile.getOutput().getClassesDirs();
         final File firstSourceSetClassesDir = sourceSetClassesDirs.iterator().next();  // normally the one for 'java'
         final File result = new File(firstSourceSetClassesDir.getParent(),
-            firstSourceSetClassesDir.getName() + Character.toUpperCase(pDepConfigName.charAt(0)) + pDepConfigName
-                .substring(1));
+            firstSourceSetClassesDir.getName() + Character.toUpperCase(pDepConfigName.charAt(0))
+                + pDepConfigName.substring(1));
         return result;
     }
 }

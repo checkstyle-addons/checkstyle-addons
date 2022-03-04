@@ -35,11 +35,10 @@ import javax.annotation.Nonnull;
 import org.gradle.api.GradleException;
 import org.gradle.api.JavaVersion;
 import org.gradle.api.Project;
-import org.gradle.api.artifacts.Configuration;
-import org.gradle.api.artifacts.Dependency;
+import org.gradle.api.artifacts.VersionCatalog;
+import org.gradle.api.artifacts.VersionCatalogsExtension;
+import org.gradle.api.artifacts.VersionConstraint;
 import org.gradle.api.file.FileCollection;
-import org.gradle.api.logging.Logger;
-import org.gradle.api.plugins.JavaPlugin;
 
 
 /**
@@ -48,7 +47,7 @@ import org.gradle.api.plugins.JavaPlugin;
 public class DependencyConfigs
 {
     /** name of the default dependency configuration */
-    public static final String DEFAULT_NAME = "default";
+    public static final String DEFAULT_DEPCONFIG_NAME = "default";
 
     private final Project project;
 
@@ -68,22 +67,13 @@ public class DependencyConfigs
     {
         project = pProject;
         buildUtil = new BuildUtil(pProject);
-        depConfigDir = new File(pProject.getProjectDir(), "project/dependencyConfigs");
+        depConfigDir = new File(pProject.getProjectDir(), "config/dependencyConfigs");
         final FileCollection listOfDepConfigFiles = readListOfDepConfigs(depConfigDir);
         depConfigs = readAllDependencyVersions(listOfDepConfigFiles);
 
-        if (getDefault() == null || !DEFAULT_NAME.equals(getDefault().getName()) || !getDefault().isDefaultConfig()) {
+        if (getDefault() == null || !DEFAULT_DEPCONFIG_NAME.equals(getDefault().getName())
+            || !getDefault().isDefaultConfig()) {
             throw new GradleException("corrupt default dependency configuration");
-        }
-
-        final Logger log = pProject.getLogger();
-        log.lifecycle("Default Checkstyle version: " + getDefault().getCheckstyleBaseVersion());
-        log.lifecycle("Active dependency configurations:");
-        for (Map.Entry<String, DependencyConfig> entry : depConfigs.entrySet()) {
-            DependencyConfig depConfig = entry.getValue();
-            log.lifecycle("  - " + entry.getKey() + ": Checkstyle " + depConfig.getCheckstyleBaseVersion() //
-                + ", Java " + depConfig.getJavaLevel() //
-                + ", compatible: " + depConfig.getCompatibleCheckstyleVersions());
         }
     }
 
@@ -91,7 +81,7 @@ public class DependencyConfigs
 
     private FileCollection readListOfDepConfigs(@Nonnull final File pDepConfigDir)
     {
-        File[] listOfFiles = pDepConfigDir.listFiles(new PropertyFileFilter());
+        File[] listOfFiles = pDepConfigDir.listFiles((dir, name) -> name.endsWith(".properties"));
         if (listOfFiles == null) {
             throw new GradleException("no dependency configurations found in dir: " + pDepConfigDir);
         }
@@ -102,22 +92,7 @@ public class DependencyConfigs
 
     private DependencyConfig loadDependencyConfig(final File pDepConfigFile)
     {
-        final Properties props = new Properties();
-
-        FileInputStream fis = null;
-        BufferedInputStream bis = null;
-        try {
-            fis = new FileInputStream(pDepConfigFile);
-            bis = new BufferedInputStream(fis);
-            props.load(bis);
-        }
-        catch (IOException e) {
-            throw new GradleException("Error reading dependency configuration: " + pDepConfigFile.getAbsolutePath(), e);
-        }
-        finally {
-            buildUtil.closeQuietly(bis);
-            buildUtil.closeQuietly(fis);
-        }
+        final Properties props = loadProperties(pDepConfigFile);
 
         final Set<String> compatibles = new HashSet<>();
         if (props.getProperty("CompatibleWithCheckstyle") != null) {
@@ -128,14 +103,37 @@ public class DependencyConfigs
             javadocLinks.addAll(Arrays.asList(props.getProperty("JavadocLinks").split("\\s*,\\s*")));
         }
         final String name = getNameFromFile(pDepConfigFile);
-        final Map<String, String> artifactVersions = getArtifactVersions(props, DEFAULT_NAME.equals(name));
+        final Map<String, String> artifactVersions = getArtifactVersions(props, DEFAULT_DEPCONFIG_NAME.equals(name));
 
         DependencyConfig result = new DependencyConfig(name, compatibles,
             JavaVersion.toVersion(props.getProperty("JavaLevel")), javadocLinks,
             Boolean.parseBoolean(props.getProperty("SonarQubeSupport")),
             props.getProperty("SonarQubeMinPlatformVersion"), props.getProperty("SonarQubeMinCheckstylePlugin"),
-            artifactVersions, DEFAULT_NAME.equals(name), pDepConfigFile);
+            artifactVersions, DEFAULT_DEPCONFIG_NAME.equals(name), pDepConfigFile);
         return result;
+    }
+
+
+
+    private Properties loadProperties(final File pPropertyFile)
+    {
+        final Properties result = new Properties();
+
+        FileInputStream fis = null;
+        BufferedInputStream bis = null;
+        try {
+            fis = new FileInputStream(pPropertyFile);
+            bis = new BufferedInputStream(fis);
+            result.load(bis);
+            return result;
+        }
+        catch (IOException e) {
+            throw new GradleException("Error reading dependency configuration: " + pPropertyFile.getAbsolutePath(), e);
+        }
+        finally {
+            buildUtil.closeQuietly(bis);
+            buildUtil.closeQuietly(fis);
+        }
     }
 
 
@@ -165,19 +163,10 @@ public class DependencyConfigs
 
     private String getDefaultCheckstyleVersion()
     {
-        String result = null;
-        final Configuration apiConfig = project.getConfigurations().getByName(JavaPlugin.API_CONFIGURATION_NAME);
-        for (final Dependency dependency : apiConfig.getAllDependencies()) {
-            if (DependencyConfig.CHECKSTYLE_GROUPID.equals(dependency.getGroup()) && "checkstyle".equals(
-                dependency.getName())) {
-                result = dependency.getVersion();
-                break;
-            }
-        }
-        if (result == null) {
-            throw new GradleException("Checkstyle dependency not found in build script");
-        }
-        return result;
+        VersionCatalogsExtension catalogs = project.getExtensions().getByType(VersionCatalogsExtension.class);
+        VersionCatalog deps = catalogs.named("checkstyleAddonsLibs");
+        VersionConstraint vc = deps.findVersion("checkstyleBase").get();
+        return vc.toString();
     }
 
 
@@ -190,7 +179,7 @@ public class DependencyConfigs
         if (dotPos > 0) {
             result = pDepConfigFile.getName().substring(0, dotPos);
         }
-        if (result == null || result.length() == 0 || "java".equalsIgnoreCase(result)) {
+        if (result == null || "java".equalsIgnoreCase(result)) {
             throw new GradleException("Invalid dependency configuration file name: " + pDepConfigFile.getName());
         }
         return result;
@@ -207,7 +196,9 @@ public class DependencyConfigs
             final DependencyConfig depConfig = loadDependencyConfig(depCfgFile);
 
             final JavaVersion myJavaLevel = depConfig.getJavaLevel();
-            if (myJavaLevel.isJava7() && !javaLevelUtil.java7Configured()) {
+            if ((myJavaLevel.isJava7() && !javaLevelUtil.java7Configured())
+                || (myJavaLevel.isJava8() && !javaLevelUtil.java8Configured())) //
+            {
                 project.getLogger().warn(
                     "WARNING: Skipping dependency configuration file '" + depConfig.getConfigFile().getName()
                         + "' because of missing JDK" + myJavaLevel.getMajorVersion() + " compiler configuration.");
@@ -221,21 +212,6 @@ public class DependencyConfigs
 
 
 
-    /**
-     * Prints all dependency configurations with full contents for debugging purposes.
-     */
-    @SuppressWarnings("unused")
-    public void printAll()
-    {
-        project.getLogger().lifecycle("Full contents of dependency configurations:");
-        project.getLogger().lifecycle("-------------------------------------------");
-        for (final Map.Entry<String, DependencyConfig> entry : depConfigs.entrySet()) {
-            project.getLogger().lifecycle("- " + entry.getKey() + ":\t" + entry.getValue());
-        }
-    }
-
-
-
     @Nonnull
     public SortedMap<String, DependencyConfig> getAll()
     {
@@ -245,24 +221,8 @@ public class DependencyConfigs
 
 
     @Nonnull
-    public Map<String, DependencyConfig> getPublications()
-    {
-        final Map<String, DependencyConfig> result = new HashMap<>();
-        for (final DependencyConfig depConfig : depConfigs.values()) {
-            String pubName = buildUtil.getExtraPropertyValue(ExtProp.DefaultPublication);
-            if (!depConfig.isDefaultConfig()) {
-                pubName += '-' + depConfig.getName();
-            }
-            result.put(pubName, depConfig);
-        }
-        return Collections.unmodifiableMap(result);
-    }
-
-
-
-    @Nonnull
     public DependencyConfig getDefault()
     {
-        return depConfigs.get(DEFAULT_NAME);
+        return depConfigs.get(DEFAULT_DEPCONFIG_NAME);
     }
 }

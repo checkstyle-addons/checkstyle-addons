@@ -22,8 +22,9 @@ import javax.annotation.Nonnull;
 import org.gradle.api.JavaVersion;
 import org.gradle.api.Project;
 import org.gradle.api.plugins.JavaBasePlugin;
-import org.gradle.api.plugins.JavaPluginConvention;
+import org.gradle.api.plugins.JavaPluginExtension;
 import org.gradle.api.tasks.SourceSet;
+import org.gradle.api.tasks.compile.JavaCompile;
 import org.gradle.api.tasks.javadoc.Javadoc;
 import org.gradle.external.javadoc.StandardJavadocDocletOptions;
 
@@ -37,19 +38,20 @@ import com.thomasjensen.checkstyle.addons.build.TaskNames;
 /**
  * Create Javadoc for the given dependency configuration.
  */
-public class JavadocTask
-    extends Javadoc
+public class JavadocTaskConfigurer
     implements ConfigurableAddonsTask
 {
+    private final Javadoc javadocTask;
+
     private final BuildUtil buildUtil;
 
 
 
-    public JavadocTask()
+    public JavadocTaskConfigurer(@Nonnull final Javadoc pJavadocTask)
     {
         super();
-        buildUtil = new BuildUtil(getProject());
-        setGroup(JavaBasePlugin.DOCUMENTATION_GROUP);
+        javadocTask = pJavadocTask;
+        buildUtil = new BuildUtil(pJavadocTask.getProject());
     }
 
 
@@ -57,47 +59,53 @@ public class JavadocTask
     @Override
     public void configureFor(@Nonnull final DependencyConfig pDepConfig)
     {
-        final Project project = getProject();
+        final Project project = javadocTask.getProject();
         final JavaVersion javaLevel = pDepConfig.getJavaLevel();
 
-        setDescription("Generate Javadoc API documentation for dependency configuration '" + pDepConfig.getName()
-            + "' (Java level: " + javaLevel + ")");
-        dependsOn(buildUtil.getTask(TaskNames.compileJava, pDepConfig));
+        javadocTask.setGroup(JavaBasePlugin.DOCUMENTATION_GROUP);
+        javadocTask.setDescription("Generate Javadoc API documentation for dependency configuration '"
+            + pDepConfig.getName() + "' (Java level: " + javaLevel + ")");
 
-        final JavaPluginConvention javaConvention = project.getConvention().getPlugin(JavaPluginConvention.class);
-        setDestinationDir(new File(javaConvention.getDocsDir(), getName()));
+        javadocTask.dependsOn(buildUtil.getTaskProvider(TaskNames.compileJava, JavaCompile.class, pDepConfig));
 
-        configureJavadocTask(this, pDepConfig);
+        final JavaPluginExtension javaExt = project.getExtensions().getByType(JavaPluginExtension.class);
+        javadocTask.setDestinationDir(new File(javaExt.getDocsDir().getAsFile().get(), javadocTask.getName()));
+
+        configureJavadocTask(pDepConfig);
 
         final JavaLevelUtil javaLevelUtil = new JavaLevelUtil(project);
         if (javaLevelUtil.isOlderSupportedJava(javaLevel)) {
-            setExecutable(javaLevelUtil.getJavadocExecutable(javaLevel));
+            javadocTask.setExecutable(javaLevelUtil.getJavadocExecutable(javaLevel));
         }
     }
 
 
 
-    public static void configureJavadocTask(final Javadoc pTask, final DependencyConfig pDepConfig)
+    /**
+     * These configurations are also applied to the standard 'javadoc' task, plus they are applied to ours.
+     *
+     * @param pDepConfig dependency config
+     */
+    public void configureJavadocTask(final DependencyConfig pDepConfig)
     {
-        final Project project = pTask.getProject();
-        final BuildUtil buildUtil = new BuildUtil(project);
+        final Project project = javadocTask.getProject();
 
-        pTask.setTitle(buildUtil.getLongName() + " v" + project.getVersion());
-        final StandardJavadocDocletOptions options = (StandardJavadocDocletOptions) pTask.getOptions();
+        final StandardJavadocDocletOptions options = (StandardJavadocDocletOptions) javadocTask.getOptions();
         options.setEncoding(StandardCharsets.UTF_8.toString());
         options.setDocEncoding(StandardCharsets.UTF_8.toString());
         options.setCharSet(StandardCharsets.UTF_8.toString());
         options.setAuthor(false);
         options.setUse(true);
         options.setNoDeprecated(true);
-        options.setWindowTitle(buildUtil.getLongName());
         options.setSplitIndex(false);
-        options.setHeader(buildUtil.getLongName());
         options.setLinks(pDepConfig.getJavadocLinks());
+        options.setHeader(buildUtil.getBuildConfig().getLongName().get());
+        options.setWindowTitle(buildUtil.getBuildConfig().getLongName().get());
+        javadocTask.setTitle(buildUtil.getBuildConfig().getLongName().get() + " v" + project.getVersion());
 
-        pTask.setSource(buildUtil.getSourceSet(SourceSet.MAIN_SOURCE_SET_NAME).getAllJava()
+        javadocTask.setSource(buildUtil.getSourceSet(SourceSet.MAIN_SOURCE_SET_NAME).getAllJava()
             .plus(buildUtil.getSourceSet(BuildUtil.SONARQUBE_SOURCE_SET_NAME).getAllJava()));
-        pTask.setClasspath(new ClasspathBuilder(project)
+        javadocTask.setClasspath(new ClasspathBuilder(project)
             .buildClassPath(pDepConfig, null, false, buildUtil.getSourceSet(SourceSet.MAIN_SOURCE_SET_NAME),
                 buildUtil.getSourceSet(BuildUtil.SONARQUBE_SOURCE_SET_NAME)));
 

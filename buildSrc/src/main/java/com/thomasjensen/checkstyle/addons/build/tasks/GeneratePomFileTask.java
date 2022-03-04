@@ -23,7 +23,6 @@ import java.util.Iterator;
 import java.util.List;
 import javax.annotation.Nonnull;
 
-import groovy.lang.Closure;
 import jakarta.xml.bind.JAXBContext;
 import jakarta.xml.bind.JAXBException;
 import jakarta.xml.bind.Marshaller;
@@ -34,13 +33,16 @@ import org.gradle.api.artifacts.Configuration;
 import org.gradle.api.artifacts.Dependency;
 import org.gradle.api.artifacts.DependencyArtifact;
 import org.gradle.api.artifacts.ExternalDependency;
+import org.gradle.api.provider.Provider;
 import org.gradle.api.publish.plugins.PublishingPlugin;
+import org.gradle.api.tasks.OutputFile;
+import org.gradle.api.tasks.TaskAction;
 import org.gradle.api.tasks.TaskInputs;
 
+import com.thomasjensen.checkstyle.addons.build.BuildConfigExtension;
 import com.thomasjensen.checkstyle.addons.build.BuildUtil;
 import com.thomasjensen.checkstyle.addons.build.ClasspathBuilder;
 import com.thomasjensen.checkstyle.addons.build.DependencyConfig;
-import com.thomasjensen.checkstyle.addons.build.ExtProp;
 import com.thomasjensen.checkstyle.addons.build.PomXml;
 import com.thomasjensen.checkstyle.addons.build.VersionWrapper;
 
@@ -52,9 +54,7 @@ public class GeneratePomFileTask
     extends DefaultTask
     implements ConfigurableAddonsTask
 {
-    private final File pomFile = new File(getTemporaryDir(), "pom.xml");
-
-    private final BuildUtil buildUtil;
+    private final Provider<File> pomFile;
 
     private DependencyConfig depConfig = null;
 
@@ -63,42 +63,55 @@ public class GeneratePomFileTask
     public GeneratePomFileTask()
     {
         super();
-        setGroup(PublishingPlugin.PUBLISH_TASK_GROUP);
-
         final Project project = getProject();
-        buildUtil = new BuildUtil(project);
+        pomFile = project.provider(() -> new File(getTemporaryDir(), "pom.xml"));
+        getOutputs().file(pomFile);
+
+        setGroup(PublishingPlugin.PUBLISH_TASK_GROUP);
+    }
+
+
+    @Override
+    public void configureFor(@Nonnull final DependencyConfig pDepConfig)
+    {
+        depConfig = pDepConfig;
+        final Project project = getProject();
+        final BuildConfigExtension buildConfig = new BuildUtil(project).getBuildConfig();
 
         final TaskInputs inputs = getInputs();
         inputs.property("groupId", project.getGroup());
         inputs.property("artifactId", project.getName());
         inputs.property("version", project.getVersion());
-        inputs.property("name", buildUtil.getLongName());
+        inputs.property("name", buildConfig.getLongName());
         inputs.property("description", project.getDescription());
-        inputs.property("url", buildUtil.getExtraPropertyValue(ExtProp.Website));
-        inputs.property("authorName", buildUtil.getExtraPropertyValue(ExtProp.AuthorName));
-        inputs.property("orgName", buildUtil.getExtraPropertyValue(ExtProp.OrgName));
-        inputs.property("orgUrl", buildUtil.getExtraPropertyValue(ExtProp.OrgUrl));
-        inputs.property("github", buildUtil.getExtraPropertyValue(ExtProp.Github));
+        inputs.property("url", buildConfig.getWebsite());
+        inputs.property("authorName", buildConfig.getAuthorName());
+        inputs.property("orgName", buildConfig.getOrgName());
+        inputs.property("orgUrl", buildConfig.getOrgUrl());
+        inputs.property("github", buildConfig.getGithub());
 
-        getOutputs().file(pomFile);
+        final String appendix = pDepConfig.getName();
+        inputs.property("appendix", appendix);
 
-        doLast(new Closure<Void>(this)
-        {
-            @Override
-            @SuppressWarnings({"ResultOfMethodCallIgnored", "MethodDoesntCallSuperMethod"})
-            public Void call()
-            {
-                pomFile.getParentFile().mkdirs();
-                PomXml pomXml = createPom();
-                try {
-                    writePomXml(pomXml);
-                }
-                catch (JAXBException e) {
-                    throw new GradleException("error creating pom", e);
-                }
-                return null;
-            }
-        });
+        setDescription("Generates the Maven POM file for publication 'checkstyleAddons' ("
+            + (pDepConfig.isDefaultConfig() ? "no appendix" : ("appendix: " + appendix)) + ").");
+    }
+
+
+
+    @TaskAction
+    public void generateFile()
+    {
+        //noinspection ResultOfMethodCallIgnored
+        pomFile.get().getParentFile().mkdirs();
+
+        PomXml pomXml = createPom();
+        try {
+            writePomXml(pomXml);
+        }
+        catch (JAXBException e) {
+            throw new GradleException("error creating pom", e);
+        }
     }
 
 
@@ -177,32 +190,14 @@ public class GeneratePomFileTask
         marshaller.setProperty(Marshaller.JAXB_SCHEMA_LOCATION,
             "http://maven.apache.org/POM/" + PomXml.MODEL_VERSION + " http://maven.apache.org/xsd/maven-"
                 + PomXml.MODEL_VERSION + ".xsd");
-        marshaller.marshal(pPomXml, pomFile);
+        marshaller.marshal(pPomXml, pomFile.get());
     }
 
 
 
-    @Override
-    public void configureFor(@Nonnull final DependencyConfig pDepConfig)
-    {
-        depConfig = pDepConfig;
 
-        String appendix = pDepConfig.getName();
-        if (appendix != null) {
-            getInputs().property("appendix", appendix);
-        }
-        else {
-            getInputs().getProperties().remove("appendix");
-        }
-
-        setDescription(
-            "Generates the Maven POM file for publication " + "'checkstyleAddons' (" + (pDepConfig.isDefaultConfig()
-                ? "no appendix" : "appendix: " + appendix) + ").");
-    }
-
-
-
-    public File getPomFile()
+    @OutputFile
+    public Provider<File> getPomFile()
     {
         return pomFile;
     }

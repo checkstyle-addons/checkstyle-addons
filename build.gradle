@@ -14,38 +14,21 @@
  * program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-buildscript {
-    repositories {
-        mavenCentral()
-    }
-}
 plugins {
     id 'java-library'
     id 'jacoco'
     id 'checkstyle'
-//    id 'com.github.spotbugs'
     id 'idea'
     id 'maven-publish'
+    id 'com.github.spotbugs'
     id 'com.jfrog.bintray' version '1.8.4'
     id 'org.barfuin.gradle.taskinfo' version '1.3.1'
+    id 'com.thomasjensen.checkstyle.addons.build'
 }
 
 repositories {
     mavenCentral()
 }
-
-
-import com.thomasjensen.checkstyle.addons.build.BuildUtil
-import com.thomasjensen.checkstyle.addons.build.ClasspathBuilder
-import com.thomasjensen.checkstyle.addons.build.DependencyConfig
-import com.thomasjensen.checkstyle.addons.build.DependencyConfigs
-import com.thomasjensen.checkstyle.addons.build.JavaLevelUtil
-import com.thomasjensen.checkstyle.addons.build.TaskCreator
-import com.thomasjensen.checkstyle.addons.build.VersionWrapper
-import com.thomasjensen.checkstyle.addons.build.tasks.JavadocTask
-import com.thomasjensen.checkstyle.addons.build.tasks.SiteTask
-import com.thomasjensen.checkstyle.addons.build.tasks.TestTask
-import org.apache.tools.ant.filters.ReplaceTokens
 
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
@@ -54,28 +37,20 @@ import org.apache.tools.ant.filters.ReplaceTokens
 
 group = 'com.thomasjensen.checkstyle.addons'
 description = 'Additional Checkstyle Checks'
-version = new VersionWrapper(project).toString()
-ClasspathBuilder.clearConfigCache()
-new JavaLevelUtil(project).analyzeJavaLevels()
-sourceCompatibility = JavaVersion.VERSION_1_7
+// version set by build plugin based on version.properties file
 
-ext {
-    // keep these in sync with the ExtProp enum
-    defaultPublication = 'checkstyleAddons'   // name of the default Gradle publication
+checkstyleAddons {
     authorName = 'Thomas Jensen'
+    buildTimestamp = new Date()
+    checksPackage = 'com/thomasjensen/checkstyle/addons/checks'
+    github = 'checkstyle-addons/checkstyle-addons'
+    issueTrackerUrl = github.map { "https://github.com/${it}/issues" }
     longName = 'Checkstyle Addons'
     orgName = 'Checkstyle Addons'
     orgUrl = 'https://github.com/checkstyle-addons'
-    github = 'checkstyle-addons/checkstyle-addons'
-    issueTrackerUrl = "https://github.com/${github}/issues"
-    buildTimestamp = new Date()
-    sqPluginKey = 'checkstyleaddons'
     sqPackage = 'com/thomasjensen/checkstyle/addons/sonarqube'
-    checksPackage = 'com/thomasjensen/checkstyle/addons/checks'
+    sqPluginKey = 'checkstyleaddons'
     website = 'https://checkstyle-addons.thomasjensen.com/'
-    checkstyleBaseVersion = '10.0'
-    buildUtil = new BuildUtil(project)
-    gitHash = buildUtil.currentGitCommitHash()
 }
 
 
@@ -83,73 +58,34 @@ ext {
 //   Dependencies of the 'default' dependency configuration, which is also used by the IDE
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
-final TaskCreator taskCreator = new TaskCreator(project)
-taskCreator.establishSonarQubeSourceSet()
-taskCreator.establishGeneralCompileOnlyCfg()
-
 dependencies {
-    generalCompileOnly group: 'net.jcip', name: 'jcip-annotations', version: '1.0'
-    generalCompileOnly group: 'com.github.spotbugs', name: 'spotbugs-annotations', version: '3.1.12'
-    generalCompileOnly group: 'com.google.code.findbugs', name: 'jsr305', version: '3.0.2'
+    generalCompileOnly checkstyleAddonsLibs.jcip
+    generalCompileOnly checkstyleAddonsLibs.spotbugs.annotations
+    generalCompileOnly checkstyleAddonsLibs.jsr305
 
-    api group: 'com.puppycrawl.tools', name: 'checkstyle', version: project.ext.checkstyleBaseVersion
-    api group: 'com.fasterxml.jackson.core', name: 'jackson-databind', version: '2.12.6'
+    api group: 'com.puppycrawl.tools', name: 'checkstyle', version: checkstyleAddonsLibs.versions.checkstyleBase.get()
+    api group: 'com.fasterxml.jackson.core', name: 'jackson-databind', version: '2.13.2'
 
     sonarqubeImplementation group: 'org.codehaus.sonar', name: 'sonar-plugin-api', version: '3.0'
     sonarqubeRuntimeOnly group: 'org.slf4j', name: 'slf4j-nop', version: '1.6.2'
 
-    testImplementation group: 'junit', name: 'junit', version: '4.13.2'
+    testImplementation checkstyleAddonsLibs.junit
     testImplementation group: 'org.mockito', name: 'mockito-core', version: '2.27.0'
 
-    /* spotbugsPlugins group: 'com.mebigfatguy.sb-contrib', name: 'sb-contrib', version: '7.4.6' */
-}
-
-ext {
-    depConfigs = new DependencyConfigs(project)
+    /* spotbugsPlugins group: 'com.mebigfatguy.sb-contrib', name: 'sb-contrib', version: '7.4.6' */ // TODO
 }
 
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-//   Create all the tasks needed for handling dependency configurations
+//   Compilation
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
-ext {
-    testConfigClosure = {
-        testLogging {
-            events 'failed'
-            showStackTraces = true
-            showExceptions = true
-            showCauses = true
-            exceptionFormat 'full'
-        }
-        onOutput { final TestDescriptor descriptor, final TestOutputEvent event ->
-            if (descriptor.className != 'com.thomasjensen.checkstyle.addons.checks.misc.MdlJsonConfigValidatorTest' ||
-                    event.getDestination() == TestOutputEvent.Destination.StdErr) {
-                logger.lifecycle(event.message)
-            }
-        }
-        afterSuite { final TestDescriptor descriptor, final TestResult testResult ->
-            if (descriptor.getParent() == null) {
-                logger.lifecycle('\r\t' + testResult.testCount + ' tests executed, ' +
-                        testResult.successfulTestCount + ' successful, ' +
-                        (testResult.testCount - testResult.successfulTestCount - testResult.skippedTestCount) +
-                        ' failed, ' + testResult.skippedTestCount + ' skipped.')
-            }
-        }
-
-        if (name == JavaPlugin.TEST_TASK_NAME) {
-            systemProperty(TestTask.CSVERSION_SYSPROP_NAME, project.ext.checkstyleBaseVersion)
-        }
-    }
+java {
+    sourceCompatibility = JavaVersion.VERSION_1_7
+    disableAutoTargetJvm()
 }
 
-project.ext.depConfigs.getAll().findAll{ !it.value.isDefaultConfig() }.each {
-    final Map.Entry<String, DependencyConfig> entry -> taskCreator.setupBuildTasks(entry.getValue())
-}
-taskCreator.setupCrossCheckTasks()
-taskCreator.adjustTaskGroupAssignments()
-
-tasks.withType(JavaCompile) {
+tasks.withType(JavaCompile).configureEach {
     options.encoding = 'UTF-8'
     options.compilerArgs << '-Xlint:unchecked'
     if (it.name != JavaPlugin.COMPILE_JAVA_TASK_NAME) {
@@ -161,9 +97,9 @@ tasks.withType(JavaCompile) {
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 //   FindBugs configuration
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-/*
+
 spotbugs {
-    toolVersion = '4.5.3'
+    toolVersion = checkstyleAddonsLibs.versions.spotbugs.get()
 //    reports {
 //        xml.enabled = false
 //        html.enabled = true
@@ -171,10 +107,10 @@ spotbugs {
     effort = 'max'
     reportLevel = 'low'
     ignoreFailures = false
-    includeFilter = file('project/findbugs.xml')
-    excludeFilter = file('project/findbugs-excludes.xml')
+    includeFilter = file('config/findbugs.xml')
+    excludeFilter = file('config/findbugs-excludes.xml')
 }
-*/
+
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 //   IntelliJ IDEA
@@ -192,20 +128,13 @@ idea.module {
 
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-//   Javadoc
-// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-
-JavadocTask.configureJavadocTask((Javadoc) tasks.javadoc, (DependencyConfig) project.ext.depConfigs.getDefault())
-
-
-// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 //   Checkstyle configuration for checking our own code
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
 checkstyle {
-    configFile file('project/checkstyle.xml')
+    configDirectory = file('config')
     configProperties 'workspace_loc': project.projectDir
-    toolVersion '7.1.2'    // depends on our checkstyle.xml; has nothing to do with the CS version used for building
+    toolVersion = '7.1.2'    // depends on our checkstyle.xml; has nothing to do with the CS version used for building
     showViolations = true
     ignoreFailures = false
 }
@@ -216,17 +145,17 @@ checkstyle {
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
 def excludedClasses = ['CheckstyleApiFixer', 'MdlJsonConfigValidator']
-test((Closure) testConfigClosure)
 test {
+    // TODO this will realize the task. do this in a provider.configure() instead
     jacoco {
         excludes = excludedClasses
     }
 }
 jacocoTestReport {
     reports {
-        html.enabled = true
-        xml.enabled = true
-        csv.enabled = false
+        html.required = true
+        xml.required = true
+        csv.required = false
     }
     sourceSets(sourceSets.main, sourceSets.sonarqube)
     classDirectories.setFrom((FileCollection) fileTree(
@@ -237,76 +166,8 @@ tasks.jacocoTestReport.dependsOn tasks.test
 
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-//   Packaging of documentation for publication on the website
-// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-
-task siteCopyJavadoc(type: Copy, dependsOn: javadoc) {
-    setDescription('Copy Javadoc to site directory')
-    setGroup(SiteTask.SITE_GROUP)
-
-    destinationDir = new File(project.buildDir, 'site')
-    into("v${project.version}/apidocs") {
-        from fileTree(dir: javadoc.destinationDir)
-        filter { String line ->
-            line.contains("${project.ext.website}latest/checks/") ? line.replace("${project.ext.website}latest/checks/",
-                "${project.ext.website}v${project.version}/checks/") : line
-        }
-    }
-    into("v${project.version}/apidocs/resources") {
-        from fileTree(dir: new File(javadoc.destinationDir, 'resources'))
-    }
-    into('latest/apidocs') {
-        from fileTree(dir: javadoc.destinationDir)
-    }
-}
-
-
-task siteCopyAllChecks(type: Copy) {
-    setDescription('Copy list of all checks to site directory')
-    setGroup(SiteTask.SITE_GROUP)
-
-    destinationDir = new File(project.buildDir, 'site')
-    final File originalFile = new File(sourceSets.main.resources.srcDirs.iterator().next(),
-        '/' + (String) project.ext.checksPackage + '/all_checks.html')
-    final Closure action = {
-        from originalFile
-        rename { String fileName -> fileName.replace(originalFile.name, 'index.html') }
-        filter(ReplaceTokens, tokens: [
-            buildTimestamp: project.ext.buildTimestamp.format('YYYY-MM-dd HH:mm:ss ZZZZ'),
-            version: "v${project.version}".toString()
-        ])
-    }
-    into("v${project.version}/checks", action)
-    into('latest/checks', action)
-}
-
-
-task siteCopyDownloadGuide(type: Copy) {
-    setDescription('Copy download guide frontmatter stub to site directory')
-    setGroup(SiteTask.SITE_GROUP)
-
-    destinationDir = new File(project.buildDir, 'site')
-    final File originalFile = new File(sourceSets.main.resources.srcDirs.iterator().next(), '/download-guide.html')
-    final Closure action = {
-        from originalFile
-        filter(ReplaceTokens, tokens: [
-            buildTimestamp: project.ext.buildTimestamp.format('YYYY-MM-dd HH:mm:ss ZZZZ'),
-            version: project.version
-        ])
-    }
-    into("v${project.version}", action)
-    into('latest', action)
-}
-
-task site (type: SiteTask)
-
-
-// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 //   Publishing of artifacts
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-
-taskCreator.setupArtifactTasks()
-taskCreator.rewirePublishingTasks(this)
 
 task checkProperties {
     setDescription('Ensure that all properties required for bintray upload are set')
@@ -330,7 +191,9 @@ bintray {
         user = project.property('bintray.user')
         key = project.property('bintray.apikey')
 
-        Set<String> pubNames = project.ext.depConfigs.publications.keySet()
+        /* Set<String> pubNames = project.ext.depConfigs.publications.keySet() // TODO */
+        Set<String> pubNames = [ 'checkstyle-addons',
+                                 'checkstyle-addons-java7', 'checkstyle-addons-java8a', 'checkstyle-addons-java8b' ]
         publications = pubNames.toArray(new String[pubNames.size()])
         publish = true
         dryRun = true   // comment out for actual release deployment
@@ -339,15 +202,15 @@ bintray {
             userOrg = 'checkstyle-addons'
             name = project.name
             desc = project.description
-            websiteUrl = project.ext.website
-            issueTrackerUrl = project.ext.issueTrackerUrl
-            vcsUrl = "https://github.com/${project.ext.github}.git"
+            websiteUrl = checkstyleAddons.website
+            issueTrackerUrl = checkstyleAddons.issueTrackerUrl
+            vcsUrl = "https://github.com/${checkstyleAddons.github}.git"
             licenses = ['GPL-3.0']
             publicDownloadNumbers = true
             version {
                 name = project.version  // Bintray logical version name
                 desc = project.description
-                released = project.ext.buildTimestamp
+                released = checkstyleAddons.buildTimestamp
                 vcsTag = 'v' + project.version
                 gpg {
                     sign = true

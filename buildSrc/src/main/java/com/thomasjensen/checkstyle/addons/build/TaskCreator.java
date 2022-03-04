@@ -16,43 +16,43 @@ package com.thomasjensen.checkstyle.addons.build;
  */
 
 import java.io.File;
-import java.util.Arrays;
-import java.util.Map;
+import java.util.ArrayList;
+import java.util.List;
 import javax.annotation.Nonnull;
 
-import com.github.spotbugs.SpotBugsTask;
-import groovy.lang.Closure;
+import com.github.jengelman.gradle.plugins.shadow.tasks.ShadowJar;
+import com.github.spotbugs.snom.SpotBugsTask;
 import org.gradle.api.JavaVersion;
 import org.gradle.api.Project;
 import org.gradle.api.Task;
-import org.gradle.api.artifacts.Configuration;
-import org.gradle.api.artifacts.ConfigurationContainer;
-import org.gradle.api.file.FileCollection;
 import org.gradle.api.plugins.BasePlugin;
 import org.gradle.api.plugins.JavaBasePlugin;
 import org.gradle.api.plugins.JavaPlugin;
-import org.gradle.api.plugins.JavaPluginConvention;
 import org.gradle.api.plugins.quality.Checkstyle;
 import org.gradle.api.publish.PublishingExtension;
 import org.gradle.api.publish.maven.MavenPublication;
 import org.gradle.api.publish.maven.tasks.GenerateMavenPom;
 import org.gradle.api.tasks.Copy;
 import org.gradle.api.tasks.SourceSet;
-import org.gradle.api.tasks.SourceSetContainer;
 import org.gradle.api.tasks.TaskContainer;
+import org.gradle.api.tasks.TaskProvider;
+import org.gradle.api.tasks.bundling.Jar;
+import org.gradle.api.tasks.compile.JavaCompile;
+import org.gradle.api.tasks.javadoc.Javadoc;
+import org.gradle.api.tasks.testing.Test;
 import org.gradle.language.base.plugins.LifecycleBasePlugin;
 
-import com.thomasjensen.checkstyle.addons.build.tasks.CompileTask;
-import com.thomasjensen.checkstyle.addons.build.tasks.CreateFatJarTask;
-import com.thomasjensen.checkstyle.addons.build.tasks.CreateJarEclipseTask;
-import com.thomasjensen.checkstyle.addons.build.tasks.CreateJarJavadocTask;
-import com.thomasjensen.checkstyle.addons.build.tasks.CreateJarSonarqubeTask;
-import com.thomasjensen.checkstyle.addons.build.tasks.CreateJarSourcesTask;
-import com.thomasjensen.checkstyle.addons.build.tasks.CreateJarTask;
+import com.thomasjensen.checkstyle.addons.build.tasks.CompileTaskConfigurer;
+import com.thomasjensen.checkstyle.addons.build.tasks.FatJarTaskConfigurer;
 import com.thomasjensen.checkstyle.addons.build.tasks.GeneratePomFileTask;
 import com.thomasjensen.checkstyle.addons.build.tasks.GeneratePomPropsTask;
-import com.thomasjensen.checkstyle.addons.build.tasks.JavadocTask;
-import com.thomasjensen.checkstyle.addons.build.tasks.TestTask;
+import com.thomasjensen.checkstyle.addons.build.tasks.JarEclipseTaskConfigurer;
+import com.thomasjensen.checkstyle.addons.build.tasks.JarJavadocTaskConfigurer;
+import com.thomasjensen.checkstyle.addons.build.tasks.JarSonarqubeTaskConfigurer;
+import com.thomasjensen.checkstyle.addons.build.tasks.JarSourcesTaskConfigurer;
+import com.thomasjensen.checkstyle.addons.build.tasks.JarTaskConfigurer;
+import com.thomasjensen.checkstyle.addons.build.tasks.JavadocTaskConfigurer;
+import com.thomasjensen.checkstyle.addons.build.tasks.TestTaskConfigurer;
 
 
 /**
@@ -68,9 +68,6 @@ public class TaskCreator
 
     /** name of the task bundling all the xtest tasks */
     public static final String XTEST_TASK_NAME = "xtest";
-
-    /** name of the configuration for compileOnly dependencies which get added to all source sets */
-    public static final String GENERAL_COMPILE_ONLY_CONFIG_NAME = "generalCompileOnly";
 
     private final Project project;
 
@@ -91,49 +88,6 @@ public class TaskCreator
 
 
 
-    public void establishSonarQubeSourceSet()
-    {
-        final JavaPluginConvention javaConvention = project.getConvention().getPlugin(JavaPluginConvention.class);
-        final SourceSetContainer sourceSets = javaConvention.getSourceSets();
-        final ConfigurationContainer configs = project.getConfigurations();
-
-        final SourceSet testSourceSet = sourceSets.getByName(SourceSet.TEST_SOURCE_SET_NAME);
-        final SourceSet sqSourceSet = sourceSets.create(BuildUtil.SONARQUBE_SOURCE_SET_NAME);
-
-        configs.getByName(testSourceSet.getImplementationConfigurationName()).extendsFrom(
-            configs.getByName(sqSourceSet.getImplementationConfigurationName()));
-        configs.getByName(testSourceSet.getRuntimeOnlyConfigurationName()).extendsFrom(
-            configs.getByName(sqSourceSet.getRuntimeOnlyConfigurationName()));
-
-        final TaskContainer tasks = project.getTasks();
-        tasks.getByName(JavaPlugin.COMPILE_TEST_JAVA_TASK_NAME).dependsOn(
-            tasks.getByName(sqSourceSet.getClassesTaskName()));
-
-        final FileCollection sqOutputs = sqSourceSet.getOutput().getClassesDirs().plus(
-            project.files(sqSourceSet.getOutput().getResourcesDir()));
-        testSourceSet.setCompileClasspath(testSourceSet.getCompileClasspath().plus(sqOutputs));
-        testSourceSet.setRuntimeClasspath(testSourceSet.getRuntimeClasspath().plus(sqOutputs));
-    }
-
-
-
-    public void establishGeneralCompileOnlyCfg()
-    {
-        final JavaPluginConvention javaConvention = project.getConvention().getPlugin(JavaPluginConvention.class);
-        final SourceSetContainer sourceSets = javaConvention.getSourceSets();
-        final ConfigurationContainer configs = project.getConfigurations();
-
-        final Configuration generalCompileOnly = configs.create(GENERAL_COMPILE_ONLY_CONFIG_NAME);
-
-        Arrays.asList(SourceSet.MAIN_SOURCE_SET_NAME, BuildUtil.SONARQUBE_SOURCE_SET_NAME,
-            SourceSet.TEST_SOURCE_SET_NAME).forEach((@Nonnull final String pSourceSetName) -> {
-            final SourceSet sourceSet = sourceSets.getByName(pSourceSetName);
-            configs.getByName(sourceSet.getCompileOnlyConfigurationName()).extendsFrom(generalCompileOnly);
-        });
-    }
-
-
-
     public void setupBuildTasks(@Nonnull final DependencyConfig pDepConfig)
     {
         final TaskContainer tasks = project.getTasks();
@@ -147,12 +101,14 @@ public class TaskCreator
             TaskNames.testClasses);
 
         // test
-        final TestTask testTask = tasks.create(TaskNames.test.getName(pDepConfig), TestTask.class);
-        testTask.configureFor(pDepConfig, pDepConfig.getCheckstyleBaseVersion());
+        final TaskProvider<Test> testTaskProvider = tasks.register(TaskNames.test.getName(pDepConfig), Test.class);
+        testTaskProvider.configure(testTask -> new TestTaskConfigurer(testTask)
+            .configureFor(pDepConfig, pDepConfig.getCheckstyleBaseVersion()));
 
         // javadoc
-        final JavadocTask javadocTask = tasks.create(TaskNames.javadoc.getName(pDepConfig), JavadocTask.class);
-        javadocTask.configureFor(pDepConfig);
+        final TaskProvider<Javadoc> javadocTaskProvider =
+            tasks.register(TaskNames.javadoc.getName(pDepConfig), Javadoc.class);
+        javadocTaskProvider.configure(javadocTask -> new JavadocTaskConfigurer(javadocTask).configureFor(pDepConfig));
     }
 
 
@@ -165,14 +121,18 @@ public class TaskCreator
         final boolean isTest = SourceSet.TEST_SOURCE_SET_NAME.equals(pSourceSetName);
 
         final SourceSet sourceSet = buildUtil.getSourceSet(pSourceSetName);
-        final CompileTask compileTask = tasks.create(pCompileTaskName.getName(pDepConfig), CompileTask.class);
-        compileTask.configureFor(pDepConfig, sourceSet, isTest);
+        final TaskProvider<JavaCompile> compileTaskProvider =
+            tasks.register(pCompileTaskName.getName(pDepConfig), JavaCompile.class);
+        compileTaskProvider.configure(compileTask ->
+            new CompileTaskConfigurer(compileTask).configureFor(pDepConfig, sourceSet, isTest));
 
-        final Task classesTask = tasks.create(pClassesTaskName.getName(pDepConfig));
-        classesTask.setDescription("Assembles '" + pSourceSetName + "' classes for dependency configuration '"
-            + pDepConfig.getName() + "'");
-        classesTask.setGroup(BasePlugin.BUILD_GROUP);
-        classesTask.dependsOn(compileTask, tasks.getByName(sourceSet.getProcessResourcesTaskName()));
+        final TaskProvider<Task> classesTaskProvider = tasks.register(pClassesTaskName.getName(pDepConfig));
+        classesTaskProvider.configure(classesTask -> {
+            classesTask.setDescription("Assembles '" + pSourceSetName + "' classes for dependency configuration '"
+                + pDepConfig.getName() + "'");
+            classesTask.setGroup(BasePlugin.BUILD_GROUP);
+            classesTask.dependsOn(compileTaskProvider, tasks.named(sourceSet.getProcessResourcesTaskName()));
+        });
     }
 
 
@@ -180,18 +140,16 @@ public class TaskCreator
     /**
      * Set up cross-check feature. We provide an 'xcheck' task which depends on a number of Test tasks that run the
      * unit tests compiled against every Checkstyle version against all the other Checkstyle libraries. In this way, we
-     * find out which versions are compatible.
+     * make sure that Checkstyle Addons is compatible with all versions of Checkstyle.
+     *
+     * @param pDepConfigs the dependency configs
      */
-    public void setupCrossCheckTasks()
+    public void setupCrossCheckTasks(@Nonnull final DependencyConfigs pDepConfigs)
     {
         final TaskContainer tasks = project.getTasks();
 
-        final Task xtest = tasks.create(XTEST_TASK_NAME);
-        xtest.setGroup(XTEST_GROUP_NAME);
-        xtest.setDescription("Run the unit tests against all supported Checkstyle runtimes");
-        tasks.getByName(JavaBasePlugin.BUILD_TASK_NAME).dependsOn(xtest);
-
-        for (final DependencyConfig depConfig : buildUtil.getDepConfigs().getAll().values()) {
+        final List<TaskProvider<Test>> crossCheckTasks = new ArrayList<>();
+        for (final DependencyConfig depConfig : pDepConfigs.getAll().values()) {
             final JavaVersion javaLevel = depConfig.getJavaLevel();
             final String csBaseVersion = depConfig.getCheckstyleBaseVersion();
             for (final String csRuntimeVersion : depConfig.getCompatibleCheckstyleVersions()) {
@@ -199,56 +157,71 @@ public class TaskCreator
                     continue;
                 }
 
-                final TestTask testTask = tasks.create(TaskNames.xtest.getName(depConfig, csRuntimeVersion),
-                    TestTask.class);
-                testTask.configureFor(depConfig, csRuntimeVersion);
-                testTask.setGroup(XTEST_GROUP_NAME);
-                testTask.setDescription("Run the unit tests compiled for Checkstyle " + csBaseVersion
-                    + " against a Checkstyle " + csRuntimeVersion + " runtime (Java level: " + javaLevel + ")");
-                testTask.getReports().getHtml().setEnabled(false);  // no test report needed in build/reports/tests
-                xtest.dependsOn(testTask);
+                final TaskProvider<Test> testTaskProvider =
+                    tasks.register(TaskNames.xtest.getName(depConfig, csRuntimeVersion), Test.class);
+                testTaskProvider.configure(testTask -> {
+                    new TestTaskConfigurer(testTask).configureFor(depConfig, csRuntimeVersion);
+                    testTask.setGroup(XTEST_GROUP_NAME);
+                    testTask.setDescription("Run the unit tests compiled for Checkstyle " + csBaseVersion
+                        + " against a Checkstyle " + csRuntimeVersion + " runtime (Java level: " + javaLevel + ")");
+                    // No test report needed in build/reports/tests:
+                    testTask.getReports().getHtml().getRequired().set(Boolean.FALSE);
+                });
+                crossCheckTasks.add(testTaskProvider);
             }
         }
+
+        final TaskProvider<Task> xtestProvider = tasks.register(XTEST_TASK_NAME);
+        xtestProvider.configure(xtest -> {
+            xtest.setGroup(XTEST_GROUP_NAME);
+            xtest.setDescription("Run the unit tests against all supported Checkstyle runtimes");
+            xtest.setDependsOn(crossCheckTasks);
+        });
+        tasks.named(JavaBasePlugin.BUILD_TASK_NAME).configure(buildTask -> buildTask.dependsOn(xtestProvider));
     }
 
 
 
-    public void setupArtifactTasks()
+    public void setupArtifactTasks(@Nonnull final DependencyConfigs pDepConfigs)
     {
         final TaskContainer tasks = project.getTasks();
 
-        for (final DependencyConfig depConfig : buildUtil.getDepConfigs().getAll().values()) {
+        for (final DependencyConfig depConfig : pDepConfigs.getAll().values()) {
             final String pubSuffix = depConfig.getName();
 
             // 'generatePomProperties' task
             final String pomPropsTaskName = TaskNames.generatePomProperties.getName(depConfig);
-            final GeneratePomPropsTask pomPropsTask = tasks.create(pomPropsTaskName, GeneratePomPropsTask.class);
-            pomPropsTask.setAppendix(depConfig.isDefaultConfig() ? null : pubSuffix);
+            final TaskProvider<GeneratePomPropsTask> pomPropsTaskTaskProvider =
+                tasks.register(pomPropsTaskName, GeneratePomPropsTask.class);
+            pomPropsTaskTaskProvider.configure(pomPropsTask ->
+                pomPropsTask.getAppendix().set(depConfig.isDefaultConfig() ? null : pubSuffix));
 
             // 'generatePom' task
-            final GeneratePomFileTask generatePomTask = tasks.create(TaskNames.generatePom.getName(depConfig),
-                GeneratePomFileTask.class);
-            generatePomTask.configureFor(depConfig);
+            final TaskProvider<GeneratePomFileTask> pomFileTaskProvider =
+                tasks.register(TaskNames.generatePom.getName(depConfig), GeneratePomFileTask.class);
+            pomFileTaskProvider.configure(generatePomTask -> generatePomTask.configureFor(depConfig));
 
             // 'jar' task
             final String jarTaskName = TaskNames.jar.getName(depConfig);
-            final CreateJarTask jarTask = tasks.create(jarTaskName, CreateJarTask.class);
-            jarTask.configureFor(depConfig);
+            final TaskProvider<Jar> jarTaskProvider = tasks.register(jarTaskName, Jar.class);
+            jarTaskProvider.configure(jarTask -> new JarTaskConfigurer(jarTask).configureFor(depConfig));
 
             // 'fatjar' task
             final String fatjarTaskName = TaskNames.fatJar.getName(depConfig);
-            final CreateFatJarTask fatjarTask = tasks.create(fatjarTaskName, CreateFatJarTask.class);
-            fatjarTask.configureFor(depConfig);
+            final TaskProvider<ShadowJar> shadowJarTaskProvider = tasks.register(fatjarTaskName, ShadowJar.class);
+            shadowJarTaskProvider.configure(fatjarTask -> new FatJarTaskConfigurer(fatjarTask).configureFor(depConfig));
 
             // 'jarSources' task
             final String jarSourcesTaskName = TaskNames.jarSources.getName(depConfig);
-            final CreateJarSourcesTask jarSourcesTask = tasks.create(jarSourcesTaskName, CreateJarSourcesTask.class);
-            jarSourcesTask.configureFor(depConfig);
+            final TaskProvider<Jar> jarSourcesTaskProvider = tasks.register(jarSourcesTaskName, Jar.class);
+            jarSourcesTaskProvider.configure(jarSourcesTask ->
+                new JarSourcesTaskConfigurer(jarSourcesTask).configureFor(depConfig));
 
             // 'jarJavadoc' task
             final String jarJavadocTaskName = TaskNames.jarJavadoc.getName(depConfig);
-            final CreateJarJavadocTask jarJavadocTask = tasks.create(jarJavadocTaskName, CreateJarJavadocTask.class);
-            jarJavadocTask.configureFor(depConfig);
+            final TaskProvider<Jar> jarJavadocTaskProvider = tasks.register(jarJavadocTaskName, Jar.class);
+            jarJavadocTaskProvider.configure(jarJavadocTask ->
+                new JarJavadocTaskConfigurer(jarJavadocTask).configureFor(depConfig));
 
             // Add JARs to list of artifacts to publish
             String pubName = "checkstyleAddons";
@@ -260,45 +233,55 @@ public class TaskCreator
             final MavenPublication pub = publishing.getPublications().create(pubName, MavenPublication.class);
             final String pubArtifactId = project.getName() + (depConfig.isDefaultConfig() ? "" : ("-" + pubSuffix));
             pub.setArtifactId(pubArtifactId);
-            pub.artifact(jarTask);
-            pub.artifact(jarSourcesTask);
-            pub.artifact(jarJavadocTask);
+            pub.artifact(jarTaskProvider);
+            pub.artifact(jarSourcesTaskProvider);
+            pub.artifact(jarJavadocTaskProvider);
 
             // 'jarEclipse' task
             final String eclipseTaskName = TaskNames.jarEclipse.getName(depConfig);
-            final CreateJarEclipseTask jarEclipseTask = tasks.create(eclipseTaskName, CreateJarEclipseTask.class);
-            jarEclipseTask.configureFor(depConfig);
+            final TaskProvider<Jar> jarEclipseTaskProvider = tasks.register(eclipseTaskName, Jar.class);
+            jarEclipseTaskProvider.configure(jarEclipseTask ->
+                new JarEclipseTaskConfigurer(jarEclipseTask).configureFor(depConfig));
 
             // 'jarSonarqube' task
-            CreateJarSonarqubeTask jarSqTask = null;
+            TaskProvider<Jar> jarSqTaskProvider = null;
             if (depConfig.isSonarQubeSupported()) {
                 final String sqTaskName = TaskNames.jarSonarqube.getName(depConfig);
-                jarSqTask = tasks.create(sqTaskName, CreateJarSonarqubeTask.class);
-                jarSqTask.configureFor(depConfig);
+                jarSqTaskProvider = tasks.register(sqTaskName, Jar.class);
+                jarSqTaskProvider.configure(jarSqTask ->
+                    new JarSonarqubeTaskConfigurer(jarSqTask).configureFor(depConfig));
             }
+            final TaskProvider<Jar> jarSqTaskProviderFinal = jarSqTaskProvider;
 
             // 'assemble' task for the dependency configuration
-            Task assembleTask = tasks.getByName(BasePlugin.ASSEMBLE_TASK_NAME);
-            if (!depConfig.isDefaultConfig()) {
-                assembleTask = tasks.create(TaskNames.assemble.getName(depConfig));
-                assembleTask.setDescription("Assembles the artifacts belonging to dependency configuration '"
-                    + depConfig.getName() + "'");
-                final Task buildTask = tasks.getByName(LifecycleBasePlugin.BUILD_TASK_NAME);
-                buildTask.dependsOn(assembleTask);
+            TaskProvider<Task> assembleTaskProvider = null;
+            if (depConfig.isDefaultConfig()) {
+                assembleTaskProvider = tasks.named(BasePlugin.ASSEMBLE_TASK_NAME);
             }
-            assembleTask.setGroup(ARTIFACTS_GROUP_NAME);
-            assembleTask.dependsOn(jarTask);
-            assembleTask.dependsOn(fatjarTask);
-            assembleTask.dependsOn(jarSourcesTask);
-            assembleTask.dependsOn(jarJavadocTask);
-            assembleTask.dependsOn(jarEclipseTask);
-            if (jarSqTask != null) {
-                assembleTask.dependsOn(jarSqTask);
+            else {
+                assembleTaskProvider = tasks.register(TaskNames.assemble.getName(depConfig));
+                assembleTaskProvider.configure(assembleTask ->
+                    assembleTask.setDescription("Assembles the artifacts belonging to dependency configuration '"
+                        + depConfig.getName() + "'"));
+                final TaskProvider<Task> assembleTaskProviderFinal = assembleTaskProvider;
+                final TaskProvider<Task> buildTaskProvider = tasks.named(JavaBasePlugin.BUILD_TASK_NAME);
+                buildTaskProvider.configure(buildTask -> buildTask.dependsOn(assembleTaskProviderFinal));
             }
+            assembleTaskProvider.configure(assembleTask -> {
+                assembleTask.setGroup(ARTIFACTS_GROUP_NAME);
+                assembleTask.dependsOn(jarTaskProvider);
+                assembleTask.dependsOn(shadowJarTaskProvider);
+                assembleTask.dependsOn(jarSourcesTaskProvider);
+                assembleTask.dependsOn(jarJavadocTaskProvider);
+                assembleTask.dependsOn(jarEclipseTaskProvider);
+                if (jarSqTaskProviderFinal != null) {
+                    assembleTask.dependsOn(jarSqTaskProviderFinal);
+                }
+            });
         }
 
         // disable standard 'jar' task
-        tasks.getByName(JavaPlugin.JAR_TASK_NAME).setEnabled(false);
+        tasks.named(JavaPlugin.JAR_TASK_NAME).configure(t -> t.setEnabled(false));
     }
 
 
@@ -310,19 +293,19 @@ public class TaskCreator
     public void adjustTaskGroupAssignments()
     {
         final TaskContainer tasks = project.getTasks();
-        tasks.getByName(BasePlugin.ASSEMBLE_TASK_NAME).setGroup(ARTIFACTS_GROUP_NAME);
-        tasks.getByName(JavaPlugin.JAR_TASK_NAME).setGroup(ARTIFACTS_GROUP_NAME);
+        tasks.named(BasePlugin.ASSEMBLE_TASK_NAME).configure(t -> t.setGroup(ARTIFACTS_GROUP_NAME));
+        tasks.named(JavaPlugin.JAR_TASK_NAME).configure(t -> t.setGroup(ARTIFACTS_GROUP_NAME));
 
         final SourceSet sqSourceSet = buildUtil.getSourceSet(BuildUtil.SONARQUBE_SOURCE_SET_NAME);
-        tasks.getByName(JavaPlugin.COMPILE_JAVA_TASK_NAME).setGroup(BasePlugin.BUILD_GROUP);
-        tasks.getByName(sqSourceSet.getCompileJavaTaskName()).setGroup(BasePlugin.BUILD_GROUP);
-        tasks.getByName(JavaPlugin.COMPILE_TEST_JAVA_TASK_NAME).setGroup(BasePlugin.BUILD_GROUP);
+        tasks.named(JavaPlugin.COMPILE_JAVA_TASK_NAME).configure(t -> t.setGroup(BasePlugin.BUILD_GROUP));
+        tasks.named(sqSourceSet.getCompileJavaTaskName()).configure(t -> t.setGroup(BasePlugin.BUILD_GROUP));
+        tasks.named(JavaPlugin.COMPILE_TEST_JAVA_TASK_NAME).configure(t -> t.setGroup(BasePlugin.BUILD_GROUP));
 
         for (final SpotBugsTask sbTask : tasks.withType(SpotBugsTask.class)) {
-            sbTask.setGroup(LifecycleBasePlugin.VERIFICATION_GROUP);
+            sbTask.setGroup(JavaBasePlugin.VERIFICATION_GROUP);
         }
         for (final Checkstyle csTask : tasks.withType(Checkstyle.class)) {
-            csTask.setGroup(LifecycleBasePlugin.VERIFICATION_GROUP);
+            csTask.setGroup(JavaBasePlugin.VERIFICATION_GROUP);
         }
         for (final Copy task : tasks.withType(Copy.class)) {
             if (task.getName().startsWith("process") && task.getName().endsWith("Resources")) {
@@ -333,43 +316,37 @@ public class TaskCreator
 
 
 
-    public void rewirePublishingTasks(@Nonnull final Object pScript)
+    public void rewirePublishingTasks(@Nonnull final DependencyConfigs pDepConfigs)
     {
-        final TaskContainer tasks = project.getTasks();
-        final DependencyConfigs depConfigs = buildUtil.getDepConfigs();
+        project.getTasks().configureEach(task -> {
+            for (final DependencyConfig depConfig : pDepConfigs.getAll().values()) {
+                final String pubName = pubNameFromDepCfg(depConfig);
+                final String pubNameCap = Character.toUpperCase(pubName.charAt(0)) + pubName.substring(1);
 
-        tasks.all(new Closure<Void>(pScript)
-        {
-            @Override
-            @SuppressWarnings("MethodDoesntCallSuperMethod")
-            public Void call(final Object... pArgs)
-            {
-                final Task task = (Task) getDelegate();
-                for (final Map.Entry<String, DependencyConfig> entry : depConfigs.getPublications().entrySet()) {
-                    final String pubNameCap = Character.toUpperCase(entry.getKey().charAt(0)) + entry.getKey()
-                        .substring(1);
-                    final DependencyConfig depConfig = entry.getValue();
-
-                    // local publication depends on the pom.xml
-                    if (task.getName().endsWith("PublicationToMavenLocal")) {
-                        final String taskName = "publish" + pubNameCap + "PublicationToMavenLocal";
-                        if (taskName.equals(task.getName())) {
-                            task.dependsOn(buildUtil.getTask(TaskNames.generatePom, depConfig));
-                        }
-                    }
-
-                    // the default task for POM creation is replaced by our own
-                    else if (task.getName().startsWith("generatePomFileFor")) {
-                        final String taskName = "generatePomFileFor" + pubNameCap + "Publication";
-                        if (taskName.equals(task.getName())) {
-                            task.setEnabled(false);  // we do this manually
-                            ((GenerateMavenPom) task).setDestination(new File(project.getBuildDir(),
-                                "tmp/" + TaskNames.generatePom.getName(depConfig) + "/pom.xml"));
-                        }
-                    }
+                // local publication depends on the pom.xml
+                if (task.getName().equals("publish" + pubNameCap + "PublicationToMavenLocal")) {
+                    task.dependsOn(buildUtil.getTaskProvider(TaskNames.generatePom, Task.class, depConfig));
                 }
-                return null;
+
+                // the default task for POM creation is replaced by our own
+                else if (task.getName().equals("generatePomFileFor" + pubNameCap + "Publication")) {
+                    task.setEnabled(false);  // we do this manually
+                    ((GenerateMavenPom) task).setDestination(new File(project.getBuildDir(),
+                        "tmp/" + TaskNames.generatePom.getName(depConfig) + "/pom.xml"));
+                }
             }
         });
+    }
+
+
+
+    @Nonnull
+    private String pubNameFromDepCfg(@Nonnull final DependencyConfig pDepConfig)
+    {
+        String pubName = DependencyConfig.DEFAULT_PUBLICATION_NAME;
+        if (!pDepConfig.isDefaultConfig()) {
+            pubName += '-' + pDepConfig.getName();
+        }
+        return pubName;
     }
 }

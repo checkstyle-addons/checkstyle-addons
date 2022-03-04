@@ -41,15 +41,15 @@
     </module>
     <module name="Header">
         <property name="fileExtensions" value="java"/>
-        <property name="headerFile" value="${workspace_loc}/project/java.header"/>
+        <property name="headerFile" value="${workspace_loc}/config/java.header"/>
         <property name="ignoreLines" value="1"/>
     </module>
     <module name="Header">
         <property name="fileExtensions" value="xml"/>
-        <property name="headerFile" value="${workspace_loc}/project/xml.header"/>
+        <property name="headerFile" value="${workspace_loc}/config/xml.header"/>
     </module>
     <module name="SuppressionFilter">
-        <property name="file" value="${workspace_loc}/project/suppressions.xml"/>
+        <property name="file" value="${workspace_loc}/config/suppressions.xml"/>
     </module>
 
     <module name="TreeWalker">

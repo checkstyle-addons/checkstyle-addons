@@ -20,16 +20,15 @@ import java.io.IOException;
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 
-import groovy.lang.Closure;
 import org.ajoberstar.grgit.Grgit;
-import org.gradle.api.GradleException;
+import org.gradle.api.Action;
 import org.gradle.api.Project;
 import org.gradle.api.Task;
 import org.gradle.api.java.archives.Attributes;
-import org.gradle.api.plugins.ExtraPropertiesExtension;
-import org.gradle.api.plugins.JavaPluginConvention;
+import org.gradle.api.plugins.JavaPluginExtension;
 import org.gradle.api.tasks.SourceSet;
 import org.gradle.api.tasks.SourceSetContainer;
+import org.gradle.api.tasks.TaskProvider;
 import org.gradle.api.tasks.bundling.Jar;
 
 
@@ -52,21 +51,12 @@ public final class BuildUtil
 
     private final Project project;
 
-    private final SourceSetContainer sourceSets;
 
 
-
-    /**
-     * Constructor.
-     *
-     * @param pProject the Gradle project
-     */
     public BuildUtil(@Nonnull final Project pProject)
     {
         super();
         project = pProject;
-        final JavaPluginConvention javaConvention = project.getConvention().getPlugin(JavaPluginConvention.class);
-        sourceSets = javaConvention.getSourceSets();
     }
 
 
@@ -91,102 +81,79 @@ public final class BuildUtil
 
 
     /**
-     * Retrieve the dep configs from the project's extra properties.
-     *
-     * @return the dependency configuration container
-     */
-    public DependencyConfigs getDepConfigs()
-    {
-        return getExtraPropertyValue(ExtProp.DepConfigs);
-    }
-
-
-
-    /**
-     * Retrieve the longName from the project's extra properties.
-     *
-     * @return the long name of this software
-     */
-    public String getLongName()
-    {
-        return getExtraPropertyValue(ExtProp.LongName);
-    }
-
-
-
-    /**
-     * Read the value of an extra property of the project.
-     *
-     * @param pExtraPropName the reference to the extra property name
-     * @param <T> type of the property value
-     * @return the property's value
-     */
-    @SuppressWarnings("unchecked")
-    public <T> T getExtraPropertyValue(@Nonnull final ExtProp pExtraPropName)
-    {
-        ExtraPropertiesExtension extraProps = project.getExtensions().getByType(ExtraPropertiesExtension.class);
-        if (extraProps.has(pExtraPropName.getPropertyName())) {
-            return (T) extraProps.get(pExtraPropName.getPropertyName());
-        }
-        throw new GradleException(
-            "Reference to non-existent project extra property '" + pExtraPropName.getPropertyName() + "'");
-    }
-
-
-
-    /**
-     * Convenience method for getting a specific task directly.
+     * Convenience method for getting a specific task directly. <b>This will realize the referenced task. Therefore,
+     * prefer {@link #getTaskProvider} over this method.</b>
      *
      * @param pTaskName the task to get
+     * @param pTaskType the type of the task to get
      * @param pDepConfig the dependency configuration for which the task is intended
-     * @return a task object
+     * @return a task
      */
     @Nonnull
-    public Task getTask(@Nonnull final TaskNames pTaskName, @Nonnull final DependencyConfig pDepConfig)
+    public <T extends Task> T getTask(@Nonnull final TaskNames pTaskName, @Nonnull final Class<T> pTaskType,
+        @Nonnull final DependencyConfig pDepConfig)
     {
-        return project.getTasks().getByName(pTaskName.getName(pDepConfig));
+        return pTaskType.cast(project.getTasks().getByName(pTaskName.getName(pDepConfig)));
     }
 
 
 
     /**
-     * Get a source set by name.
+     * Convenience method for getting a specific task provider directly.
      *
-     * @param pName the source set name
-     * @return the source set
+     * @param pTaskName the name of the task whose provider to get
+     * @param pTaskType the type of the task whose provider to get
+     * @param pDepConfig the dependency configuration for which the task is intended
+     * @return a task provider
      */
+    @Nonnull
+    public <T extends Task> TaskProvider<T> getTaskProvider(@Nonnull final TaskNames pTaskName,
+        @Nonnull final Class<T> pTaskType, @Nonnull final DependencyConfig pDepConfig)
+    {
+        return project.getTasks().named(pTaskName.getName(pDepConfig), pTaskType);
+    }
+
+
+
+    @Nonnull
+    public SourceSetContainer getSourceSets()
+    {
+        final JavaPluginExtension javaExt = project.getExtensions().getByType(JavaPluginExtension.class);
+        return javaExt.getSourceSets();
+    }
+
+
+
     @Nonnull
     public SourceSet getSourceSet(@Nonnull final String pName)
     {
-        return sourceSets.getByName(pName);
+        return getSourceSets().getByName(pName);
     }
 
 
 
     private void addBuildTimestamp(@Nonnull final Attributes pAttributes)
     {
-        pAttributes.put("Build-Timestamp", getExtraPropertyValue(ExtProp.BuildTimestamp).toString());
+        pAttributes.put("Build-Timestamp", getBuildConfig().getBuildTimestamp().toString());
     }
 
 
 
     /**
-     * Add build timestamp to some manifest attributes in the execution phase, so that it does not count for the
+     * Add build timestamp to manifest attributes in a doFirst() action, so that it does not count for the
      * up-to-date check.
      *
-     * @param pTask the executing task
-     * @param pAttributes the attributes map to add to
+     * @param pJarTask the task to whose manifest to add the build timestamp
      */
-    public void addBuildTimestampDeferred(@Nonnull final Task pTask, @Nonnull final Attributes pAttributes)
+    @SuppressWarnings("Convert2Lambda")  // MUST NOT USE LAMBDA, as this would cause Gradle errors
+    public void addBuildTimestampDeferred(@Nonnull final Jar pJarTask)
     {
-        pTask.doFirst(new Closure<Void>(pTask)
-        {
+        pJarTask.doFirst(new Action<>() {
             @Override
-            @SuppressWarnings("MethodDoesntCallSuperMethod")
-            public Void call()
+            public void execute(@Nonnull final Task pJarTask)
             {
-                addBuildTimestamp(pAttributes);
-                return null;
+                // https://docs.gradle.org/7.4/userguide/validation_problems.html#implementation_unknown
+                addBuildTimestamp(((Jar) pJarTask).getManifest().getAttributes());
             }
         });
     }
@@ -199,18 +166,17 @@ public final class BuildUtil
      * @param pTask the executing task
      * @param pDepConfig the dependency configuration for which the Jar task is intended
      */
+    @SuppressWarnings("Convert2Lambda")  // MUST NOT USE LAMBDA, as this would cause Gradle errors
     public void inheritManifest(@Nonnull final Jar pTask, @Nonnull final DependencyConfig pDepConfig)
     {
-        pTask.doFirst(new Closure<Void>(pTask)
-        {
+        pTask.doFirst(new Action<>() {
             @Override
-            @SuppressWarnings("MethodDoesntCallSuperMethod")
-            public Void call()
+            public void execute(@Nonnull final Task pTask)
             {
-                final Jar jarTask = (Jar) getTask(TaskNames.jar, pDepConfig);
-                pTask.setManifest(jarTask.getManifest());
-                addBuildTimestamp(pTask.getManifest().getAttributes());
-                return null;
+                final Jar jarTask = (Jar) pTask;
+                final Jar thinJarTask = getTask(TaskNames.jar, Jar.class, pDepConfig);
+                jarTask.setManifest(thinJarTask.getManifest());
+                addBuildTimestamp(jarTask.getManifest().getAttributes());
             }
         });
     }
@@ -222,10 +188,19 @@ public final class BuildUtil
      *
      * @return the hash
      */
+    @SuppressWarnings("deprecation")
     public String currentGitCommitHash()
     {
-        try (Grgit gitRepo = Grgit.open(project.getRootProject().getProjectDir())) {
+        try (Grgit gitRepo = Grgit.open(project.getRootDir())) {
             return gitRepo.head().getId();
         }
+    }
+
+
+
+    @Nonnull
+    public BuildConfigExtension getBuildConfig()
+    {
+        return project.getExtensions().getByType(BuildConfigExtension.class);
     }
 }

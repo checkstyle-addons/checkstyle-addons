@@ -1,4 +1,3 @@
-package com.thomasjensen.checkstyle.addons.build;
 /*
  * Checkstyle-Addons - Additional Checkstyle checks
  * Copyright (c) 2015-2020, the Checkstyle Addons contributors
@@ -15,20 +14,10 @@ package com.thomasjensen.checkstyle.addons.build;
  * program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-import java.io.File;
-import java.io.FilenameFilter;
-import javax.annotation.Nonnull;
-
-
-/**
- * FilenameFilter which selects files that have a <code>.properties</code> extension.
- */
-public class PropertyFileFilter
-    implements FilenameFilter
-{
-    @Override
-    public boolean accept(@Nonnull final File pDir, @Nonnull final String pName)
-    {
-        return pName.endsWith(".properties");
+dependencyResolutionManagement {
+    versionCatalogs {
+        checkstyleAddonsLibs {
+            from(files("../gradle/checkstyleAddonsLibs.versions.toml"))
+        }
     }
 }

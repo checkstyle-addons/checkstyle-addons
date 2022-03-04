@@ -22,7 +22,6 @@ import javax.annotation.Nonnull;
 
 import com.github.jengelman.gradle.plugins.shadow.internal.DependencyFilter;
 import com.github.jengelman.gradle.plugins.shadow.tasks.ShadowJar;
-import org.gradle.api.Project;
 import org.gradle.api.artifacts.Configuration;
 import org.gradle.api.artifacts.ResolvedDependency;
 import org.gradle.api.tasks.SourceSet;
@@ -36,39 +35,22 @@ import com.thomasjensen.checkstyle.addons.build.TaskNames;
 
 
 /**
- * Gradle task to create a Checkstyle Addons FatJar.
+ * Configure a ShadowJar task to create a Checkstyle Addons FatJar.
  */
-public class CreateFatJarTask
-    extends ShadowJar
+public class FatJarTaskConfigurer
     implements ConfigurableAddonsTask
 {
+    private final ShadowJar fatJarTask;
+
     private final BuildUtil buildUtil;
 
 
 
-    public CreateFatJarTask()
+    public FatJarTaskConfigurer(@Nonnull final ShadowJar pFatJarTask)
     {
         super();
-        final Project project = getProject();
-        buildUtil = new BuildUtil(project);
-        setGroup(TaskCreator.ARTIFACTS_GROUP_NAME);
-        getArchiveClassifier().set("all");
-    }
-
-
-
-    protected static Set<String> getNonCheckstyleDeps(final Configuration pConfiguration)
-    {
-        Set<String> result = new HashSet<>();
-        for (ResolvedDependency dep : pConfiguration.getResolvedConfiguration().getFirstLevelModuleDependencies()) {
-            if (!CreateJarEclipseTask.isCheckstyle(dep)) {
-                result.add(dep.getName());
-                for (final ResolvedDependency rd : dep.getChildren()) {
-                    result.add(rd.getName());
-                }
-            }
-        }
-        return result;
+        fatJarTask = pFatJarTask;
+        buildUtil = new BuildUtil(pFatJarTask.getProject());
     }
 
 
@@ -76,34 +58,53 @@ public class CreateFatJarTask
     @Override
     public void configureFor(@Nonnull final DependencyConfig pDepConfig)
     {
+        fatJarTask.setGroup(TaskCreator.ARTIFACTS_GROUP_NAME);
+        fatJarTask.getArchiveClassifier().set("all");
+
         // set appendix for archive name
         final String appendix = pDepConfig.getName();
         if (!pDepConfig.isDefaultConfig()) {
-            getArchiveAppendix().set(appendix);
+            fatJarTask.getArchiveAppendix().set(appendix);
         }
 
         // dependency on the corresponding (thin) Jar task
-        final Jar thinJarTask = (Jar) buildUtil.getTask(TaskNames.jar, pDepConfig);
-        dependsOn(thinJarTask);
+        final Jar thinJarTask = buildUtil.getTask(TaskNames.jar, Jar.class, pDepConfig);
+        fatJarTask.dependsOn(thinJarTask);
 
-        setDescription("Create a combined JAR of project and runtime dependencies of '"
+        fatJarTask.setDescription("Create a combined JAR of project and runtime dependencies of '"
             + SourceSet.MAIN_SOURCE_SET_NAME + "' for dependency configuration '" + pDepConfig.getName() + "'");
 
-        getManifest().inheritFrom(thinJarTask.getManifest());
+        fatJarTask.getManifest().inheritFrom(thinJarTask.getManifest());
 
-        from(thinJarTask.getArchiveFile().get().getAsFile());
-        Configuration cfg = new ClasspathBuilder(getProject()).buildMainRuntimeConfiguration(pDepConfig);
-        setConfigurations(Collections.singletonList(cfg));
-        exclude("META-INF/INDEX.LIST", "META-INF/*.SF", "META-INF/*.DSA", "META-INF/*.RSA", "META-INF/maven/**/*",
-            "pom.xml");
+        fatJarTask.from(thinJarTask.getArchiveFile());
+        Configuration cfg = new ClasspathBuilder(fatJarTask.getProject()).buildMainRuntimeConfiguration(pDepConfig);
+        fatJarTask.setConfigurations(Collections.singletonList(cfg));
+        fatJarTask.exclude("META-INF/INDEX.LIST", "META-INF/*.SF", "META-INF/*.DSA", "META-INF/*.RSA",
+            "META-INF/maven/**/*", "pom.xml");
         final Set<String> deps = getNonCheckstyleDeps(cfg);
         if (deps.size() > 0) {
-            append("META-INF/LICENSE");  // append all licenses found in dependent Jars into one
-            dependencies((final DependencyFilter pDependencyFilter) -> {
+            fatJarTask.append("META-INF/LICENSE");  // append all licenses found in dependent Jars into one
+            fatJarTask.dependencies((final DependencyFilter pDependencyFilter) -> {
                 for (String dep : deps) {
                     pDependencyFilter.include(pDependencyFilter.dependency(dep));
                 }
             });
         }
+    }
+
+
+
+    private Set<String> getNonCheckstyleDeps(final Configuration pConfiguration)
+    {
+        Set<String> result = new HashSet<>();
+        for (ResolvedDependency dep : pConfiguration.getResolvedConfiguration().getFirstLevelModuleDependencies()) {
+            if (!JarEclipseTaskConfigurer.isCheckstyle(dep)) {
+                result.add(dep.getName());
+                for (final ResolvedDependency rd : dep.getChildren()) {
+                    result.add(rd.getName());
+                }
+            }
+        }
+        return result;
     }
 }

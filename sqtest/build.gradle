@@ -14,6 +14,15 @@
  * program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+buildscript {
+    repositories {
+        mavenCentral()
+    }
+    dependencies {
+        classpath group: 'io.github.java-diff-utils', name: 'java-diff-utils', version: '4.11'
+    }
+}
+
 import com.github.difflib.text.DiffRow
 import com.github.difflib.text.DiffRowGenerator
 import groovy.json.JsonOutput
@@ -21,26 +30,19 @@ import groovy.json.JsonSlurper
 import java.nio.file.Files
 import java.util.regex.Pattern
 
-buildscript {
-    repositories {
-        mavenCentral()
-    }
-    dependencies {
-        classpath group: 'io.github.java-diff-utils', name: 'java-diff-utils', version: '4.0'
-    }
-}
-
 plugins {
     id 'java'
     id 'checkstyle'
-    id 'org.sonarqube' version '2.6'
+    id 'org.sonarqube' version '3.3'
 }
 repositories {
     mavenCentral()
 }
 
 description = 'Sources to analyze for SonarQube integration test'
-sourceCompatibility = JavaVersion.VERSION_1_8
+java {
+    sourceCompatibility = JavaVersion.VERSION_1_8
+}
 
 dependencies {
     checkstyle rootProject
@@ -61,7 +63,7 @@ ext {
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
 checkstyle {
-    configDir = file('config')
+    configDirectory = file('config')
     configProperties 'workspace_loc': projectDir
     sourceSets = [project.sourceSets.main]
     toolVersion = '8.14'
@@ -69,9 +71,10 @@ checkstyle {
 }
 tasks['checkstyleMain'].enabled = false
 
-task checkstyle(type: Checkstyle, dependsOn: classes) {
+tasks.register('checkstyle', Checkstyle).configure {
     description = 'Check our integration test dummy source code with Checkstyle via Gradle (for reference only)'
     group = 'sqtest'
+    dependsOn(tasks.named("classes"))
 
     source = project.sourceSets.main.allSource
     checkstyleClasspath += rootProject.sourceSets.main.output
@@ -99,9 +102,10 @@ String getDockerImageId()
 }
 
 
-task buildDockerImage(type: Exec, dependsOn: rootProject.tasks['jarSonarqubeDefault']) {
-    description = 'Build the docker image for the ' + rootProject.ext.longName + ' integration test'
+tasks.register('buildDockerImage', Exec).configure {
+    description = 'Build the docker image for the ' + rootProject.checkstyleAddons.longName + ' integration test'
     group = 'sqtest'
+    dependsOn(rootProject.tasks.named('jarSonarqubeDefault'))
 
     final File imageIdFile = new File(getTemporaryDir(), "docker-image-id.txt")
     outputs.file(imageIdFile)
@@ -113,10 +117,10 @@ task buildDockerImage(type: Exec, dependsOn: rootProject.tasks['jarSonarqubeDefa
         versionExt += '-' + project.ext.dockerCheckstyleAddonsDepConfig
     }
     commandLine = ['docker', 'build',
-        '--build-arg', "SQ_VERSION=${project.ext.dockerSonarqubeVersion}",
-        '--build-arg', "CS_SQPLUGIN_VERSION=${project.ext.dockerSonarCheckstyleVersion}",
-        '--build-arg', "CS_ADDONS_VERSION_EXT=${versionExt}",
-        '-t', project.ext.dockerImage, '.']
+                   '--build-arg', "SQ_VERSION=${project.ext.dockerSonarqubeVersion}",
+                   '--build-arg', "CS_SQPLUGIN_VERSION=${project.ext.dockerSonarCheckstyleVersion}",
+                   '--build-arg', "CS_ADDONS_VERSION_EXT=${versionExt}",
+                   '-t', project.ext.dockerImage, '.']
 
     doFirst {
         getLogger().lifecycle('Executing: ' + String.join(' ', getCommandLine()))
@@ -168,9 +172,10 @@ def waitForSonarQubeStart()
 }
 
 
-task startDockerContainer(type: Exec, dependsOn: buildDockerImage) {
-    description = 'Start the SonarQube docker container for the ' + rootProject.ext.longName + ' integration test'
+tasks.register('startDockerContainer', Exec).configure {
+    description = 'Start the SonarQube docker container for the ' + rootProject.checkstyleAddons.longName + ' integration test'
     group = 'sqtest'
+    dependsOn(tasks.named('buildDockerImage'))
 
     final File containerIdFile = new File(getTemporaryDir(), 'container-id.txt')
     outputs.file(containerIdFile)
@@ -198,10 +203,11 @@ task startDockerContainer(type: Exec, dependsOn: buildDockerImage) {
 }
 
 
-task initDockerContainer(type: Exec, dependsOn: startDockerContainer) {
-    description = 'Initialize a newly started SonarQube docker container for the ' + rootProject.ext.longName +
-        ' integration test'
+tasks.register('initDockerContainer', Exec).configure {
+    description = 'Initialize a newly started SonarQube docker container for the ' + rootProject.checkstyleAddons.longName +
+            ' integration test'
     group = 'sqtest'
+    dependsOn(tasks.named('startDockerContainer'))
 
     workingDir = rootProject.projectDir
     doFirst {
@@ -213,9 +219,10 @@ task initDockerContainer(type: Exec, dependsOn: startDockerContainer) {
 }
 
 
-task fetchApiToken(type: Exec, dependsOn: initDockerContainer) {
+tasks.register('fetchApiToken', Exec).configure {
     description = 'Read the SonarQube API token from the initialized container'
     group = 'sqtest'
+    dependsOn(tasks.named('initDockerContainer'))
 
     doFirst {
         final String containerId = tasks['startDockerContainer'].containerIdFile.text
@@ -236,9 +243,10 @@ task fetchApiToken(type: Exec, dependsOn: initDockerContainer) {
 }
 
 
-task fetchResultIssues(dependsOn: tasks['sonarqube']) {
+tasks.register('fetchResultIssues').configure {
     description = 'Fetch the issues created by the SonarQube analysis from the server'
     group = 'sqtest'
+    dependsOn(tasks.named('sonarqube'))
 
     final File resultFile = new File(getTemporaryDir(), 'sonarqube-result.json')
     //outputs.file(resultFile)   // do not register, so that this task always runs
@@ -266,11 +274,11 @@ task fetchResultIssues(dependsOn: tasks['sonarqube']) {
                 msg = msg.substring(0, msg.indexOf(':')) + ': (snip)'
             }
             def issue = [
-                'rule': it.rule,
-                'file': filePattern.matcher(it.component).replaceFirst('$1'),
-                'severity': it.severity,
-                'line': it.line,
-                'message': msg
+                    'rule': it.rule,
+                    'file': filePattern.matcher(it.component).replaceFirst('$1'),
+                    'severity': it.severity,
+                    'line': it.line,
+                    'message': msg
             ]
             result.add(issue)
         }
@@ -280,9 +288,10 @@ task fetchResultIssues(dependsOn: tasks['sonarqube']) {
 }
 
 
-task integrationTest(dependsOn: fetchResultIssues) {
+tasks.register('integrationTest').configure {
     description = 'Fetch the issues created by the SonarQube analysis from the server'
     group = 'sqtest'
+    dependsOn(tasks.named('fetchResultIssues'))
 
     final File expectedFile = file('config/expected.json')
     final File resultFile = tasks['fetchResultIssues'].resultFile
@@ -323,10 +332,10 @@ task integrationTest(dependsOn: fetchResultIssues) {
 ['checkstyleMain', 'checkstyleTest', 'compileJava', 'compileTestJava', 'processResources', 'processTestResources',
  'sonarqube', 'test', 'check', 'assemble', 'build', 'buildDependents', 'buildNeeded', 'classes', 'clean', 'jar',
  'testClasses'].each {
-    tasks[it].group = 'sqtest'
+    tasks.named(it).configure(t -> t.setGroup('sqtest'))
 }
 
-project.tasks['sonarqube'].dependsOn 'fetchApiToken'
+tasks.named('sonarqube').configure(t -> t.dependsOn(tasks.named('fetchApiToken')))
 
 sonarqube {
     properties {

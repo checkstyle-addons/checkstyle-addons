@@ -16,10 +16,12 @@ package com.thomasjensen.checkstyle.addons.build;
  */
 
 import java.io.File;
+import java.io.Serializable;
 import java.util.Collections;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.Set;
 import java.util.SortedSet;
 import java.util.TreeSet;
@@ -27,9 +29,8 @@ import javax.annotation.CheckForNull;
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 
-import org.gradle.api.JavaVersion;
-
 import net.jcip.annotations.Immutable;
+import org.gradle.api.JavaVersion;
 
 
 /**
@@ -42,9 +43,14 @@ import net.jcip.annotations.Immutable;
  */
 @Immutable
 public final class DependencyConfig
+    implements Serializable
 {
+    private static final long serialVersionUID = 1L;
+
     /** Maven group ID of the Checkstyle artifacts */
     public static final String CHECKSTYLE_GROUPID = "com.puppycrawl.tools";
+
+    public static final String DEFAULT_PUBLICATION_NAME = "checkstyleAddons";
 
     private final String name;
 
@@ -78,7 +84,8 @@ public final class DependencyConfig
      * @param pSonarQubeSupport flag if SonarQube is supported
      * @param pSonarQubeMinPlatformVersion minimum SonarQube platform version (for use in manifest)
      * @param pSonarQubeMinCsPluginVersion minimum SonarQube Checkstyle plugin version
-     * @param pArtifactVersions versions of certain artifact dependencies
+     * @param pArtifactVersions versions of certain artifact dependencies as a map from group ID to version. Must
+     *     always include a value for Checkstyle
      * @param pDefaultConfig flag if this is the default dependency configuration
      * @param pConfigFile the dependency config file
      */
@@ -88,37 +95,22 @@ public final class DependencyConfig
         @Nullable final String pSonarQubeMinCsPluginVersion, @Nonnull final Map<String, String> pArtifactVersions,
         final boolean pDefaultConfig, @Nonnull final File pConfigFile)
     {
-        if (pName == null) {
-            throw new IllegalArgumentException("pName is null");
-        }
-        if (pJavaLevel == null) {
-            throw new IllegalArgumentException("pJavaLevel is null");
-        }
-        if (pArtifactVersions == null) {
-            throw new IllegalArgumentException("pArtifactVersions is null");
-        }
-        if (pJavadocLinks == null) {
-            throw new IllegalArgumentException("pJavadocLinks is null");
-        }
-        if (pConfigFile == null) {
-            throw new IllegalArgumentException("pConfigFile is null");
-        }
-        if (pArtifactVersions.get(CHECKSTYLE_GROUPID) == null) {
-            throw new IllegalArgumentException("Checkstyle version is null");
-        }
-
-        name = pName;
+        name = Objects.requireNonNull(pName, "pName is null");
         SortedSet<String> ccv = new TreeSet<>(new VersionComparator());
         ccv.addAll(pCompatibleCheckstyleVersions);
         compatibleCheckstyleVersions = Collections.unmodifiableSortedSet(ccv);
-        javaLevel = pJavaLevel;
-        javadocLinks = Collections.unmodifiableList(pJavadocLinks);
+        javaLevel = Objects.requireNonNull(pJavaLevel, "pJavaLevel is null");
+        javadocLinks = Collections.unmodifiableList(Objects.requireNonNull(pJavadocLinks, "pJavadocLinks is null"));
         sonarQubeSupport = pSonarQubeSupport;
         sonarQubeMinPlatformVersion = pSonarQubeMinPlatformVersion;
         sonarQubeMinCsPluginVersion = pSonarQubeMinCsPluginVersion;
-        artifactVersions = pArtifactVersions;
+        artifactVersions = Objects.requireNonNull(pArtifactVersions, "pArtifactVersions is null");
         defaultConfig = pDefaultConfig;
-        configFile = pConfigFile;
+        configFile = Objects.requireNonNull(pConfigFile, "pConfigFile is null");
+
+        if (pArtifactVersions.get(CHECKSTYLE_GROUPID) == null) {
+            throw new IllegalArgumentException("Checkstyle version is null");
+        }
     }
 
 
@@ -127,7 +119,7 @@ public final class DependencyConfig
      * Getter.
      *
      * @return the name of the dependency configuration, also the name without extension of the configuration file, and
-     * the suffix of the corresponding publication name
+     *     the suffix of the corresponding publication name
      */
     @Nonnull
     public String getName()
@@ -154,7 +146,7 @@ public final class DependencyConfig
      * Getter.
      *
      * @return Comma-separated list of Checkstyle versions that are supposed to be compatible with the artifact produced
-     * with this dependency configuration. These compatibility relationships are tested during the build.
+     *     with this dependency configuration. These compatibility relationships are tested during the build.
      */
     @Nonnull
     public SortedSet<String> getCompatibleCheckstyleVersions()
@@ -168,7 +160,7 @@ public final class DependencyConfig
      * Getter.
      *
      * @return The Java level required by the Checkstyle version given in {@link #CheckstyleBase}, for example {@code
-     * 1.7}.
+     *     1.7}.
      */
     @Nonnull
     public JavaVersion getJavaLevel()
@@ -219,7 +211,7 @@ public final class DependencyConfig
      * Getter.
      *
      * @return The minimum required runtime version of the SonarQube Checkstyle plugin. This will be declared in the
-     * manifest.
+     *     manifest.
      */
     @CheckForNull
     public String getSonarQubeMinCsPluginVersion()
@@ -249,11 +241,23 @@ public final class DependencyConfig
 
 
 
+    @Nonnull
+    public String getPublicationName()
+    {
+        String pubName = DEFAULT_PUBLICATION_NAME;
+        if (!isDefaultConfig()) {
+            pubName += '-' + name;
+        }
+        return pubName;
+    }
+
+
+
     /**
      * Getter.
      *
      * @return A {@link java.io.File} object pointing to the dependency configuration file upon which this dependency
-     * configuration is based.
+     *     configuration is based.
      */
     @Nonnull
     public File getConfigFile()
@@ -273,7 +277,7 @@ public final class DependencyConfig
         sb.append(", artifactVersions=");
         if (artifactVersions != null) {
             sb.append('{');
-            for (Iterator<Map.Entry<String, String>> iter = artifactVersions.entrySet().iterator(); iter.hasNext();) {
+            for (Iterator<Map.Entry<String, String>> iter = artifactVersions.entrySet().iterator(); iter.hasNext(); ) {
                 final Map.Entry<String, String> entry = iter.next();
                 sb.append(entry.getKey());
                 sb.append("->'").append(entry.getValue()).append('\'');

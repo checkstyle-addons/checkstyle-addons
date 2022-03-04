@@ -20,8 +20,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-import java.util.concurrent.ConcurrentHashMap;
-import java.util.concurrent.ConcurrentMap;
+import java.util.TreeSet;
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 
@@ -31,7 +30,9 @@ import org.gradle.api.artifacts.Configuration;
 import org.gradle.api.artifacts.Dependency;
 import org.gradle.api.artifacts.ModuleDependency;
 import org.gradle.api.file.FileCollection;
+import org.gradle.api.logging.Logger;
 import org.gradle.api.tasks.SourceSet;
+import org.gradle.api.tasks.TaskProvider;
 import org.gradle.api.tasks.compile.JavaCompile;
 
 
@@ -39,12 +40,9 @@ import org.gradle.api.tasks.compile.JavaCompile;
  * Constructs classpaths in the form of a {@link FileCollection} for one Gradle configuration and one dependency
  * configuration. The Checkstyle version used can sometimes be individually overridden. Any references to JAR
  * dependencies may also be altered if the given dependency configuration requires it.
- * <p>Internally, a cache of detached configurations is maintained in order to improve build performance.</p>
  */
 public class ClasspathBuilder
 {
-    private static final ConcurrentMap<CacheKey, Configuration> DETACHED_CONFIG_CACHE = new ConcurrentHashMap<>();
-
     private final Project project;
 
     private final BuildUtil buildUtil;
@@ -65,19 +63,8 @@ public class ClasspathBuilder
 
 
     /**
-     * Clear the cache of detached configurations. This should be called once at the beginning of the build script
-     * just in case the Gradle demon unduly extended the instance's lifespan.
-     */
-    public static void clearConfigCache()
-    {
-        DETACHED_CONFIG_CACHE.clear();
-    }
-
-
-
-    /**
      * Determine the directory where the dependency configuration specific compile tasks store their compiled classes.
-     * This can be just a single directory (the destination directory of teh Java compile task), or a file collection
+     * This can be just a single directory (the destination directory of the Java compile task), or a file collection
      * (the classes directories of the source set output).
      *
      * @param pSourceSet the source set
@@ -87,22 +74,28 @@ public class ClasspathBuilder
     public FileCollection getClassesDirs(@Nonnull final SourceSet pSourceSet,
         @Nonnull final DependencyConfig pDepConfig)
     {
-        FileCollection result = pSourceSet.getOutput().getClassesDirs();
-        if (!pDepConfig.isDefaultConfig()) {
-            JavaCompile compileTask = null;
+        FileCollection result = null;
+        if (pDepConfig.isDefaultConfig()) {
+            result = pSourceSet.getOutput().getClassesDirs();
+        }
+        else {
+            TaskProvider<JavaCompile> compileTaskProvider = null;
             if (SourceSet.MAIN_SOURCE_SET_NAME.equals(pSourceSet.getName())) {
-                compileTask = (JavaCompile) buildUtil.getTask(TaskNames.compileJava, pDepConfig);
+                compileTaskProvider = buildUtil.getTaskProvider(TaskNames.compileJava,
+                    JavaCompile.class, pDepConfig);
             }
             else if (BuildUtil.SONARQUBE_SOURCE_SET_NAME.equals(pSourceSet.getName())) {
-                compileTask = (JavaCompile) buildUtil.getTask(TaskNames.compileSonarqubeJava, pDepConfig);
+                compileTaskProvider = buildUtil.getTaskProvider(TaskNames.compileSonarqubeJava,
+                    JavaCompile.class, pDepConfig);
             }
             else if (SourceSet.TEST_SOURCE_SET_NAME.equals(pSourceSet.getName())) {
-                compileTask = (JavaCompile) buildUtil.getTask(TaskNames.compileTestJava, pDepConfig);
+                compileTaskProvider = buildUtil.getTaskProvider(TaskNames.compileTestJava,
+                    JavaCompile.class, pDepConfig);
             }
             else {
                 throw new GradleException("unknown source set: " + pSourceSet.getName());
             }
-            result = project.files(compileTask.getDestinationDir());
+            result = project.files(compileTaskProvider.flatMap(compileTask -> compileTask.getDestinationDirectory()));
         }
         return result;
     }
@@ -122,12 +115,13 @@ public class ClasspathBuilder
 
     /**
      * Run the classpath builder to produce a classpath for compilation, running the Javadoc generation, or running
-     * unit tests.
+     * unit tests. <b>This will resolve configurations in order to get at concrete file paths.</b>
      *
      * @param pDepConfig the dependency configuration
-     * @param pCsVersionOverride if a Checkstyle runtime should be used which is different from the base version given
-     * as part of the dependency configuration
-     * @param pIsTestRun if the resulting classpath if to be used to <em>execute</em> tests (rather than compile them)
+     * @param pCsVersionOverride if a Checkstyle runtime should be used which is different from the base version
+     *     given as part of the dependency configuration
+     * @param pIsTestRun if the resulting classpath if to be used to <em>execute</em> tests (rather than compile
+     *     them)
      * @param pSourceSet1 source set to include first in the constructed classpath
      * @param pOtherSourceSets more source sets to include
      * @return the classpath
@@ -145,40 +139,53 @@ public class ClasspathBuilder
             }
         }
 
-        cp = cp.plus(project.files(//
+        cp = cp.plus(project.files(
             calculateDependencies(pDepConfig, pCsVersionOverride, getConfigName(pSourceSet1, pIsTestRun))));
         if (pOtherSourceSets != null && pOtherSourceSets.length > 0) {
             for (final SourceSet sourceSet : pOtherSourceSets) {
-                cp = cp.plus(project.files(//
+                cp = cp.plus(project.files(
                     calculateDependencies(pDepConfig, pCsVersionOverride, getConfigName(sourceSet, pIsTestRun))));
             }
         }
 
-        // final Logger logger = task.getLogger();
-        // logger.lifecycle("---------------------------------------------------------------------------");
-        // logger.lifecycle("Classpath of " + task.getName() + " (" + task.getClass().getSimpleName() + "):");
-        // for (File f : cp) {
-        //     logger.lifecycle("\t- " + f.getAbsolutePath());
-        // }
-        // logger.lifecycle("- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -");
+        logClasspathInfo(pDepConfig, pCsVersionOverride, pIsTestRun, pSourceSet1, pOtherSourceSets, cp);
         return cp;
     }
 
 
 
-    private Configuration getDetachedConfiguration(@Nonnull final DependencyConfig pDepConfig,
-        @Nullable final String pCsVersionOverride, @Nonnull final String pClasspathConfigurationName)
+    private void logClasspathInfo(@Nonnull final DependencyConfig pDepConfig,
+        @Nullable final String pCsVersionOverride, final boolean pIsTestRun, @Nonnull final SourceSet pSourceSet1,
+        @Nullable final SourceSet[] pOtherSourceSets, @Nonnull final FileCollection pClasspath)
     {
-        CacheKey key = new CacheKey(pDepConfig.getName(), pCsVersionOverride, pClasspathConfigurationName);
-        Configuration result = DETACHED_CONFIG_CACHE.get(key);
-        if (result == null) {
-            result = buildDetachedConfiguration(pDepConfig, pCsVersionOverride, pClasspathConfigurationName);
-            final Configuration previous = DETACHED_CONFIG_CACHE.putIfAbsent(key, result);
-            if (previous != null) {
-                result = previous;
+        final Logger logger = project.getLogger();
+        logger.info("-----------------------------------------------------------------------------------------");
+        logger.info("Classpath of dependency configuration '" + pDepConfig.getName() + "'");
+        logger.info("Checkstyle version: "
+            + (pCsVersionOverride != null ? pCsVersionOverride : pDepConfig.getCheckstyleBaseVersion()));
+        logger.info("isTestRun = " + pIsTestRun);
+        Set<String> sourceSetNames = new TreeSet<>();
+        sourceSetNames.add(pSourceSet1.getName());
+        if (pOtherSourceSets != null && pOtherSourceSets.length > 0) {
+            for (final SourceSet sourceSet : pOtherSourceSets) {
+                sourceSetNames.add(sourceSet.getName());
             }
         }
-        return result;
+        logger.info("SourceSets = " + sourceSetNames);
+        logger.info("- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -");
+        for (File f : pClasspath) {
+            logger.info("  - " + f.getAbsolutePath());
+        }
+        logger.info("- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -");
+    }
+
+
+
+    private Set<File> calculateDependencies(@Nonnull final DependencyConfig pDepConfig,
+        @Nullable final String pCsVersionOverride, @Nonnull final String pClasspathConfigurationName)
+    {
+        Configuration cfg = buildDetachedConfiguration(pDepConfig, pCsVersionOverride, pClasspathConfigurationName);
+        return cfg.resolve();
     }
 
 
@@ -202,8 +209,7 @@ public class ClasspathBuilder
                 newDeps.add(newDep);
             }
             else if (!pDepConfig.getJavaLevel().isJava8Compatible()
-                && "com.github.spotbugs".equals(dependency.getGroup()))
-            {
+                && "com.github.spotbugs".equals(dependency.getGroup())) {
                 // com.github.spotbugs requires minimum JDK8, so for older depConfigs, we must replace with FindBugs.
                 // This is ok, because the annotation is only *used* by SpotBugs in the default depConfig.
                 final ModuleDependency newDep = (ModuleDependency) project.getDependencies().create(
@@ -219,22 +225,20 @@ public class ClasspathBuilder
 
 
 
-    private Set<File> calculateDependencies(@Nonnull final DependencyConfig pDepConfig,
-        @Nullable final String pCsVersionOverride, @Nonnull final String pClasspathConfigurationName)
-    {
-        Configuration cfg = getDetachedConfiguration(pDepConfig, pCsVersionOverride, pClasspathConfigurationName);
-        return cfg.resolve();
-    }
-
-
-
+    /**
+     * Return a detached configuration containing the runtime dependencies (without our own code). <b>This will resolve
+     * the configuration to get at concrete file paths.</b>
+     *
+     * @param pDepConfig a dependency configuration
+     * @return runtimeClasspath configuration of the main source set
+     */
     public Configuration buildMainRuntimeConfiguration(@Nonnull final DependencyConfig pDepConfig)
     {
         String runtimeCpConfigName = buildUtil.getSourceSet(SourceSet.MAIN_SOURCE_SET_NAME)
             .getRuntimeClasspathConfigurationName();
         Configuration result = project.getConfigurations().getByName(runtimeCpConfigName);
         if (!pDepConfig.isDefaultConfig()) {
-            result = getDetachedConfiguration(pDepConfig, null, runtimeCpConfigName);
+            result = buildDetachedConfiguration(pDepConfig, null, runtimeCpConfigName);
         }
         return result;
     }

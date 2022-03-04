@@ -16,3 +16,11 @@
 
 rootProject.name='checkstyle-addons'
 include ':sqtest'
+
+dependencyResolutionManagement {
+    versionCatalogs {
+        checkstyleAddonsLibs {
+            from(files("gradle/checkstyleAddonsLibs.versions.toml"))
+        }
+    }
+}

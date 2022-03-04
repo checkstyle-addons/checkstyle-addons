@@ -17,8 +17,10 @@ package com.thomasjensen.checkstyle.addons.build.tasks;
 
 import javax.annotation.Nonnull;
 
+import org.gradle.api.tasks.bundling.Jar;
 import org.gradle.api.tasks.javadoc.Javadoc;
 
+import com.thomasjensen.checkstyle.addons.build.BuildUtil;
 import com.thomasjensen.checkstyle.addons.build.DependencyConfig;
 import com.thomasjensen.checkstyle.addons.build.TaskNames;
 
@@ -26,13 +28,17 @@ import com.thomasjensen.checkstyle.addons.build.TaskNames;
 /**
  * Gradle task to create Javadoc JARs for publication.
  */
-public class CreateJarJavadocTask
-    extends AbstractAddonsJarTask
+public class JarJavadocTaskConfigurer
+    implements ConfigurableAddonsTask
 {
-    public CreateJarJavadocTask()
+    private final Jar jarTask;
+
+
+
+    public JarJavadocTaskConfigurer(@Nonnull final Jar pJarTask)
     {
         super();
-        getArchiveClassifier().set("javadoc");
+        jarTask = pJarTask;
     }
 
 
@@ -40,22 +46,26 @@ public class CreateJarJavadocTask
     @Override
     public void configureFor(@Nonnull final DependencyConfig pDepConfig)
     {
+        final BuildUtil buildUtil = new BuildUtil(jarTask.getProject());
+
+        jarTask.getArchiveClassifier().set("javadoc");
+
         // set appendix for archive name
         if (!pDepConfig.isDefaultConfig()) {
             final String appendix = pDepConfig.getName();
-            getArchiveAppendix().set(appendix);
+            jarTask.getArchiveAppendix().set(appendix);
         }
-        setDescription("Build the javadoc JAR for dependency configuration '" + pDepConfig.getName() + "'");
+        jarTask.setDescription("Build the javadoc JAR for dependency configuration '" + pDepConfig.getName() + "'");
 
         // Dependency on javadoc generating task
-        final Javadoc javadocTask = (Javadoc) getBuildUtil().getTask(TaskNames.javadoc, pDepConfig);
-        dependsOn(javadocTask);
+        final Javadoc javadocTask = buildUtil.getTask(TaskNames.javadoc, Javadoc.class, pDepConfig);
+        jarTask.dependsOn(javadocTask);
 
         // Configuration of JAR file contents
-        from(javadocTask.getDestinationDir());
-        intoFrom("META-INF", "LICENSE");
+        jarTask.from(javadocTask.getDestinationDir());
+        jarTask.into("META-INF", copySpec -> copySpec.from("LICENSE"));
 
         // Manifest
-        getBuildUtil().inheritManifest(this, pDepConfig);
+        buildUtil.inheritManifest(jarTask, pDepConfig);
     }
 }

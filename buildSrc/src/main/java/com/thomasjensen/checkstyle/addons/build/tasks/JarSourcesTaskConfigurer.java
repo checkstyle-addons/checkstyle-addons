@@ -18,21 +18,27 @@ package com.thomasjensen.checkstyle.addons.build.tasks;
 import javax.annotation.Nonnull;
 
 import org.gradle.api.tasks.SourceSet;
+import org.gradle.api.tasks.bundling.Jar;
 
 import com.thomasjensen.checkstyle.addons.build.BuildUtil;
 import com.thomasjensen.checkstyle.addons.build.DependencyConfig;
+import com.thomasjensen.checkstyle.addons.build.TaskCreator;
 
 
 /**
  * Gradle task to create a sources JAR.
  */
-public class CreateJarSourcesTask
-    extends AbstractAddonsJarTask
+public class JarSourcesTaskConfigurer
+    implements ConfigurableAddonsTask
 {
-    public CreateJarSourcesTask()
+    private final Jar jarTask;
+
+
+
+    public JarSourcesTaskConfigurer(@Nonnull final Jar pJarTask)
     {
         super();
-        getArchiveClassifier().set("sources");
+        jarTask = pJarTask;
     }
 
 
@@ -40,23 +46,28 @@ public class CreateJarSourcesTask
     @Override
     public void configureFor(@Nonnull final DependencyConfig pDepConfig)
     {
+        final BuildUtil buildUtil = new BuildUtil(jarTask.getProject());
+
+        jarTask.setGroup(TaskCreator.ARTIFACTS_GROUP_NAME);
+        jarTask.getArchiveClassifier().set("sources");
+
         // set appendix for archive name
         if (!pDepConfig.isDefaultConfig()) {
             final String appendix = pDepConfig.getName();
-            getArchiveAppendix().set(appendix);
+            jarTask.getArchiveAppendix().set(appendix);
         }
-        setDescription("Build the source JAR for dependency configuration '" + pDepConfig.getName() + "'");
+        jarTask.setDescription("Build the source JAR for dependency configuration '" + pDepConfig.getName() + "'");
 
         // SourceSet that fits the dependency configuration
-        final SourceSet mainSourceSet = getBuildUtil().getSourceSet(SourceSet.MAIN_SOURCE_SET_NAME);
-        final SourceSet sqSourceSet = getBuildUtil().getSourceSet(BuildUtil.SONARQUBE_SOURCE_SET_NAME);
+        final SourceSet mainSourceSet = buildUtil.getSourceSet(SourceSet.MAIN_SOURCE_SET_NAME);
+        final SourceSet sqSourceSet = buildUtil.getSourceSet(BuildUtil.SONARQUBE_SOURCE_SET_NAME);
 
         // Configuration of JAR file contents
-        from(mainSourceSet.getAllJava());
-        from(sqSourceSet.getAllJava());
-        intoFrom("META-INF", "LICENSE");
+        jarTask.from(mainSourceSet.getAllJava());
+        jarTask.from(sqSourceSet.getAllJava());
+        jarTask.into("META-INF", copySpec -> copySpec.from("LICENSE"));
 
         // Manifest
-        getBuildUtil().inheritManifest(this, pDepConfig);
+        buildUtil.inheritManifest(jarTask, pDepConfig);
     }
 }

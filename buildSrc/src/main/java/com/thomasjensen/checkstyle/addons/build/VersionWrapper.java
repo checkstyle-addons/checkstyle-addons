@@ -45,7 +45,7 @@ public class VersionWrapper
 
     public VersionWrapper(@Nonnull final Project pProject)
     {
-        final File versionFile = new File(pProject.getRootDir(), "project/version.properties");
+        final File versionFile = new File(pProject.getRootDir(), "config/version.properties");
         final Properties props = new Properties();
         try (InputStream fis = new FileInputStream(versionFile)) {
             props.load(fis);
