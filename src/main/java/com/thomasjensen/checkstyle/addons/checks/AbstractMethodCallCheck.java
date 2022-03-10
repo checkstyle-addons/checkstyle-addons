@@ -27,6 +27,8 @@ import javax.annotation.Nullable;
 
 import com.puppycrawl.tools.checkstyle.api.DetailAST;
 import com.puppycrawl.tools.checkstyle.api.TokenTypes;
+import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
+
 import com.thomasjensen.checkstyle.addons.util.Util;
 
 
@@ -47,6 +49,7 @@ public abstract class AbstractMethodCallCheck
 
 
     @Override
+    @SuppressFBWarnings(value = "EI_EXPOSE_REP", justification = "It's really a Collections.unmodifiableSet().")
     public Set<Integer> getRelevantTokens()
     {
         return TOKEN_TYPES;
@@ -67,7 +70,7 @@ public abstract class AbstractMethodCallCheck
      * Filter method which determines if the given method call is considered relevant.
      *
      * @param pQualifier the <em>qualifier</em> of the method call (for a call like <code>Foo.Bar.call()</code>, the
-     * qualifier is <code>Foo.Bar</code>)
+     *     qualifier is <code>Foo.Bar</code>)
      * @param pMethodName the simple name of the called method
      * @return indication of whether the call is relevant (<code>true</code>) or not (<code>false</code>)
      */
@@ -81,7 +84,7 @@ public abstract class AbstractMethodCallCheck
      *
      * @param pMethodName the simple name of the called method
      * @param pMethodCallAst AST of the call, useful for logging issues ( this is a METHOD_DEF, CTOR_CALL, or a
-     * SUPER_CTOR_CALL token)
+     *     SUPER_CTOR_CALL token)
      */
     protected abstract void visitMethodCall(@Nonnull String pMethodName, @Nonnull DetailAST pMethodCallAst);
 

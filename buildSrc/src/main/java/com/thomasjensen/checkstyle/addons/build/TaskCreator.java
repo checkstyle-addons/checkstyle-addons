@@ -21,7 +21,6 @@ import java.util.List;
 import javax.annotation.Nonnull;
 
 import com.github.jengelman.gradle.plugins.shadow.tasks.ShadowJar;
-import com.github.spotbugs.snom.SpotBugsTask;
 import org.gradle.api.JavaVersion;
 import org.gradle.api.Project;
 import org.gradle.api.Task;
@@ -304,9 +303,6 @@ public class TaskCreator
         tasks.named(sqSourceSet.getCompileJavaTaskName()).configure(t -> t.setGroup(BasePlugin.BUILD_GROUP));
         tasks.named(JavaPlugin.COMPILE_TEST_JAVA_TASK_NAME).configure(t -> t.setGroup(BasePlugin.BUILD_GROUP));
 
-        for (final SpotBugsTask sbTask : tasks.withType(SpotBugsTask.class)) {
-            sbTask.setGroup(JavaBasePlugin.VERIFICATION_GROUP);
-        }
         for (final Checkstyle csTask : tasks.withType(Checkstyle.class)) {
             csTask.setGroup(JavaBasePlugin.VERIFICATION_GROUP);
         }

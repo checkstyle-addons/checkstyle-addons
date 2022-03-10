@@ -20,7 +20,7 @@ plugins {
     id 'checkstyle'
     id 'idea'
     id 'maven-publish'
-    id 'com.github.spotbugs'
+    alias checkstyleAddonsLibs.plugins.spotbugs
     id 'com.jfrog.bintray' version '1.8.4'
     id 'org.barfuin.gradle.taskinfo' version '1.3.1'
     id 'com.thomasjensen.checkstyle.addons.build'
@@ -101,20 +101,27 @@ tasks.withType(JavaCompile).configureEach {
 
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-//   FindBugs configuration
+//   SpotBugs configuration
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
 spotbugs {
     toolVersion = checkstyleAddonsLibs.versions.spotbugs.get()
-//    reports {
-//        xml.enabled = false
-//        html.enabled = true
-//    }
     effort = 'max'
     reportLevel = 'low'
     ignoreFailures = false
-    includeFilter = file('config/findbugs.xml')
-    excludeFilter = file('config/findbugs-excludes.xml')
+    includeFilter = file('config/spotbugs.xml')
+    excludeFilter = file('config/spotbugs-excludes.xml')
+}
+
+tasks.withType(com.github.spotbugs.snom.SpotBugsTask.class) {
+    it.setGroup(JavaBasePlugin.VERIFICATION_GROUP)
+    reports {
+        xml.enabled = false
+        html {
+            required = true
+            stylesheet = 'fancy-hist.xsl'
+        }
+    }
 }
 
 

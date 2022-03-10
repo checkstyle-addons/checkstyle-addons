@@ -26,6 +26,7 @@ import javax.annotation.Nullable;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
+import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 
 import com.thomasjensen.checkstyle.addons.util.Util;
 
@@ -33,6 +34,7 @@ import com.thomasjensen.checkstyle.addons.util.Util;
 /**
  * Deserialized version of the <i>directories.json</i>.
  */
+@SuppressWarnings("unused")
 public class MdlJsonConfig
     implements SelfValidating
 {
@@ -50,6 +52,7 @@ public class MdlJsonConfig
     /**
      * Encapsulates the general settings which are supported in a <i>directories.json</i>.
      */
+    @SuppressWarnings("FieldMayBeFinal")
     public static class Settings
         implements SelfValidating
     {
@@ -113,6 +116,8 @@ public class MdlJsonConfig
      * An MDL Spec specifies the characteristics of one directory in the module directory layout, for example
      * <code>src/main/java</code>.
      */
+    @SuppressWarnings("FieldMayBeFinal")
+    @SuppressFBWarnings("EI_EXPOSE_REP")
     public static class MdlSpec
         implements SelfValidating
     {
@@ -174,7 +179,6 @@ public class MdlJsonConfig
 
 
         @Override
-        @SuppressWarnings("unchecked")
         public void validate()
             throws ConfigValidationException
         {
@@ -298,6 +302,7 @@ public class MdlJsonConfig
 
 
     @Nonnull
+    @SuppressFBWarnings("EI_EXPOSE_REP")
     public Map<String, MdlSpec> getStructure()
     {
         return structure;

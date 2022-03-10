@@ -22,6 +22,7 @@ import java.util.List;
 import java.util.Set;
 import javax.annotation.Nonnull;
 
+import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import net.jcip.annotations.Immutable;
 
 
@@ -53,8 +54,9 @@ public class DecomposedPath
      * @param pSpecificPath the specific path, for example <code>com/acme/Foo.java</code>
      * @param pSimpleFilename the simple file name, for example <code>Foo.java</code>
      * @param pFileExtensions the list of file extensions, for example <code>java</code>, but it could be a list if
-     * multiple dots are present (e.g. <code>tar.gz, gz</code>)
-     * @param pSpecificFolders the simple names of all folders on the specific path, for example <code>com, acme</code>
+     *     multiple dots are present (e.g. <code>tar.gz, gz</code>)
+     * @param pSpecificFolders the simple names of all folders on the specific path, for example <code>com,
+     *     acme</code>
      */
     public DecomposedPath(@Nonnull final String pModulePath, @Nonnull final String pMdlPath,
         @Nonnull final String pSpecificPath, @Nonnull final String pSimpleFilename,
@@ -103,6 +105,7 @@ public class DecomposedPath
 
 
     @Nonnull
+    @SuppressFBWarnings(value = "EI_EXPOSE_REP", justification = "It's really a Collections.unmodifiableSet().")
     public Set<String> getFileExtensions()
     {
         return fileExtensions;
@@ -111,6 +114,7 @@ public class DecomposedPath
 
 
     @Nonnull
+    @SuppressFBWarnings(value = "EI_EXPOSE_REP", justification = "It's really a Collections.unmodifiableList().")
     public List<String> getSpecificFolders()
     {
         return specificFolders;

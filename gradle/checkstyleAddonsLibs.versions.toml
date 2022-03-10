@@ -26,3 +26,8 @@ jcip = "net.jcip:jcip-annotations:1.0"
 jsr305 = "com.google.code.findbugs:jsr305:3.0.2"
 junit = "junit:junit:4.13.2"
 spotbugs-annotations = { group = "com.github.spotbugs", name = "spotbugs-annotations", version.ref = "spotbugs" }
+
+
+[plugins]
+
+spotbugs = { id = "com.github.spotbugs", version = "5.0.6" }

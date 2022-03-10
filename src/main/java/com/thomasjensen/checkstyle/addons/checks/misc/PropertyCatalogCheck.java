@@ -130,6 +130,7 @@ public class PropertyCatalogCheck
 
 
     @Override
+    @SuppressFBWarnings(value = "EI_EXPOSE_REP", justification = "It's really a Collections.unmodifiableSet().")
     public Set<Integer> getRelevantTokens()
     {
         return TOKENS;

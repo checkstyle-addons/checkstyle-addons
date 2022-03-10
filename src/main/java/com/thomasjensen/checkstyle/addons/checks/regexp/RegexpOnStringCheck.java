@@ -26,6 +26,8 @@ import javax.annotation.Nullable;
 
 import com.puppycrawl.tools.checkstyle.api.DetailAST;
 import com.puppycrawl.tools.checkstyle.api.TokenTypes;
+import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
+
 import com.thomasjensen.checkstyle.addons.checks.AbstractAddonsCheck;
 import com.thomasjensen.checkstyle.addons.checks.BinaryName;
 import com.thomasjensen.checkstyle.addons.util.Util;
@@ -90,6 +92,7 @@ public class RegexpOnStringCheck
 
 
     @Override
+    @SuppressFBWarnings(value = "EI_EXPOSE_REP", justification = "It's really a Collections.singleton().")
     public Set<Integer> getRelevantTokens()
     {
         return TOKEN_TYPES;

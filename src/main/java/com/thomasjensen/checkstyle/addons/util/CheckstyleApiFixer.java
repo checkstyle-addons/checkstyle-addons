@@ -28,6 +28,7 @@ import javax.annotation.Nullable;
 import com.puppycrawl.tools.checkstyle.api.AbstractCheck;
 import com.puppycrawl.tools.checkstyle.api.FileContents;
 import com.puppycrawl.tools.checkstyle.api.TokenTypes;
+import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 
 
 /**
@@ -61,6 +62,7 @@ public class CheckstyleApiFixer
      * @param pCheck the check for which this instance of the API fixer shall run
      * @param pCurrentFileNameMockFile file to use as result of {@link #getCurrentFileName()} in unit tests
      */
+    @SuppressFBWarnings("EI_EXPOSE_REP2")
     public CheckstyleApiFixer(@Nonnull final AbstractCheck pCheck, @Nullable final String pCurrentFileNameMockFile)
     {
         check = pCheck;
@@ -74,8 +76,8 @@ public class CheckstyleApiFixer
      * href="https://github.com/checkstyle/checkstyle/issues/1205">#1205</a>).
      *
      * @return the currently analyzed file as returned by Checkstyle
-     *
-     * @throws UnsupportedOperationException no known variant of <code>FileContents.getFileName()</code> could be found
+     * @throws UnsupportedOperationException no known variant of <code>FileContents.getFileName()</code> could be
+     *     found
      */
     @CheckForNull
     @SuppressWarnings({"JavaReflectionMemberAccess", "deprecation"})
@@ -120,7 +122,6 @@ public class CheckstyleApiFixer
      *
      * @param pTokenId the ID of the token name to get
      * @return a token name as returned by Checkstyle
-     *
      * @throws UnsupportedOperationException no known variant of <code>getTokenName()</code> could be found
      */
     @Nonnull
@@ -161,10 +162,11 @@ public class CheckstyleApiFixer
      * Determine if the given token is the root token of Checkstyle's AST. This means it's either an <code>EOF</code>
      * token or a <code>COMPILATION_UNIT</code> token. This must be performed reflectively, because in Checkstyle 9.0,
      * the <code>EOF</code> token was replaced with <code>COMPILATION_UNIT</code>.
+     *
      * @param pToken the token to check
      * @return flag indicating root token
      * @throws IllegalStateException TokenTypes class has neither an <code>EOF</code> nor a
-     *      <code>COMPILATION_UNIT</code> field
+     *     <code>COMPILATION_UNIT</code> field
      */
     @SuppressWarnings("JavaReflectionMemberAccess")
     public boolean isRootToken(final int pToken)
