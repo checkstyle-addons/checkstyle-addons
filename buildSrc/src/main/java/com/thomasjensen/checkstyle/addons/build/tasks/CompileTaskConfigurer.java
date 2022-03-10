@@ -53,13 +53,13 @@ public class CompileTaskConfigurer
 
 
 
-    public void configureFor(@Nonnull final DependencyConfig pDepConfig, @Nonnull final SourceSet pSourceSetToCompile,
-        final boolean pIsTest)
+    public void configureFor(@Nonnull final DependencyConfig pDepConfig, @Nonnull final SourceSet pSourceSetToCompile)
     {
+        final boolean isTest = SourceSet.TEST_SOURCE_SET_NAME.equals(pSourceSetToCompile.getName());
         if (compileTask.getLogger().isInfoEnabled()) {
             compileTask.getLogger().info("Configuring task '" + compileTask.getPath() + "' for depConfig '"
                 + pDepConfig.getName() + "' and sourceSet '" + pSourceSetToCompile.getName() + "' (isTest = "
-                + pIsTest + ")");
+                + isTest + ")");
         }
         final Project project = compileTask.getProject();
         final BuildUtil buildUtil = new BuildUtil(project);
@@ -84,23 +84,16 @@ public class CompileTaskConfigurer
         }
 
         final File destDir = calculateDestDirFromSourceSet(pSourceSetToCompile, pDepConfig.getName());
-        compileTask.setSource(pSourceSetToCompile.getJava());
+        compileTask.setSource(pSourceSetToCompile.getAllSource());
         compileTask.getDestinationDirectory().set(destDir);
         compileTask.setSourceCompatibility(javaLevel.toString());
         compileTask.setTargetCompatibility(javaLevel.toString());
 
-        FileCollection cp = null;
-        if (pIsTest) {
-            cp = new ClasspathBuilder(project).buildClassPath(pDepConfig, null, false, pSourceSetToCompile,
-                buildUtil.getSourceSet(SourceSet.MAIN_SOURCE_SET_NAME),
-                buildUtil.getSourceSet(BuildUtil.SONARQUBE_SOURCE_SET_NAME));
-        }
-        else {
-            cp = new ClasspathBuilder(project).buildClassPath(pDepConfig, null, false, pSourceSetToCompile);
-        }
+        FileCollection cp = new ClasspathBuilder(project)
+            .buildCompileClasspath(pDepConfig, pSourceSetToCompile.getName());
         compileTask.setClasspath(cp);
 
-        if (pIsTest) {
+        if (isTest) {
             TaskProvider<Task> mainClasses =
                 buildUtil.getTaskProvider(TaskNames.mainClasses, Task.class, pDepConfig);
             TaskProvider<Task> sonarqubeClasses =

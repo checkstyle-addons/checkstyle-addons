@@ -105,9 +105,7 @@ public class JavadocTaskConfigurer
 
         javadocTask.setSource(buildUtil.getSourceSet(SourceSet.MAIN_SOURCE_SET_NAME).getAllJava()
             .plus(buildUtil.getSourceSet(BuildUtil.SONARQUBE_SOURCE_SET_NAME).getAllJava()));
-        javadocTask.setClasspath(new ClasspathBuilder(project)
-            .buildClassPath(pDepConfig, null, false, buildUtil.getSourceSet(SourceSet.MAIN_SOURCE_SET_NAME),
-                buildUtil.getSourceSet(BuildUtil.SONARQUBE_SOURCE_SET_NAME)));
+        javadocTask.setClasspath(new ClasspathBuilder(project).buildJavadocClasspath(pDepConfig));
 
         // javadoc does not inherit the proxy settings (https://issues.gradle.org/browse/GRADLE-1228)
         if (System.getProperty("http.proxyHost") != null) {

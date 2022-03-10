@@ -118,13 +118,12 @@ public class TaskCreator
         @Nonnull final TaskNames pClassesTaskName)
     {
         final TaskContainer tasks = project.getTasks();
-        final boolean isTest = SourceSet.TEST_SOURCE_SET_NAME.equals(pSourceSetName);
 
         final SourceSet sourceSet = buildUtil.getSourceSet(pSourceSetName);
         final TaskProvider<JavaCompile> compileTaskProvider =
             tasks.register(pCompileTaskName.getName(pDepConfig), JavaCompile.class);
         compileTaskProvider.configure(compileTask ->
-            new CompileTaskConfigurer(compileTask).configureFor(pDepConfig, sourceSet, isTest));
+            new CompileTaskConfigurer(compileTask).configureFor(pDepConfig, sourceSet));
 
         final TaskProvider<Task> classesTaskProvider = tasks.register(pClassesTaskName.getName(pDepConfig));
         classesTaskProvider.configure(classesTask -> {

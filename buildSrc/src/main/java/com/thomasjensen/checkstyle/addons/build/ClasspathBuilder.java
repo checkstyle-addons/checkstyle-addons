@@ -19,8 +19,6 @@ import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
-import java.util.TreeSet;
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 
@@ -33,6 +31,7 @@ import org.gradle.api.file.FileCollection;
 import org.gradle.api.logging.Logger;
 import org.gradle.api.tasks.SourceSet;
 import org.gradle.api.tasks.TaskProvider;
+import org.gradle.api.tasks.compile.AbstractCompile;
 import org.gradle.api.tasks.compile.JavaCompile;
 
 
@@ -62,6 +61,96 @@ public class ClasspathBuilder
 
 
 
+    public FileCollection buildCompileClasspath(@Nonnull final DependencyConfig pDepConfig,
+        @Nonnull final String pNameOfSourceSetToCompile)
+    {
+        final SourceSet sourceSetToCompile = buildUtil.getSourceSet(pNameOfSourceSetToCompile);
+        final boolean isTestCompile = SourceSet.TEST_SOURCE_SET_NAME.equals(pNameOfSourceSetToCompile);
+        final SourceSet mainSourceSet = buildUtil.getSourceSet(SourceSet.MAIN_SOURCE_SET_NAME);
+        final SourceSet sqSourceSet = buildUtil.getSourceSet(BuildUtil.SONARQUBE_SOURCE_SET_NAME);
+
+        FileCollection cp = project.getObjects().fileCollection();
+        if (isTestCompile) {
+            cp = cp
+                .plus(sourceSetDirs(pDepConfig, mainSourceSet))
+                .plus(sourceSetDirs(pDepConfig, sqSourceSet));
+        }
+
+        cp = cp
+            .plus(calculateDependencies(pDepConfig, null, sourceSetToCompile.getCompileClasspathConfigurationName()));
+        if (isTestCompile) {
+            cp = cp
+                .plus(calculateDependencies(pDepConfig, null, mainSourceSet.getCompileClasspathConfigurationName()))
+                .plus(calculateDependencies(pDepConfig, null, sqSourceSet.getCompileClasspathConfigurationName()));
+        }
+
+        logClasspathInfo("Compile(" + pNameOfSourceSetToCompile + ")", pDepConfig, null, cp);
+        return cp;
+    }
+
+
+
+    public FileCollection buildJavadocClasspath(@Nonnull final DependencyConfig pDepConfig)
+    {
+        final SourceSet mainSourceSet = buildUtil.getSourceSet(SourceSet.MAIN_SOURCE_SET_NAME);
+        final SourceSet sqSourceSet = buildUtil.getSourceSet(BuildUtil.SONARQUBE_SOURCE_SET_NAME);
+
+        FileCollection cp = project.getObjects().fileCollection();
+        cp = cp
+            .plus(getClassesDirs(mainSourceSet, pDepConfig))
+            .plus(getClassesDirs(sqSourceSet, pDepConfig))
+            .plus(calculateDependencies(pDepConfig, null, mainSourceSet.getCompileClasspathConfigurationName()))
+            .plus(calculateDependencies(pDepConfig, null, sqSourceSet.getCompileClasspathConfigurationName()));
+
+        logClasspathInfo("Javadoc", pDepConfig, null, cp);
+        return cp;
+    }
+
+
+
+    /**
+     * Run the classpath builder to produce a runtime classpath for test execution.
+     * <p><b>This will resolve configurations in order to get at concrete file paths.</b></p>
+     *
+     * @param pDepConfig the dependency configuration
+     * @param pCsVersion if a Checkstyle runtime should be used which is different from the base version
+     *     given as part of the dependency configuration
+     * @return the classpath
+     */
+    public FileCollection buildTestExecutionClasspath(@Nonnull final DependencyConfig pDepConfig,
+        @Nonnull final String pCsVersion)
+    {
+        final SourceSet testSourceSet = buildUtil.getSourceSet(SourceSet.TEST_SOURCE_SET_NAME);
+        final SourceSet mainSourceSet = buildUtil.getSourceSet(SourceSet.MAIN_SOURCE_SET_NAME);
+        final SourceSet sqSourceSet = buildUtil.getSourceSet(BuildUtil.SONARQUBE_SOURCE_SET_NAME);
+
+        FileCollection cp = project.getObjects().fileCollection();
+        cp = cp
+            .plus(sourceSetDirs(pDepConfig, testSourceSet))
+            .plus(sourceSetDirs(pDepConfig, mainSourceSet))
+            .plus(sourceSetDirs(pDepConfig, sqSourceSet))
+            .plus(calculateDependencies(pDepConfig, pCsVersion, testSourceSet.getRuntimeClasspathConfigurationName()))
+            .plus(calculateDependencies(pDepConfig, pCsVersion, mainSourceSet.getRuntimeClasspathConfigurationName()))
+            .plus(calculateDependencies(pDepConfig, pCsVersion, sqSourceSet.getRuntimeClasspathConfigurationName()));
+
+        logClasspathInfo("Test runtime", pDepConfig, pCsVersion, cp);
+        return cp;
+    }
+
+
+
+    private FileCollection sourceSetDirs(@Nonnull final DependencyConfig pDepConfig,
+        @Nonnull final SourceSet pSourceSet)
+    {
+        FileCollection result = project.getObjects().fileCollection();
+        result = result
+            .plus(getClassesDirs(pSourceSet, pDepConfig))
+            .plus(project.files(pSourceSet.getOutput().getResourcesDir()));
+        return result;
+    }
+
+
+
     /**
      * Determine the directory where the dependency configuration specific compile tasks store their compiled classes.
      * This can be just a single directory (the destination directory of the Java compile task), or a file collection
@@ -69,7 +158,7 @@ public class ClasspathBuilder
      *
      * @param pSourceSet the source set
      * @param pDepConfig the dependency configuration whose classes dir we are interested in
-     * @return the classes dir
+     * @return the classes dir(s)
      */
     public FileCollection getClassesDirs(@Nonnull final SourceSet pSourceSet,
         @Nonnull final DependencyConfig pDepConfig)
@@ -95,97 +184,18 @@ public class ClasspathBuilder
             else {
                 throw new GradleException("unknown source set: " + pSourceSet.getName());
             }
-            result = project.files(compileTaskProvider.flatMap(compileTask -> compileTask.getDestinationDirectory()));
+            result = project.files(compileTaskProvider.flatMap(AbstractCompile::getDestinationDirectory));
         }
         return result;
     }
 
 
 
-    private String getConfigName(@Nonnull final SourceSet pSourceSet, final boolean pIsTestRun)
-    {
-        String result = pSourceSet.getCompileClasspathConfigurationName();
-        if (pIsTestRun) {
-            result = pSourceSet.getRuntimeClasspathConfigurationName();
-        }
-        return result;
-    }
-
-
-
-    /**
-     * Run the classpath builder to produce a classpath for compilation, running the Javadoc generation, or running
-     * unit tests. <b>This will resolve configurations in order to get at concrete file paths.</b>
-     *
-     * @param pDepConfig the dependency configuration
-     * @param pCsVersionOverride if a Checkstyle runtime should be used which is different from the base version
-     *     given as part of the dependency configuration
-     * @param pIsTestRun if the resulting classpath if to be used to <em>execute</em> tests (rather than compile
-     *     them)
-     * @param pSourceSet1 source set to include first in the constructed classpath
-     * @param pOtherSourceSets more source sets to include
-     * @return the classpath
-     */
-    public FileCollection buildClassPath(@Nonnull final DependencyConfig pDepConfig,
-        @Nullable final String pCsVersionOverride, final boolean pIsTestRun, @Nonnull final SourceSet pSourceSet1,
-        @Nullable final SourceSet... pOtherSourceSets)
-    {
-        FileCollection cp = getClassesDirs(pSourceSet1, pDepConfig).plus(
-            project.files(pSourceSet1.getOutput().getResourcesDir()));
-        if (pOtherSourceSets != null && pOtherSourceSets.length > 0) {
-            for (final SourceSet sourceSet : pOtherSourceSets) {
-                cp = cp.plus(getClassesDirs(sourceSet, pDepConfig)).plus(
-                    project.files(sourceSet.getOutput().getResourcesDir()));
-            }
-        }
-
-        cp = cp.plus(project.files(
-            calculateDependencies(pDepConfig, pCsVersionOverride, getConfigName(pSourceSet1, pIsTestRun))));
-        if (pOtherSourceSets != null && pOtherSourceSets.length > 0) {
-            for (final SourceSet sourceSet : pOtherSourceSets) {
-                cp = cp.plus(project.files(
-                    calculateDependencies(pDepConfig, pCsVersionOverride, getConfigName(sourceSet, pIsTestRun))));
-            }
-        }
-
-        logClasspathInfo(pDepConfig, pCsVersionOverride, pIsTestRun, pSourceSet1, pOtherSourceSets, cp);
-        return cp;
-    }
-
-
-
-    private void logClasspathInfo(@Nonnull final DependencyConfig pDepConfig,
-        @Nullable final String pCsVersionOverride, final boolean pIsTestRun, @Nonnull final SourceSet pSourceSet1,
-        @Nullable final SourceSet[] pOtherSourceSets, @Nonnull final FileCollection pClasspath)
-    {
-        final Logger logger = project.getLogger();
-        logger.info("-----------------------------------------------------------------------------------------");
-        logger.info("Classpath of dependency configuration '" + pDepConfig.getName() + "'");
-        logger.info("Checkstyle version: "
-            + (pCsVersionOverride != null ? pCsVersionOverride : pDepConfig.getCheckstyleBaseVersion()));
-        logger.info("isTestRun = " + pIsTestRun);
-        Set<String> sourceSetNames = new TreeSet<>();
-        sourceSetNames.add(pSourceSet1.getName());
-        if (pOtherSourceSets != null && pOtherSourceSets.length > 0) {
-            for (final SourceSet sourceSet : pOtherSourceSets) {
-                sourceSetNames.add(sourceSet.getName());
-            }
-        }
-        logger.info("SourceSets = " + sourceSetNames);
-        logger.info("- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -");
-        for (File f : pClasspath) {
-            logger.info("  - " + f.getAbsolutePath());
-        }
-        logger.info("- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -");
-    }
-
-
-
-    private Set<File> calculateDependencies(@Nonnull final DependencyConfig pDepConfig,
+    private FileCollection calculateDependencies(@Nonnull final DependencyConfig pDepConfig,
         @Nullable final String pCsVersionOverride, @Nonnull final String pClasspathConfigurationName)
     {
         Configuration cfg = buildDetachedConfiguration(pDepConfig, pCsVersionOverride, pClasspathConfigurationName);
-        return cfg.resolve();
+        return project.files(cfg.resolve());
     }
 
 
@@ -234,12 +244,27 @@ public class ClasspathBuilder
      */
     public Configuration buildMainRuntimeConfiguration(@Nonnull final DependencyConfig pDepConfig)
     {
-        String runtimeCpConfigName = buildUtil.getSourceSet(SourceSet.MAIN_SOURCE_SET_NAME)
-            .getRuntimeClasspathConfigurationName();
+        final SourceSet mainSourceSet = buildUtil.getSourceSet(SourceSet.MAIN_SOURCE_SET_NAME);
+        final String runtimeCpConfigName = mainSourceSet.getRuntimeClasspathConfigurationName();
         Configuration result = project.getConfigurations().getByName(runtimeCpConfigName);
         if (!pDepConfig.isDefaultConfig()) {
             result = buildDetachedConfiguration(pDepConfig, null, runtimeCpConfigName);
         }
         return result;
+    }
+
+
+
+    private void logClasspathInfo(@Nonnull final String pWhat, @Nonnull final DependencyConfig pDepConfig,
+        @Nullable final String pCsVersionOverride, @Nonnull final FileCollection pClasspath)
+    {
+        final Logger logger = project.getLogger();
+        logger.info("-----------------------------------------------------------------------------------------");
+        logger.info(pWhat + " classpath of dependency configuration '" + pDepConfig.getName() + "', Checkstyle version "
+            + (pCsVersionOverride != null ? pCsVersionOverride : pDepConfig.getCheckstyleBaseVersion()));
+        for (File f : pClasspath) {
+            logger.info("  - " + f.getAbsolutePath());
+        }
+        logger.info("- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -");
     }
 }

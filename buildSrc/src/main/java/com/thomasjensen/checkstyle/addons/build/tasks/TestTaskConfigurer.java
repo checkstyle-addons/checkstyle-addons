@@ -25,7 +25,6 @@ import org.gradle.api.file.Directory;
 import org.gradle.api.plugins.JavaBasePlugin;
 import org.gradle.api.plugins.JavaPluginExtension;
 import org.gradle.api.provider.Provider;
-import org.gradle.api.tasks.SourceSet;
 import org.gradle.api.tasks.TaskProvider;
 import org.gradle.api.tasks.compile.AbstractCompile;
 import org.gradle.api.tasks.compile.JavaCompile;
@@ -103,10 +102,7 @@ public class TestTaskConfigurer
             JacocoPluginExtension.TASK_EXTENSION_NAME);
         jacoco.setEnabled(false);
 
-        testTask.setClasspath(new ClasspathBuilder(project).buildClassPath(pDepConfig, pCsVersion, true,
-            buildUtil.getSourceSet(SourceSet.TEST_SOURCE_SET_NAME),
-            buildUtil.getSourceSet(SourceSet.MAIN_SOURCE_SET_NAME),
-            buildUtil.getSourceSet(BuildUtil.SONARQUBE_SOURCE_SET_NAME)));
+        testTask.setClasspath(new ClasspathBuilder(project).buildTestExecutionClasspath(pDepConfig, pCsVersion));
 
         final JavaLevelUtil javaLevelUtil = new JavaLevelUtil(project);
         if (javaLevelUtil.isOlderSupportedJava(javaLevel)) {
