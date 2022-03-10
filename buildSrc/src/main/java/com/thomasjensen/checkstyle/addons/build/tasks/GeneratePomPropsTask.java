@@ -59,8 +59,8 @@ public class GeneratePomPropsTask
 
         final Project project = getProject();
         appendix = project.getObjects().property(String.class);
-        appendixChanged();
         appendix.set((String) null);
+        updateDescription();
 
         // Task Inputs: the property values identifying the artifact
         final TaskInputs inputs = getInputs();
@@ -113,21 +113,19 @@ public class GeneratePomPropsTask
 
 
     /**
-     * When the {@code appendix} property is changed, update task description and inputs.
+     * Update the task description with the value of the {@code appendix} property.
      */
-    public void appendixChanged()
+    public void updateDescription()
     {
-        appendix.flatMap((String newValue) -> {
-            getInputs().property("appendix", newValue);
-            if (newValue != null && newValue.length() > 0) {
-                setDescription(
-                    "Create file '" + pluginPomProps.getName() + "' for use in JAR (appendix: " + newValue + ")");
-            }
-            else {
-                setDescription("Create file '" + pluginPomProps.getName() + "' for use in JAR (no appendix)");
-            }
-            return appendix;
-        });
+        final String appendixValue = appendix.getOrNull();
+        String text = "Create file '" + pluginPomProps.getName() + "' for use in JAR ";
+        if (appendixValue != null && appendixValue.length() > 0) {
+            text += "(appendix: " + appendixValue + ")";
+        }
+        else {
+            text += "(no appendix)";
+        }
+        setDescription(text);
     }
 
 

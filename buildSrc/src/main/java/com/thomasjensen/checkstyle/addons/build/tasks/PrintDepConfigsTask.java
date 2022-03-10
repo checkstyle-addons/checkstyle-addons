@@ -27,6 +27,7 @@ public class PrintDepConfigsTask
     public PrintDepConfigsTask(@Nonnull final DependencyConfigs pDepConfigs)
     {
         depConfigs = pDepConfigs;
+        setDescription("Print the Checkstyle Addons dependency configurations");
     }
 
 

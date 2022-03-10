@@ -22,6 +22,7 @@ import org.gradle.api.tasks.javadoc.Javadoc;
 
 import com.thomasjensen.checkstyle.addons.build.BuildUtil;
 import com.thomasjensen.checkstyle.addons.build.DependencyConfig;
+import com.thomasjensen.checkstyle.addons.build.TaskCreator;
 import com.thomasjensen.checkstyle.addons.build.TaskNames;
 
 
@@ -48,6 +49,7 @@ public class JarJavadocTaskConfigurer
     {
         final BuildUtil buildUtil = new BuildUtil(jarTask.getProject());
 
+        jarTask.setGroup(TaskCreator.ARTIFACTS_GROUP_NAME);
         jarTask.getArchiveClassifier().set("javadoc");
 
         // set appendix for archive name

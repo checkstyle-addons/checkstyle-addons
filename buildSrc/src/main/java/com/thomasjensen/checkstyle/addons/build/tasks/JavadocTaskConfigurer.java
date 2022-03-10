@@ -66,7 +66,10 @@ public class JavadocTaskConfigurer
         javadocTask.setDescription("Generate Javadoc API documentation for dependency configuration '"
             + pDepConfig.getName() + "' (Java level: " + javaLevel + ")");
 
-        javadocTask.dependsOn(buildUtil.getTaskProvider(TaskNames.compileJava, JavaCompile.class, pDepConfig));
+        javadocTask.dependsOn(
+            buildUtil.getTaskProvider(TaskNames.compileJava, JavaCompile.class, pDepConfig),
+            buildUtil.getTaskProvider(TaskNames.compileSonarqubeJava, JavaCompile.class, pDepConfig)
+        );
 
         final JavaPluginExtension javaExt = project.getExtensions().getByType(JavaPluginExtension.class);
         javadocTask.setDestinationDir(new File(javaExt.getDocsDir().getAsFile().get(), javadocTask.getName()));

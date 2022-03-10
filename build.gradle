@@ -53,6 +53,12 @@ checkstyleAddons {
     website = 'https://checkstyle-addons.thomasjensen.com/'
 }
 
+project.gradle.taskGraph.whenReady { taskGraph ->
+    if (taskGraph.hasTask(':classes')) {
+        logger.lifecycle("\nBuilding ${project.name} ${project.version}")
+    }
+}
+
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 //   Dependencies of the 'default' dependency configuration, which is also used by the IDE
@@ -72,7 +78,7 @@ dependencies {
     testImplementation checkstyleAddonsLibs.junit
     testImplementation group: 'org.mockito', name: 'mockito-core', version: '2.27.0'
 
-    /* spotbugsPlugins group: 'com.mebigfatguy.sb-contrib', name: 'sb-contrib', version: '7.4.6' */ // TODO
+    spotbugsPlugins group: 'com.mebigfatguy.sb-contrib', name: 'sb-contrib', version: '7.4.7'
 }
 
 
@@ -145,24 +151,23 @@ checkstyle {
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
 def excludedClasses = ['CheckstyleApiFixer', 'MdlJsonConfigValidator']
-test {
-    // TODO this will realize the task. do this in a provider.configure() instead
+tasks.named('test').configure {
     jacoco {
         excludes = excludedClasses
     }
 }
-jacocoTestReport {
-    reports {
+tasks.named('jacocoTestReport', JacocoReport).configure { jacocoReportTask ->
+    jacocoReportTask.dependsOn(tasks.named('test'))
+    jacocoReportTask.reports {
         html.required = true
         xml.required = true
         csv.required = false
     }
-    sourceSets(sourceSets.main, sourceSets.sonarqube)
-    classDirectories.setFrom((FileCollection) fileTree(
+    jacocoReportTask.sourceSets(sourceSets.main, sourceSets.sonarqube)
+    jacocoReportTask.classDirectories.setFrom((FileCollection) fileTree(
         dir: sourceSets.main.output.classesDirs.first()).exclude(excludedClasses.collect{"**/$it*"}))
-    additionalClassDirs.setFrom(fileTree(dir: sourceSets.sonarqube.output.classesDirs.first()))
+    jacocoReportTask.additionalClassDirs.setFrom(fileTree(dir: sourceSets.sonarqube.output.classesDirs.first()))
 }
-tasks.jacocoTestReport.dependsOn tasks.test
 
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
@@ -191,7 +196,8 @@ bintray {
         user = project.property('bintray.user')
         key = project.property('bintray.apikey')
 
-        /* Set<String> pubNames = project.ext.depConfigs.publications.keySet() // TODO */
+        /* Set<String> pubNames = project.ext.depConfigs.publications.keySet()
+         // TODO publish directly to maven central */
         Set<String> pubNames = [ 'checkstyle-addons',
                                  'checkstyle-addons-java7', 'checkstyle-addons-java8a', 'checkstyle-addons-java8b' ]
         publications = pubNames.toArray(new String[pubNames.size()])

@@ -1,4 +1,19 @@
 package com.thomasjensen.checkstyle.addons.build;
+/*
+ * Checkstyle-Addons - Additional Checkstyle checks
+ * Copyright (c) 2015-2020, the Checkstyle Addons contributors
+ *
+ * This program is free software: you can redistribute it and/or modify it under the
+ * terms of the GNU General Public License, version 3, as published by the Free
+ * Software Foundation.
+ *
+ * This program is distributed in the hope that it will be useful, but WITHOUT ANY
+ * WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A
+ * PARTICULAR PURPOSE. See the GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License along with this
+ * program.  If not, see <http://www.gnu.org/licenses/>.
+ */
 
 import java.util.Arrays;
 import javax.annotation.Nonnull;
@@ -11,6 +26,7 @@ import org.gradle.api.file.FileCollection;
 import org.gradle.api.plugins.JavaBasePlugin;
 import org.gradle.api.plugins.JavaPlugin;
 import org.gradle.api.plugins.JavaPluginExtension;
+import org.gradle.api.tasks.Copy;
 import org.gradle.api.tasks.SourceSet;
 import org.gradle.api.tasks.SourceSetContainer;
 import org.gradle.api.tasks.TaskContainer;
@@ -18,9 +34,13 @@ import org.gradle.api.tasks.TaskProvider;
 import org.gradle.api.tasks.javadoc.Javadoc;
 import org.gradle.api.tasks.testing.Test;
 
-import com.thomasjensen.checkstyle.addons.build.tasks.JavadocTaskConfigurer;
+import com.thomasjensen.checkstyle.addons.build.tasks.JavadocConfigAction;
 import com.thomasjensen.checkstyle.addons.build.tasks.PrintDepConfigsTask;
-import com.thomasjensen.checkstyle.addons.build.tasks.TestTaskConfigurer;
+import com.thomasjensen.checkstyle.addons.build.tasks.SiteCopyAllChecksConfigAction;
+import com.thomasjensen.checkstyle.addons.build.tasks.SiteCopyDownloadGuideConfigAction;
+import com.thomasjensen.checkstyle.addons.build.tasks.SiteCopyJavadocConfigAction;
+import com.thomasjensen.checkstyle.addons.build.tasks.SiteTask;
+import com.thomasjensen.checkstyle.addons.build.tasks.TestTaskConfigAction;
 
 
 /**
@@ -45,7 +65,7 @@ public class BuildPlugin
         project.getExtensions().create("checkstyleAddons", BuildConfigExtension.class, project);
 
         setVersionFromFile(project);
-        final DependencyConfigs depConfigs = provideDepConfigs(project);
+        final DependencyConfigs depConfigs = new DependencyConfigs(pRootProject);
         new JavaLevelUtil(project).analyzeJavaLevels();
         provideGitHash();
         establishSonarQubeSourceSet(project);
@@ -55,7 +75,7 @@ public class BuildPlugin
             new TestConfigAction().execute(testTask);
             // Since the default test task (and not our own TestTask class) will be used to run the tests in the
             // default dependency configuration, we need to provide it with the same system property.
-            testTask.systemProperty(TestTaskConfigurer.CSVERSION_SYSPROP_NAME,
+            testTask.systemProperty(TestTaskConfigAction.CSVERSION_SYSPROP_NAME,
                 depConfigs.getDefault().getCheckstyleBaseVersion());
         });
 
@@ -72,7 +92,8 @@ public class BuildPlugin
         taskCreator.setupArtifactTasks(depConfigs);
         taskCreator.rewirePublishingTasks(depConfigs);
 
-        new SetupSiteTasks(project).registerTasks();
+        configurePrintDepConfigsTask(project, depConfigs);
+        configureSiteTasks(project);
     }
 
 
@@ -85,14 +106,25 @@ public class BuildPlugin
 
 
 
-    private DependencyConfigs provideDepConfigs(final Project pRootProject)
+    private void configurePrintDepConfigsTask(@Nonnull final Project pRootProject,
+        @Nonnull final DependencyConfigs pDepConfigs)
     {
-        final DependencyConfigs depConfigs = new DependencyConfigs(pRootProject);
         final TaskProvider<PrintDepConfigsTask> printTaskProvider =
-            pRootProject.getTasks().register("printDepConfigs", PrintDepConfigsTask.class, depConfigs);
+            pRootProject.getTasks().register("printDepConfigs", PrintDepConfigsTask.class, pDepConfigs);
         pRootProject.getTasks().named(JavaBasePlugin.BUILD_TASK_NAME).configure(buildTask ->
             buildTask.dependsOn(printTaskProvider));
-        return depConfigs;
+
+        // The 'printDepConfigs' task should run first.
+        for (DependencyConfig depConfig : pDepConfigs.getAll().values()) {
+            if (!depConfig.isDefaultConfig()) {
+                buildUtil.getTaskProvider(TaskNames.assemble, Task.class, depConfig).configure(assembleTask ->
+                    assembleTask.shouldRunAfter(printTaskProvider));
+            }
+        }
+        pRootProject.getTasks().named(LifecycleBasePlugin.ASSEMBLE_TASK_NAME).configure(assembleTask ->
+            assembleTask.shouldRunAfter(printTaskProvider));
+        pRootProject.getTasks().named(LifecycleBasePlugin.CHECK_TASK_NAME).configure(checkTask ->
+            checkTask.shouldRunAfter(printTaskProvider));
     }
 
 
@@ -148,6 +180,21 @@ public class BuildPlugin
     private void configureDefaultJavadocTask(final Project pRootProject, final DependencyConfigs pDepConfigs)
     {
         pRootProject.getTasks().named("javadoc", Javadoc.class).configure(javadocTask ->
-            new JavadocTaskConfigurer(javadocTask).configureJavadocTask(pDepConfigs.getDefault()));
+            new JavadocConfigAction(pDepConfigs.getDefault())
+                .configureJavadocTask(javadocTask, pDepConfigs.getDefault()));
+    }
+
+
+
+    private void configureSiteTasks(@Nonnull final Project pRootProject)
+    {
+        pRootProject.getTasks().register("siteCopyJavadoc", Copy.class)
+            .configure(new SiteCopyJavadocConfigAction());
+        pRootProject.getTasks().register("siteCopyAllChecks", Copy.class)
+            .configure(new SiteCopyAllChecksConfigAction());
+        pRootProject.getTasks().register("siteCopyDownloadGuide", Copy.class)
+            .configure(new SiteCopyDownloadGuideConfigAction());
+        pRootProject.getTasks().register("site", SiteTask.class)
+            .configure(SiteTask::configureTask);
     }
 }

@@ -72,8 +72,8 @@ public class ClasspathBuilder
         FileCollection cp = project.getObjects().fileCollection();
         if (isTestCompile) {
             cp = cp
-                .plus(sourceSetDirs(pDepConfig, mainSourceSet))
-                .plus(sourceSetDirs(pDepConfig, sqSourceSet));
+                .plus(getClassesDirs(mainSourceSet, pDepConfig))
+                .plus(getClassesDirs(sqSourceSet, pDepConfig));
         }
 
         cp = cp

@@ -114,7 +114,7 @@ public class JarTaskConfigurer
             copySpec.from(pomUsed);
             copySpec.from(pomPropsUsed);
             Map<String, String> placeHolders = new HashMap<>();
-            placeHolders.put("buildTimestamp", buildConfig.getBuildTimestamp().toString());
+            placeHolders.put("buildTimestamp", buildConfig.getBuildTimestamp().get().toString());
             Map<String, Object> propsMap = new HashMap<>();
             propsMap.put("tokens", placeHolders);
             copySpec.filter(propsMap, ReplaceTokens.class);

@@ -103,7 +103,7 @@ String getDockerImageId()
 
 
 tasks.register('buildDockerImage', Exec).configure {
-    description = 'Build the docker image for the ' + rootProject.checkstyleAddons.longName + ' integration test'
+    description = 'Build the docker image for the ' + rootProject.checkstyleAddons.longName.get() + ' integration test'
     group = 'sqtest'
     dependsOn(rootProject.tasks.named('jarSonarqubeDefault'))
 
@@ -173,7 +173,8 @@ def waitForSonarQubeStart()
 
 
 tasks.register('startDockerContainer', Exec).configure {
-    description = 'Start the SonarQube docker container for the ' + rootProject.checkstyleAddons.longName + ' integration test'
+    description = 'Start the SonarQube docker container for the ' + rootProject.checkstyleAddons.longName.get() +
+            ' integration test'
     group = 'sqtest'
     dependsOn(tasks.named('buildDockerImage'))
 
@@ -204,8 +205,8 @@ tasks.register('startDockerContainer', Exec).configure {
 
 
 tasks.register('initDockerContainer', Exec).configure {
-    description = 'Initialize a newly started SonarQube docker container for the ' + rootProject.checkstyleAddons.longName +
-            ' integration test'
+    description = 'Initialize a newly started SonarQube docker container for the ' +
+            rootProject.checkstyleAddons.longName.get() + ' integration test'
     group = 'sqtest'
     dependsOn(tasks.named('startDockerContainer'))
 

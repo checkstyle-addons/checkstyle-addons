@@ -70,7 +70,6 @@ public class VersionWrapper
         }
 
         strVersion = sb.toString();
-        pProject.getLogger().lifecycle("Building version: " + strVersion);
     }
 
 

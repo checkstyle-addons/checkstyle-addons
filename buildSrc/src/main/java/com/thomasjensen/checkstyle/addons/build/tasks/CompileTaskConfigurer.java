@@ -84,7 +84,7 @@ public class CompileTaskConfigurer
         }
 
         final File destDir = calculateDestDirFromSourceSet(pSourceSetToCompile, pDepConfig.getName());
-        compileTask.setSource(pSourceSetToCompile.getAllSource());
+        compileTask.setSource(pSourceSetToCompile.getAllJava());
         compileTask.getDestinationDirectory().set(destDir);
         compileTask.setSourceCompatibility(javaLevel.toString());
         compileTask.setTargetCompatibility(javaLevel.toString());
@@ -94,11 +94,11 @@ public class CompileTaskConfigurer
         compileTask.setClasspath(cp);
 
         if (isTest) {
-            TaskProvider<Task> mainClasses =
-                buildUtil.getTaskProvider(TaskNames.mainClasses, Task.class, pDepConfig);
-            TaskProvider<Task> sonarqubeClasses =
-                buildUtil.getTaskProvider(TaskNames.sonarqubeClasses, Task.class, pDepConfig);
-            compileTask.dependsOn(mainClasses, sonarqubeClasses);
+            TaskProvider<Task> mainCompile =
+                buildUtil.getTaskProvider(TaskNames.compileJava, Task.class, pDepConfig);
+            TaskProvider<Task> sonarqubeCompile =
+                buildUtil.getTaskProvider(TaskNames.compileSonarqubeJava, Task.class, pDepConfig);
+            compileTask.dependsOn(mainCompile, sonarqubeCompile);
         }
     }
 

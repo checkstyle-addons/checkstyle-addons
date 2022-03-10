@@ -22,9 +22,10 @@ import org.gradle.api.JavaVersion;
 import org.gradle.api.Project;
 import org.gradle.api.Task;
 import org.gradle.api.file.Directory;
-import org.gradle.api.plugins.JavaBasePlugin;
 import org.gradle.api.plugins.JavaPluginExtension;
 import org.gradle.api.provider.Provider;
+import org.gradle.api.tasks.SourceSet;
+import org.gradle.api.tasks.TaskContainer;
 import org.gradle.api.tasks.TaskProvider;
 import org.gradle.api.tasks.compile.AbstractCompile;
 import org.gradle.api.tasks.compile.JavaCompile;
@@ -64,6 +65,7 @@ public class TestTaskConfigurer
     {
         final Project project = testTask.getProject();
         final BuildUtil buildUtil = new BuildUtil(project);
+        final TaskContainer tasks = project.getTasks();
         final JavaVersion javaLevel = pDepConfig.getJavaLevel();
         final String baseCsVersion = pDepConfig.getCheckstyleBaseVersion();
 
@@ -81,7 +83,17 @@ public class TestTaskConfigurer
                 + " against a Checkstyle " + pCsVersion + " runtime (Java level: " + javaLevel + ")");
         }
 
-        testTask.dependsOn(buildUtil.getTaskProvider(TaskNames.testClasses, Task.class, pDepConfig));
+        final SourceSet testSourceSet = buildUtil.getSourceSet(SourceSet.TEST_SOURCE_SET_NAME);
+        final SourceSet mainSourceSet = buildUtil.getSourceSet(SourceSet.MAIN_SOURCE_SET_NAME);
+        final SourceSet sqSourceSet = buildUtil.getSourceSet(BuildUtil.SONARQUBE_SOURCE_SET_NAME);
+        testTask.dependsOn(
+            buildUtil.getTaskProvider(TaskNames.compileTestJava, Task.class, pDepConfig),
+            tasks.named(testSourceSet.getProcessResourcesTaskName()),
+            buildUtil.getTaskProvider(TaskNames.compileJava, Task.class, pDepConfig),
+            tasks.named(mainSourceSet.getProcessResourcesTaskName()),
+            buildUtil.getTaskProvider(TaskNames.compileSonarqubeJava, Task.class, pDepConfig),
+            tasks.named(sqSourceSet.getProcessResourcesTaskName())
+        );
 
         new TestConfigAction().execute(testTask);
 
@@ -89,10 +101,6 @@ public class TestTaskConfigurer
             buildUtil.getTaskProvider(TaskNames.compileTestJava, JavaCompile.class, pDepConfig);
         Provider<Directory> destDir = compileTaskProvider.flatMap(AbstractCompile::getDestinationDirectory);
         testTask.setTestClassesDirs(project.files(destDir));
-
-        if (baseCsVersion.equals(pCsVersion)) {
-            project.getTasks().getByName(JavaBasePlugin.CHECK_TASK_NAME).dependsOn(testTask);
-        }
 
         final JavaPluginExtension javaExt = project.getExtensions().getByType(JavaPluginExtension.class);
         testTask.getReports().getHtml().getOutputLocation().fileValue(

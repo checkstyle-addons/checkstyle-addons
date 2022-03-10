@@ -134,7 +134,7 @@ public final class BuildUtil
 
     private void addBuildTimestamp(@Nonnull final Attributes pAttributes)
     {
-        pAttributes.put("Build-Timestamp", getBuildConfig().getBuildTimestamp().toString());
+        pAttributes.put("Build-Timestamp", getBuildConfig().getBuildTimestamp().get().toString());
     }
 
 

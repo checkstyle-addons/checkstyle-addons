@@ -48,10 +48,18 @@ public class TestConfigAction
         pTestTask.onOutput(new Closure<Void>(pTestTask)
         {
             @Override
-            public Void call(final Object... args)
+            public int getMaximumNumberOfParameters()
             {
-                TestDescriptor descriptor = (TestDescriptor) args[0];
-                TestOutputEvent event = (TestOutputEvent) args[1];
+                return Math.max(super.getMaximumNumberOfParameters(), 2);
+            }
+
+
+
+            @Override
+            public Void call(final Object... pArgs)
+            {
+                TestDescriptor descriptor = (TestDescriptor) pArgs[0];
+                TestOutputEvent event = (TestOutputEvent) pArgs[1];
                 if (!"com.thomasjensen.checkstyle.addons.checks.misc.MdlJsonConfigValidatorTest".equals(
                     descriptor.getClassName())
                     || event.getDestination() == TestOutputEvent.Destination.StdErr) //
@@ -65,10 +73,18 @@ public class TestConfigAction
         pTestTask.afterSuite(new Closure<Void>(pTestTask)
         {
             @Override
-            public Void call(final Object... args)
+            public int getMaximumNumberOfParameters()
             {
-                TestDescriptor descriptor = (TestDescriptor) args[0];
-                TestResult testResult = (TestResult) args[1];
+                return Math.max(super.getMaximumNumberOfParameters(), 2);
+            }
+
+
+
+            @Override
+            public Void call(final Object... pArgs)
+            {
+                TestDescriptor descriptor = (TestDescriptor) pArgs[0];
+                TestResult testResult = (TestResult) pArgs[1];
                 if (descriptor.getParent() == null) {
                     pTestTask.getLogger().lifecycle(System.lineSeparator()
                         + testResult.getTestCount() + " tests executed, "

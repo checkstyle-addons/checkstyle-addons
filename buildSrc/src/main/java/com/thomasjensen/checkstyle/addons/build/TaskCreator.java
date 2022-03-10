@@ -104,6 +104,8 @@ public class TaskCreator
         final TaskProvider<Test> testTaskProvider = tasks.register(TaskNames.test.getName(pDepConfig), Test.class);
         testTaskProvider.configure(testTask -> new TestTaskConfigurer(testTask)
             .configureFor(pDepConfig, pDepConfig.getCheckstyleBaseVersion()));
+        final TaskProvider<Task> checkTaskProvider = tasks.named(JavaBasePlugin.CHECK_TASK_NAME);
+        checkTaskProvider.configure(checkTask -> checkTask.dependsOn(testTaskProvider));
 
         // javadoc
         final TaskProvider<Javadoc> javadocTaskProvider =
@@ -192,8 +194,10 @@ public class TaskCreator
             final String pomPropsTaskName = TaskNames.generatePomProperties.getName(depConfig);
             final TaskProvider<GeneratePomPropsTask> pomPropsTaskTaskProvider =
                 tasks.register(pomPropsTaskName, GeneratePomPropsTask.class);
-            pomPropsTaskTaskProvider.configure(pomPropsTask ->
-                pomPropsTask.getAppendix().set(depConfig.isDefaultConfig() ? null : pubSuffix));
+            pomPropsTaskTaskProvider.configure(pomPropsTask -> {
+                pomPropsTask.getAppendix().set(depConfig.isDefaultConfig() ? null : pubSuffix);
+                pomPropsTask.updateDescription();
+            });
 
             // 'generatePom' task
             final TaskProvider<GeneratePomFileTask> pomFileTaskProvider =

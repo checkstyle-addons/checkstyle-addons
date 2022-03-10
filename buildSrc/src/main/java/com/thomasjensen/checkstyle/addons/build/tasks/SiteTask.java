@@ -165,7 +165,7 @@ public class SiteTask
 
             // timestamp of this file's generation, for sitemap.xml
             sb.append("last_modified_at: ");
-            sb.append(sdf.format(buildUtil.getBuildConfig().getBuildTimestamp()));
+            sb.append(sdf.format(buildUtil.getBuildConfig().getBuildTimestamp().get()));
             sb.append("\n");
             sb.append("---\n\n");
 
