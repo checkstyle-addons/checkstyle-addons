@@ -11,6 +11,7 @@ import org.apache.tools.ant.filters.ReplaceTokens;
 import org.gradle.api.Action;
 import org.gradle.api.Project;
 import org.gradle.api.file.CopySpec;
+import org.gradle.api.file.DuplicatesStrategy;
 import org.gradle.api.tasks.Copy;
 import org.gradle.api.tasks.SourceSet;
 import org.gradle.api.tasks.TaskProvider;
@@ -55,6 +56,7 @@ public class SetupSiteTasks
             copyTask.setDescription("Copy Javadoc to site directory");
             copyTask.setGroup(SiteTask.SITE_GROUP);
             copyTask.setDestinationDir(new File(project.getBuildDir(), "site"));
+            copyTask.setDuplicatesStrategy(DuplicatesStrategy.EXCLUDE);
 
             final String website = buildUtil.getBuildConfig().getWebsite().get();
             copyTask.into("v" + project.getVersion() + "/apidocs", (CopySpec copySpec) -> {
