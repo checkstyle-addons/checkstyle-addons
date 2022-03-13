@@ -52,7 +52,6 @@ import com.thomasjensen.checkstyle.addons.build.VersionWrapper;
  */
 public class GeneratePomFileTask
     extends DefaultTask
-    implements ConfigurableAddonsTask
 {
     private final Provider<File> pomFile;
 
@@ -71,7 +70,7 @@ public class GeneratePomFileTask
     }
 
 
-    @Override
+
     public void configureFor(@Nonnull final DependencyConfig pDepConfig)
     {
         depConfig = pDepConfig;
@@ -172,7 +171,7 @@ public class GeneratePomFileTask
         VersionWrapper version = new VersionWrapper(getProject());
         String github = (String) getInputs().getProperties().get("github");
         boolean isRelease = !version.isSnapshot();
-        String versionStr = isRelease ? ("v" + version.toString()) : "master";
+        String versionStr = isRelease ? ("v" + version) : "master";
         return "https://raw.githubusercontent.com/" + github + "/" + versionStr + "/LICENSE";
     }
 
@@ -192,7 +191,6 @@ public class GeneratePomFileTask
                 + PomXml.MODEL_VERSION + ".xsd");
         marshaller.marshal(pPomXml, pomFile.get());
     }
-
 
 
 

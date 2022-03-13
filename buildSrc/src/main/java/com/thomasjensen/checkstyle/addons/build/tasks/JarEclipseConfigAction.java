@@ -20,11 +20,12 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.Map;
+import java.util.Objects;
 import java.util.Set;
 import javax.annotation.Nonnull;
+import javax.annotation.Nullable;
 
 import org.apache.tools.ant.filters.ReplaceTokens;
-import org.gradle.api.Project;
 import org.gradle.api.Task;
 import org.gradle.api.artifacts.Configuration;
 import org.gradle.api.artifacts.ResolvedArtifact;
@@ -44,94 +45,82 @@ import com.thomasjensen.checkstyle.addons.build.TaskNames;
 
 
 /**
- * Gradle task to create the Eclipse plugin.
+ * Gradle task configuration for the Eclipse plugin JAR creation task.
  */
-public class JarEclipseTaskConfigurer
-    implements ConfigurableAddonsTask
+public class JarEclipseConfigAction
+    extends AbstractTaskConfigAction<Jar>
 {
-    private final Jar jarTask;
-
-
-
-    public JarEclipseTaskConfigurer(@Nonnull final Jar pJarTask)
+    public JarEclipseConfigAction(@Nonnull DependencyConfig pDepConfig)
     {
-        super();
-        jarTask = pJarTask;
+        super(pDepConfig);
     }
 
 
 
     @Override
-    @SuppressWarnings("MethodDoesntCallSuperMethod")
-    public void configureFor(@Nonnull final DependencyConfig pDepConfig)
+    protected void configureTaskFor(@Nonnull Jar pJarTask, @Nullable DependencyConfig pDepConfig)
     {
-        final Project project = jarTask.getProject();
-        final BuildUtil buildUtil = new BuildUtil(project);
+        Objects.requireNonNull(pDepConfig, "required dependency config not present");
         final BuildConfigExtension buildConfig = buildUtil.getBuildConfig();
         final String baseCsVersion = pDepConfig.getCheckstyleBaseVersion();
         final String myJavaLevel = pDepConfig.getJavaLevel().toString();
+        pJarTask.setGroup(TaskCreator.ARTIFACTS_GROUP_NAME);
 
-        jarTask.setGroup(TaskCreator.ARTIFACTS_GROUP_NAME);
-        jarTask.setDescription("Assembles the Eclipse-CS plugin for dependency configuration '" + pDepConfig.getName()
-            + "'");
+        pJarTask.setDescription("Assembles the Eclipse-CS plugin for dependency configuration '"
+            + pDepConfig.getName() + "'");
 
         // adjust archive name
         String appendix = "eclipse";
         if (!pDepConfig.isDefaultConfig()) {
             appendix = pDepConfig.getName() + '-' + appendix;
         }
-        jarTask.getArchiveAppendix().set(appendix);
+        pJarTask.getArchiveAppendix().set(appendix);
 
         // Dependency on 'classes' task (compile and resources)
-        jarTask.dependsOn(buildUtil.getTaskProvider(TaskNames.mainClasses, Task.class, pDepConfig));
+        pJarTask.dependsOn(buildUtil.getTaskProvider(TaskNames.mainClasses, Task.class, pDepConfig));
 
         // Inputs for up-to-date checking
-        final TaskInputs inputs = jarTask.getInputs();
+        final TaskInputs inputs = pJarTask.getInputs();
         inputs.property(BuildUtil.GROUP_ID, project.getGroup());
         inputs.property(BuildUtil.VERSION, project.getVersion());
         inputs.property("name", buildConfig.getLongName());
         inputs.property("authorName", buildConfig.getAuthorName());
 
         // Configuration of JAR file contents
-        jarTask.into("META-INF", copySpec -> copySpec.from("LICENSE"));
+        pJarTask.into("META-INF", copySpec -> copySpec.from("LICENSE"));
 
         final JavaCompile compileTask = buildUtil.getTask(TaskNames.compileJava, JavaCompile.class, pDepConfig);
-        jarTask.from(compileTask.getDestinationDirectory());
+        pJarTask.from(compileTask.getDestinationDirectory());
 
         final SourceSet mainSourceSet = buildUtil.getSourceSet(SourceSet.MAIN_SOURCE_SET_NAME);
-        jarTask.from(mainSourceSet.getOutput().getResourcesDir(), copySpec -> {
+        pJarTask.from(Objects.requireNonNull(mainSourceSet.getOutput().getResourcesDir()), copySpec -> {
             copySpec.exclude("**/*.html", "**/*.md");
             copySpec.rename(filename -> filename.replace("eclipsecs-plugin.xml", "plugin.xml"));
             copySpec.filter(versionReplacement(project.getVersion().toString()), ReplaceTokens.class);
         });
 
-        final Set<File> pubLibs = getPublishedDependencyLibs(jarTask, pDepConfig);
-        jarTask.into("lib", copySpec -> copySpec.from(pubLibs));
+        final Set<File> pubLibs = getPublishedDependencyLibs(pJarTask, pDepConfig);
+        pJarTask.into("lib", copySpec -> copySpec.from(pubLibs));
 
-        final Attributes attrs = jarTask.getManifest().getAttributes();
+        final Attributes attrs = pJarTask.getManifest().getAttributes();
         attrs.clear();
         attrs.put("Bundle-ManifestVersion", "2");
-        attrs.put("Bundle-Name", inputs.getProperties().get("name")
-            + " Eclipse-CS Extension (based on Checkstyle " + baseCsVersion + ")");
+        attrs.put("Bundle-Name",
+            inputs.getProperties().get("name") + " Eclipse-CS Extension (based on Checkstyle " + baseCsVersion + ")");
         attrs.put("Bundle-SymbolicName", inputs.getProperties().get(BuildUtil.GROUP_ID) + ";singleton:=true");
         attrs.put("Bundle-Version", inputs.getProperties().get(BuildUtil.VERSION));
-        attrs.put("Require-Bundle", "net.sf.eclipsecs.checkstyle,"
-            + "net.sf.eclipsecs.core,"
-            + "net.sf.eclipsecs.ui");
+        attrs.put("Require-Bundle", "net.sf.eclipsecs.checkstyle," + "net.sf.eclipsecs.core," + "net.sf.eclipsecs.ui");
         attrs.put("Bundle-RequiredExecutionEnvironment", "JavaSE-" + myJavaLevel);
         attrs.put("Eclipse-LazyStart", "true");
         attrs.put("Bundle-Vendor", inputs.getProperties().get("authorName"));
-        attrs.put("Import-Package", "org.eclipse.core.resources,"
-            + "org.eclipse.jdt.core.dom,"
-            + "org.eclipse.jface.resource,"
-            + "org.eclipse.jface.text,"
-            + "org.eclipse.swt.graphics,"
+        attrs.put("Import-Package", "org.eclipse.core.resources," + "org.eclipse.jdt.core.dom,"
+            + "org.eclipse.jface.resource," + "org.eclipse.jface.text," + "org.eclipse.swt.graphics,"
             + "org.eclipse.ui");
-        attrs.putAll(JarTaskConfigurer.mfAttrStd(project));
+        attrs.putAll(JarConfigAction.mfAttrStd(project));
         if (!pubLibs.isEmpty()) {
             attrs.put("Bundle-ClassPath", ".," + flattenPrefixLibs("lib/", pubLibs, ','));
         }
-        buildUtil.addBuildTimestampDeferred(jarTask);
+        buildUtil.addBuildTimestampDeferred(pJarTask);
     }
 
 
@@ -197,5 +186,4 @@ public class JarEclipseTaskConfigurer
         }
         return sb.toString();
     }
-
 }

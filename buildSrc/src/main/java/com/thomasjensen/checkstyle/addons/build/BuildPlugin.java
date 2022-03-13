@@ -20,6 +20,7 @@ import javax.annotation.Nonnull;
 
 import org.gradle.api.Plugin;
 import org.gradle.api.Project;
+import org.gradle.api.Task;
 import org.gradle.api.artifacts.Configuration;
 import org.gradle.api.artifacts.ConfigurationContainer;
 import org.gradle.api.file.FileCollection;
@@ -33,6 +34,7 @@ import org.gradle.api.tasks.TaskContainer;
 import org.gradle.api.tasks.TaskProvider;
 import org.gradle.api.tasks.javadoc.Javadoc;
 import org.gradle.api.tasks.testing.Test;
+import org.gradle.language.base.plugins.LifecycleBasePlugin;
 
 import com.thomasjensen.checkstyle.addons.build.tasks.JavadocConfigAction;
 import com.thomasjensen.checkstyle.addons.build.tasks.PrintDepConfigsTask;

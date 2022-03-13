@@ -18,7 +18,9 @@ package com.thomasjensen.checkstyle.addons.build.tasks;
 import java.io.File;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Objects;
 import javax.annotation.Nonnull;
+import javax.annotation.Nullable;
 
 import org.apache.tools.ant.filters.ReplaceTokens;
 import org.gradle.api.Project;
@@ -41,76 +43,70 @@ import com.thomasjensen.checkstyle.addons.build.TaskNames;
 
 
 /**
- * Gradle task to create the main binary JAR.
+ * Gradle task configuration for the main binary JAR creation task.
  */
-public class JarTaskConfigurer
-    implements ConfigurableAddonsTask
+public class JarConfigAction
+    extends AbstractTaskConfigAction<Jar>
 {
-    private final Jar jarTask;
-
-
-
-    public JarTaskConfigurer(@Nonnull final Jar pJarTask)
+    public JarConfigAction(@Nonnull DependencyConfig pDepConfig)
     {
-        super();
-        jarTask = pJarTask;
+        super(pDepConfig);
     }
 
 
 
     @Override
-    public void configureFor(@Nonnull final DependencyConfig pDepConfig)
+    protected void configureTaskFor(@Nonnull Jar pJarTask, @Nullable DependencyConfig pDepConfig)
     {
-        final Project project = jarTask.getProject();
-        final BuildUtil buildUtil = new BuildUtil(project);
+        Objects.requireNonNull(pDepConfig, "required dependency config not present");
         final BuildConfigExtension buildConfig = buildUtil.getBuildConfig();
         final TaskContainer tasks = project.getTasks();
 
-        jarTask.setGroup(TaskCreator.ARTIFACTS_GROUP_NAME);
-        jarTask.setDescription("Assembles a jar archive containing the '" + SourceSet.MAIN_SOURCE_SET_NAME
+        pJarTask.setGroup(TaskCreator.ARTIFACTS_GROUP_NAME);
+        pJarTask.setDescription("Assembles a jar archive containing the '" + SourceSet.MAIN_SOURCE_SET_NAME
             + "' classes for dependency configuration '" + pDepConfig.getName() + "'");
 
         // set appendix for archive name
         final String appendix = pDepConfig.getName();
         if (!pDepConfig.isDefaultConfig()) {
-            jarTask.getArchiveAppendix().set(appendix);
+            pJarTask.getArchiveAppendix().set(appendix);
         }
 
         // Dependency on pom.properties generating task
-        jarTask.dependsOn(tasks.named(TaskNames.generatePomProperties.getName(pDepConfig)));
+        pJarTask.dependsOn(tasks.named(TaskNames.generatePomProperties.getName(pDepConfig)));
 
         // Task Input: pom.properties file
         final File pomPropsUsed = ((GeneratePomPropsTask)
             tasks.getByName(TaskNames.generatePomProperties.getName(pDepConfig))).getPluginPomProps();
-        jarTask.getInputs().file(pomPropsUsed);
+        pJarTask.getInputs().file(pomPropsUsed);
 
         // Dependency on pom.xml generating task
-        jarTask.dependsOn(tasks.named(TaskNames.generatePom.getName(pDepConfig)));
+        pJarTask.dependsOn(tasks.named(TaskNames.generatePom.getName(pDepConfig)));
 
         // Task Input: pom.xml
         final Provider<File> pomUsed = ((GeneratePomFileTask)
             tasks.getByName(TaskNames.generatePom.getName(pDepConfig))).getPomFile();
-        jarTask.getInputs().file(pomUsed);
+        pJarTask.getInputs().file(pomUsed);
 
         // Dependency on 'classes' task (compile and resources)
-        jarTask.dependsOn(buildUtil.getTaskProvider(TaskNames.mainClasses, Task.class, pDepConfig));
+        pJarTask.dependsOn(buildUtil.getTaskProvider(TaskNames.mainClasses, Task.class, pDepConfig));
 
         // Configuration of JAR file contents
-        jarTask.from(pomUsed);
+        pJarTask.from(pomUsed);
         final SourceSet mainSourceSet = buildUtil.getSourceSet(SourceSet.MAIN_SOURCE_SET_NAME);
-        jarTask.from(new ClasspathBuilder(project).getClassesDirs(mainSourceSet, pDepConfig));
-        jarTask.from(mainSourceSet.getOutput().getResourcesDir());
+        pJarTask.from(new ClasspathBuilder(project).getClassesDirs(mainSourceSet, pDepConfig));
+        pJarTask.from(mainSourceSet.getOutput().getResourcesDir());
 
-        jarTask.exclude("download-guide.html",
+        pJarTask.exclude("download-guide.html",
             "**/*.md",
             "**/checks/all_checks.html",
             "eclipsecs-plugin.xml",
             "**/checkstyle-metadata.*");
 
-        jarTask.into("META-INF", copySpec -> copySpec.from("LICENSE"));
+        pJarTask.into("META-INF", copySpec -> copySpec.from("LICENSE"));
 
         // add generated pom.xml and pom.properties to archive, setting build timestamp in the process
-        jarTask.into("META-INF/maven/" + project.getGroup() + "/" + project.getName(), copySpec -> {
+        pJarTask.into("META-INF/maven/" + project.getGroup() + "/" + project.getName(), copySpec -> {
             copySpec.from(pomUsed);
             copySpec.from(pomPropsUsed);
             Map<String, String> placeHolders = new HashMap<>();
@@ -125,7 +121,7 @@ public class JarTaskConfigurer
         if (!pDepConfig.isDefaultConfig()) {
             effectiveName += '-' + appendix;
         }
-        Manifest manifest = jarTask.getManifest();
+        Manifest manifest = pJarTask.getManifest();
         final Attributes attrs = manifest.getAttributes();
         attrs.clear();
         attrs.put("Specification-Title", effectiveName);
@@ -139,7 +135,7 @@ public class JarTaskConfigurer
         attrs.put("Implementation-Build", buildConfig.getGitHash().get());
         attrs.put("Checkstyle-Version", pDepConfig.getCheckstyleBaseVersion());
         attrs.putAll(mfAttrStd(project));
-        buildUtil.addBuildTimestampDeferred(jarTask);
+        buildUtil.addBuildTimestampDeferred(pJarTask);
     }
 
 

@@ -19,12 +19,13 @@ import java.io.File;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.Map;
+import java.util.Objects;
 import java.util.Set;
 import javax.annotation.Nonnull;
+import javax.annotation.Nullable;
 
 import org.apache.tools.ant.filters.ReplaceTokens;
 import org.gradle.api.Action;
-import org.gradle.api.Project;
 import org.gradle.api.Task;
 import org.gradle.api.java.archives.Attributes;
 import org.gradle.api.tasks.SourceSet;
@@ -41,39 +42,29 @@ import com.thomasjensen.checkstyle.addons.build.TaskNames;
 
 
 /**
- * Gradle task to produce the SonarQube plugin.
+ * Configure a Gradle task to produce the SonarQube plugin.
  */
-public class JarSonarqubeTaskConfigurer
-    implements ConfigurableAddonsTask
+public class JarSonarqubeConfigAction
+    extends AbstractTaskConfigAction<Jar>
 {
-    private final Jar jarTask;
-
-
-
-    public JarSonarqubeTaskConfigurer(@Nonnull final Jar pJarTask)
+    public JarSonarqubeConfigAction(@Nonnull DependencyConfig pDepConfig)
     {
-        super();
-        jarTask = pJarTask;
+        super(pDepConfig);
     }
 
 
 
     @Override
-    @SuppressWarnings("MethodDoesntCallSuperMethod")
-    public void configureFor(@Nonnull final DependencyConfig pDepConfig)
+    protected void configureTaskFor(@Nonnull Jar pJarTask, @Nullable DependencyConfig pDepConfig)
     {
-        jarTask.getLogger().info("Configuring '" + jarTask.getPath() + "' for depConfig '" + pDepConfig.getName()
-            + "' (Java " + pDepConfig.getJavaLevel() + ")");
-        final Project project = jarTask.getProject();
-        final BuildUtil buildUtil = new BuildUtil(project);
+        Objects.requireNonNull(pDepConfig, "required dependency config not present");
+        pJarTask.setGroup(TaskCreator.ARTIFACTS_GROUP_NAME);
+        pJarTask.setDescription("Assembles the SonarQube plugin for dependency configuration '"
+            + pDepConfig.getName() + "'");
         final BuildConfigExtension buildConfig = buildUtil.getBuildConfig();
 
-        jarTask.setGroup(TaskCreator.ARTIFACTS_GROUP_NAME);
-        jarTask.setDescription("Assembles the SonarQube plugin for dependency configuration '" + pDepConfig.getName()
-            + "'");
-
         // Inputs for up-to-date checking
-        final TaskInputs inputs = jarTask.getInputs();
+        final TaskInputs inputs = pJarTask.getInputs();
         inputs.property(BuildUtil.GROUP_ID, project.getGroup());
         inputs.property(BuildUtil.VERSION, project.getVersion());
         inputs.property("name", buildConfig.getLongName());
@@ -87,51 +78,51 @@ public class JarSonarqubeTaskConfigurer
         inputs.property("website", buildConfig.getWebsite());
 
         // archive name
-        jarTask.getArchiveFileName().set("sonar-" + inputs.getProperties().get("sqPluginKey") + "-"
+        pJarTask.getArchiveFileName().set("sonar-" + inputs.getProperties().get("sqPluginKey") + "-"
             + inputs.getProperties().get(BuildUtil.VERSION)
             + (pDepConfig.isDefaultConfig() ? "" : ("-csp" + pDepConfig.getSonarQubeMinCsPluginVersion()))
             + ".jar");
 
         // Task Dependencies
         final Jar defaultJarTask = buildUtil.getTask(TaskNames.jar, Jar.class, pDepConfig);
-        jarTask.dependsOn(defaultJarTask);
+        pJarTask.dependsOn(defaultJarTask);
         final TaskProvider<Task> sqClassesTaskProvider =
             buildUtil.getTaskProvider(TaskNames.sonarqubeClasses, Task.class, pDepConfig);
-        jarTask.dependsOn(sqClassesTaskProvider);
+        pJarTask.dependsOn(sqClassesTaskProvider);
 
         // Configuration of JAR file contents
-        jarTask.into("META-INF", copySpec -> copySpec.from("LICENSE"));
+        pJarTask.into("META-INF", copySpec -> copySpec.from("LICENSE"));
 
         final JavaCompile compileTask =
             buildUtil.getTask(TaskNames.compileSonarqubeJava, JavaCompile.class, pDepConfig);
-        jarTask.from(compileTask.getDestinationDirectory());
+        pJarTask.from(compileTask.getDestinationDirectory());
 
-        jarTask.into(inputs.getProperties().get("sqPackage"), copySpec -> {
+        pJarTask.into(inputs.getProperties().get("sqPackage"), copySpec -> {
             final SourceSet sqSourceSet = buildUtil.getSourceSet(BuildUtil.SONARQUBE_SOURCE_SET_NAME);
             copySpec.from(new File(sqSourceSet.getOutput().getResourcesDir(), "sonarqube.xml"));
-            copySpec.filter(JarEclipseTaskConfigurer.versionReplacement(
+            copySpec.filter(JarEclipseConfigAction.versionReplacement(
                 inputs.getProperties().get(BuildUtil.VERSION).toString()), ReplaceTokens.class);
         });
 
-        final Set<File> pubLibs = JarEclipseTaskConfigurer.getPublishedDependencyLibs(jarTask, pDepConfig);
-        jarTask.into("META-INF/lib", copySpec -> {
+        final Set<File> pubLibs = JarEclipseConfigAction.getPublishedDependencyLibs(pJarTask, pDepConfig);
+        pJarTask.into("META-INF/lib", copySpec -> {
             copySpec.from(defaultJarTask.getArchiveFile());
             copySpec.from(pubLibs);
         });
 
         // Manifest
-        setManifestAttributes(pDepConfig, pubLibs);
+        setManifestAttributes(pJarTask, pDepConfig, pubLibs);
     }
 
 
 
-    private void setManifestAttributes(@Nonnull final DependencyConfig pDepConfig, @Nonnull final Set<File> pPubLibs)
+    private void setManifestAttributes(@Nonnull Jar pJarTask, @Nonnull final DependencyConfig pDepConfig,
+        @Nonnull final Set<File> pPubLibs)
     {
-        final BuildUtil buildUtil = new BuildUtil(jarTask.getProject());
         final String baseCsVersion = pDepConfig.getCheckstyleBaseVersion();
-        final Map<String, Object> inputProps = jarTask.getInputs().getProperties();
+        final Map<String, Object> inputProps = pJarTask.getInputs().getProperties();
         final Jar thinJarTask = buildUtil.getTask(TaskNames.jar, Jar.class, pDepConfig);
-        final Attributes attributes = jarTask.getManifest().getAttributes();
+        final Attributes attributes = pJarTask.getManifest().getAttributes();
 
         attributes.clear();
         attributes.put("Plugin-Name", inputProps.get("name"));
@@ -149,17 +140,18 @@ public class JarSonarqubeTaskConfigurer
         attributes.put("Plugin-RequirePlugins", "checkstyle:" + pDepConfig.getSonarQubeMinCsPluginVersion());
         attributes.put("Plugin-Dependencies", "META-INF/lib/" + thinJarTask.getArchiveFileName().get()
             + (pPubLibs.size() > 0 ? " " : "")
-            + JarEclipseTaskConfigurer.flattenPrefixLibs("META-INF/lib/", pPubLibs, ' '));
+            + JarEclipseConfigAction.flattenPrefixLibs("META-INF/lib/", pPubLibs, ' '));
         attributes.put("Plugin-License", "GPLv3");
         attributes.put("Plugin-Homepage", inputProps.get("website"));
         //attrs.put("Plugin-TermsConditionsUrl", "");
         // TODO use same SonarQube version in manifest and compile dependencies
         attributes.put("Sonar-Version", pDepConfig.getSonarQubeMinPlatformVersion());
-        attributes.putAll(JarTaskConfigurer.mfAttrStd(jarTask.getProject()));
+        attributes.putAll(JarConfigAction.mfAttrStd(project));
         attributes.remove("Website");
 
         //noinspection Convert2Lambda
-        jarTask.doFirst(new Action<>() {
+        pJarTask.doFirst(new Action<>()
+        {
             @Override
             public void execute(@Nonnull final Task pTask)
             {

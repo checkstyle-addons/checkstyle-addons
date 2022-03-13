@@ -17,10 +17,11 @@ package com.thomasjensen.checkstyle.addons.build.tasks;
 
 import java.io.File;
 import java.nio.charset.StandardCharsets;
+import java.util.Objects;
 import javax.annotation.Nonnull;
+import javax.annotation.Nullable;
 
 import org.gradle.api.JavaVersion;
-import org.gradle.api.Project;
 import org.gradle.api.Task;
 import org.gradle.api.file.FileCollection;
 import org.gradle.api.plugins.BasePlugin;
@@ -29,7 +30,6 @@ import org.gradle.api.tasks.TaskProvider;
 import org.gradle.api.tasks.compile.CompileOptions;
 import org.gradle.api.tasks.compile.JavaCompile;
 
-import com.thomasjensen.checkstyle.addons.build.BuildUtil;
 import com.thomasjensen.checkstyle.addons.build.ClasspathBuilder;
 import com.thomasjensen.checkstyle.addons.build.DependencyConfig;
 import com.thomasjensen.checkstyle.addons.build.JavaLevelUtil;
@@ -39,41 +39,60 @@ import com.thomasjensen.checkstyle.addons.build.TaskNames;
 /**
  * Configure a compilation task to compile the sources with settings from the given dependency configuration.
  */
-public class CompileTaskConfigurer
+public class CompileConfigAction
+    extends AbstractTaskConfigAction<JavaCompile>
 {
-    private final JavaCompile compileTask;
-
-
-
-    public CompileTaskConfigurer(final JavaCompile pCompileTask)
+    public CompileConfigAction(@Nonnull DependencyConfig pDepConfig, @Nonnull final SourceSet pSourceSetToCompile)
     {
-        super();
-        compileTask = pCompileTask;
+        super(pDepConfig, pSourceSetToCompile);
     }
 
 
 
-    public void configureFor(@Nonnull final DependencyConfig pDepConfig, @Nonnull final SourceSet pSourceSetToCompile)
+    @Nonnull
+    private SourceSet getSourceSetToCompile()
     {
-        final boolean isTest = SourceSet.TEST_SOURCE_SET_NAME.equals(pSourceSetToCompile.getName());
-        if (compileTask.getLogger().isInfoEnabled()) {
-            compileTask.getLogger().info("Configuring task '" + compileTask.getPath() + "' for depConfig '"
-                + pDepConfig.getName() + "' and sourceSet '" + pSourceSetToCompile.getName() + "' (isTest = "
-                + isTest + ")");
+        if (getExtraParams() != null && getExtraParams()[0] instanceof SourceSet) {
+            return (SourceSet) getExtraParams()[0];
         }
-        final Project project = compileTask.getProject();
-        final BuildUtil buildUtil = new BuildUtil(project);
-        final JavaVersion javaLevel = pDepConfig.getJavaLevel();
+        throw new NullPointerException("extraParams[0] in " + CompileConfigAction.class.getSimpleName());
+    }
 
-        compileTask.setGroup(BasePlugin.BUILD_GROUP);
-        compileTask.setDescription("Compile sources from '" + pSourceSetToCompile.getName()
+
+
+    @Nonnull
+    @Override
+    protected String getExtraLogInfo(@Nonnull JavaCompile pTask)
+    {
+        SourceSet sourceSetToCompile = getSourceSetToCompile();
+        return " and sourceSet '" + sourceSetToCompile.getName() + "' (isTest = " + isTest(sourceSetToCompile) + ")";
+    }
+
+
+
+    private boolean isTest(@Nonnull SourceSet pSourceSetToCompile)
+    {
+        return SourceSet.TEST_SOURCE_SET_NAME.equals(pSourceSetToCompile.getName());
+    }
+
+
+
+    @Override
+    protected void configureTaskFor(@Nonnull JavaCompile pCompileTask, @Nullable DependencyConfig pDepConfig)
+    {
+        Objects.requireNonNull(pDepConfig, "required dependency config not present");
+        final SourceSet sourceSetToCompile = getSourceSetToCompile();
+
+        final JavaVersion javaLevel = pDepConfig.getJavaLevel();
+        pCompileTask.setGroup(BasePlugin.BUILD_GROUP);
+        pCompileTask.setDescription("Compile sources from '" + sourceSetToCompile.getName()
             + "' source set using dependency configuration '" + pDepConfig.getName() + "' (Java level: " + javaLevel
             + ")");
 
         // Additional Task Input: the dependency configuration file
-        compileTask.getInputs().file(pDepConfig.getConfigFile());
+        pCompileTask.getInputs().file(pDepConfig.getConfigFile());
 
-        final CompileOptions options = compileTask.getOptions();
+        final CompileOptions options = pCompileTask.getOptions();
         options.setEncoding(StandardCharsets.UTF_8.toString());
         options.setDeprecation(true);  // show deprecation warnings in compiler output
 
@@ -83,22 +102,22 @@ public class CompileTaskConfigurer
             options.getForkOptions().setExecutable(javaLevelUtil.getCompilerExecutable(javaLevel));
         }
 
-        final File destDir = calculateDestDirFromSourceSet(pSourceSetToCompile, pDepConfig.getName());
-        compileTask.setSource(pSourceSetToCompile.getAllJava());
-        compileTask.getDestinationDirectory().set(destDir);
-        compileTask.setSourceCompatibility(javaLevel.toString());
-        compileTask.setTargetCompatibility(javaLevel.toString());
+        final File destDir = calculateDestDirFromSourceSet(sourceSetToCompile, pDepConfig.getName());
+        pCompileTask.setSource(sourceSetToCompile.getAllJava());
+        pCompileTask.getDestinationDirectory().set(destDir);
+        pCompileTask.setSourceCompatibility(javaLevel.toString());
+        pCompileTask.setTargetCompatibility(javaLevel.toString());
 
         FileCollection cp = new ClasspathBuilder(project)
-            .buildCompileClasspath(pDepConfig, pSourceSetToCompile.getName());
-        compileTask.setClasspath(cp);
+            .buildCompileClasspath(pDepConfig, sourceSetToCompile.getName());
+        pCompileTask.setClasspath(cp);
 
-        if (isTest) {
+        if (isTest(sourceSetToCompile)) {
             TaskProvider<Task> mainCompile =
                 buildUtil.getTaskProvider(TaskNames.compileJava, Task.class, pDepConfig);
             TaskProvider<Task> sonarqubeCompile =
                 buildUtil.getTaskProvider(TaskNames.compileSonarqubeJava, Task.class, pDepConfig);
-            compileTask.dependsOn(mainCompile, sonarqubeCompile);
+            pCompileTask.dependsOn(mainCompile, sonarqubeCompile);
         }
     }
 

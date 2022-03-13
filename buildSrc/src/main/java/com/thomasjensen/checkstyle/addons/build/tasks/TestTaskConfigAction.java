@@ -16,10 +16,11 @@ package com.thomasjensen.checkstyle.addons.build.tasks;
  */
 
 import java.io.File;
+import java.util.Objects;
 import javax.annotation.Nonnull;
+import javax.annotation.Nullable;
 
 import org.gradle.api.JavaVersion;
-import org.gradle.api.Project;
 import org.gradle.api.Task;
 import org.gradle.api.file.Directory;
 import org.gradle.api.plugins.JavaPluginExtension;
@@ -39,54 +40,71 @@ import com.thomasjensen.checkstyle.addons.build.ClasspathBuilder;
 import com.thomasjensen.checkstyle.addons.build.DependencyConfig;
 import com.thomasjensen.checkstyle.addons.build.JavaLevelUtil;
 import com.thomasjensen.checkstyle.addons.build.TaskNames;
-import com.thomasjensen.checkstyle.addons.build.TestConfigAction;
 
 
 /**
  * Configure a Test task to execute tests according to a given dependency configuration.
  */
-public class TestTaskConfigurer
+public class TestTaskConfigAction
+    extends AbstractTaskConfigAction<Test>
 {
     public static final String CSVERSION_SYSPROP_NAME = "com.thomasjensen.checkstyle.addons.checkstyle.version";
 
-    private final Test testTask;
 
 
-
-    public TestTaskConfigurer(@Nonnull final Test pTestTask)
+    public TestTaskConfigAction(@Nonnull DependencyConfig pDepConfig, @Nonnull final String pCsVersion)
     {
-        super();
-        testTask = pTestTask;
+        super(pDepConfig, pCsVersion);
     }
 
 
 
-    public void configureFor(@Nonnull final DependencyConfig pDepConfig, @Nonnull final String pCsVersion)
+    @Nonnull
+    @Override
+    protected String getExtraLogInfo(@Nonnull Test pTask)
     {
-        final Project project = testTask.getProject();
-        final BuildUtil buildUtil = new BuildUtil(project);
+        return " and Checkstyle version " + getCsVersion();
+    }
+
+
+
+    @Nonnull
+    private String getCsVersion()
+    {
+        if (getExtraParams() != null && getExtraParams()[0] instanceof String) {
+            return (String) getExtraParams()[0];
+        }
+        throw new NullPointerException("extraParams[0] in " + TestTaskConfigAction.class.getSimpleName());
+    }
+
+
+
+    @Override
+    protected void configureTaskFor(@Nonnull Test pTestTask, @Nullable DependencyConfig pDepConfig)
+    {
+        Objects.requireNonNull(pDepConfig, "required dependency config not present");
+        final String csVersion = getCsVersion();
+        final String baseCsVersion = pDepConfig.getCheckstyleBaseVersion();
         final TaskContainer tasks = project.getTasks();
         final JavaVersion javaLevel = pDepConfig.getJavaLevel();
-        final String baseCsVersion = pDepConfig.getCheckstyleBaseVersion();
-
-        testTask.setGroup(LifecycleBasePlugin.VERIFICATION_GROUP);
+        pTestTask.setGroup(LifecycleBasePlugin.VERIFICATION_GROUP);
 
         // Only produce JUnit XMLs for the default test task in order to minimize noise.
-        testTask.getReports().getJunitXml().getRequired().set(Boolean.FALSE);
+        pTestTask.getReports().getJunitXml().getRequired().set(Boolean.FALSE);
 
-        if (baseCsVersion.equals(pCsVersion)) {
-            testTask.setDescription("Run the unit tests using dependency configuration '" + pDepConfig.getName()
+        if (baseCsVersion.equals(csVersion)) {
+            pTestTask.setDescription("Run the unit tests using dependency configuration '" + pDepConfig.getName()
                 + "' (Checkstyle " + baseCsVersion + ", Java level: " + javaLevel + ")");
         }
         else {
-            testTask.setDescription("Run the unit tests compiled for Checkstyle " + baseCsVersion
-                + " against a Checkstyle " + pCsVersion + " runtime (Java level: " + javaLevel + ")");
+            pTestTask.setDescription("Run the unit tests compiled for Checkstyle " + baseCsVersion
+                + " against a Checkstyle " + csVersion + " runtime (Java level: " + javaLevel + ")");
         }
 
         final SourceSet testSourceSet = buildUtil.getSourceSet(SourceSet.TEST_SOURCE_SET_NAME);
         final SourceSet mainSourceSet = buildUtil.getSourceSet(SourceSet.MAIN_SOURCE_SET_NAME);
         final SourceSet sqSourceSet = buildUtil.getSourceSet(BuildUtil.SONARQUBE_SOURCE_SET_NAME);
-        testTask.dependsOn(
+        pTestTask.dependsOn(
             buildUtil.getTaskProvider(TaskNames.compileTestJava, Task.class, pDepConfig),
             tasks.named(testSourceSet.getProcessResourcesTaskName()),
             buildUtil.getTaskProvider(TaskNames.compileJava, Task.class, pDepConfig),
@@ -95,29 +113,29 @@ public class TestTaskConfigurer
             tasks.named(sqSourceSet.getProcessResourcesTaskName())
         );
 
-        new TestConfigAction().execute(testTask);
+        new com.thomasjensen.checkstyle.addons.build.TestConfigAction().execute(pTestTask);
 
         final TaskProvider<JavaCompile> compileTaskProvider =
             buildUtil.getTaskProvider(TaskNames.compileTestJava, JavaCompile.class, pDepConfig);
         Provider<Directory> destDir = compileTaskProvider.flatMap(AbstractCompile::getDestinationDirectory);
-        testTask.setTestClassesDirs(project.files(destDir));
+        pTestTask.setTestClassesDirs(project.files(destDir));
 
         final JavaPluginExtension javaExt = project.getExtensions().getByType(JavaPluginExtension.class);
-        testTask.getReports().getHtml().getOutputLocation().fileValue(
-            new File(javaExt.getTestReportDir().getAsFile().get(), testTask.getName()));
+        pTestTask.getReports().getHtml().getOutputLocation().fileValue(
+            new File(javaExt.getTestReportDir().getAsFile().get(), pTestTask.getName()));
 
-        final JacocoTaskExtension jacoco = (JacocoTaskExtension) testTask.getExtensions().getByName(
+        final JacocoTaskExtension jacoco = (JacocoTaskExtension) pTestTask.getExtensions().getByName(
             JacocoPluginExtension.TASK_EXTENSION_NAME);
         jacoco.setEnabled(false);
 
-        testTask.setClasspath(new ClasspathBuilder(project).buildTestExecutionClasspath(pDepConfig, pCsVersion));
+        pTestTask.setClasspath(new ClasspathBuilder(project).buildTestExecutionClasspath(pDepConfig, csVersion));
 
         final JavaLevelUtil javaLevelUtil = new JavaLevelUtil(project);
         if (javaLevelUtil.isOlderSupportedJava(javaLevel)) {
-            testTask.setExecutable(javaLevelUtil.getJvmExecutable(javaLevel));
+            pTestTask.setExecutable(javaLevelUtil.getJvmExecutable(javaLevel));
         }
 
         // Make the Checkstyle version available to the test cases via a system property.
-        testTask.systemProperty(CSVERSION_SYSPROP_NAME, pCsVersion);
+        pTestTask.systemProperty(CSVERSION_SYSPROP_NAME, csVersion);
     }
 }

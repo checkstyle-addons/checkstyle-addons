@@ -17,7 +17,9 @@ package com.thomasjensen.checkstyle.addons.build.tasks;
 
 import java.io.File;
 import java.nio.charset.StandardCharsets;
+import java.util.Objects;
 import javax.annotation.Nonnull;
+import javax.annotation.Nullable;
 
 import org.gradle.api.JavaVersion;
 import org.gradle.api.Project;
@@ -38,47 +40,39 @@ import com.thomasjensen.checkstyle.addons.build.TaskNames;
 /**
  * Create Javadoc for the given dependency configuration.
  */
-public class JavadocTaskConfigurer
-    implements ConfigurableAddonsTask
+public class JavadocConfigAction
+    extends AbstractTaskConfigAction<Javadoc>
 {
-    private final Javadoc javadocTask;
-
-    private final BuildUtil buildUtil;
-
-
-
-    public JavadocTaskConfigurer(@Nonnull final Javadoc pJavadocTask)
+    public JavadocConfigAction(@Nonnull DependencyConfig pDepConfig)
     {
-        super();
-        javadocTask = pJavadocTask;
-        buildUtil = new BuildUtil(pJavadocTask.getProject());
+        super(pDepConfig);
     }
 
 
 
     @Override
-    public void configureFor(@Nonnull final DependencyConfig pDepConfig)
+    protected void configureTaskFor(@Nonnull Javadoc pJavadocTask, @Nullable DependencyConfig pDepConfig)
     {
-        final Project project = javadocTask.getProject();
+        Objects.requireNonNull(pDepConfig, "required dependency config not present");
         final JavaVersion javaLevel = pDepConfig.getJavaLevel();
 
-        javadocTask.setGroup(JavaBasePlugin.DOCUMENTATION_GROUP);
-        javadocTask.setDescription("Generate Javadoc API documentation for dependency configuration '"
+        pJavadocTask.setGroup(JavaBasePlugin.DOCUMENTATION_GROUP);
+        pJavadocTask.setDescription("Generate Javadoc API documentation for dependency configuration '"
             + pDepConfig.getName() + "' (Java level: " + javaLevel + ")");
 
-        javadocTask.dependsOn(
+        pJavadocTask.dependsOn(
             buildUtil.getTaskProvider(TaskNames.compileJava, JavaCompile.class, pDepConfig),
             buildUtil.getTaskProvider(TaskNames.compileSonarqubeJava, JavaCompile.class, pDepConfig)
         );
 
         final JavaPluginExtension javaExt = project.getExtensions().getByType(JavaPluginExtension.class);
-        javadocTask.setDestinationDir(new File(javaExt.getDocsDir().getAsFile().get(), javadocTask.getName()));
+        pJavadocTask.setDestinationDir(new File(javaExt.getDocsDir().getAsFile().get(), pJavadocTask.getName()));
 
-        configureJavadocTask(pDepConfig);
+        configureJavadocTask(pJavadocTask, pDepConfig);
 
         final JavaLevelUtil javaLevelUtil = new JavaLevelUtil(project);
         if (javaLevelUtil.isOlderSupportedJava(javaLevel)) {
-            javadocTask.setExecutable(javaLevelUtil.getJavadocExecutable(javaLevel));
+            pJavadocTask.setExecutable(javaLevelUtil.getJavadocExecutable(javaLevel));
         }
     }
 
@@ -87,13 +81,15 @@ public class JavadocTaskConfigurer
     /**
      * These configurations are also applied to the standard 'javadoc' task, plus they are applied to ours.
      *
+     * @param pJavadocTask the task to configure
      * @param pDepConfig dependency config
      */
-    public void configureJavadocTask(final DependencyConfig pDepConfig)
+    public void configureJavadocTask(@Nonnull Javadoc pJavadocTask, @Nonnull final DependencyConfig pDepConfig)
     {
-        final Project project = javadocTask.getProject();
+        final Project project = pJavadocTask.getProject();  // can't use fields here
+        final BuildUtil buildUtil = new BuildUtil(project);
 
-        final StandardJavadocDocletOptions options = (StandardJavadocDocletOptions) javadocTask.getOptions();
+        final StandardJavadocDocletOptions options = (StandardJavadocDocletOptions) pJavadocTask.getOptions();
         options.setEncoding(StandardCharsets.UTF_8.toString());
         options.setDocEncoding(StandardCharsets.UTF_8.toString());
         options.setCharSet(StandardCharsets.UTF_8.toString());
@@ -104,11 +100,11 @@ public class JavadocTaskConfigurer
         options.setLinks(pDepConfig.getJavadocLinks());
         options.setHeader(buildUtil.getBuildConfig().getLongName().get());
         options.setWindowTitle(buildUtil.getBuildConfig().getLongName().get());
-        javadocTask.setTitle(buildUtil.getBuildConfig().getLongName().get() + " v" + project.getVersion());
+        pJavadocTask.setTitle(buildUtil.getBuildConfig().getLongName().get() + " v" + project.getVersion());
 
-        javadocTask.setSource(buildUtil.getSourceSet(SourceSet.MAIN_SOURCE_SET_NAME).getAllJava()
+        pJavadocTask.setSource(buildUtil.getSourceSet(SourceSet.MAIN_SOURCE_SET_NAME).getAllJava()
             .plus(buildUtil.getSourceSet(BuildUtil.SONARQUBE_SOURCE_SET_NAME).getAllJava()));
-        javadocTask.setClasspath(new ClasspathBuilder(project).buildJavadocClasspath(pDepConfig));
+        pJavadocTask.setClasspath(new ClasspathBuilder(project).buildJavadocClasspath(pDepConfig));
 
         // javadoc does not inherit the proxy settings (https://issues.gradle.org/browse/GRADLE-1228)
         if (System.getProperty("http.proxyHost") != null) {

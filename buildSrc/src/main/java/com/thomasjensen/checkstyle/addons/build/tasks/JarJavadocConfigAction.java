@@ -15,59 +15,54 @@ package com.thomasjensen.checkstyle.addons.build.tasks;
  * program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+import java.util.Objects;
 import javax.annotation.Nonnull;
+import javax.annotation.Nullable;
 
 import org.gradle.api.tasks.bundling.Jar;
 import org.gradle.api.tasks.javadoc.Javadoc;
 
-import com.thomasjensen.checkstyle.addons.build.BuildUtil;
 import com.thomasjensen.checkstyle.addons.build.DependencyConfig;
 import com.thomasjensen.checkstyle.addons.build.TaskCreator;
 import com.thomasjensen.checkstyle.addons.build.TaskNames;
 
 
 /**
- * Gradle task to create Javadoc JARs for publication.
+ * Gradle configuration for the task that creates the Javadoc JARs for publication.
  */
-public class JarJavadocTaskConfigurer
-    implements ConfigurableAddonsTask
+public class JarJavadocConfigAction
+    extends AbstractTaskConfigAction<Jar>
 {
-    private final Jar jarTask;
-
-
-
-    public JarJavadocTaskConfigurer(@Nonnull final Jar pJarTask)
+    public JarJavadocConfigAction(@Nonnull DependencyConfig pDepConfig)
     {
-        super();
-        jarTask = pJarTask;
+        super(pDepConfig);
     }
 
 
 
     @Override
-    public void configureFor(@Nonnull final DependencyConfig pDepConfig)
+    protected void configureTaskFor(@Nonnull Jar pJarTask, @Nullable DependencyConfig pDepConfig)
     {
-        final BuildUtil buildUtil = new BuildUtil(jarTask.getProject());
-
-        jarTask.setGroup(TaskCreator.ARTIFACTS_GROUP_NAME);
-        jarTask.getArchiveClassifier().set("javadoc");
+        Objects.requireNonNull(pDepConfig, "required dependency config not present");
+        pJarTask.setGroup(TaskCreator.ARTIFACTS_GROUP_NAME);
+        pJarTask.getArchiveClassifier().set("javadoc");
 
         // set appendix for archive name
         if (!pDepConfig.isDefaultConfig()) {
             final String appendix = pDepConfig.getName();
-            jarTask.getArchiveAppendix().set(appendix);
+            pJarTask.getArchiveAppendix().set(appendix);
         }
-        jarTask.setDescription("Build the javadoc JAR for dependency configuration '" + pDepConfig.getName() + "'");
+        pJarTask.setDescription("Build the javadoc JAR for dependency configuration '" + pDepConfig.getName() + "'");
 
         // Dependency on javadoc generating task
         final Javadoc javadocTask = buildUtil.getTask(TaskNames.javadoc, Javadoc.class, pDepConfig);
-        jarTask.dependsOn(javadocTask);
+        pJarTask.dependsOn(javadocTask);
 
         // Configuration of JAR file contents
-        jarTask.from(javadocTask.getDestinationDir());
-        jarTask.into("META-INF", copySpec -> copySpec.from("LICENSE"));
+        pJarTask.from(javadocTask.getDestinationDir());
+        pJarTask.into("META-INF", copySpec -> copySpec.from("LICENSE"));
 
         // Manifest
-        buildUtil.inheritManifest(jarTask, pDepConfig);
+        buildUtil.inheritManifest(pJarTask, pDepConfig);
     }
 }

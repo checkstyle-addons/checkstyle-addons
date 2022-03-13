@@ -41,17 +41,17 @@ import org.gradle.api.tasks.javadoc.Javadoc;
 import org.gradle.api.tasks.testing.Test;
 import org.gradle.language.base.plugins.LifecycleBasePlugin;
 
-import com.thomasjensen.checkstyle.addons.build.tasks.CompileTaskConfigurer;
-import com.thomasjensen.checkstyle.addons.build.tasks.FatJarTaskConfigurer;
+import com.thomasjensen.checkstyle.addons.build.tasks.CompileConfigAction;
+import com.thomasjensen.checkstyle.addons.build.tasks.FatJarConfigAction;
 import com.thomasjensen.checkstyle.addons.build.tasks.GeneratePomFileTask;
 import com.thomasjensen.checkstyle.addons.build.tasks.GeneratePomPropsTask;
-import com.thomasjensen.checkstyle.addons.build.tasks.JarEclipseTaskConfigurer;
-import com.thomasjensen.checkstyle.addons.build.tasks.JarJavadocTaskConfigurer;
-import com.thomasjensen.checkstyle.addons.build.tasks.JarSonarqubeTaskConfigurer;
-import com.thomasjensen.checkstyle.addons.build.tasks.JarSourcesTaskConfigurer;
-import com.thomasjensen.checkstyle.addons.build.tasks.JarTaskConfigurer;
-import com.thomasjensen.checkstyle.addons.build.tasks.JavadocTaskConfigurer;
-import com.thomasjensen.checkstyle.addons.build.tasks.TestTaskConfigurer;
+import com.thomasjensen.checkstyle.addons.build.tasks.JarEclipseConfigAction;
+import com.thomasjensen.checkstyle.addons.build.tasks.JarJavadocConfigAction;
+import com.thomasjensen.checkstyle.addons.build.tasks.JarSonarqubeConfigAction;
+import com.thomasjensen.checkstyle.addons.build.tasks.JarSourcesConfigAction;
+import com.thomasjensen.checkstyle.addons.build.tasks.JarConfigAction;
+import com.thomasjensen.checkstyle.addons.build.tasks.JavadocConfigAction;
+import com.thomasjensen.checkstyle.addons.build.tasks.TestTaskConfigAction;
 
 
 /**
@@ -101,15 +101,14 @@ public class TaskCreator
 
         // test
         final TaskProvider<Test> testTaskProvider = tasks.register(TaskNames.test.getName(pDepConfig), Test.class);
-        testTaskProvider.configure(testTask -> new TestTaskConfigurer(testTask)
-            .configureFor(pDepConfig, pDepConfig.getCheckstyleBaseVersion()));
+        testTaskProvider.configure(new TestTaskConfigAction(pDepConfig, pDepConfig.getCheckstyleBaseVersion()));
         final TaskProvider<Task> checkTaskProvider = tasks.named(JavaBasePlugin.CHECK_TASK_NAME);
         checkTaskProvider.configure(checkTask -> checkTask.dependsOn(testTaskProvider));
 
         // javadoc
         final TaskProvider<Javadoc> javadocTaskProvider =
             tasks.register(TaskNames.javadoc.getName(pDepConfig), Javadoc.class);
-        javadocTaskProvider.configure(javadocTask -> new JavadocTaskConfigurer(javadocTask).configureFor(pDepConfig));
+        javadocTaskProvider.configure(new JavadocConfigAction(pDepConfig));
     }
 
 
@@ -123,8 +122,7 @@ public class TaskCreator
         final SourceSet sourceSet = buildUtil.getSourceSet(pSourceSetName);
         final TaskProvider<JavaCompile> compileTaskProvider =
             tasks.register(pCompileTaskName.getName(pDepConfig), JavaCompile.class);
-        compileTaskProvider.configure(compileTask ->
-            new CompileTaskConfigurer(compileTask).configureFor(pDepConfig, sourceSet));
+        compileTaskProvider.configure(new CompileConfigAction(pDepConfig, sourceSet));
 
         final TaskProvider<Task> classesTaskProvider = tasks.register(pClassesTaskName.getName(pDepConfig));
         classesTaskProvider.configure(classesTask -> {
@@ -159,8 +157,8 @@ public class TaskCreator
 
                 final TaskProvider<Test> testTaskProvider =
                     tasks.register(TaskNames.xtest.getName(depConfig, csRuntimeVersion), Test.class);
+                testTaskProvider.configure(new TestTaskConfigAction(depConfig, csRuntimeVersion));
                 testTaskProvider.configure(testTask -> {
-                    new TestTaskConfigurer(testTask).configureFor(depConfig, csRuntimeVersion);
                     testTask.setGroup(XTEST_GROUP_NAME);
                     testTask.setDescription("Run the unit tests compiled for Checkstyle " + csBaseVersion
                         + " against a Checkstyle " + csRuntimeVersion + " runtime (Java level: " + javaLevel + ")");
@@ -206,24 +204,22 @@ public class TaskCreator
             // 'jar' task
             final String jarTaskName = TaskNames.jar.getName(depConfig);
             final TaskProvider<Jar> jarTaskProvider = tasks.register(jarTaskName, Jar.class);
-            jarTaskProvider.configure(jarTask -> new JarTaskConfigurer(jarTask).configureFor(depConfig));
+            jarTaskProvider.configure(new JarConfigAction(depConfig));
 
             // 'fatjar' task
             final String fatjarTaskName = TaskNames.fatJar.getName(depConfig);
             final TaskProvider<ShadowJar> shadowJarTaskProvider = tasks.register(fatjarTaskName, ShadowJar.class);
-            shadowJarTaskProvider.configure(fatjarTask -> new FatJarTaskConfigurer(fatjarTask).configureFor(depConfig));
+            shadowJarTaskProvider.configure(new FatJarConfigAction(depConfig));
 
             // 'jarSources' task
             final String jarSourcesTaskName = TaskNames.jarSources.getName(depConfig);
             final TaskProvider<Jar> jarSourcesTaskProvider = tasks.register(jarSourcesTaskName, Jar.class);
-            jarSourcesTaskProvider.configure(jarSourcesTask ->
-                new JarSourcesTaskConfigurer(jarSourcesTask).configureFor(depConfig));
+            jarSourcesTaskProvider.configure(new JarSourcesConfigAction(depConfig));
 
             // 'jarJavadoc' task
             final String jarJavadocTaskName = TaskNames.jarJavadoc.getName(depConfig);
             final TaskProvider<Jar> jarJavadocTaskProvider = tasks.register(jarJavadocTaskName, Jar.class);
-            jarJavadocTaskProvider.configure(jarJavadocTask ->
-                new JarJavadocTaskConfigurer(jarJavadocTask).configureFor(depConfig));
+            jarJavadocTaskProvider.configure(new JarJavadocConfigAction(depConfig));
 
             // Add JARs to list of artifacts to publish
             String pubName = "checkstyleAddons";
@@ -242,16 +238,14 @@ public class TaskCreator
             // 'jarEclipse' task
             final String eclipseTaskName = TaskNames.jarEclipse.getName(depConfig);
             final TaskProvider<Jar> jarEclipseTaskProvider = tasks.register(eclipseTaskName, Jar.class);
-            jarEclipseTaskProvider.configure(jarEclipseTask ->
-                new JarEclipseTaskConfigurer(jarEclipseTask).configureFor(depConfig));
+            jarEclipseTaskProvider.configure(new JarEclipseConfigAction(depConfig));
 
             // 'jarSonarqube' task
             TaskProvider<Jar> jarSqTaskProvider = null;
             if (depConfig.isSonarQubeSupported()) {
                 final String sqTaskName = TaskNames.jarSonarqube.getName(depConfig);
                 jarSqTaskProvider = tasks.register(sqTaskName, Jar.class);
-                jarSqTaskProvider.configure(jarSqTask ->
-                    new JarSonarqubeTaskConfigurer(jarSqTask).configureFor(depConfig));
+                jarSqTaskProvider.configure(new JarSonarqubeConfigAction(depConfig));
             }
             final TaskProvider<Jar> jarSqTaskProviderFinal = jarSqTaskProvider;
 

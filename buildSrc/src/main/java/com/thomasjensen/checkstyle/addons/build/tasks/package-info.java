@@ -16,6 +16,6 @@
  */
 
 /**
- * Gradle tasks used for building Checkstyle Addons.
+ * Gradle tasks and task config actions used for building Checkstyle Addons.
  */
 package com.thomasjensen.checkstyle.addons.build.tasks;
