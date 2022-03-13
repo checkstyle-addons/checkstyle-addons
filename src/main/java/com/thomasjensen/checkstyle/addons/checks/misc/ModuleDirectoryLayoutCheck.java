@@ -20,6 +20,7 @@ import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
+import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
@@ -494,7 +495,7 @@ public class ModuleDirectoryLayoutCheck
         throws IOException
     {
         final byte[] fileContents = Util.readBytes(pInputStream);
-        final String json = new String(fileContents, Util.UTF8);
+        final String json = new String(fileContents, StandardCharsets.UTF_8);
         final MdlJsonConfig result = new ObjectMapper().readValue(json, MdlJsonConfig.class);
         return result;
     }

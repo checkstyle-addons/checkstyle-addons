@@ -25,6 +25,7 @@ import java.io.OutputStream;
 import java.io.PrintStream;
 import java.io.UnsupportedEncodingException;
 import java.lang.reflect.Constructor;
+import java.nio.charset.StandardCharsets;
 import java.util.Collections;
 import java.util.List;
 import java.util.Locale;
@@ -41,8 +42,6 @@ import com.puppycrawl.tools.checkstyle.api.AuditListener;
 import com.puppycrawl.tools.checkstyle.api.Configuration;
 import junit.framework.AssertionFailedError;
 import org.junit.Assert;
-
-import com.thomasjensen.checkstyle.addons.util.Util;
 
 // @formatter:off
 /**
@@ -156,7 +155,7 @@ public abstract class BaseCheckTestSupport
     protected BaseCheckTestSupport()
     {
         try {
-            mStream = new PrintStream(mBAOS, false, Util.UTF8.name());
+            mStream = new PrintStream(mBAOS, false, StandardCharsets.UTF_8.name());
         }
         catch (UnsupportedEncodingException e) {
             // cannot happen because we use an existing Charset object
@@ -255,7 +254,7 @@ public abstract class BaseCheckTestSupport
 
             // process each of the lines
             final ByteArrayInputStream bais = new ByteArrayInputStream(mBAOS.toByteArray());
-            final LineNumberReader lnr = new LineNumberReader(new InputStreamReader(bais, Util.UTF8));
+            final LineNumberReader lnr = new LineNumberReader(new InputStreamReader(bais, StandardCharsets.UTF_8));
 
             for (int i = 0; i < pExpected.length; i++) {
                 final String expected = pMessageFileName + ":" + pExpected[i];

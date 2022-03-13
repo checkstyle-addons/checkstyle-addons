@@ -17,11 +17,13 @@ package com.thomasjensen.checkstyle.addons.checks.misc;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.nio.charset.StandardCharsets;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.thomasjensen.checkstyle.addons.util.Util;
 import org.junit.Assert;
 import org.junit.Test;
+
+import com.thomasjensen.checkstyle.addons.util.Util;
 
 
 /**
@@ -43,7 +45,7 @@ public final class MdlJsonConfigTest
             Util.closeQuietly(is);
         }
 
-        String json = new String(fileContents, Util.UTF8);
+        String json = new String(fileContents, StandardCharsets.UTF_8);
         MdlJsonConfig cfg = new ObjectMapper().readValue(json, MdlJsonConfig.class);
 
         cfg.validate();  // should be ok

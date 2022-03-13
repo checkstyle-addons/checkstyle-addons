@@ -48,7 +48,6 @@ import com.thomasjensen.checkstyle.addons.build.BuildUtil;
 /**
  * Gradle task to assemble the documentation for publication on the website.
  */
-@SuppressWarnings("MethodDoesntCallSuperMethod")
 public class SiteTask
     extends DefaultTask
 {

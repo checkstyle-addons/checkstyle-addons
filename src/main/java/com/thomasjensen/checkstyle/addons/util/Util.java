@@ -21,7 +21,6 @@ import java.io.Closeable;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
-import java.nio.charset.Charset;
 import java.util.Collections;
 import java.util.HashSet;
 import java.util.Set;
@@ -42,9 +41,6 @@ public final class Util
 {
     /** A pattern that never matches (and does so efficiently) */
     public static final Pattern NEVER_MATCH = Pattern.compile("^(?!x)x");
-
-    /** Constant for UTF-8 charset; can be replaced with StandardCharsets.UTF_8 after moving to Java 7 */
-    public static final Charset UTF8 = Charset.forName("UTF-8");
 
     /** Size of the file I/O buffer in bytes */
     private static final int IO_BUFFER_SIZE_BYTES = 8000;
