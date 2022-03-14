@@ -19,9 +19,9 @@ plugins {
     id 'jacoco'
     id 'checkstyle'
     id 'idea'
+    id 'signing'
     id 'maven-publish'
     alias checkstyleAddonsLibs.plugins.spotbugs
-    id 'com.jfrog.bintray' version '1.8.4'
     id 'org.barfuin.gradle.taskinfo' version '1.3.1'
     id 'com.thomasjensen.checkstyle.addons.build'
 }
@@ -54,7 +54,7 @@ checkstyleAddons {
 }
 
 project.gradle.taskGraph.whenReady { taskGraph ->
-    if (taskGraph.hasTask(':classes')) {
+    if (taskGraph.hasTask(':jarDefault')) {
         logger.lifecycle("\nBuilding ${project.name} ${project.version}")
     }
 }
@@ -88,7 +88,7 @@ dependencies {
 
 java {
     sourceCompatibility = JavaVersion.VERSION_1_7
-    disableAutoTargetJvm()
+    disableAutoTargetJvm()     // TODO
 }
 
 tasks.withType(JavaCompile).configureEach {
@@ -181,61 +181,48 @@ tasks.named('jacocoTestReport', JacocoReport).configure { jacocoReportTask ->
 //   Publishing of artifacts
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
-task checkProperties {
-    setDescription('Ensure that all properties required for bintray upload are set')
-    setGroup(PublishingPlugin.PUBLISH_TASK_GROUP)
-    doLast {
-        ['bintray.user', 'bintray.apikey', 'bintray.gpg.passphrase', 'sonatype.user', 'sonatype.password'].each {
-            final String prp ->
-                if (!project.hasProperty(prp)) {
-                    throw new GradleException("Could not find property \'${prp}\'. " +
-                        'Did you forget to specify it in ~/.gradle/gradle.properties?')
-                }
+publishing {
+    repositories {
+        maven {
+            name = 'localBuildDir'
+            url = "$buildDir/maven-repo-test"
         }
-    }
-}
-
-bintray {
-    if (project.hasProperty('bintray.user') && project.hasProperty('bintray.apikey')
-        && project.hasProperty('bintray.gpg.passphrase') && project.hasProperty('sonatype.user')
-        && project.hasProperty('sonatype.password'))
-    {
-        user = project.property('bintray.user')
-        key = project.property('bintray.apikey')
-
-        /* Set<String> pubNames = project.ext.depConfigs.publications.keySet()
-         // TODO publish directly to maven central */
-        Set<String> pubNames = [ 'checkstyle-addons',
-                                 'checkstyle-addons-java7', 'checkstyle-addons-java8a', 'checkstyle-addons-java8b' ]
-        publications = pubNames.toArray(new String[pubNames.size()])
-        publish = true
-        dryRun = true   // comment out for actual release deployment
-        pkg {
-            repo = 'checkstyle-addons'
-            userOrg = 'checkstyle-addons'
-            name = project.name
-            desc = project.description
-            websiteUrl = checkstyleAddons.website
-            issueTrackerUrl = checkstyleAddons.issueTrackerUrl
-            vcsUrl = "https://github.com/${checkstyleAddons.github}.git"
-            licenses = ['GPL-3.0']
-            publicDownloadNumbers = true
-            version {
-                name = project.version  // Bintray logical version name
-                desc = project.description
-                released = checkstyleAddons.buildTimestamp
-                vcsTag = 'v' + project.version
-                gpg {
-                    sign = true
-                    passphrase = project.property('bintray.gpg.passphrase')
-                }
-                mavenCentralSync {
-                    sync = true
-                    user = project.property('sonatype.user')
-                    password = project.property('sonatype.password')
+        maven {
+            name = 'mavenCentralStaging'
+            url = 'https://oss.sonatype.org/service/local/staging/deploy/maven2/'
+            if (project.hasProperty('sonatype.user') && project.hasProperty('sonatype.password')) {
+                credentials {
+                    username = project.getProperty('sonatype.user')
+                    password = project.getProperty('sonatype.password')
                 }
             }
         }
     }
 }
-tasks['bintrayUpload'].dependsOn('checkProperties')
+
+signing {
+    useGpgCmd()   // use local GPG installation and agent
+}
+
+tasks.register('checkPublishProperties').configure {
+    setDescription('Ensure that all properties required for publishing are set')
+    setGroup(PublishingPlugin.PUBLISH_TASK_GROUP)
+    doLast {
+        ['sonatype.user', 'sonatype.password', 'signing.gnupg.keyName.thomasjensen.com'].each {
+            final String prp ->
+                if (!project.hasProperty(prp)) {
+                    String gradlePropsPath = new File(gradle.getGradleUserHomeDir(), "gradle.properties").canonicalPath;
+                    throw new GradleException("Could not find property \'${prp}\'. " +
+                            "Did you forget to specify it in ${gradlePropsPath}?")
+                }
+        }
+    }
+}
+tasks.withType(PublishToMavenRepository).configureEach {
+    if (it.name.endsWith('ToMavenCentralStagingRepository')) {
+        it.dependsOn(tasks.named('checkPublishProperties'))
+    }
+}
+tasks.withType(Sign).configureEach {
+    it.dependsOn(tasks.named('checkPublishProperties'))
+}

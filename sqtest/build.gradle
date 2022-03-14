@@ -329,14 +329,12 @@ tasks.register('integrationTest').configure {
     }
 }
 
-
-['checkstyleMain', 'checkstyleTest', 'compileJava', 'compileTestJava', 'processResources', 'processTestResources',
- 'sonarqube', 'test', 'check', 'assemble', 'build', 'buildDependents', 'buildNeeded', 'classes', 'clean', 'jar',
- 'testClasses'].each {
-    tasks.named(it).configure(t -> t.setGroup('sqtest'))
+project.tasks.configureEach {
+    if (!['buildDependents', 'buildEnvironment', 'buildNeeded', 'components', 'dependencyInsight',
+          'dependentComponents', 'help', 'javaToolchains', 'model', 'outgoingVariants'].contains(it.name)) {
+        it.setGroup('sqtest')
+    }
 }
-
-tasks.named('sonarqube').configure(t -> t.dependsOn(tasks.named('fetchApiToken')))
 
 sonarqube {
     properties {
@@ -345,4 +343,8 @@ sonarqube {
         property 'sonar.host.url', 'http://localhost:9000'
         // sonar.login set by fetchApiToken task using value from container
     }
+}
+
+project.tasks.named('sonarqube').configure {
+    it.dependsOn(tasks.named('fetchApiToken'))
 }

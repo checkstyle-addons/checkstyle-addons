@@ -18,6 +18,9 @@ package com.thomasjensen.checkstyle.addons.build;
 import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 import javax.annotation.Nonnull;
 
 import com.github.jengelman.gradle.plugins.shadow.tasks.ShadowJar;
@@ -28,8 +31,6 @@ import org.gradle.api.plugins.BasePlugin;
 import org.gradle.api.plugins.JavaBasePlugin;
 import org.gradle.api.plugins.JavaPlugin;
 import org.gradle.api.plugins.quality.Checkstyle;
-import org.gradle.api.publish.PublishingExtension;
-import org.gradle.api.publish.maven.MavenPublication;
 import org.gradle.api.publish.maven.tasks.GenerateMavenPom;
 import org.gradle.api.tasks.Copy;
 import org.gradle.api.tasks.SourceSet;
@@ -45,11 +46,11 @@ import com.thomasjensen.checkstyle.addons.build.tasks.CompileConfigAction;
 import com.thomasjensen.checkstyle.addons.build.tasks.FatJarConfigAction;
 import com.thomasjensen.checkstyle.addons.build.tasks.GeneratePomFileTask;
 import com.thomasjensen.checkstyle.addons.build.tasks.GeneratePomPropsTask;
+import com.thomasjensen.checkstyle.addons.build.tasks.JarConfigAction;
 import com.thomasjensen.checkstyle.addons.build.tasks.JarEclipseConfigAction;
 import com.thomasjensen.checkstyle.addons.build.tasks.JarJavadocConfigAction;
 import com.thomasjensen.checkstyle.addons.build.tasks.JarSonarqubeConfigAction;
 import com.thomasjensen.checkstyle.addons.build.tasks.JarSourcesConfigAction;
-import com.thomasjensen.checkstyle.addons.build.tasks.JarConfigAction;
 import com.thomasjensen.checkstyle.addons.build.tasks.JavadocConfigAction;
 import com.thomasjensen.checkstyle.addons.build.tasks.TestTaskConfigAction;
 
@@ -221,20 +222,6 @@ public class TaskCreator
             final TaskProvider<Jar> jarJavadocTaskProvider = tasks.register(jarJavadocTaskName, Jar.class);
             jarJavadocTaskProvider.configure(new JarJavadocConfigAction(depConfig));
 
-            // Add JARs to list of artifacts to publish
-            String pubName = "checkstyleAddons";
-            if (!depConfig.isDefaultConfig()) {
-                pubName += '-' + pubSuffix;
-            }
-            final PublishingExtension publishing = (PublishingExtension) project.getExtensions().getByName(
-                PublishingExtension.NAME);
-            final MavenPublication pub = publishing.getPublications().create(pubName, MavenPublication.class);
-            final String pubArtifactId = project.getName() + (depConfig.isDefaultConfig() ? "" : ("-" + pubSuffix));
-            pub.setArtifactId(pubArtifactId);
-            pub.artifact(jarTaskProvider);
-            pub.artifact(jarSourcesTaskProvider);
-            pub.artifact(jarJavadocTaskProvider);
-
             // 'jarEclipse' task
             final String eclipseTaskName = TaskNames.jarEclipse.getName(depConfig);
             final TaskProvider<Jar> jarEclipseTaskProvider = tasks.register(eclipseTaskName, Jar.class);
@@ -311,35 +298,32 @@ public class TaskCreator
 
     public void rewirePublishingTasks(@Nonnull final DependencyConfigs pDepConfigs)
     {
-        project.getTasks().configureEach(task -> {
-            for (final DependencyConfig depConfig : pDepConfigs.getAll().values()) {
-                final String pubName = pubNameFromDepCfg(depConfig);
-                final String pubNameCap = Character.toUpperCase(pubName.charAt(0)) + pubName.substring(1);
-
-                // local publication depends on the pom.xml
-                if (task.getName().equals("publish" + pubNameCap + "PublicationToMavenLocal")) {
-                    task.dependsOn(buildUtil.getTaskProvider(TaskNames.generatePom, Task.class, depConfig));
-                }
-
-                // the default task for POM creation is replaced by our own
-                else if (task.getName().equals("generatePomFileFor" + pubNameCap + "Publication")) {
-                    task.setEnabled(false);  // we do this manually
-                    ((GenerateMavenPom) task).setDestination(new File(project.getBuildDir(),
-                        "tmp/" + TaskNames.generatePom.getName(depConfig) + "/pom.xml"));
-                }
-            }
+        // This feels dirty. Shouldn't we rather tell the publishing mechanism to get the POM from somewhere else?
+        project.getTasks().withType(GenerateMavenPom.class).configureEach(regularPomTask -> {
+            regularPomTask.setEnabled(false);  // we do this ourselves
+            DependencyConfig depConfig = task2depConfig(regularPomTask, pDepConfigs);
+            regularPomTask.setDestination(new File(project.getBuildDir(),
+                "tmp/" + TaskNames.generatePom.getName(depConfig) + "/pom.xml"));
         });
     }
 
 
 
     @Nonnull
-    private String pubNameFromDepCfg(@Nonnull final DependencyConfig pDepConfig)
+    private DependencyConfig task2depConfig(@Nonnull final GenerateMavenPom pTask,
+        @Nonnull final DependencyConfigs pDepConfigs)
     {
-        String pubName = DependencyConfig.DEFAULT_PUBLICATION_NAME;
-        if (!pDepConfig.isDefaultConfig()) {
-            pubName += '-' + pDepConfig.getName();
+        // e.g. "generatePomFileForCheckstyleAddons-java8bPublication"
+        pTask.getLogger().info("GenerateMavenPom task: " + pTask.getName());
+        Pattern pattern = Pattern.compile("generatePomFileForCheckstyleAddons(.*?)Publication");
+        Matcher matcher = pattern.matcher(pTask.getName());
+        DependencyConfig result = pDepConfigs.getDefault();
+        if (matcher.matches()) {
+            String g = matcher.group(1);
+            if (g != null && g.length() > 0) {
+                result = pDepConfigs.getAll().get(g.substring(1));   // dash
+            }
         }
-        return pubName;
+        return Objects.requireNonNull(result, "Could not map task name '" + pTask.getName() + "' to a depConfig");
     }
 }

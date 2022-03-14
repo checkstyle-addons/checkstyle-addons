@@ -18,6 +18,7 @@ package com.thomasjensen.checkstyle.addons.build;
 import java.util.Arrays;
 import javax.annotation.Nonnull;
 
+import org.gradle.api.NamedDomainObjectProvider;
 import org.gradle.api.Plugin;
 import org.gradle.api.Project;
 import org.gradle.api.Task;
@@ -27,14 +28,21 @@ import org.gradle.api.file.FileCollection;
 import org.gradle.api.plugins.JavaBasePlugin;
 import org.gradle.api.plugins.JavaPlugin;
 import org.gradle.api.plugins.JavaPluginExtension;
+import org.gradle.api.publish.PublicationContainer;
+import org.gradle.api.publish.PublishingExtension;
+import org.gradle.api.publish.maven.MavenPublication;
+import org.gradle.api.publish.plugins.PublishingPlugin;
 import org.gradle.api.tasks.Copy;
 import org.gradle.api.tasks.SourceSet;
 import org.gradle.api.tasks.SourceSetContainer;
 import org.gradle.api.tasks.TaskContainer;
 import org.gradle.api.tasks.TaskProvider;
+import org.gradle.api.tasks.bundling.Jar;
 import org.gradle.api.tasks.javadoc.Javadoc;
 import org.gradle.api.tasks.testing.Test;
 import org.gradle.language.base.plugins.LifecycleBasePlugin;
+import org.gradle.plugins.signing.Sign;
+import org.gradle.plugins.signing.SigningExtension;
 
 import com.thomasjensen.checkstyle.addons.build.tasks.JavadocConfigAction;
 import com.thomasjensen.checkstyle.addons.build.tasks.PrintDepConfigsTask;
@@ -92,6 +100,7 @@ public class BuildPlugin
 
         configureDefaultJavadocTask(project, depConfigs);
         taskCreator.setupArtifactTasks(depConfigs);
+        registerPublications(project, depConfigs);
         taskCreator.rewirePublishingTasks(depConfigs);
 
         configurePrintDepConfigsTask(project, depConfigs);
@@ -184,6 +193,50 @@ public class BuildPlugin
         pRootProject.getTasks().named("javadoc", Javadoc.class).configure(javadocTask ->
             new JavadocConfigAction(pDepConfigs.getDefault())
                 .configureJavadocTask(javadocTask, pDepConfigs.getDefault()));
+    }
+
+
+
+    private void registerPublications(@Nonnull final Project pProject, @Nonnull final DependencyConfigs pDepConfigs)
+    {
+        final SigningExtension signExt = pProject.getExtensions().getByType(SigningExtension.class);
+        final PublishingExtension pubExt = pProject.getExtensions().getByType(PublishingExtension.class);
+        final PublicationContainer publications = pubExt.getPublications();
+
+        for (DependencyConfig depConfig : pDepConfigs.getAll().values()) {
+            final String pubSuffix = depConfig.getName();
+            final NamedDomainObjectProvider<MavenPublication> pubProvider =
+                publications.register(depConfig.getPublicationName(), MavenPublication.class);
+            pubProvider.configure((MavenPublication pub) ->
+            {
+                final String artifactId = pProject.getName() + (depConfig.isDefaultConfig() ? "" : ("-" + pubSuffix));
+                pub.setArtifactId(artifactId);
+
+                final TaskProvider<Jar> jarTaskProvider =
+                    buildUtil.getTaskProvider(TaskNames.jar, Jar.class, depConfig);
+                pub.artifact(jarTaskProvider);
+
+                final TaskProvider<Jar> jarSrcTaskProvider =
+                    buildUtil.getTaskProvider(TaskNames.jarSources, Jar.class, depConfig);
+                pub.artifact(jarSrcTaskProvider, a -> a.setClassifier("sources"));
+
+                final TaskProvider<Jar> jarJavadocTaskProvider =
+                    buildUtil.getTaskProvider(TaskNames.jarJavadoc, Jar.class, depConfig);
+                pub.artifact(jarJavadocTaskProvider, a -> a.setClassifier("javadoc"));
+            });
+        }
+
+        // CHECK The use of afterEvaluate() is a workaround here, because the signing plugin does not make use of
+        //       configuration avoidance yet, so it causes 20+ tasks to be created that would otherwise not even be
+        //       configured. This sucks so much! Ah well, but one day, they'll fix it and then ...
+        pProject.afterEvaluate(p -> signExt.sign(publications));
+
+        if (pProject.hasProperty("signing.gnupg.keyName.thomasjensen.com")) {
+            pProject.setProperty("signing.gnupg.keyName",
+                pProject.getProperties().get("signing.gnupg.keyName.thomasjensen.com"));
+        }
+        pProject.getTasks().withType(Sign.class).configureEach(signTask ->
+            signTask.setGroup(PublishingPlugin.PUBLISH_TASK_GROUP));
     }
 
 
