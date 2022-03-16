@@ -16,6 +16,7 @@
 
 plugins {
     id 'java-gradle-plugin'
+    id 'idea'
 }
 
 repositories {
@@ -53,6 +54,16 @@ java {
 tasks.withType(JavaCompile) {
     options.encoding = 'UTF-8'
     options.compilerArgs << '-Xlint:unchecked' << '-Xlint:deprecation'
+}
+
+
+// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+//   IntelliJ IDEA
+// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+
+idea.module {
+    downloadSources = true
+    downloadJavadoc = true
 }
 
 

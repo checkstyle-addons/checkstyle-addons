@@ -23,23 +23,28 @@ buildscript {
     }
 }
 
-import com.github.difflib.text.DiffRow
-import com.github.difflib.text.DiffRowGenerator
-import groovy.json.JsonOutput
-import groovy.json.JsonSlurper
-import java.nio.file.Files
-import java.util.regex.Pattern
-
 plugins {
     id 'java'
     id 'checkstyle'
+    id 'idea'
     id 'org.sonarqube' version '3.3'
 }
+
 repositories {
     mavenCentral()
 }
 
+
+import com.github.difflib.text.DiffRow
+import com.github.difflib.text.DiffRowGenerator
+import groovy.json.JsonOutput
+import groovy.json.JsonSlurper
+
+import java.nio.file.Files
+import java.util.regex.Pattern
+
 description = 'Sources to analyze for SonarQube integration test'
+
 java {
     sourceCompatibility = JavaVersion.VERSION_1_8
 }
@@ -83,6 +88,16 @@ tasks.register('checkstyle', Checkstyle).configure {
     doFirst {
         logger.lifecycle('The following Checkstyle run is *expected* to produce issues:')
     }
+}
+
+
+// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+//   IntelliJ IDEA
+// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+
+idea.module {
+    downloadSources = true
+    downloadJavadoc = true
 }
 
 

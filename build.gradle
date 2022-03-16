@@ -30,6 +30,8 @@ repositories {
     mavenCentral()
 }
 
+import org.gradle.plugins.ide.idea.model.IdeaLanguageLevel
+
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 //   Project metadata
@@ -87,8 +89,7 @@ dependencies {
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
 java {
-    sourceCompatibility = JavaVersion.VERSION_1_7
-    disableAutoTargetJvm()     // TODO
+    sourceCompatibility = JavaVersion.VERSION_11
 }
 
 tasks.withType(JavaCompile).configureEach {
@@ -113,10 +114,10 @@ spotbugs {
     excludeFilter = file('config/spotbugs-excludes.xml')
 }
 
-tasks.withType(com.github.spotbugs.snom.SpotBugsTask.class) {
+tasks.withType(com.github.spotbugs.snom.SpotBugsTask.class).configureEach {
     it.setGroup(JavaBasePlugin.VERIFICATION_GROUP)
     reports {
-        xml.enabled = false
+        xml.required = false
         html {
             required = true
             stylesheet = 'fancy-hist.xsl'
@@ -130,6 +131,9 @@ tasks.withType(com.github.spotbugs.snom.SpotBugsTask.class) {
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
 idea.module {
+    // Caution: The next line is not picked up correctly by IDEA. Correct manually after import.
+    //          This means making sure that 'main', 'test', and 'sonarqube' source sets are set to Java 7.
+    languageLevel = new IdeaLanguageLevel(JavaVersion.VERSION_1_7)
     downloadSources = true
     downloadJavadoc = true
     excludeDirs += file('.idea')
@@ -137,6 +141,10 @@ idea.module {
     excludeDirs += file('_posts')
     excludeDirs += file('_site')
     excludeDirs += file('_support')
+}
+idea.project {
+    jdkName = JavaVersion.VERSION_11
+    languageLevel = JavaVersion.VERSION_11
 }
 
 
@@ -202,6 +210,12 @@ publishing {
 
 signing {
     useGpgCmd()   // use local GPG installation and agent
+    // CHECK Unfortunately, the signing plugin does not make use of configuration avoidance yet, so it causes 20+ tasks
+    //       to be unnecessarily realized (as of Gradle 7.4.1).
+    sign(publishing.publications)
+}
+tasks.withType(Sign).configureEach {
+    it.setGroup(PublishingPlugin.PUBLISH_TASK_GROUP)
 }
 
 tasks.register('checkPublishProperties').configure {

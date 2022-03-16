@@ -68,7 +68,7 @@ public class FatJarConfigAction
         pFatJarTask.setDescription("Create a combined JAR of project and runtime dependencies of '"
             + SourceSet.MAIN_SOURCE_SET_NAME + "' for dependency configuration '" + pDepConfig.getName() + "'");
 
-        pFatJarTask.getManifest().inheritFrom(thinJarTask.getManifest());
+        buildUtil.inheritManifest(pFatJarTask, pDepConfig);
 
         pFatJarTask.from(thinJarTask.getArchiveFile());
         Configuration cfg = new ClasspathBuilder(project).buildMainRuntimeConfiguration(pDepConfig);

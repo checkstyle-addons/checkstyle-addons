@@ -163,22 +163,12 @@ public final class BuildUtil
     /**
      * Make the given Jar task inherit its manifest from the "main" "thin" Jar task. Also set the build timestamp.
      *
-     * @param pTask the executing task
+     * @param pJarTask the executing task
      * @param pDepConfig the dependency configuration for which the Jar task is intended
      */
-    @SuppressWarnings("Convert2Lambda")  // MUST NOT USE LAMBDA, as this would cause Gradle errors
-    public void inheritManifest(@Nonnull final Jar pTask, @Nonnull final DependencyConfig pDepConfig)
+    public void inheritManifest(@Nonnull final Jar pJarTask, @Nonnull final DependencyConfig pDepConfig)
     {
-        pTask.doFirst(new Action<>() {
-            @Override
-            public void execute(@Nonnull final Task pTask)
-            {
-                final Jar jarTask = (Jar) pTask;
-                final Jar thinJarTask = getTask(TaskNames.jar, Jar.class, pDepConfig);
-                jarTask.setManifest(thinJarTask.getManifest());
-                addBuildTimestamp(jarTask.getManifest().getAttributes());
-            }
-        });
+        pJarTask.getManifest().from(getTask(TaskNames.jar, Jar.class, pDepConfig).getManifest());
     }
 
 
