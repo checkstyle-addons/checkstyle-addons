@@ -1,7 +1,7 @@
 // package-info.java
 /*
  * Checkstyle-Addons - Additional Checkstyle checks
- * Copyright (c) 2015-2020, the Checkstyle Addons contributors
+ * Copyright (c) 2015-2022, the Checkstyle Addons contributors
  *
  * This program is free software: you can redistribute it and/or modify it under the
  * terms of the GNU General Public License, version 3, as published by the Free
