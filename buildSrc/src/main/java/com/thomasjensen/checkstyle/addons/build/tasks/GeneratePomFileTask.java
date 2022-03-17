@@ -44,7 +44,6 @@ import com.thomasjensen.checkstyle.addons.build.BuildUtil;
 import com.thomasjensen.checkstyle.addons.build.ClasspathBuilder;
 import com.thomasjensen.checkstyle.addons.build.DependencyConfig;
 import com.thomasjensen.checkstyle.addons.build.PomXml;
-import com.thomasjensen.checkstyle.addons.build.VersionWrapper;
 
 
 /**
@@ -168,9 +167,9 @@ public class GeneratePomFileTask
 
     private String getLicenseUrl()
     {
-        VersionWrapper version = new VersionWrapper(getProject());
+        final String version = getProject().getVersion().toString();
         String github = (String) getInputs().getProperties().get("github");
-        boolean isRelease = !version.isSnapshot();
+        boolean isRelease = version.indexOf('-') < 0;
         String versionStr = isRelease ? ("v" + version) : "master";
         return "https://raw.githubusercontent.com/" + github + "/" + versionStr + "/LICENSE";
     }

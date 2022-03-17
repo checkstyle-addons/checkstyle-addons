@@ -20,7 +20,6 @@ import java.io.IOException;
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 
-import org.ajoberstar.grgit.Grgit;
 import org.gradle.api.Action;
 import org.gradle.api.Project;
 import org.gradle.api.Task;
@@ -169,21 +168,6 @@ public final class BuildUtil
     public void inheritManifest(@Nonnull final Jar pJarTask, @Nonnull final DependencyConfig pDepConfig)
     {
         pJarTask.getManifest().from(getTask(TaskNames.jar, Jar.class, pDepConfig).getManifest());
-    }
-
-
-
-    /**
-     * Determine the git commit hash of the most recent commit in this repo.
-     *
-     * @return the hash
-     */
-    @SuppressWarnings("deprecation")
-    public String currentGitCommitHash()
-    {
-        try (Grgit gitRepo = Grgit.open(project.getRootDir())) {
-            return gitRepo.head().getId();
-        }
     }
 
 

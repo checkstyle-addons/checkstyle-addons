@@ -15,9 +15,17 @@ package com.thomasjensen.checkstyle.addons.build;
  * program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+import java.io.File;
+import java.io.IOException;
 import java.util.Arrays;
 import javax.annotation.Nonnull;
 
+import org.eclipse.jgit.api.Git;
+import org.eclipse.jgit.api.errors.GitAPIException;
+import org.eclipse.jgit.errors.InvalidPatternException;
+import org.eclipse.jgit.lib.Repository;
+import org.eclipse.jgit.storage.file.FileRepositoryBuilder;
+import org.gradle.api.GradleException;
 import org.gradle.api.NamedDomainObjectProvider;
 import org.gradle.api.Plugin;
 import org.gradle.api.Project;
@@ -71,10 +79,9 @@ public class BuildPlugin
 
         project.getExtensions().create("checkstyleAddons", BuildConfigExtension.class, project);
 
-        setVersionFromFile(project);
+        provideGitInfos(project);
         final DependencyConfigs depConfigs = new DependencyConfigs(pRootProject);
         new JavaLevelUtil(project).analyzeJavaLevels();
-        provideGitHash();
         establishSonarQubeSourceSet(project);
         establishGeneralCompileOnlyCfg(project);
 
@@ -106,14 +113,6 @@ public class BuildPlugin
 
 
 
-    private void setVersionFromFile(final Project pRootProject)
-    {
-        String version = new VersionWrapper(pRootProject).toString();
-        pRootProject.setVersion(version);
-    }
-
-
-
     private void configurePrintDepConfigsTask(@Nonnull final Project pRootProject,
         @Nonnull final DependencyConfigs pDepConfigs)
     {
@@ -137,9 +136,39 @@ public class BuildPlugin
 
 
 
-    private void provideGitHash()
+    private void provideGitInfos(final Project pProject)
     {
-        buildUtil.getBuildConfig().getGitHash().set(buildUtil.currentGitCommitHash());
+        FileRepositoryBuilder builder = new FileRepositoryBuilder();
+        try (
+            Repository gitRepo = builder.setGitDir(new File(pProject.getRootDir(), ".git")).build()
+        ) {
+            String hash = gitRepo.resolve("HEAD").getName();
+            pProject.getLogger().info("Detected current Git commit hash as: " + hash);
+            buildUtil.getBuildConfig().getGitHash().set(hash);
+
+            final Git git = new Git(gitRepo);
+            String version = getGitVersion(pProject, git);
+            pProject.setVersion(version);
+        }
+        catch (GitAPIException | InvalidPatternException | IOException | RuntimeException e) {
+            throw new GradleException("Failed to interact with local Git repository: " + e.getMessage(), e);
+        }
+    }
+
+
+
+    private String getGitVersion(@Nonnull final Project pProject, @Nonnull final Git pGit)
+        throws GitAPIException, InvalidPatternException
+    {
+        // We basically perform: git describe --tags "--match=v*" --always --dirty | cut -c 2-
+        final boolean clean = pGit.status().call().isClean();
+        String version = pGit.describe().setTags(true).setMatch("v*").setAlways(true).call()
+            + (clean ? "" : "-dirty");
+        if (version.charAt(0) == 'v') {
+            version = version.substring(1);
+        }
+        pProject.getLogger().info("Determined Git version as: " + version);
+        return version;
     }
 
 

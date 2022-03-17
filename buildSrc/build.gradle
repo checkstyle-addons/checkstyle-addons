@@ -35,7 +35,7 @@ dependencies {
     compileOnly checkstyleAddonsLibs.jsr305
 
     implementation group: 'gradle.plugin.com.github.johnrengelman', name: 'shadow', version: '7.1.2'
-    implementation group: 'org.ajoberstar', name: 'grgit', version: '1.7.2'
+    implementation group: 'org.eclipse.jgit', name: 'org.eclipse.jgit', version: '6.1.0.202203080745-r'
     implementation group: 'jakarta.xml.bind', name: 'jakarta.xml.bind-api', version: '3.0.1'
     runtimeOnly group: 'com.sun.xml.bind', name: 'jaxb-impl', version: '3.0.2'
 
