@@ -108,7 +108,7 @@ public class JarEclipseConfigAction
         attrs.put("Bundle-Name",
             inputs.getProperties().get("name") + " Eclipse-CS Extension (based on Checkstyle " + baseCsVersion + ")");
         attrs.put("Bundle-SymbolicName", inputs.getProperties().get(BuildUtil.GROUP_ID) + ";singleton:=true");
-        attrs.put("Bundle-Version", inputs.getProperties().get(BuildUtil.VERSION));
+        attrs.put("Bundle-Version", eclipsifyVersion(inputs.getProperties().get(BuildUtil.VERSION).toString()));
         attrs.put("Require-Bundle", "net.sf.eclipsecs.checkstyle," + "net.sf.eclipsecs.core," + "net.sf.eclipsecs.ui");
         attrs.put("Bundle-RequiredExecutionEnvironment", "JavaSE-" + myJavaLevel);
         attrs.put("Eclipse-LazyStart", "true");
@@ -121,6 +121,31 @@ public class JarEclipseConfigAction
             attrs.put("Bundle-ClassPath", ".," + flattenPrefixLibs("lib/", pubLibs, ','));
         }
         buildUtil.addBuildTimestampDeferred(pJarTask);
+    }
+
+
+
+    /**
+     * Modify our declared plugin version so that it conforms with OSGI version syntax:
+     * <pre>    version ::= major('.'minor('.'micro('.'qualifier)?)?)?
+     *    major ::= digit+
+     *    minor ::= digit+
+     *    micro ::= digit+
+     *    qualifier ::= (alpha|digit|'_'|'-')+
+     *    digit ::= [0..9]
+     *    alpha ::= [a..zA..Z]</pre>
+     * This is only necessary for snapshots. Releases always conform naturally.
+     *
+     * @param pVersion our normal version
+     * @return the "eclipsified" version
+     */
+    private String eclipsifyVersion(@Nonnull final String pVersion)
+    {
+        int dashPos = pVersion.indexOf('-');
+        if (dashPos >= 0) {
+            return pVersion.substring(0, dashPos) + '.' + pVersion.substring(dashPos + 1);
+        }
+        return pVersion;
     }
 
 
