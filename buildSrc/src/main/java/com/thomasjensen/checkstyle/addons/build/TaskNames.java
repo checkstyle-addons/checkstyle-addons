@@ -27,7 +27,7 @@ import javax.annotation.Nonnull;
 public enum TaskNames
 {
     /** <code>assemble</code> / <code>assemble{0}</code> */
-    assemble(true, "assemble{0}"),
+    assemble(false, "assemble{0}"),
 
     /** <code>compileJava</code> / <code>compileMain{0}</code> */
     compileJava(false, "compileMain{0}"),

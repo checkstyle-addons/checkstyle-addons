@@ -107,6 +107,7 @@ public class BuildPlugin
         configureDefaultJavadocTask(project, depConfigs);
         taskCreator.setupArtifactTasks(depConfigs);
         registerPublications(project, depConfigs);
+        configureAssembleAllTask(project, depConfigs);
 
         configurePrintDepConfigsTask(project, depConfigs);
         configureSiteTasks(project);
@@ -259,6 +260,20 @@ public class BuildPlugin
             pProject.setProperty("signing.gnupg.keyName",
                 pProject.getProperties().get("signing.gnupg.keyName.thomasjensen.com"));
         }
+    }
+
+
+
+    private void configureAssembleAllTask(@Nonnull final Project pProject, @Nonnull final DependencyConfigs pDepConfigs)
+    {
+        pProject.getTasks().register("assembleAll").configure(task -> {
+            String longName = buildUtil.getBuildConfig().getLongName().get();
+            task.setGroup(TaskCreator.ARTIFACTS_GROUP_NAME);
+            task.setDescription("Assembles all " + longName + " artifacts from all dependency configurations");
+            for (DependencyConfig depConfig : pDepConfigs.getAll().values()) {
+                task.dependsOn(buildUtil.getTaskProvider(TaskNames.assemble, Task.class, depConfig));
+            }
+        });
     }
 
 
