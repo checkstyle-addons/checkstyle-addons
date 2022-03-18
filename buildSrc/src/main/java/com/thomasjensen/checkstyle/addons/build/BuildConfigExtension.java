@@ -16,12 +16,12 @@ package com.thomasjensen.checkstyle.addons.build;
  */
 
 import java.util.Date;
-
 import javax.annotation.Nonnull;
 
 import org.gradle.api.Project;
 import org.gradle.api.model.ObjectFactory;
 import org.gradle.api.provider.Property;
+import org.gradle.api.provider.Provider;
 
 
 public class BuildConfigExtension
@@ -38,6 +38,8 @@ public class BuildConfigExtension
 
     private final Property<String> issueTrackerUrl;
 
+    private final Provider<String> licenseUrl;
+
     private final Property<String> longName;
 
     private final Property<String> orgName;
@@ -52,7 +54,7 @@ public class BuildConfigExtension
 
 
 
-    public BuildConfigExtension(final Project pProject)
+    public BuildConfigExtension(@Nonnull final Project pProject)
     {
         final ObjectFactory objectFactory = pProject.getObjects();
         authorName = objectFactory.property(String.class);
@@ -61,6 +63,7 @@ public class BuildConfigExtension
         gitHash = objectFactory.property(String.class);
         github = objectFactory.property(String.class);
         issueTrackerUrl = objectFactory.property(String.class);
+        licenseUrl = github.map(gh -> buildLicenseUrl(pProject, gh));
         longName = objectFactory.property(String.class);
         orgName = objectFactory.property(String.class);
         orgUrl = objectFactory.property(String.class);
@@ -120,6 +123,14 @@ public class BuildConfigExtension
 
 
     @Nonnull
+    public Provider<String> getLicenseUrl()
+    {
+        return licenseUrl;
+    }
+
+
+
+    @Nonnull
     public Property<String> getLongName()
     {
         return longName;
@@ -163,5 +174,16 @@ public class BuildConfigExtension
     public Property<String> getWebsite()
     {
         return website;
+    }
+
+
+
+    @Nonnull
+    private String buildLicenseUrl(@Nonnull final Project pProject, @Nonnull final String pGitHub)
+    {
+        final String version = pProject.getVersion().toString();
+        boolean isRelease = version.indexOf('-') < 0;
+        String versionStr = isRelease ? ("v" + version) : "master";
+        return "https://raw.githubusercontent.com/" + pGitHub + "/" + versionStr + "/LICENSE";
     }
 }

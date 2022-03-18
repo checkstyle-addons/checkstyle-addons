@@ -206,6 +206,36 @@ publishing {
             }
         }
     }
+    publications.configureEach {
+        pom {
+            name = checkstyleAddons.longName.get()
+            description = project.description
+            url = checkstyleAddons.website.get()
+            inceptionYear = '2015'
+            licenses {
+                license {
+                    name = 'GPL-3.0-only'
+                    url = checkstyleAddons.licenseUrl.get()
+                }
+            }
+            developers {
+                developer {
+                    name = checkstyleAddons.authorName.get()
+                    email = 'checkstyle@thomasjensen.com'
+                }
+            }
+            organization {
+                name = checkstyleAddons.orgName.get()
+                url = checkstyleAddons.orgUrl.get()
+            }
+            final String ga = "git@github.com:${checkstyleAddons.github.get()}.git"
+            scm {
+                connection = 'scm:git:' + ga
+                developerConnection = 'scm:git:' + ga
+                url = ga
+            }
+        }
+    }
 }
 
 signing {

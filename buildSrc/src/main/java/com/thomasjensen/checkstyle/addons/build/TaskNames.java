@@ -41,8 +41,11 @@ public enum TaskNames
     /** <code>generatePomProperties</code> / <code>generatePomProperties{0}</code> */
     generatePomProperties(true, "generatePomProperties{0}"),
 
-    /** <code>generatePom</code> / <code>generatePom{0}</code> */
-    generatePom(false, "generatePom{0}"),
+    /**
+     * <code>generatePomFileForCheckstyleAddonsPublication</code> /
+     * <code>generatePomFileForCheckstyleAddons-{0}Publication</code>
+     */
+    generatePomFileForCheckstyleAddonsPublication(false, "generatePomFileForCheckstyleAddons-{0}Publication"),
 
     /** <code>fatjar</code> / <code>fatjar{0}</code> */
     fatJar(true, "fatjar{0}"),
@@ -102,7 +105,7 @@ public enum TaskNames
      * Getter.
      *
      * @return the name of the entity without any dependency configuration name or Checkstyle version added to it,
-     * usually the Enum constant name
+     *     usually the Enum constant name
      */
     private String getNameWithoutVersion()
     {
@@ -154,8 +157,8 @@ public enum TaskNames
 
     /**
      * Flag that tells us how names are expected to be created when the {@link NameFactory} is called with the default
-     * Checkstyle version. If <code>true</code>, the name will be resolved by calling {@link #getNameWithoutVersion} .
-     * If <code>false</code>, it will be resolved by calling {@link #getNameWithVersion}.
+     * Checkstyle version. If <code>true</code>, the name will be resolved by calling {@link #getNameWithVersion} .
+     * If <code>false</code>, it will be resolved by calling {@link #getNameWithoutVersion}.
      *
      * @return flag
      */
@@ -192,6 +195,9 @@ public enum TaskNames
     {
         if (pDepConfig.isDefaultConfig() && !useVersionForDefault()) {
             return getNameWithoutVersion();
+        }
+        else if (this == generatePomFileForCheckstyleAddonsPublication) {
+            return getNameWithVersion(pDepConfig.getName());
         }
         else {
             return getNameWithVersion(gradlify(pDepConfig.getName()));

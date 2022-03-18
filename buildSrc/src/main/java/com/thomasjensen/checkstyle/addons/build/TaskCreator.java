@@ -15,12 +15,8 @@ package com.thomasjensen.checkstyle.addons.build;
  * program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Objects;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 import javax.annotation.Nonnull;
 
 import com.github.jengelman.gradle.plugins.shadow.tasks.ShadowJar;
@@ -31,7 +27,6 @@ import org.gradle.api.plugins.BasePlugin;
 import org.gradle.api.plugins.JavaBasePlugin;
 import org.gradle.api.plugins.JavaPlugin;
 import org.gradle.api.plugins.quality.Checkstyle;
-import org.gradle.api.publish.maven.tasks.GenerateMavenPom;
 import org.gradle.api.tasks.Copy;
 import org.gradle.api.tasks.SourceSet;
 import org.gradle.api.tasks.TaskContainer;
@@ -44,7 +39,6 @@ import org.gradle.language.base.plugins.LifecycleBasePlugin;
 
 import com.thomasjensen.checkstyle.addons.build.tasks.CompileConfigAction;
 import com.thomasjensen.checkstyle.addons.build.tasks.FatJarConfigAction;
-import com.thomasjensen.checkstyle.addons.build.tasks.GeneratePomFileTask;
 import com.thomasjensen.checkstyle.addons.build.tasks.GeneratePomPropsTask;
 import com.thomasjensen.checkstyle.addons.build.tasks.JarConfigAction;
 import com.thomasjensen.checkstyle.addons.build.tasks.JarEclipseConfigAction;
@@ -197,11 +191,6 @@ public class TaskCreator
                 pomPropsTask.updateDescription();
             });
 
-            // 'generatePom' task
-            final TaskProvider<GeneratePomFileTask> pomFileTaskProvider =
-                tasks.register(TaskNames.generatePom.getName(depConfig), GeneratePomFileTask.class);
-            pomFileTaskProvider.configure(generatePomTask -> generatePomTask.configureFor(depConfig));
-
             // 'jar' task
             final String jarTaskName = TaskNames.jar.getName(depConfig);
             final TaskProvider<Jar> jarTaskProvider = tasks.register(jarTaskName, Jar.class);
@@ -292,38 +281,5 @@ public class TaskCreator
                 task.setGroup(LifecycleBasePlugin.BUILD_GROUP);
             }
         }
-    }
-
-
-
-    public void rewirePublishingTasks(@Nonnull final DependencyConfigs pDepConfigs)
-    {
-        // This feels dirty. Shouldn't we rather tell the publishing mechanism to get the POM from somewhere else?
-        project.getTasks().withType(GenerateMavenPom.class).configureEach(regularPomTask -> {
-            regularPomTask.setEnabled(false);  // we do this ourselves
-            DependencyConfig depConfig = task2depConfig(regularPomTask, pDepConfigs);
-            regularPomTask.setDestination(new File(project.getBuildDir(),
-                "tmp/" + TaskNames.generatePom.getName(depConfig) + "/pom.xml"));
-        });
-    }
-
-
-
-    @Nonnull
-    private DependencyConfig task2depConfig(@Nonnull final GenerateMavenPom pTask,
-        @Nonnull final DependencyConfigs pDepConfigs)
-    {
-        // e.g. "generatePomFileForCheckstyleAddons-java8bPublication"
-        pTask.getLogger().info("GenerateMavenPom task: " + pTask.getName());
-        Pattern pattern = Pattern.compile("generatePomFileForCheckstyleAddons(.*?)Publication");
-        Matcher matcher = pattern.matcher(pTask.getName());
-        DependencyConfig result = pDepConfigs.getDefault();
-        if (matcher.matches()) {
-            String g = matcher.group(1);
-            if (g != null && g.length() > 0) {
-                result = pDepConfigs.getAll().get(g.substring(1));   // dash
-            }
-        }
-        return Objects.requireNonNull(result, "Could not map task name '" + pTask.getName() + "' to a depConfig");
     }
 }

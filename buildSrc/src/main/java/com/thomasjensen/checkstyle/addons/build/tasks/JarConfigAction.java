@@ -27,7 +27,7 @@ import org.gradle.api.Project;
 import org.gradle.api.Task;
 import org.gradle.api.java.archives.Attributes;
 import org.gradle.api.java.archives.Manifest;
-import org.gradle.api.provider.Provider;
+import org.gradle.api.publish.maven.tasks.GenerateMavenPom;
 import org.gradle.api.tasks.SourceSet;
 import org.gradle.api.tasks.TaskContainer;
 import org.gradle.api.tasks.bundling.Jar;
@@ -81,18 +81,16 @@ public class JarConfigAction
         pJarTask.getInputs().file(pomPropsUsed);
 
         // Dependency on pom.xml generating task
-        pJarTask.dependsOn(tasks.named(TaskNames.generatePom.getName(pDepConfig)));
-
-        // Task Input: pom.xml
-        final Provider<File> pomUsed = ((GeneratePomFileTask)
-            tasks.getByName(TaskNames.generatePom.getName(pDepConfig))).getPomFile();
-        pJarTask.getInputs().file(pomUsed);
+        final GenerateMavenPom generatePomTask = buildUtil.getTask(
+            TaskNames.generatePomFileForCheckstyleAddonsPublication, GenerateMavenPom.class, pDepConfig);
+        pJarTask.dependsOn(generatePomTask);
 
         // Dependency on 'classes' task (compile and resources)
         pJarTask.dependsOn(buildUtil.getTaskProvider(TaskNames.mainClasses, Task.class, pDepConfig));
 
         // Configuration of JAR file contents
-        pJarTask.from(pomUsed);
+        pJarTask.from(generatePomTask.getDestination(), copySpec ->
+            copySpec.rename(filename -> filename.replace("pom-default.xml", "pom.xml")));
         final SourceSet mainSourceSet = buildUtil.getSourceSet(SourceSet.MAIN_SOURCE_SET_NAME);
         pJarTask.from(new ClasspathBuilder(project).getClassesDirs(mainSourceSet, pDepConfig));
         pJarTask.from(mainSourceSet.getOutput().getResourcesDir());
@@ -107,7 +105,8 @@ public class JarConfigAction
 
         // add generated pom.xml and pom.properties to archive, setting build timestamp in the process
         pJarTask.into("META-INF/maven/" + project.getGroup() + "/" + project.getName(), copySpec -> {
-            copySpec.from(pomUsed);
+            copySpec.from(generatePomTask.getDestination());
+            copySpec.rename(filename -> filename.replace("pom-default.xml", "pom.xml"));
             copySpec.from(pomPropsUsed);
             Map<String, String> placeHolders = new HashMap<>();
             placeHolders.put("buildTimestamp", buildConfig.getBuildTimestamp().get().toString());
@@ -117,9 +116,18 @@ public class JarConfigAction
         });
 
         // Manifest
+        configureManifest(pJarTask, pDepConfig, appendix);
+    }
+
+
+
+    private void configureManifest(@Nonnull Jar pJarTask, @Nonnull DependencyConfig pDepConfig,
+        @Nonnull final String pAppendix)
+    {
+        final BuildConfigExtension buildConfig = buildUtil.getBuildConfig();
         String effectiveName = project.getName();
         if (!pDepConfig.isDefaultConfig()) {
-            effectiveName += '-' + appendix;
+            effectiveName += '-' + pAppendix;
         }
         Manifest manifest = pJarTask.getManifest();
         final Attributes attrs = manifest.getAttributes();

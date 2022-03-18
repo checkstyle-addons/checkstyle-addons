@@ -39,6 +39,7 @@ import org.gradle.api.plugins.JavaPluginExtension;
 import org.gradle.api.publish.PublicationContainer;
 import org.gradle.api.publish.PublishingExtension;
 import org.gradle.api.publish.maven.MavenPublication;
+import org.gradle.api.publish.maven.tasks.GenerateMavenPom;
 import org.gradle.api.tasks.Copy;
 import org.gradle.api.tasks.SourceSet;
 import org.gradle.api.tasks.SourceSetContainer;
@@ -50,6 +51,7 @@ import org.gradle.api.tasks.testing.Test;
 import org.gradle.language.base.plugins.LifecycleBasePlugin;
 
 import com.thomasjensen.checkstyle.addons.build.tasks.JavadocConfigAction;
+import com.thomasjensen.checkstyle.addons.build.tasks.GeneratePomConfigAction;
 import com.thomasjensen.checkstyle.addons.build.tasks.PrintDepConfigsTask;
 import com.thomasjensen.checkstyle.addons.build.tasks.SiteCopyAllChecksConfigAction;
 import com.thomasjensen.checkstyle.addons.build.tasks.SiteCopyDownloadGuideConfigAction;
@@ -105,7 +107,6 @@ public class BuildPlugin
         configureDefaultJavadocTask(project, depConfigs);
         taskCreator.setupArtifactTasks(depConfigs);
         registerPublications(project, depConfigs);
-        taskCreator.rewirePublishingTasks(depConfigs);
 
         configurePrintDepConfigsTask(project, depConfigs);
         configureSiteTasks(project);
@@ -249,6 +250,9 @@ public class BuildPlugin
                     buildUtil.getTaskProvider(TaskNames.jarJavadoc, Jar.class, depConfig);
                 pub.artifact(jarJavadocTaskProvider, a -> a.setClassifier("javadoc"));
             });
+
+            buildUtil.getTaskProvider(TaskNames.generatePomFileForCheckstyleAddonsPublication, GenerateMavenPom.class,
+                depConfig).configure(new GeneratePomConfigAction(depConfig));
         }
 
         if (pProject.hasProperty("signing.gnupg.keyName.thomasjensen.com")) {
