@@ -34,8 +34,8 @@ dependencies {
     compileOnly checkstyleAddonsLibs.spotbugs.annotations
     compileOnly checkstyleAddonsLibs.jsr305
 
-    implementation group: 'gradle.plugin.com.github.johnrengelman', name: 'shadow', version: '7.1.2'
-    implementation group: 'org.eclipse.jgit', name: 'org.eclipse.jgit', version: '6.1.0.202203080745-r'
+    implementation checkstyleAddonsLibs.shadow
+    implementation checkstyleAddonsLibs.jgit
 
     testImplementation checkstyleAddonsLibs.junit
 }

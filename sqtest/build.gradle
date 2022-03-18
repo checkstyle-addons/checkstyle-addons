@@ -19,7 +19,7 @@ buildscript {
         mavenCentral()
     }
     dependencies {
-        classpath group: 'io.github.java-diff-utils', name: 'java-diff-utils', version: '4.11'
+        classpath checkstyleAddonsLibs.diffutils
     }
 }
 
@@ -27,13 +27,12 @@ plugins {
     id 'java'
     id 'checkstyle'
     id 'idea'
-    id 'org.sonarqube' version '3.3'
+    alias checkstyleAddonsLibs.plugins.sonarqube
 }
 
 repositories {
     mavenCentral()
 }
-
 
 import com.github.difflib.text.DiffRow
 import com.github.difflib.text.DiffRowGenerator
@@ -42,6 +41,7 @@ import groovy.json.JsonSlurper
 
 import java.nio.file.Files
 import java.util.regex.Pattern
+
 
 description = 'Sources to analyze for SonarQube integration test'
 
