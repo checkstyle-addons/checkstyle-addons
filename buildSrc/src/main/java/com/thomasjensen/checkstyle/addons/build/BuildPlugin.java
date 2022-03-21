@@ -50,14 +50,15 @@ import org.gradle.api.tasks.javadoc.Javadoc;
 import org.gradle.api.tasks.testing.Test;
 import org.gradle.language.base.plugins.LifecycleBasePlugin;
 
-import com.thomasjensen.checkstyle.addons.build.tasks.JavadocConfigAction;
 import com.thomasjensen.checkstyle.addons.build.tasks.GeneratePomConfigAction;
+import com.thomasjensen.checkstyle.addons.build.tasks.JavadocConfigAction;
 import com.thomasjensen.checkstyle.addons.build.tasks.PrintDepConfigsTask;
 import com.thomasjensen.checkstyle.addons.build.tasks.SiteCopyAllChecksConfigAction;
 import com.thomasjensen.checkstyle.addons.build.tasks.SiteCopyDownloadGuideConfigAction;
 import com.thomasjensen.checkstyle.addons.build.tasks.SiteCopyJavadocConfigAction;
 import com.thomasjensen.checkstyle.addons.build.tasks.SiteTask;
 import com.thomasjensen.checkstyle.addons.build.tasks.TestTaskConfigAction;
+import com.thomasjensen.checkstyle.addons.build.tasks.VersionFileTask;
 
 
 /**
@@ -84,6 +85,8 @@ public class BuildPlugin
         provideGitInfos(project);
         final DependencyConfigs depConfigs = new DependencyConfigs(pRootProject);
         new JavaLevelUtil(project).analyzeJavaLevels();
+        project.getTasks().register(VersionFileTask.TASK_NAME, VersionFileTask.class)
+            .configure(VersionFileTask::konfigure);
         establishSonarQubeSourceSet(project);
         establishGeneralCompileOnlyCfg(project);
 

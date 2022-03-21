@@ -16,20 +16,19 @@ package com.thomasjensen.checkstyle.addons.sonarqube;
  */
 
 import java.util.Collections;
-import java.util.List;
 
-import org.sonar.api.SonarPlugin;
+import org.sonar.api.Plugin;
 
 
 /**
  * The Checkstyle Addons SonarQube plugin main class.
  */
 public final class CheckstyleExtensionPlugin
-    extends SonarPlugin
+    implements Plugin
 {
     @Override
-    public List<?> getExtensions()
+    public void define(final Context pContext)
     {
-        return Collections.singletonList(CheckstyleExtensionRepository.class);
+        pContext.addExtensions(Collections.singleton(RulesExtension.class));
     }
 }

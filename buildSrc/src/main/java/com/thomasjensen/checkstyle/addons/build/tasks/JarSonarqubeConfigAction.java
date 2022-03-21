@@ -24,11 +24,9 @@ import java.util.Set;
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 
-import org.apache.tools.ant.filters.ReplaceTokens;
 import org.gradle.api.Action;
 import org.gradle.api.Task;
 import org.gradle.api.java.archives.Attributes;
-import org.gradle.api.tasks.SourceSet;
 import org.gradle.api.tasks.TaskInputs;
 import org.gradle.api.tasks.TaskProvider;
 import org.gradle.api.tasks.bundling.Jar;
@@ -89,6 +87,8 @@ public class JarSonarqubeConfigAction
         final TaskProvider<Task> sqClassesTaskProvider =
             buildUtil.getTaskProvider(TaskNames.sonarqubeClasses, Task.class, pDepConfig);
         pJarTask.dependsOn(sqClassesTaskProvider);
+        final VersionFileTask versionTask = (VersionFileTask) project.getTasks().getByName(VersionFileTask.TASK_NAME);
+        pJarTask.dependsOn(versionTask);
 
         // Configuration of JAR file contents
         pJarTask.into("META-INF", copySpec -> copySpec.from("LICENSE"));
@@ -97,12 +97,7 @@ public class JarSonarqubeConfigAction
             buildUtil.getTask(TaskNames.compileSonarqubeJava, JavaCompile.class, pDepConfig);
         pJarTask.from(compileTask.getDestinationDirectory());
 
-        pJarTask.into(inputs.getProperties().get("sqPackage"), copySpec -> {
-            final SourceSet sqSourceSet = buildUtil.getSourceSet(BuildUtil.SONARQUBE_SOURCE_SET_NAME);
-            copySpec.from(new File(sqSourceSet.getOutput().getResourcesDir(), "sonarqube.xml"));
-            copySpec.filter(JarEclipseConfigAction.versionReplacement(
-                inputs.getProperties().get(BuildUtil.VERSION).toString()), ReplaceTokens.class);
-        });
+        pJarTask.into(inputs.getProperties().get("sqPackage"), copySpec -> copySpec.from(versionTask.getVersionFile()));
 
         final Set<File> pubLibs = JarEclipseConfigAction.getPublishedDependencyLibs(pJarTask, pDepConfig);
         pJarTask.into("META-INF/lib", copySpec -> {
@@ -138,13 +133,14 @@ public class JarSonarqubeConfigAction
         attributes.put("Plugin-IssueTrackerUrl", inputProps.get("issueTrackerUrl"));
         attributes.put("Plugin-Class", "com.thomasjensen.checkstyle.addons.sonarqube.CheckstyleExtensionPlugin");
         attributes.put("Plugin-RequirePlugins", "checkstyle:" + pDepConfig.getSonarQubeMinCsPluginVersion());
+        // TODO Use of 'Plugin-Dependencies' mechanism is planned for removal.
+        //      Update the plugin Checkstyle Addons [checkstyleaddons] to shade its dependencies instead.
         attributes.put("Plugin-Dependencies", "META-INF/lib/" + thinJarTask.getArchiveFileName().get()
             + (pPubLibs.size() > 0 ? " " : "")
             + JarEclipseConfigAction.flattenPrefixLibs("META-INF/lib/", pPubLibs, ' '));
         attributes.put("Plugin-License", "GPLv3");
         attributes.put("Plugin-Homepage", inputProps.get("website"));
         //attrs.put("Plugin-TermsConditionsUrl", "");
-        // TODO use same SonarQube version in manifest and compile dependencies
         attributes.put("Sonar-Version", pDepConfig.getSonarQubeMinPlatformVersion());
         attributes.putAll(JarConfigAction.mfAttrStd(project));
         attributes.remove("Website");

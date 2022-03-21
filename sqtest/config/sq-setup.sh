@@ -120,6 +120,13 @@ function write_token_file()
 
 
 
+if [[ $# -ne 1 ]]; then
+    echo "Missing argument workspace_loc"
+    exit 1
+fi
+declare -r workspace_loc="$1"
+echo "workspace_loc = ${workspace_loc} (URL-encoded)"
+
 declare -r curlOpts="--silent --show-error --fail"
 
 # Create API token
@@ -139,7 +146,7 @@ echo
 declare ruleKey
 
 create_custom_rule ruleKey LocalVariableNameTester \
-    checkstyle:com.puppycrawl.tools.checkstyle.checks.naming.LocalVariableNameCheck \
+    checkstyle:com.puppycrawl.tools.checkstyle.checks.naming.LocalVariableNameChecktemplate \
     CODE_SMELL
 activate_rule ${ruleKey} ${ruleKey} MINOR
 
@@ -173,16 +180,17 @@ activate_rule LostInstance \
 activate_rule ModuleDirectoryLayout \
     checkstyle:com.thomasjensen.checkstyle.addons.checks.misc.ModuleDirectoryLayoutCheck \
     CRITICAL \
-    "configFile%3Dsqtest%2Fconfig%2Fdirectories.json"
+    "baseDir%3D${workspace_loc}%3BconfigFile%3D${workspace_loc}%2Fconfig%2Fdirectories.json"
 
 activate_rule PropertyCatalog \
     checkstyle:com.thomasjensen.checkstyle.addons.checks.misc.PropertyCatalogCheck \
     MAJOR \
-    "selection%3DPropertyCatalog%3BpropertyFile%3Dsqtest%2Fsrc%2Fmain%2Fresources%2F%7B1%7D.properties"
+    "selection%3DPropertyCatalog%3BbaseDir%3D${workspace_loc}%3BpropertyFile%3Dsrc%2Fmain%2Fresources%2F%7B1%7D.properties"
 
-activate_rule FileTabCharacter \
-    checkstyle:com.puppycrawl.tools.checkstyle.checks.whitespace.FileTabCharacterCheck \
-    MINOR
+create_custom_rule ruleKey FileTabCharacterTester \
+    checkstyle:com.puppycrawl.tools.checkstyle.checks.whitespace.FileTabCharacterChecktemplate \
+    CODE_SMELL
+activate_rule ${ruleKey} ${ruleKey} MINOR
 echo
 
 

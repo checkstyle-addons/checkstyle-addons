@@ -33,13 +33,14 @@ checkstyle = { group = "com.puppycrawl.tools", name = "checkstyle", version.ref 
 jackson-databind = "com.fasterxml.jackson.core:jackson-databind:2.13.2"
 jcip = "net.jcip:jcip-annotations:1.0"
 jsr305 = "com.google.code.findbugs:jsr305:3.0.2"
-slf4j-nop = "org.slf4j:slf4j-nop:1.6.2"
-sonarqubePluginApi = "org.codehaus.sonar:sonar-plugin-api:3.0"
+slf4j-nop = "org.slf4j:slf4j-nop:1.7.32"
+# The "SonarQubeMinPlatformVersion" in a depConfig must be at least this:
+sonarqubePluginApi = "org.sonarsource.sonarqube:sonar-plugin-api:7.9.1"
 spotbugs-annotations = { group = "com.github.spotbugs", name = "spotbugs-annotations", version.ref = "spotbugs" }
 
 # Test
 junit = "junit:junit:4.13.2"
-mockito = "org.mockito:mockito-core:2.27.0"
+mockito = "org.mockito:mockito-core:4.4.0"
 
 
 [plugins]

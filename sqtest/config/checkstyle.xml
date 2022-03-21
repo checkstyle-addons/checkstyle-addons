@@ -46,7 +46,8 @@
         </module>
     </module>
     <module name="ModuleDirectoryLayout">
-        <property name="configFile" value="${config_loc}/directories.json"/>
+        <property name="baseDir" value="${workspace_loc}"/>
+        <property name="configFile" value="${workspace_loc}/config/directories.json"/>
     </module>
     <module name="RegexpOnFilenameOrg">
         <property name="regexp" value="Illegal\.java$"/>

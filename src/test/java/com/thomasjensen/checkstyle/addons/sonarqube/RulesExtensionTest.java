@@ -16,20 +16,19 @@ package com.thomasjensen.checkstyle.addons.sonarqube;
  */
 
 import org.junit.Test;
-import org.mockito.Mockito;
-import org.sonar.api.Plugin;
+import org.sonar.api.server.rule.RulesDefinition;
 
 
 /**
- * Very basic unit test of our {@link CheckstyleExtensionPlugin}.
+ * Very basic unit test of our {@link RulesExtension} class.
  */
-public class CheckstyleExtensionPluginTest
+public class RulesExtensionTest
 {
     @Test
-    public void testPluginDefinition()
+    public void testRulesDefinition()
     {
-        Plugin.Context mockCtx = Mockito.mock(Plugin.Context.class);
-        CheckstyleExtensionPlugin underTest = new CheckstyleExtensionPlugin();
+        RulesDefinition.Context mockCtx = new RulesDefinition.Context();
+        RulesExtension underTest = new RulesExtension();
         underTest.define(mockCtx);
     }
 }

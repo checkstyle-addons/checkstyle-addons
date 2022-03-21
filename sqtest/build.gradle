@@ -39,7 +39,9 @@ import com.github.difflib.text.DiffRowGenerator
 import groovy.json.JsonOutput
 import groovy.json.JsonSlurper
 
+import java.nio.charset.StandardCharsets
 import java.nio.file.Files
+import java.util.function.Function
 import java.util.regex.Pattern
 
 
@@ -54,9 +56,9 @@ dependencies {
 }
 
 ext {
-    dockerSonarqubeVersion = '7.8'
-    dockerSonarCheckstyleVersion = '4.21'
-    dockerCheckstyleAddonsDepConfig = '' // or, for example, 'csp3.1'
+    dockerSonarqubeVersion = '8.9'
+    dockerSonarCheckstyleVersion = '10.0'
+    dockerCheckstyleAddonsDepConfig = '' // or, for example, 'csp4.29'
     dockerImage = "sonarqube:${dockerSonarqubeVersion}-${dockerSonarCheckstyleVersion}-checkstyle-addons-intTest"
     sqHost = 'localhost'
     sqPort = 9000
@@ -168,7 +170,8 @@ def waitForSonarQubeStart()
     String status = 'UNKNOWN'
     for (int count = 0; count < 30 && status != 'UP'; count++) {
         try {
-            final URLConnection get = new URL("http://${sqHost}:${sqPort}/api/system/status").openConnection()
+            final URLConnection get = new URL("http://${project.ext.sqHost}:${project.ext.sqPort}/api/system/status")
+                    .openConnection()
             get.setConnectTimeout(1000)
             get.setReadTimeout(2000)
             def getRC = get.getResponseCode()
@@ -229,7 +232,7 @@ tasks.register('initDockerContainer', Exec).configure {
     doFirst {
         final String containerId = tasks['startDockerContainer'].containerIdFile.text
         commandLine = ['docker', 'exec', '--user', 'sonarqube', '--workdir', '/home/sonarqube', containerId,
-                       './sq-setup.sh']
+                       './sq-setup.sh', URLEncoder.encode(project.projectDir.absolutePath, StandardCharsets.UTF_8)]
         getLogger().lifecycle('Executing: ' + String.join(' ', getCommandLine()))
     }
 }
@@ -319,8 +322,8 @@ tasks.register('integrationTest').configure {
                 .showInlineDiffs(true)
                 .mergeOriginalRevised(true)
                 .inlineDiffByWord(true)
-                .oldTag({f -> f ? '{' : '' })
-                .newTag({f -> f ? '->' : '}' })
+                .oldTag((Function<Boolean, String>) { f -> f ? '{' : '' })
+                .newTag((Function<Boolean, String>) { f -> f ? '->' : '}' })
                 .build()
 
         final List<String> expectedLines = Files.readAllLines(expectedFile.toPath())
@@ -355,7 +358,7 @@ sonarqube {
     properties {
         property 'sonar.projectVersion', rootProject.version
         property 'sonar.sourceEncoding', 'UTF-8'
-        property 'sonar.host.url', 'http://localhost:9000'
+        property 'sonar.host.url', "http://${sqHost}:${sqPort}"
         // sonar.login set by fetchApiToken task using value from container
     }
 }

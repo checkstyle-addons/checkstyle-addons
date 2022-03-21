@@ -2,7 +2,6 @@
     "comment": "The module directory layout for the SonarQube integration test",
     "settings": {
         "formatVersion": 1,
-        "moduleRegex": "sqtest",
         "excludeRegex": "^\\.idea[\\\\/](?:checkstyleidea\\.tmp[\\\\/])?csi-\\w+[\\\\/]"
     },
     "structure": {

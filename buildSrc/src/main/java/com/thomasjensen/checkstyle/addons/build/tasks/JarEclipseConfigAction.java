@@ -150,7 +150,7 @@ public class JarEclipseConfigAction
 
 
 
-    static Map<String, Object> versionReplacement(@Nonnull final String pVersion)
+    private Map<String, Object> versionReplacement(@Nonnull final String pVersion)
     {
         Map<String, String> placeHolders = new HashMap<>();
         placeHolders.put("version", pVersion);
