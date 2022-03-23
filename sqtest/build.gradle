@@ -262,31 +262,40 @@ tasks.register('fetchApiToken', Exec).configure {
 }
 
 
-tasks.register('fetchResultIssues').configure {
+tasks.register('fetchCookieJar', Exec).configure {
+    description = 'Create cookie jar with SonarQube auth info'
+    group = 'sqtest'
+    dependsOn(tasks.named('startDockerContainer'))
+    ext.cookieJar = new File(getTemporaryDir(), 'cookies.txt')
+    outputs.file(ext.cookieJar)
+    commandLine = ['curl', '--silent', '--show-error', '--fail', '--cookie-jar', ext.cookieJar.path, '-X', 'POST',
+                   "http://${sqHost}:${sqPort}/api/authentication/login?login=admin&password=admin"]
+}
+
+
+tasks.register('fetchResultIssues', Exec).configure {
     description = 'Fetch the issues created by the SonarQube analysis from the server'
     group = 'sqtest'
-    dependsOn(tasks.named('sonarqube'))
+    dependsOn(tasks.named('sonarqube'), tasks.named('fetchCookieJar'))
+    onlyIf { true }
 
+    final File rawFile = new File(getTemporaryDir(), 'sonarqube-result.raw.json')
     final File resultFile = new File(getTemporaryDir(), 'sonarqube-result.json')
-    //outputs.file(resultFile)   // do not register, so that this task always runs
+    ext.rawFile = rawFile
     ext.resultFile = resultFile
 
+    final String compKey = "${rootProject.group}:${rootProject.name}:${project.name}"
+    commandLine = ['curl', '--silent', '--show-error', '--fail', '--cookie', tasks.fetchCookieJar.cookieJar.path,
+            '-o', rawFile.path, "http://${sqHost}:${sqPort}/api/issues/search?componentKeys=${compKey}"]
+
+    doFirst {
+        Thread.sleep(10000)
+    }
 
     doLast {
-        Thread.sleep(10000)
-        final String compKey = "${rootProject.group}:${rootProject.name}:${project.name}"
-        final URLConnection get =
-                new URL("http://${sqHost}:${sqPort}/api/issues/search?componentKeys=${compKey}").openConnection()
-        get.setConnectTimeout(1000)
-        get.setReadTimeout(3000)
-        def getRC = get.getResponseCode()
-        if (getRC != 200) {
-            throw new GradleException('Failed to retrieve issues from server: ' + getRC)
-        }
-
         def result = []
         final Pattern filePattern = Pattern.compile('^.*?[/\\\\]([^/\\\\]+)$')
-        def issues = new JsonSlurper().parseText(get.getInputStream().getText()).issues
+        def issues = new JsonSlurper().parseText(rawFile.getText()).issues
         issues.each {
             String msg = it.message
             if (msg.contains(' not found in file: ')) {
@@ -301,7 +310,7 @@ tasks.register('fetchResultIssues').configure {
             ]
             result.add(issue)
         }
-        result = result.sort { it.file }
+        result = result.sort { it.file }    // This sort is not precise enough (e.g. two issues in one file).
         resultFile.write(JsonOutput.prettyPrint(JsonOutput.toJson(result)))
     }
 }
