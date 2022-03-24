@@ -194,20 +194,33 @@ public class ClasspathBuilder
     private FileCollection calculateDependencies(@Nonnull final DependencyConfig pDepConfig,
         @Nullable final String pCsVersionOverride, @Nonnull final String pClasspathConfigurationName)
     {
-        Configuration cfg = buildDetachedConfiguration(pDepConfig, pCsVersionOverride, pClasspathConfigurationName);
+        Configuration cfg = buildDetachedConfiguration(pDepConfig, pCsVersionOverride, pClasspathConfigurationName,
+            true);
         return project.files(cfg.resolve());
     }
 
 
 
+    private boolean isCheckstyle(@Nonnull final Dependency pDependency)
+    {
+        return DependencyConfig.CHECKSTYLE_GROUPID.equals(pDependency.getGroup())
+            && "checkstyle".equals(pDependency.getName());
+    }
+
+
+
     private Configuration buildDetachedConfiguration(@Nonnull final DependencyConfig pDepConfig,
-        @Nullable final String pCsVersionOverride, @Nonnull final String pClasspathConfigurationName)
+        @Nullable final String pCsVersionOverride, @Nonnull final String pClasspathConfigurationName,
+        final boolean pIncludeCheckstyle)
     {
         final Configuration compileConfig = project.getConfigurations().getByName(pClasspathConfigurationName);
         final Map<String, String> versionOverrides = pDepConfig.getArtifactVersions();
         final List<Dependency> newDeps = new ArrayList<>();
         for (final Dependency dependency : compileConfig.getAllDependencies()) {
-            if (DependencyConfig.CHECKSTYLE_GROUPID.equals(dependency.getGroup()) && pCsVersionOverride != null) {
+            if (isCheckstyle(dependency) && !pIncludeCheckstyle) {
+                continue;
+            }
+            if (isCheckstyle(dependency) && pCsVersionOverride != null) {
                 final ModuleDependency newDep = (ModuleDependency) project.getDependencies().create(
                     dependency.getGroup() + ":" + dependency.getName() + ":" + pCsVersionOverride);
                 newDeps.add(newDep);
@@ -240,17 +253,36 @@ public class ClasspathBuilder
      * the configuration to get at concrete file paths.</b>
      *
      * @param pDepConfig a dependency configuration
+     * @param pIncludeCheckstyle flag indicating whether Checkstyle and its transitive dependencies should be
+     *     included
      * @return runtimeClasspath configuration of the main source set
      */
-    public Configuration buildMainRuntimeConfiguration(@Nonnull final DependencyConfig pDepConfig)
+    public Configuration buildMainRuntimeConfiguration(@Nonnull final DependencyConfig pDepConfig,
+        final boolean pIncludeCheckstyle)
     {
         final SourceSet mainSourceSet = buildUtil.getSourceSet(SourceSet.MAIN_SOURCE_SET_NAME);
         final String runtimeCpConfigName = mainSourceSet.getRuntimeClasspathConfigurationName();
         Configuration result = project.getConfigurations().getByName(runtimeCpConfigName);
-        if (!pDepConfig.isDefaultConfig()) {
-            result = buildDetachedConfiguration(pDepConfig, null, runtimeCpConfigName);
+        if (!pIncludeCheckstyle || !pDepConfig.isDefaultConfig()) {
+            result = buildDetachedConfiguration(pDepConfig, null, runtimeCpConfigName, pIncludeCheckstyle);
         }
+        logClasspathInfo("Runtime(main " + (pIncludeCheckstyle ? "including" : "WITHOUT") + " Checkstyle)",
+            pDepConfig, null, project.files(result.resolve()));
         return result;
+    }
+
+
+
+    /**
+     * Return a detached configuration containing the runtime dependencies (without our own code, but including
+     * Checkstyle). <b>This will resolve the configuration to get at concrete file paths.</b>
+     *
+     * @param pDepConfig a dependency configuration
+     * @return runtimeClasspath configuration of the main source set
+     */
+    public Configuration buildMainRuntimeConfiguration(@Nonnull final DependencyConfig pDepConfig)
+    {
+        return buildMainRuntimeConfiguration(pDepConfig, true);
     }
 
 

@@ -65,6 +65,9 @@ public enum TaskNames
     /** <code>jarSonarqube</code> / <code>jarSonarqube{0}</code> */
     jarSonarqube(true, "jarSonarqube{0}"),
 
+    /** <code>jarSonarqubeRelocate</code> / <code>jarSonarqubeRelocate{0}</code> */
+    jarSonarqubeRelocate(true, "jarSonarqubeRelocate{0}"),
+
     /** <code>javadoc</code> / <code>javadoc{0}</code> */
     javadoc(false, "javadoc{0}"),
 

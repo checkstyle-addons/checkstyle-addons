@@ -170,8 +170,7 @@ public class JarEclipseConfigAction
      * @return list of files
      */
     @Nonnull
-    public static Set<File> getPublishedDependencyLibs(@Nonnull final Task pTask,
-        @Nonnull final DependencyConfig pDepConfig)
+    private Set<File> getPublishedDependencyLibs(@Nonnull final Task pTask, @Nonnull final DependencyConfig pDepConfig)
     {
         Set<File> result = new HashSet<>();
         Configuration cfg = new ClasspathBuilder(pTask.getProject()).buildMainRuntimeConfiguration(pDepConfig);
@@ -187,6 +186,7 @@ public class JarEclipseConfigAction
 
 
 
+    @SuppressWarnings("BooleanMethodIsAlwaysInverted")
     static boolean isCheckstyle(final ResolvedDependency pDependency)
     {
         return pDependency != null && DependencyConfig.CHECKSTYLE_GROUPID.equals(pDependency.getModuleGroup())
@@ -195,7 +195,8 @@ public class JarEclipseConfigAction
 
 
 
-    public static String flattenPrefixLibs(final String pPrefix, final Set<File> pLibs, final char pSeparator)
+    @SuppressWarnings("SameParameterValue")
+    private String flattenPrefixLibs(final String pPrefix, final Set<File> pLibs, final char pSeparator)
     {
         Set<String> set = new HashSet<>();
         final String prefix = pPrefix.endsWith("/") ? pPrefix : (pPrefix + "/");
