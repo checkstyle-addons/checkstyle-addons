@@ -201,7 +201,7 @@ tasks.register('startDockerContainer', Exec).configure {
     outputs.upToDateWhen { !getRunningDockerContainerId(containerIdFile).isEmpty() }
 
     workingDir = rootProject.projectDir
-    commandLine = ['docker', 'run', '--detach', '-p', "${sqPort}:9000", project.ext.dockerImage]
+    commandLine = ['docker', 'run', '--rm', '--detach', '-p', "${sqPort}:9000", project.ext.dockerImage]
     standardOutput = new ByteArrayOutputStream()
     ext.output = {
         return standardOutput.toString().trim()
@@ -290,6 +290,7 @@ tasks.register('fetchResultIssues', Exec).configure {
 
     doFirst {
         Thread.sleep(10000)
+        logger.lifecycle('Executing: ' + commandLine.join(' '))
     }
 
     doLast {
@@ -310,7 +311,7 @@ tasks.register('fetchResultIssues', Exec).configure {
             ]
             result.add(issue)
         }
-        result = result.sort { it.file }    // This sort is not precise enough (e.g. two issues in one file).
+        result = result.sort { it.file + '_' + it.rule }
         resultFile.write(JsonOutput.prettyPrint(JsonOutput.toJson(result)))
     }
 }

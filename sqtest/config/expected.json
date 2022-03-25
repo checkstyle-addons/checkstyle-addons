@@ -42,18 +42,18 @@
         "message": "Property 'three' not found in file: (snip)"
     },
     {
-        "rule": "checkstyle:com.thomasjensen.checkstyle.addons.checks.misc.ModuleDirectoryLayoutCheck",
-        "file": "RegexpOnFilenameOrgIllegal.java",
-        "severity": "CRITICAL",
-        "line": 1,
-        "message": "File is not accepted content of src/main/java: com\\thomasjensen\\checkstyle\\addons\\sqtest\\RegexpOnFilenameOrgIllegal.java"
-    },
-    {
         "rule": "checkstyle:RegexpOnFilenameOrgTester",
         "file": "RegexpOnFilenameOrgIllegal.java",
         "severity": "MAJOR",
         "line": 1,
         "message": "Filename 'RegexpOnFilenameOrgIllegal.java' contains illegal pattern 'Illegal\\.java$'."
+    },
+    {
+        "rule": "checkstyle:com.thomasjensen.checkstyle.addons.checks.misc.ModuleDirectoryLayoutCheck",
+        "file": "RegexpOnFilenameOrgIllegal.java",
+        "severity": "CRITICAL",
+        "line": 1,
+        "message": "File is not accepted content of src/main/java: com\\thomasjensen\\checkstyle\\addons\\sqtest\\RegexpOnFilenameOrgIllegal.java"
     },
     {
         "rule": "checkstyle:RegexpOnStringTester",
