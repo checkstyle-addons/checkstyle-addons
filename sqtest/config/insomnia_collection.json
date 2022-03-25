@@ -1,0 +1,376 @@
+{
+    "_type": "export",
+    "__export_format": 4,
+    "__export_date": "2022-03-25T08:27:15.005Z",
+    "__export_source": "insomnia.desktop.app:v2022.2.1",
+    "resources": [
+        {
+            "_id": "req_100d9d4778cb415892e5be9c008d7ecb",
+            "parentId": "fld_34790330cdea48b8bd35c12f6ba831da",
+            "modified": 1648196785705,
+            "created": 1643744527945,
+            "url": "{{baseurl}}/api/authentication/login",
+            "name": "Login",
+            "description": "",
+            "method": "POST",
+            "body": {},
+            "parameters": [
+                {
+                    "id": "pair_0cf273b72d424f429658c040f5f4ea86",
+                    "name": "login",
+                    "value": "admin",
+                    "description": ""
+                },
+                {
+                    "id": "pair_0fa48ddfc82b46c99339df932c4921d2",
+                    "name": "password",
+                    "value": "admin",
+                    "description": ""
+                }
+            ],
+            "headers": [],
+            "authentication": {},
+            "metaSortKey": -1643744527945,
+            "isPrivate": false,
+            "settingStoreCookies": true,
+            "settingSendCookies": true,
+            "settingDisableRenderRequestBody": false,
+            "settingEncodeUrl": true,
+            "settingRebuildPath": true,
+            "settingFollowRedirects": "global",
+            "_type": "request"
+        },
+        {
+            "_id": "fld_34790330cdea48b8bd35c12f6ba831da",
+            "parentId": "wrk_d37ff99d955e47f2872d5710924131f5",
+            "modified": 1647893569873,
+            "created": 1643744527947,
+            "name": "SonarQube",
+            "description": "",
+            "environment": {
+                "baseurl": "http://localhost:9000",
+                "api_token": "__placeholder_for_api_token__"
+            },
+            "environmentPropertyOrder": {
+                "&": [
+                    "baseurl",
+                    "api_token"
+                ]
+            },
+            "metaSortKey": -1643744527947,
+            "_type": "request_group"
+        },
+        {
+            "_id": "wrk_d37ff99d955e47f2872d5710924131f5",
+            "parentId": null,
+            "modified": 1643744557624,
+            "created": 1643744531182,
+            "name": "SonarQube",
+            "description": "",
+            "scope": "collection",
+            "_type": "workspace"
+        },
+        {
+            "_id": "req_38288dfce3104486bbddc3e5974f0d6a",
+            "parentId": "fld_34790330cdea48b8bd35c12f6ba831da",
+            "modified": 1648196737055,
+            "created": 1643744527943,
+            "url": "{{baseurl}}/api/user_tokens/generate",
+            "name": "Generate Token (API)",
+            "description": "",
+            "method": "POST",
+            "body": {},
+            "parameters": [
+                {
+                    "id": "pair_d9d03fbe69134b5c927776884d8d8bde",
+                    "name": "login",
+                    "value": "admin",
+                    "description": ""
+                },
+                {
+                    "id": "pair_2e686d53282c48258779c1940c285e6c",
+                    "name": "name",
+                    "value": "api2",
+                    "description": ""
+                }
+            ],
+            "headers": [
+                {
+                    "name": "X-XSRF-TOKEN",
+                    "value": "vq1n3pjlsoavgl7s4pqu25o64k",
+                    "id": "pair_2cc799ec4f294340b75aa2bbc4f065ab"
+                }
+            ],
+            "authentication": {},
+            "metaSortKey": -1643744527943,
+            "isPrivate": false,
+            "settingStoreCookies": true,
+            "settingSendCookies": true,
+            "settingDisableRenderRequestBody": false,
+            "settingEncodeUrl": true,
+            "settingRebuildPath": true,
+            "settingFollowRedirects": "global",
+            "_type": "request"
+        },
+        {
+            "_id": "req_e75f729f0f7246c3bb22a939b52472ba",
+            "parentId": "fld_34790330cdea48b8bd35c12f6ba831da",
+            "modified": 1643744527941,
+            "created": 1643744527941,
+            "url": "{{baseurl}}/api/user_tokens/generate",
+            "name": "Generate Token (Form)",
+            "description": "",
+            "method": "POST",
+            "body": {
+                "params": [
+                    {
+                        "value": "api3",
+                        "name": "name",
+                        "disabled": false
+                    },
+                    {
+                        "value": "admin",
+                        "name": "login",
+                        "disabled": false
+                    }
+                ],
+                "mimeType": "application/x-www-form-urlencoded"
+            },
+            "parameters": [],
+            "headers": [
+                {
+                    "name": "Content-Type",
+                    "value": "application/x-www-form-urlencoded"
+                },
+                {
+                    "name": "X-XSRF-TOKEN",
+                    "value": "4uqq9p6f8svbanifk2lqqfd3qi"
+                }
+            ],
+            "authentication": {},
+            "metaSortKey": -1643744527941,
+            "isPrivate": false,
+            "settingStoreCookies": true,
+            "settingSendCookies": true,
+            "settingDisableRenderRequestBody": false,
+            "settingEncodeUrl": true,
+            "settingRebuildPath": true,
+            "settingFollowRedirects": "global",
+            "_type": "request"
+        },
+        {
+            "_id": "req_4b97e72e67b74d0ca26356162efdbc8c",
+            "parentId": "fld_34790330cdea48b8bd35c12f6ba831da",
+            "modified": 1648196483299,
+            "created": 1643744527935,
+            "url": "{{baseurl}}/api/rules/repositories",
+            "name": "List Rule Repositories",
+            "description": "",
+            "method": "GET",
+            "body": {},
+            "parameters": [],
+            "headers": [],
+            "authentication": {
+                "type": "basic",
+                "useISO88591": false,
+                "disabled": false,
+                "username": "{{ _.api_token }}",
+                "password": ""
+            },
+            "metaSortKey": -1643744527935,
+            "isPrivate": false,
+            "settingStoreCookies": true,
+            "settingSendCookies": true,
+            "settingDisableRenderRequestBody": false,
+            "settingEncodeUrl": true,
+            "settingRebuildPath": true,
+            "settingFollowRedirects": "global",
+            "_type": "request"
+        },
+        {
+            "_id": "req_d6726e26e12c4f0fbb9afa2bfb9d53c0",
+            "parentId": "fld_34790330cdea48b8bd35c12f6ba831da",
+            "modified": 1648196646029,
+            "created": 1643744527933,
+            "url": "{{baseurl}}/api/rules/create",
+            "name": "Create Custom Rule",
+            "description": "",
+            "method": "POST",
+            "body": {},
+            "parameters": [
+                {
+                    "id": "pair_6a3e7f3165bc4c53adfa7b209b61392b",
+                    "name": "custom_key",
+                    "value": "LocalVariableNameTester2",
+                    "description": ""
+                },
+                {
+                    "id": "pair_b583a0dcf0d24b6e8cb68928f6739cbe",
+                    "name": "markdown_description",
+                    "value": "Flag an issue for the Checkstyle Addons integration test",
+                    "description": ""
+                },
+                {
+                    "id": "pair_294744123c6c4d588bcf26140bde062d",
+                    "name": "name",
+                    "value": "LocalVariableNameTester2",
+                    "description": ""
+                },
+                {
+                    "id": "pair_700712f288b74133b3acfef746fbd760",
+                    "name": "severity",
+                    "value": "MINOR",
+                    "description": ""
+                },
+                {
+                    "id": "pair_7b2cd8ad5188463e87ea217dc286b6ce",
+                    "name": "template_key",
+                    "value": "checkstyle:com.puppycrawl.tools.checkstyle.checks.naming.LocalVariableNameChecktemplate",
+                    "description": ""
+                }
+            ],
+            "headers": [],
+            "authentication": {
+                "type": "basic",
+                "disabled": false,
+                "username": "{{ _.api_token }}",
+                "password": ""
+            },
+            "metaSortKey": -1643744527933,
+            "isPrivate": false,
+            "settingStoreCookies": true,
+            "settingSendCookies": true,
+            "settingDisableRenderRequestBody": false,
+            "settingEncodeUrl": true,
+            "settingRebuildPath": true,
+            "settingFollowRedirects": "global",
+            "_type": "request"
+        },
+        {
+            "_id": "req_35072cbd17d3449a94af896625ca619f",
+            "parentId": "fld_34790330cdea48b8bd35c12f6ba831da",
+            "modified": 1648196490480,
+            "created": 1643744527931,
+            "url": "{{baseurl}}/api/qualityprofiles/create",
+            "name": "Create Quality Profile",
+            "description": "",
+            "method": "POST",
+            "body": {},
+            "parameters": [
+                {
+                    "id": "pair_13346f962a354f469ff10d5a7c95fd40",
+                    "name": "language",
+                    "value": "java",
+                    "description": ""
+                },
+                {
+                    "id": "pair_702402f6c9314c1382224233bb8be1b7",
+                    "name": "name",
+                    "value": "Checkstyle Addons IntTest",
+                    "description": ""
+                }
+            ],
+            "headers": [],
+            "authentication": {
+                "type": "basic",
+                "disabled": false,
+                "username": "{{ _.api_token }}",
+                "password": ""
+            },
+            "metaSortKey": -1643744527931,
+            "isPrivate": false,
+            "settingStoreCookies": true,
+            "settingSendCookies": true,
+            "settingDisableRenderRequestBody": false,
+            "settingEncodeUrl": true,
+            "settingRebuildPath": true,
+            "settingFollowRedirects": "global",
+            "_type": "request"
+        },
+        {
+            "_id": "req_8f6ef1c939574be6b6d7e3af99d5d599",
+            "parentId": "fld_34790330cdea48b8bd35c12f6ba831da",
+            "modified": 1648196683411,
+            "created": 1643744527929,
+            "url": "{{baseurl}}/api/qualityprofiles/activate_rule",
+            "name": "Activate Rule",
+            "description": "",
+            "method": "POST",
+            "body": {},
+            "parameters": [
+                {
+                    "id": "pair_04db36d5a93d4ad7b687ecce0221aaa5",
+                    "name": "key",
+                    "value": "AWl4pPNkSY0iiIxpOGgY",
+                    "description": ""
+                },
+                {
+                    "id": "pair_5a4537d90d414d4b98d40c32821a0455",
+                    "name": "rule",
+                    "value": "checkstyle:com.thomasjensen.checkstyle.addons.checks.coding.IllegalMethodCallCheck",
+                    "description": ""
+                },
+                {
+                    "id": "pair_fff5f793030443e98f7efdee75b0fb03",
+                    "name": "severity",
+                    "value": "CRITICAL",
+                    "description": ""
+                },
+                {
+                    "id": "pair_16afbc8ad2db48dea8329d13d6480c4f",
+                    "name": "params",
+                    "value": "illegalMethodNames=forName, newInstance",
+                    "description": ""
+                }
+            ],
+            "headers": [],
+            "authentication": {
+                "type": "basic",
+                "disabled": false,
+                "username": "{{ _.api_token }}",
+                "password": ""
+            },
+            "metaSortKey": -1643744527929,
+            "isPrivate": false,
+            "settingStoreCookies": true,
+            "settingSendCookies": true,
+            "settingDisableRenderRequestBody": false,
+            "settingEncodeUrl": true,
+            "settingRebuildPath": true,
+            "settingFollowRedirects": "global",
+            "_type": "request"
+        },
+        {
+            "_id": "env_3714d563fc79ccc0cc4be0f5ac5880c780696096",
+            "parentId": "wrk_d37ff99d955e47f2872d5710924131f5",
+            "modified": 1647893561163,
+            "created": 1643744538837,
+            "name": "Base Environment",
+            "data": {},
+            "dataPropertyOrder": {},
+            "color": null,
+            "isPrivate": false,
+            "metaSortKey": 1643744538837,
+            "_type": "environment"
+        },
+        {
+            "_id": "jar_3714d563fc79ccc0cc4be0f5ac5880c780696096",
+            "parentId": "wrk_d37ff99d955e47f2872d5710924131f5",
+            "modified": 1643744538839,
+            "created": 1643744538839,
+            "name": "Default Jar",
+            "cookies": [],
+            "_type": "cookie_jar"
+        },
+        {
+            "_id": "spc_1080f04cb8da4abfba7659ff45709256",
+            "parentId": "wrk_d37ff99d955e47f2872d5710924131f5",
+            "modified": 1643744531182,
+            "created": 1643744531182,
+            "fileName": "My Collection",
+            "contents": "",
+            "contentType": "yaml",
+            "_type": "api_spec"
+        }
+    ]
+}
