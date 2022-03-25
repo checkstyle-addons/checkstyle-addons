@@ -65,5 +65,6 @@ public class JarSourcesConfigAction
 
         // Manifest
         buildUtil.inheritManifest(pJarTask, pDepConfig);
+        buildUtil.addBuildTimestampDeferred(pJarTask);
     }
 }

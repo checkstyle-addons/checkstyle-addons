@@ -64,5 +64,6 @@ public class JarJavadocConfigAction
 
         // Manifest
         buildUtil.inheritManifest(pJarTask, pDepConfig);
+        buildUtil.addBuildTimestampDeferred(pJarTask);
     }
 }
