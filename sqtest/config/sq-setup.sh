@@ -146,7 +146,7 @@ echo
 declare ruleKey
 
 create_custom_rule ruleKey LocalVariableNameTester \
-    checkstyle:com.puppycrawl.tools.checkstyle.checks.naming.LocalVariableNameChecktemplate \
+    checkstyle:com.puppycrawl.tools.checkstyle.checks.naming.LocalVariableNameCheck \
     CODE_SMELL
 activate_rule ${ruleKey} ${ruleKey} MINOR
 
@@ -187,10 +187,9 @@ activate_rule PropertyCatalog \
     MAJOR \
     "selection%3DPropertyCatalog%3BbaseDir%3D${workspace_loc}%3BpropertyFile%3Dsrc%2Fmain%2Fresources%2F%7B1%7D.properties"
 
-create_custom_rule ruleKey FileTabCharacterTester \
-    checkstyle:com.puppycrawl.tools.checkstyle.checks.whitespace.FileTabCharacterChecktemplate \
-    CODE_SMELL
-activate_rule ${ruleKey} ${ruleKey} MINOR
+activate_rule FileTabCharacter \
+    checkstyle:com.puppycrawl.tools.checkstyle.checks.whitespace.FileTabCharacterCheck \
+    MINOR
 echo
 
 

@@ -58,9 +58,9 @@ dependencies {
 }
 
 ext {
-    dockerSonarqubeVersion = '8.9'
-    dockerSonarCheckstyleVersion = '10.0'
-    dockerCheckstyleAddonsDepConfig = '' // or, for example, 'java8b'
+    dockerSonarqubeVersion = '7.9.1'
+    dockerSonarCheckstyleVersion = '4.29'
+    dockerCheckstyleAddonsDepConfig = 'java8b'
     dockerImage = "sonarqube:${dockerSonarqubeVersion}-${dockerSonarCheckstyleVersion}-checkstyle-addons-intTest"
     sqHost = 'localhost'
     sqPort = 9000
@@ -124,7 +124,7 @@ String getDockerImageId()
 tasks.register('buildDockerImage', Exec).configure {
     description = 'Build the docker image for the ' + rootProject.checkstyleAddons.longName.get() + ' integration test'
     group = 'sqtest'
-    dependsOn(rootProject.tasks.named('jarSonarqubeDefault'))
+    dependsOn(rootProject.tasks.named('jarSonarqubeJava8b'))
 
     final File imageIdFile = new File(getTemporaryDir(), "docker-image-id.txt")
     outputs.file(imageIdFile)

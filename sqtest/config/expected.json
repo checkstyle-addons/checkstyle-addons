@@ -1,6 +1,6 @@
 [
     {
-        "rule": "checkstyle:FileTabCharacterTester",
+        "rule": "checkstyle:com.puppycrawl.tools.checkstyle.checks.whitespace.FileTabCharacterCheck",
         "file": "FileTabCharacterSqDummy.java",
         "severity": "MINOR",
         "line": 27,
