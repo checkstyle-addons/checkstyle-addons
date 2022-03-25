@@ -52,6 +52,7 @@ latest_checkstyle_tested: '10.0'
 
 # links to external websites that are used in multiple places throughout the site
 link_mavencentral: 'https://search.maven.org/#search%7Cgav%7C1%7Cg%3Acom.thomasjensen.checkstyle.addons'
+link_central_download: 'https://repo1.maven.org/maven2/com/thomasjensen/checkstyle/addons'
 
 link_cs_home: 'https://checkstyle.org/'
 link_cs_anttask: 'https://checkstyle.org/anttask.html'
