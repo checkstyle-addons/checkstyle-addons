@@ -32,5 +32,5 @@ USER sonarqube
 COPY --chown=sonarqube:sonarqube sqtest/config/sq-setup.sh /home/sonarqube/
 RUN curl -sSLR --output ${SQ_EXTENSIONS_DIR}/plugins/checkstyle-sonar-plugin-${CS_SQPLUGIN_VERSION}.jar \
     https://github.com/checkstyle/sonar-checkstyle/releases/download/${CS_SQPLUGIN_VERSION}/checkstyle-sonar-plugin-${CS_SQPLUGIN_VERSION}.jar
-COPY --chown=sonarqube:sonarqube build/libs/sonar-checkstyleaddons-${CS_ADDONS_VERSION_EXT}.jar ${SQ_EXTENSIONS_DIR}/plugins/
-RUN chmod 644 ${SQ_EXTENSIONS_DIR}/plugins/sonar-checkstyleaddons-*
+COPY --chown=sonarqube:sonarqube build/libs/checkstyle-addons-${CS_ADDONS_VERSION_EXT}-sonar.jar ${SQ_EXTENSIONS_DIR}/plugins/
+RUN chmod 644 ${SQ_EXTENSIONS_DIR}/plugins/checkstyle-addons-*

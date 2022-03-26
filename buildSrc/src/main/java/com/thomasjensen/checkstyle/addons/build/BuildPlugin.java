@@ -20,6 +20,7 @@ import java.io.IOException;
 import java.util.Arrays;
 import javax.annotation.Nonnull;
 
+import com.github.jengelman.gradle.plugins.shadow.tasks.ShadowJar;
 import org.eclipse.jgit.api.Git;
 import org.eclipse.jgit.api.errors.GitAPIException;
 import org.eclipse.jgit.errors.InvalidPatternException;
@@ -253,6 +254,20 @@ public class BuildPlugin
                 final TaskProvider<Jar> jarJavadocTaskProvider =
                     buildUtil.getTaskProvider(TaskNames.jarJavadoc, Jar.class, depConfig);
                 pub.artifact(jarJavadocTaskProvider, a -> a.setClassifier("javadoc"));
+
+                final TaskProvider<ShadowJar> fatJarTaskProvider =
+                    buildUtil.getTaskProvider(TaskNames.fatJar, ShadowJar.class, depConfig);
+                pub.artifact(fatJarTaskProvider, a -> a.setClassifier("all"));
+
+                final TaskProvider<Jar> jarEclipseTaskProvider =
+                    buildUtil.getTaskProvider(TaskNames.jarEclipse, Jar.class, depConfig);
+                pub.artifact(jarEclipseTaskProvider, a -> a.setClassifier("eclipse"));
+
+                if (depConfig.isSonarQubeSupported()) {
+                    final TaskProvider<ShadowJar> jarSonarqubeTaskProvider =
+                        buildUtil.getTaskProvider(TaskNames.jarSonarqube, ShadowJar.class, depConfig);
+                    pub.artifact(jarSonarqubeTaskProvider, a -> a.setClassifier("sonar"));
+                }
             });
 
             buildUtil.getTaskProvider(TaskNames.generatePomFileForCheckstyleAddonsPublication, GenerateMavenPom.class,

@@ -70,11 +70,10 @@ public class JarEclipseConfigAction
             + pDepConfig.getName() + "'");
 
         // adjust archive name
-        String appendix = "eclipse";
         if (!pDepConfig.isDefaultConfig()) {
-            appendix = pDepConfig.getName() + '-' + appendix;
+            pJarTask.getArchiveBaseName().set(pJarTask.getArchiveBaseName().get() + '-' + pDepConfig.getName());
         }
-        pJarTask.getArchiveAppendix().set(appendix);
+        pJarTask.getArchiveClassifier().set("eclipse");
 
         // Dependency on 'classes' task (compile and resources)
         pJarTask.dependsOn(buildUtil.getTaskProvider(TaskNames.mainClasses, Task.class, pDepConfig));

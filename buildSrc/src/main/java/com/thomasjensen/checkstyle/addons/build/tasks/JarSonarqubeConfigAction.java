@@ -82,10 +82,10 @@ public class JarSonarqubeConfigAction
         inputs.property("website", buildConfig.getWebsite());
 
         // archive name
-        pJarTask.getArchiveFileName().set("sonar-" + inputs.getProperties().get("sqPluginKey") + "-"
-            + inputs.getProperties().get(BuildUtil.VERSION)
-            + (pDepConfig.isDefaultConfig() ? "" : ("-csp" + pDepConfig.getSonarQubeMinCsPluginVersion()))
-            + ".jar");
+        if (!pDepConfig.isDefaultConfig()) {
+            pJarTask.getArchiveBaseName().set(pJarTask.getArchiveBaseName().get() + '-' + pDepConfig.getName());
+        }
+        pJarTask.getArchiveClassifier().set("sonar");
 
         // Task Dependencies
         final TaskProvider<Task> sqClassesTaskProvider =

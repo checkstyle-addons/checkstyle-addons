@@ -58,7 +58,7 @@ dependencies {
 ext {
     dockerSonarqubeVersion = '8.9'
     dockerSonarCheckstyleVersion = '10.0'
-    dockerCheckstyleAddonsDepConfig = '' // or, for example, 'csp4.29'
+    dockerCheckstyleAddonsDepConfig = '' // or, for example, 'java8b'
     dockerImage = "sonarqube:${dockerSonarqubeVersion}-${dockerSonarCheckstyleVersion}-checkstyle-addons-intTest"
     sqHost = 'localhost'
     sqPort = 9000
@@ -131,7 +131,7 @@ tasks.register('buildDockerImage', Exec).configure {
     workingDir = rootProject.projectDir
     String versionExt = rootProject.getVersion().toString()
     if (project.ext.dockerCheckstyleAddonsDepConfig?.trim()) {
-        versionExt += '-' + project.ext.dockerCheckstyleAddonsDepConfig
+        versionExt = project.ext.dockerCheckstyleAddonsDepConfig + '-' + versionExt
     }
     commandLine = ['docker', 'build',
                    '--build-arg', "SQ_VERSION=${project.ext.dockerSonarqubeVersion}",
