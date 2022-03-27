@@ -3,21 +3,21 @@ layout: markdown
 title: Getting Started
 surrounding-div: csa-run
 longContent: true
-last_modified_at: 2018-05-02 13:06:00 +0200
+last_modified_at: 2022-03-27 14:38:00 +0100
 ---
 
 # Getting Started
 
 Here's how to use {{ site.name }} with your standard software.
 
-{{ site.name }} is distributed via [Maven Central]({{ site.link_mavencentral }}), so major build tools can
-automatically access it.
+{{ site.name }} is distributed via [Maven Central]({{ site.link_mavencentral }}), so build tools can automatically
+access it.
 
-{{ site.name }} is compatible with all Checkstyle versions starting from 6.16.1. ({{ site.name }} v4.2.0 and earlier
-were also compatible with Checkstyle 6.0 - 6.15.)
+{{ site.name }} is compatible with all Checkstyle versions starting from 6.16.1. (Older versions of {{ site.name }}
+were also compatible with even older versions of Checkstyle, down to Checkstyle 6.0.)
 
 {{ site.name }} uses [semantic versioning](https://semver.org/){:target="_blank"}, so you can always use the latest
-within a major version, but you should try things out before moving to a higher major version.
+within a major version, but you should try things out before moving to a different major version.
 
 
 <!-- ======================================================================================= -->
@@ -37,30 +37,55 @@ plugins {
 }
 dependencies {
     checkstyle group: 'com.thomasjensen.checkstyle.addons', name: 'checkstyle-addons', version: '{{ site.latest_version }}'
-    //checkstyle group: 'com.thomasjensen.checkstyle.addons', name: 'checkstyle-addons-java8a', version: '{{ site.latest_version }}'
+    //checkstyle group: 'com.thomasjensen.checkstyle.addons', name: 'checkstyle-addons-java8b', version: '{{ site.latest_version }}'
 }
 checkstyle {
-    configFile file('your-checkstyle.xml')
-    toolVersion '{{ site.latest_version_checkstyle }}'             // set Checkstyle version here
-    //toolVersion '{{ site.latest_version_checkstyle_java8a }}'      // set Checkstyle version here
+    configFile = file('your-checkstyle.xml')
+    toolVersion = '{{ site.latest_version_checkstyle }}'             // set Checkstyle version here
+    //toolVersion = '{{ site.latest_version_checkstyle_java8b }}'      // set Checkstyle version here
 }
 {% endhighlight %}
 
 For the `checkstyle-addons` dependency, you may also use the version notation `version: '{{ site.latest_major }}.+'` in
 order to always get the latest compatible version.
 
-<div class="alert alert-warning">
-  <h4 class="alert-heading">Compatibility Notice</h4>
-  <p class="mb-0">The above example is for Checkstyle 8.21 and up. If you are using Checkstyle 7.0 - 8.20, you must
-  instead use the <code>java8a</code> variant of {{ site.name }} as shown in the commented-out lines of code in the
-  example.</p>
-</div>
+Since the Checkstyle API breaks every now and then, you must use a {{ site.name }} variant which matches the version
+of Checkstyle you are using:
 
-The example above has been tested with Checkstyle `toolVersion` values up to {{ site.latest_checkstyle_tested }}. The
-Gradle build must use at least Java&nbsp;8.\\
-The older Checkstyle versions 6.16.1 - 6.19 which can run on Java&nbsp;7, are also supported, but if you set
-`toolVersion` to these, you must depend on `checkstyle-addons-java7` instead of `checkstyle-addons` (even if you use
-Java&nbsp;8 or higher).
+<table class="table table-striped" style="width: auto;">
+<tr>
+    <th>Java</th>
+    <th>Checkstyle</th>
+    <th>{{ site.name }} Variant</th>
+</tr>
+<tr>
+    <td>≥&nbsp;11</td>
+    <td>≥&nbsp;10.0</td>
+    <td>normal (no postfix)</td>
+</tr>
+<tr>
+    <td>≥&nbsp;8</td>
+    <td>8.21 -&nbsp;9.3</td>
+    <td><code>-java8b</code></td>
+</tr>
+<tr>
+    <td>≥&nbsp;8</td>
+    <td>7.0 -&nbsp;8.20</td>
+    <td><code>-java8a</code></td>
+</tr>
+<tr>
+    <td>≥&nbsp;7</td>
+    <td>6.16.1 -&nbsp;6.19</td>
+    <td><code>-java7</code></td>
+</tr>
+<tr>
+    <td>≤&nbsp;7</td>
+    <td>older</td>
+    <td>use {{ site.name }}&nbsp;v4.x</td>
+</tr>
+</table>
+
+The example above contains commented-out lines which show how the `java8b` variant is applied.
 
 
 <!-- ======================================================================================= -->
@@ -86,18 +111,18 @@ version.
   <plugin>
     <groupId>org.apache.maven.plugins</groupId>
     <artifactId>maven-checkstyle-plugin</artifactId>
-    <version>2.17</version>
+    <version>3.1.2</version>
     <dependencies>
       <dependency>
         <groupId>com.puppycrawl.tools</groupId>
         <artifactId>checkstyle</artifactId>
         <version>{{ site.latest_version_checkstyle }}</version>    <!-- set Checkstyle version here -->
-        <!-- <version>{{ site.latest_version_checkstyle_java8a }}</version> -->
+        <!-- <version>{{ site.latest_version_checkstyle_java8b }}</version> -->
       </dependency>
       <dependency>
         <groupId>com.thomasjensen.checkstyle.addons</groupId>
         <artifactId>checkstyle-addons</artifactId>
-        <!-- <artifactId>checkstyle-addons-java8a</artifactId> -->
+        <!-- <artifactId>checkstyle-addons-java8b</artifactId> -->
         <version>{{ site.latest_version }}</version>
       </dependency>
     </dependencies>
@@ -106,17 +131,45 @@ version.
 {% endhighlight %}
 
 The example above has been tested with the Checkstyle dependency set to a version up to
-{{ site.latest_checkstyle_tested }}. Maven must run at least on Java&nbsp;8.
+{{ site.latest_checkstyle_tested }}.
 
-<div class="alert alert-warning">
-  <h4 class="alert-heading">Compatibility Notice</h4>
-  <p class="mb-0">The above example is for Checkstyle 8.21 and up. If you are using Checkstyle 7.0 - 8.20, you must
-  instead use the <code>java8a</code> variant of {{ site.name }} as shown in the commented-out lines of XML in the
-  example.</p>
-</div>
+Since the Checkstyle API breaks every now and then, you must use a {{ site.name }} variant which matches the version
+of Checkstyle you are using:
 
-The older Checkstyle versions 6.16.1 - 6.19 which can run on Java&nbsp;7, are also supported, but if you use these,
-you must depend on `checkstyle-addons-java7` instead of `checkstyle-addons` (even if you use Java&nbsp;8 or higher).
+<table class="table table-striped" style="width: auto;">
+<tr>
+    <th>Java</th>
+    <th>Checkstyle</th>
+    <th>{{ site.name }} Variant</th>
+</tr>
+<tr>
+    <td>≥&nbsp;11</td>
+    <td>≥&nbsp;10.0</td>
+    <td>normal (no postfix)</td>
+</tr>
+<tr>
+    <td>≥&nbsp;8</td>
+    <td>8.21 -&nbsp;9.3</td>
+    <td><code>-java8b</code></td>
+</tr>
+<tr>
+    <td>≥&nbsp;8</td>
+    <td>7.0 -&nbsp;8.20</td>
+    <td><code>-java8a</code></td>
+</tr>
+<tr>
+    <td>≥&nbsp;7</td>
+    <td>6.16.1 -&nbsp;6.19</td>
+    <td><code>-java7</code></td>
+</tr>
+<tr>
+    <td>≤&nbsp;7</td>
+    <td>older</td>
+    <td>use {{ site.name }}&nbsp;v4.x</td>
+</tr>
+</table>
+
+The example above contains commented-out lines which show how the `java8b` variant is applied.
 
 
 <!-- ======================================================================================= -->
@@ -127,8 +180,49 @@ In Ant, we must add {{ site.name }} to the classpath of the [Checkstyle Ant
 Task]({{ site.link_cs_anttask }}){:target="_blank"}. The Ant task is part of the standard Checkstyle distribution.
 In order to integrate {{ site.name }}, the {{ site.name }} FatJAR is put on the Ant classpath.
 
-<p><a href="https://github.com/{{ site.github }}/releases/download/v{{ site.latest_version }}/checkstyle-addons-{{
-site.latest_version }}-all.jar" class="btn btn-primary">Download FatJAR</a></p>
+The concrete FatJAR needed depends on the version of Checkstyle you are using:
+
+<table class="table table-striped" style="width: auto;">
+<tr>
+    <th>Java</th>
+    <th>Checkstyle</th>
+    <th>{{ site.name }} Variant</th>
+</tr>
+<tr>
+    <td>≥&nbsp;11</td>
+    <td>≥&nbsp;10.0</td>
+    <td><a href="{{ site.link_central_download }}/checkstyle-addons/{{ site.latest_version
+        }}/checkstyle-addons-{{ site.latest_version }}-all.jar" class="btn btn-primary">Download
+        normal FatJAR</a></td>
+</tr>
+<tr>
+    <td>≥&nbsp;8</td>
+    <td>8.21 -&nbsp;9.3</td>
+    <td><a href="{{ site.link_central_download }}/checkstyle-addons-java8b/{{ site.latest_version
+        }}/checkstyle-addons-java8b-{{ site.latest_version }}-all.jar" class="btn btn-warning btn-sm">Download
+        "java8b" FatJAR</a></td>
+</tr>
+<tr>
+    <td>≥&nbsp;8</td>
+    <td>7.0 -&nbsp;8.20</td>
+    <td><a href="{{ site.link_central_download }}/checkstyle-addons-java8a/{{ site.latest_version
+        }}/checkstyle-addons-java8a-{{ site.latest_version }}-all.jar" class="btn btn-warning btn-sm">Download
+        "java8a" FatJAR</a></td>
+</tr>
+<tr>
+    <td>≥&nbsp;7</td>
+    <td>6.16.1 -&nbsp;6.19</td>
+    <td><a href="{{ site.link_central_download }}/checkstyle-addons-java7/{{ site.latest_version
+        }}/checkstyle-addons-java7-{{ site.latest_version }}-all.jar" class="btn btn-warning btn-sm">Download
+        "java7" FatJAR</a></td>
+</tr>
+<tr>
+    <td>≤&nbsp;7</td>
+    <td>older</td>
+    <td>use {{ site.name }}&nbsp;v4.x</td>
+</tr>
+</table>
+
 
 The FatJAR is simply a JAR which includes {{ site.name }} along with all its dependencies except Checkstyle itself.
 
@@ -137,19 +231,8 @@ Then, in our Ant *build.xml*, we declare the Checkstyle task as follows:
 {% highlight xml %}
 <taskdef resource="com/puppycrawl/tools/checkstyle/ant/checkstyle-ant-task.properties">
     <classpath>
-        <pathelement location="lib/checkstyle-{{ site.latest_version_checkstyle }}-all.jar"/>
-        <pathelement location="lib/checkstyle-addons-{{ site.latest_version }}-all.jar"/>
-    </classpath>
-</taskdef>
-{% endhighlight %}
-
-The above example is for Checkstyle 8.21 and up. If you are using Checkstyle 7.0 - 8.20, use these lines instead:
-
-{% highlight xml %}
-<taskdef resource="com/puppycrawl/tools/checkstyle/ant/checkstyle-ant-task.properties">
-    <classpath>
-        <pathelement location="lib/checkstyle-{{ site.latest_version_checkstyle_java8a }}-all.jar"/>
-        <pathelement location="lib/checkstyle-addons-java8a-{{ site.latest_version }}-all.jar"/>
+        <pathelement location="lib/checkstyle-{{ site.latest_version_checkstyle }}-all.jar"/>          <!-- the core Checkstyle FatJAR -->
+        <pathelement location="lib/checkstyle-addons-{{ site.latest_version }}-all.jar"/>  <!-- our {{ site.name }} FatJAR -->
     </classpath>
 </taskdef>
 {% endhighlight %}
@@ -169,14 +252,8 @@ the Checkstyle task is standard Ant:
 For more information on Checkstyle Ant task configuration, please refer to its
 [website]({{ site.link_cs_anttask }}){:target="_blank"}.
 
-As with Maven and Gradle, you may use a Java&nbsp;7 compatible version of {{ site.name }} by using the `-java7` FatJAR
-([download](https://github.com/{{ site.github }}/releases/download/v{{ site.latest_version }}/checkstyle-addons-java7-{{
-site.latest_version }}-all.jar)) and Checkstyle 6.16.1 -&nbsp;6.19. Checkstyle 7.0 -&nbsp;8.20 are supported via the
-[java8a-FatJAR](https://github.com/{{ site.github }}/releases/download/v{{ site.latest_version
-}}/checkstyle-addons-java8a-{{ site.latest_version }}-all.jar).
-
-If you use Ivy for dependency management in Ant, you can take advantage of the fact that {{ site.name }} is on Maven
-Central.
+If you use Ivy for dependency management in Ant, you can take advantage of the fact that {{ site.name }}, including
+its FatJAR, is on Maven Central.
 
 
 <!-- ======================================================================================= -->
