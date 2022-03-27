@@ -1,0 +1,44 @@
+{%- comment -%}
+    A table that summarizes which FatJAR to download, with download buttons.
+{%- endcomment -%}
+
+<table class="table table-striped" style="width: auto;">
+<tr>
+    <th>Java</th>
+    <th>Checkstyle</th>
+    <th>{{ site.name }} Variant</th>
+</tr>
+<tr>
+    <td>≥&nbsp;11</td>
+    <td>≥&nbsp;10.0</td>
+    <td><a href="{{ site.link_central_download }}/checkstyle-addons/{{ site.latest_version
+        }}/checkstyle-addons-{{ site.latest_version }}-all.jar" class="btn btn-primary">Download
+        normal FatJAR</a></td>
+</tr>
+<tr>
+    <td>≥&nbsp;8</td>
+    <td>8.21 -&nbsp;9.3</td>
+    <td><a href="{{ site.link_central_download }}/checkstyle-addons-java8b/{{ site.latest_version
+        }}/checkstyle-addons-java8b-{{ site.latest_version }}-all.jar" class="btn btn-warning btn-sm">Download
+        "java8b" FatJAR</a></td>
+</tr>
+<tr>
+    <td>≥&nbsp;8</td>
+    <td>7.0 -&nbsp;8.20</td>
+    <td><a href="{{ site.link_central_download }}/checkstyle-addons-java8a/{{ site.latest_version
+        }}/checkstyle-addons-java8a-{{ site.latest_version }}-all.jar" class="btn btn-warning btn-sm">Download
+        "java8a" FatJAR</a></td>
+</tr>
+<tr>
+    <td>≥&nbsp;7</td>
+    <td>6.16.1 -&nbsp;6.19</td>
+    <td><a href="{{ site.link_central_download }}/checkstyle-addons-java7/{{ site.latest_version
+        }}/checkstyle-addons-java7-{{ site.latest_version }}-all.jar" class="btn btn-warning btn-sm">Download
+        "java7" FatJAR</a></td>
+</tr>
+<tr>
+    <td>≤&nbsp;7</td>
+    <td>older</td>
+    <td>use {{ site.name }}&nbsp;v4.x</td>
+</tr>
+</table>

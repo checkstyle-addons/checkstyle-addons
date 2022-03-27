@@ -182,47 +182,7 @@ In order to integrate {{ site.name }}, the {{ site.name }} FatJAR is put on the 
 
 The concrete FatJAR needed depends on the version of Checkstyle you are using:
 
-<table class="table table-striped" style="width: auto;">
-<tr>
-    <th>Java</th>
-    <th>Checkstyle</th>
-    <th>{{ site.name }} Variant</th>
-</tr>
-<tr>
-    <td>≥&nbsp;11</td>
-    <td>≥&nbsp;10.0</td>
-    <td><a href="{{ site.link_central_download }}/checkstyle-addons/{{ site.latest_version
-        }}/checkstyle-addons-{{ site.latest_version }}-all.jar" class="btn btn-primary">Download
-        normal FatJAR</a></td>
-</tr>
-<tr>
-    <td>≥&nbsp;8</td>
-    <td>8.21 -&nbsp;9.3</td>
-    <td><a href="{{ site.link_central_download }}/checkstyle-addons-java8b/{{ site.latest_version
-        }}/checkstyle-addons-java8b-{{ site.latest_version }}-all.jar" class="btn btn-warning btn-sm">Download
-        "java8b" FatJAR</a></td>
-</tr>
-<tr>
-    <td>≥&nbsp;8</td>
-    <td>7.0 -&nbsp;8.20</td>
-    <td><a href="{{ site.link_central_download }}/checkstyle-addons-java8a/{{ site.latest_version
-        }}/checkstyle-addons-java8a-{{ site.latest_version }}-all.jar" class="btn btn-warning btn-sm">Download
-        "java8a" FatJAR</a></td>
-</tr>
-<tr>
-    <td>≥&nbsp;7</td>
-    <td>6.16.1 -&nbsp;6.19</td>
-    <td><a href="{{ site.link_central_download }}/checkstyle-addons-java7/{{ site.latest_version
-        }}/checkstyle-addons-java7-{{ site.latest_version }}-all.jar" class="btn btn-warning btn-sm">Download
-        "java7" FatJAR</a></td>
-</tr>
-<tr>
-    <td>≤&nbsp;7</td>
-    <td>older</td>
-    <td>use {{ site.name }}&nbsp;v4.x</td>
-</tr>
-</table>
-
+{% include fatjar-download.html %}
 
 The FatJAR is simply a JAR which includes {{ site.name }} along with all its dependencies except Checkstyle itself.
 
@@ -265,8 +225,9 @@ In IntelliJ IDEA or Android Studio, {{ site.name }} runs as a third-party addon 
 plugin](https://plugins.jetbrains.com/plugin/1065){:target="_blank"}. So first make sure you've got Checkstyle-IDEA. If
 not, install via *File &rarr; Settings... &rarr; Plugins &rarr; Browse Repostories*.
 
-<p><a href="https://github.com/{{ site.github }}/releases/download/v{{ site.latest_version }}/checkstyle-addons-{{
-site.latest_version }}-all.jar" class="btn btn-primary">Download FatJAR</a></p>
+Next, download a {{ site.name }} FatJar:
+
+{% include fatjar-download.html %}
 
 After that, you can add {{ site.name }} to the third-party checks:
 
@@ -277,28 +238,56 @@ After that, you can add {{ site.name }} to the third-party checks:
 Checkstyle-IDEA does not offer a visual editor, so you'll have to activate the {{ site.name }} checks by modifying your
 *checkstyle.xml* directly.
 
-The {{ site.name }} version offered by the above download button is compatible with Checkstyle 8.21 and up.
-If you are using Checkstyle 7.0 - 8.20, use the `java8a` variant of {{ site.name }}. If you are using the older
-Checkstyle versions 6.16.1 - 6.19, use {{ site.name }} in the `java7` variant.
-
-<p>
-<a href="https://github.com/{{ site.github }}/releases/download/v{{ site.latest_version }}/checkstyle-addons-java8a-{{
-site.latest_version }}-all.jar" class="btn btn-warning btn-sm">Download "java8a" FatJAR</a> &nbsp;
-<a href="https://github.com/{{ site.github }}/releases/download/v{{ site.latest_version }}/checkstyle-addons-java7-{{
-site.latest_version }}-all.jar" class="btn btn-warning btn-sm">Download "java7" FatJAR</a>
-</p>
-
 
 <!-- ======================================================================================= -->
 <a name="run-eclipse" class="csa-offset-anchor"/>
 <h2>Eclipse<a href="#run-eclipse"><span class="glyphicon glyphicon-link" aria-hidden="true"></span></a></h2>
 
 In Eclipse, {{ site.name }} runs as an addon to [Eclipse-CS](http://checkstyle.org/eclipse-cs/){:target="_blank"}.
-So first make sure you've got Eclipse-CS [installed](http://checkstyle.org/eclipse-cs/#!/install){:target="_blank"} at
-version 7.2.0 or higher. Then:
+So first make sure you've got Eclipse-CS [installed](http://checkstyle.org/eclipse-cs/#!/install){:target="_blank"}.
 
-<p><a href="https://github.com/{{ site.github }}/releases/download/v{{ site.latest_version }}/checkstyle-addons-eclipse-{{
-site.latest_version }}.jar" class="btn btn-primary">Download Eclipse Plugin</a></p>
+Then download the {{ site.name }} plugin to match your version of Eclipse-CS:
+
+<table class="table table-striped" style="width: auto;">
+<tr>
+    <th>Java</th>
+    <th>Eclipse-CS</th>
+    <th>{{ site.name }} Variant</th>
+</tr>
+<tr>
+    <td>≥&nbsp;11</td>
+    <td>≥&nbsp;10.0</td>
+    <td><a href="{{ site.link_central_download }}/checkstyle-addons/{{
+        page.csa_version }}/checkstyle-addons-{{ page.csa_version }}-eclipse.jar"
+        class="btn btn-primary">Download Eclipse Plugin</a></td>
+</tr>
+<tr>
+    <td>≥&nbsp;8</td>
+    <td>8.21.0 -&nbsp;9.3.0</td>
+    <td><a href="{{ site.link_central_download }}/checkstyle-addons-java8b/{{
+        page.csa_version }}/checkstyle-addons-java8b-{{ page.csa_version }}-eclipse.jar"
+        class="btn btn-warning btn-sm">Download "java8b" Eclipse Plugin</a></td>
+</tr>
+<tr>
+    <td>≥&nbsp;8</td>
+    <td>7.2.0 -&nbsp;8.20.0</td>
+    <td><a href="{{ site.link_central_download }}/checkstyle-addons-java8a/{{
+        page.csa_version }}/checkstyle-addons-java8a-{{ page.csa_version }}-eclipse.jar"
+        class="btn btn-warning btn-sm">Download "java8a" Eclipse Plugin</a></td>
+</tr>
+<tr>
+    <td>≥&nbsp;7</td>
+    <td>6.16.0 -&nbsp;6.19.1</td>
+    <td><a href="{{ site.link_central_download }}/checkstyle-addons-java7/{{
+        page.csa_version }}/checkstyle-addons-java7-{{ page.csa_version }}-eclipse.jar"
+        class="btn btn-warning btn-sm">Download "java7" Eclipse Plugin</a></td>
+</tr>
+<tr>
+    <td>≤&nbsp;7</td>
+    <td>older</td>
+    <td>use {{ site.name }}&nbsp;v4.x</td>
+</tr>
+</table>
 
 **Installation:** Drop the downloaded plugin JAR into the *dropins* folder of your Eclipse installation and restart
 Eclipse.
@@ -311,17 +300,6 @@ editor of Eclipse-CS:
 <img src="{{ site.baseurl }}/images/run-eclipse.png" alt="{{ site.name }} in Eclipse" width="549" height="368" />
 </div>
 
-The {{ site.name }} version offered by the above download button is compatible with Checkstyle 8.21 and up. If you are
-using Checkstyle 7.0 -&nbsp;8.20, use the `java8a` variant of {{ site.name }}. If you are using the older Checkstyle
-versions 6.16.1 -&nbsp;6.19, use {{ site.name }} in the `java7` variant.
-
-<p>
-<a href="https://github.com/{{ site.github }}/releases/download/v{{ site.latest_version }}/checkstyle-addons-java8a-eclipse-{{
-site.latest_version }}.jar" class="btn btn-warning btn-sm">Download "java8a" Plugin</a> &nbsp;
-<a href="https://github.com/{{ site.github }}/releases/download/v{{ site.latest_version }}/checkstyle-addons-java7-eclipse-{{
-site.latest_version }}.jar" class="btn btn-warning btn-sm">Download "java7" Plugin</a>
-</p>
-
 
 <!-- ======================================================================================= -->
 <a name="run-sonarqube" class="csa-offset-anchor"/>
@@ -333,46 +311,31 @@ Checkstyle Plugin ([download]({{ site.link_sq_csplugin }}/releases),
 {{ site.name }} for SonarQube depending on the version of the SonarQube Checkstyle Plugin you are using:
 
 <div class="csa-largeImageWrapper">
-<table class="table table-striped csa-version-table" style="width:auto;">
-  <thead>
-    <tr>
-      <th>SonarQube Checkstyle<br>Plugin Version</th>
-      <th>Download Link</th>
-    </tr>
-  </thead>
-  <tbody>
-    <tr>
-      <td>&ge;&nbsp;4.21</td>
-      <td><a href="https://github.com/{{ site.github }}/releases/download/v{{ site.latest_version
-          }}/sonar-checkstyleaddons-{{ site.latest_version }}.jar" class="btn btn-primary">Download SonarQube Plugin
-          (v{{ site.latest_version }})</a></td>
-    </tr>
-    <tr>
-      <td>3.1 -&nbsp;4.20</td>
-      <td><a href="https://github.com/{{ site.github }}/releases/download/v{{ site.latest_version
-          }}/sonar-checkstyleaddons-{{ site.latest_version }}-csp3.1.jar" class="btn btn-warning btn-sm">Download
-          SonarQube Plugin (v{{ site.latest_version }}-csp3.1)</a></td>
-    </tr>
-    <tr>
-      <td>2.3 or 2.4</td>
-      <td><a href="https://github.com/{{ site.github
-          }}/releases/download/v4.2.0/sonar-checkstyleaddons-4.2.0-csp2.3.jar" class="btn btn-warning btn-sm">Download
-          Legacy Plugin (v4.2.0-csp2.3)</a></td>
-    </tr>
-    <tr>
-      <td>2.2</td>
-      <td><a href="https://github.com/{{ site.github
-          }}/releases/download/v4.2.0/sonar-checkstyleaddons-4.2.0-csp2.2.jar" class="btn btn-warning btn-sm">Download
-          Legacy Plugin (v4.2.0-csp2.2)</a></td>
-    </tr>
-  </tbody>
+<table class="table table-striped" style="width: auto;">
+<tr>
+    <th>Java<br>Version</th>
+    <th>SonarQube Checkstyle<br>Plugin Version</th>
+    <th>{{ site.name }} Variant</th>
+</tr>
+<tr>
+    <td>≥&nbsp;11</td>
+    <td>≥&nbsp;10.0</td>
+    <td><a href="{{ site.link_central_download }}/checkstyle-addons/{{ page.csa_version }}/checkstyle-addons-{{
+        page.csa_version }}-sonar.jar" class="btn btn-primary">Download SonarQube Plugin</a></td>
+</tr>
+<tr>
+    <td>≥&nbsp;8</td>
+    <td>4.29 -&nbsp;9.3</td>
+    <td><a href="{{ site.link_central_download }}/checkstyle-addons-java8b/{{ page.csa_version
+        }}/checkstyle-addons-java8b-{{ page.csa_version }}-sonar.jar"
+        class="btn btn-warning btn-sm">Download "java8b" SonarQube Plugin</a></td>
+</tr>
+<tr>
+    <td>≤&nbsp;8</td>
+    <td>2.2 -&nbsp;4.27</td>
+    <td>use older {{ site.name }}</td>
+</tr>
 </table>
-</div>
-
-<div class="alert alert-warning">
-  <h4 class="alert-heading">SonarQube &le;&nbsp;7.9 required</h4>
-  <p>Our {{ site.name }} plugin for SonarQube supports SonarQube up to version 7.9. If you need support for later
-     versions, consider contributing this (issue <a href="https://github.com/{{ site.github }}/issues/3">#3</a>).</p>
 </div>
 
 The SonarQube rules provided by {{ site.name }} are tagged with `checkstyle-addons`, which is useful to filter them
@@ -387,19 +350,10 @@ all the other plugins are). Restart SonarQube.
 <h2>Command Line<a href="#run-command-line"><span class="glyphicon glyphicon-link" aria-hidden="true"></span></a></h2>
 
 Checkstyle can also be run [from the command line](http://checkstyle.sourceforge.net/cmdline.html){:target="_blank"}.
-{{ site.name }} is included by simply adding its FatJAR to the classpath.\\
-The regular JAR is compatible with Checkstyle 8.21 and up (tested up to {{ site.latest_checkstyle_tested }}). If you
-are using Checkstyle 7.0 -&nbsp;8.20, you must use the `java8a` variant of {{ site.name }}. If you are using Checkstyle
-6.16.1 -&nbsp;6.19, you must use the `java7` variant.
+{{ site.name }} is included by simply adding its FatJAR to the classpath. The concrete FatJAR needed depends on the
+version of Checkstyle you are using:
 
-<p>
-<a href="https://github.com/{{ site.github }}/releases/download/v{{ site.latest_version }}/checkstyle-addons-{{
-site.latest_version }}-all.jar" class="btn btn-primary">Download regular FatJAR</a> &nbsp;
-<a href="https://github.com/{{ site.github }}/releases/download/v{{ site.latest_version }}/checkstyle-addons-java8a-{{
-site.latest_version }}-all.jar" class="btn btn-warning btn-sm">Download "java8a" FatJAR</a> &nbsp;
-<a href="https://github.com/{{ site.github }}/releases/download/v{{ site.latest_version }}/checkstyle-addons-java7-{{
-site.latest_version }}-all.jar" class="btn btn-warning btn-sm">Download "java7" FatJAR</a>
-</p>
+{% include fatjar-download.html %}
 
 Now you can run Checkstyle with {{ site.name }} like this (example for regular JAR):
 
@@ -407,5 +361,5 @@ Now you can run Checkstyle with {{ site.name }} like this (example for regular J
 java -cp checkstyle-addons-{{ site.latest_version }}-all.jar;checkstyle-{{ site.latest_version_checkstyle }}-all.jar com.puppycrawl.tools.checkstyle.Main -c your-checkstyle.xml src
 ```
 
-The above assumes that your sources are in a subdirectory *src*, and that the required JARs and your configuration file
-are in the current directory.
+The above assumes that your sources are in a subdirectory *src*, and that the downloaded JARs and your configuration
+file are in the current directory.
