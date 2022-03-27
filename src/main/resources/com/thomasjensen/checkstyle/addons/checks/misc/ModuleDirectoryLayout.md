@@ -111,9 +111,9 @@ The `FromPath` type may only occur in `deny` lists.
 
 In order to be sure that your customized *directories.json* file is syntactically correct and does not violate any
 constraints, a small verification program is supplied for your convenience. Download a copy of
-[checkstyle-addons-{{ page.check_version | remove_first:'v' }}-all.jar](https://github.com/{{ site.github
-}}/releases/download/{{ page.check_version }}/checkstyle-addons-{{ page.check_version | remove_first:'v' }}-all.jar)
-and [checkstyle-{{ site.latest_version_checkstyle
+[checkstyle-addons-{{ page.check_version | remove_first:'v' }}-all.jar]({{ site.link_central_download
+}}/checkstyle-addons/{{ page.check_version | remove_first:'v' }}/checkstyle-addons-{{
+page.check_version | remove_first:'v' }}-all.jar) and [checkstyle-{{ site.latest_version_checkstyle
 }}-all.jar](https://github.com/checkstyle/checkstyle/releases/download/checkstyle-{{ site.latest_version_checkstyle
 }}/checkstyle-{{ site.latest_version_checkstyle }}-all.jar) (or any other compatible version), then run the
 validator from the command line:

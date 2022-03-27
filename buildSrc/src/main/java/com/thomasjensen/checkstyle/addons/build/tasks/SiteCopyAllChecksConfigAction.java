@@ -72,7 +72,7 @@ public class SiteCopyAllChecksConfigAction
         Date buildTimestamp = new BuildUtil(pProject).getBuildConfig().getBuildTimestamp().get();
         Map<String, String> replacements = new HashMap<>();
         replacements.put("buildTimestamp", sdf.format(buildTimestamp));
-        replacements.put("version", "v" + pProject.getVersion());
+        replacements.put("version", pProject.getVersion().toString());
         Map<String, Object> result = new HashMap<>();
         result.put("tokens", replacements);
         return result;
