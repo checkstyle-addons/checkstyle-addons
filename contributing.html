@@ -2,7 +2,7 @@
 layout: markdown
 title: Contributing
 longContent: true
-last_modified_at: 2019-01-27 21:53:00 +0200
+last_modified_at: 2022-03-28 21:00:00 +0200
 ---
 
 # Contributing
@@ -13,6 +13,7 @@ a contribution.
 If you've got an idea or - even better - some *code* for a new high-quality check, we should talk about getting it on
 board. In fact, you can put it on board yourself by creating a pull request for it (more below). The same is true for
 all kinds of improvements, including improvements to the website.
+
 
 ## Current Status
 
@@ -59,41 +60,45 @@ In order to build {{ site.name }} yourself, follow these steps:
 
  1. Make sure you have the prerequisites set up:
    - [Git](https://git-scm.com/){:target="_blank"}
-   - [Java 8 SDK](https://adoptopenjdk.net/){:target="_blank"},
+   - [Java 11 SDK](https://adoptium.net/?variant=openjdk11){:target="_blank"},
      which must be used to run the build process
+   - [Java 8 SDK](https://adoptium.net/?variant=openjdk8){:target="_blank"}
    - [Java 7 SDK](https://www.azul.com/downloads/?version=java-7-lts&package=jdk#download-openjdk){:target="_blank"}
 
-    In order to do a full build of {{ site.name }}, we actually need both JDKs at the same time. It's no problem
+    In order to do a full build of {{ site.name }}, we actually need all three JDKs at the same time. It's no problem
     to have them all installed as long as each has its own distinct directory. The build process itself *must* run on
-    Java&nbsp;8. It is basically possible to not install the Java&nbsp;7 SDK, but then the build will
-    not create artifacts compatible with Java&nbsp;7.
+    Java&nbsp;11. It is basically possible to skip installing the other JDKs, but then the build will not create
+    artifacts compatible with older versions of Java or older Versions of Checkstyle.
 
- 1. Make sure that your environment variable `JAVA_HOME` points to the Java&nbsp;8 SDK, for example
-    `C:\PROGRA~1\Java\jdk8u192-b12` (Windows).
- 1. `%JAVA_HOME%\bin` (Windows) or `$JAVA_HOME/bin` (Linux/Unix) should be first on the `PATH`
+ 1. Make sure that your environment variable `JAVA_HOME` points to the Java&nbsp;11 SDK, for example
+    `C:\PROGRA~1\Java\jdk-11.0.11.9-hotspot` (Windows).
  1. If you don't have a Gradle User Home yet, set it up by creating an empty directory called `.gradle` somewhere,
-    for example `d:\.gradle` (Windows) or `~/.gradle` (Unix). Create an environment variable `GRADLE_USER_HOME` which
-    points to this directory. This directory may grow quite large over time, because Gradle uses it to cache all
-    downloaded stuff. Mine is 4&nbsp;GB. All Gradle processes, including your IDE, should see this environment variable.
- 1. Create an empty text file in `GRADLE_USER_HOME` called `gradle.properties`. Inside, add the following lines:
+    for example `D:\.gradle` (Windows) or `~/.gradle` (Unix). Create an environment variable `GRADLE_USER_HOME` which
+    points to this directory. It may grow quite large over time, because Gradle uses it to cache all downloaded stuff.
+    Mine is almost 10&nbsp;GB. All Gradle processes, including your IDE, should see this environment variable.
+ 1. Create an empty text file in `$GRADLE_USER_HOME` called `gradle.properties`. Inside, add the following lines:
 
         org.gradle.daemon=true
-        org.gradle.jvmargs=-Xmx1536m -XX:MaxPermSize=384m
-        checkstyleaddons_jdk7_java=C:/PROGRA~1/Java/jdk1.7.0_80/bin/java.exe
-        checkstyleaddons_jdk7_javac=C:/PROGRA~1/Java/jdk1.7.0_80/bin/javac.exe
-        checkstyleaddons_jdk7_javadoc=C:/PROGRA~1/Java/jdk1.7.0_80/bin/javadoc.exe
+        org.gradle.jvmargs=-Xmx3062m -XX:MaxPermSize=384m
+        checkstyleaddons_jdk7_java=C:/PROGRA~1/Java/zulu-7/bin/java.exe
+        checkstyleaddons_jdk7_javac=C:/PROGRA~1/Java/zulu-7/bin/javac.exe
+        checkstyleaddons_jdk7_javadoc=C:/PROGRA~1/Java/zulu-7/bin/javadoc.exe
+        checkstyleaddons_jdk8_java=C:/PROGRA~1/Java/jdk-8.0.302.8-hotspot/bin/java.exe
+        checkstyleaddons_jdk8_javac=C:/PROGRA~1/Java/jdk-8.0.302.8-hotspot/bin/javac.exe
+        checkstyleaddons_jdk8_javadoc=C:/PROGRA~1/Java/jdk-8.0.302.8-hotspot/bin/javadoc.exe
 
     The first two lines are optional and may be left out if the build works for you. The other lines
     basically configure where the executables from the lower version JDKs are at. This is used to build
     artifacts compatible with previous versions of Java. If these properties are missing, those artifacts
-    will not be created. Adjust the paths depending on where you installed your Java&nbsp;7 SDKs). The paths
-    should not contain spaces (may still work, but not tested).
- 1. Clone the {{ site.name }} repo by running on the command line:\\
+    will not be created. Adjust the paths depending on where you installed your Java&nbsp;7 and Java&nbsp;8 SDKs).
+    The paths should not contain spaces (may still work, but not tested).
+ 1. Clone the {{ site.name }} repo:\\
     `git clone https://github.com/{{ site.github }}.git`
  1. `cd checkstyle-addons`
- 1. `gradlew build`\\
+ 1. `./gradlew build`\\
     This will take care of everything needed for a successful build of {{ site.name }}, including download and
-    installation of Gradle.
+    installation of Gradle. Do not install Gradle manually (in fact, that's a good general rule outside of this
+    project, too).
  1. Find the fresh artifacts in build/libs. Done!
 
 
@@ -167,8 +172,8 @@ A quick list of development resources:
 While {{ site.name }} tries to be as open as possible for new ideas and new code, it is also focused on quality. Thus,
 there are a small number of criteria that new code must meet:
 
-  - Travis must report green, which basically means that `gradlew clean build site` runs without errors.
-  - No Checkstyle or FindBugs violations
+  - GitHub Actions must report green, which basically means that `gradlew clean build site` runs without errors.
+  - No Checkstyle or SpotBugs violations
   - Full unit test coverage
   - Meaningful documentation
   
