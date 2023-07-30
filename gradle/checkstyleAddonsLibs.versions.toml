@@ -24,13 +24,13 @@ spotbugs = "4.5.3"
 
 # Build
 diffutils = "io.github.java-diff-utils:java-diff-utils:4.11"
-jgit = "org.eclipse.jgit:org.eclipse.jgit:6.1.0.202203080745-r"
-shadow = "gradle.plugin.com.github.johnrengelman:shadow:7.1.2"
+jgit = "org.eclipse.jgit:org.eclipse.jgit:6.6.0.202305301015-r"
+shadow = "gradle.plugin.com.github.johnrengelman:shadow:8.0.0"
 spotbugs-contrib = "com.mebigfatguy.sb-contrib:sb-contrib:7.4.7"
 
 # Main
 checkstyle = { group = "com.puppycrawl.tools", name = "checkstyle", version.ref = "checkstyleBase" }
-jackson-databind = "com.fasterxml.jackson.core:jackson-databind:2.13.2"
+jackson-databind = "com.fasterxml.jackson.core:jackson-databind:2.15.2"
 jcip = "net.jcip:jcip-annotations:1.0"
 jsr305 = "com.google.code.findbugs:jsr305:3.0.2"
 slf4j-nop = "org.slf4j:slf4j-nop:1.7.32"
@@ -45,7 +45,7 @@ mockito = "org.mockito:mockito-core:4.4.0"
 
 [plugins]
 
-jacocoLog = { id = "org.barfuin.gradle.jacocolog", version = "2.0.0" }
-taskinfo = { id = "org.barfuin.gradle.taskinfo", version = "1.3.1" }
+jacocoLog = { id = "org.barfuin.gradle.jacocolog", version = "3.1.0" }
+taskinfo = { id = "org.barfuin.gradle.taskinfo", version = "2.1.0" }
 sonarqube = { id = "org.sonarqube", version = "3.3" }
 spotbugs = { id = "com.github.spotbugs", version = "5.0.6" }
