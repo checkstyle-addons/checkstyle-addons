@@ -57,9 +57,11 @@ public abstract class AbstractAddonsCheck
     private final Map<BinaryName, DetailAST> iClassDeclarationPositions = new HashMap<>();
 
     /** CLASS_DEF/IDENTs as encountered */
+    @SuppressFBWarnings(value = "CNC_COLLECTION_NAMING_CONFUSION", justification = "It's really a stack.")
     private final Deque<String> iClassDefStack = new LinkedList<>();
 
     /** Encountered binary class names in the current Java file */
+    @SuppressFBWarnings(value = "CNC_COLLECTION_NAMING_CONFUSION", justification = "It's really a stack.")
     private final Deque<BinaryName> iBinaryNameStack = new LinkedList<>();
 
     /** Package that the currently checked class resides in */

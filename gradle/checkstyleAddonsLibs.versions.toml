@@ -17,7 +17,7 @@
 [versions]
 
 checkstyleBase = "10.0"
-spotbugs = "4.5.3"
+spotbugs = "4.7.3"
 
 
 [libraries]
@@ -26,7 +26,7 @@ spotbugs = "4.5.3"
 diffutils = "io.github.java-diff-utils:java-diff-utils:4.11"
 jgit = "org.eclipse.jgit:org.eclipse.jgit:6.6.0.202305301015-r"
 shadow = "gradle.plugin.com.github.johnrengelman:shadow:8.0.0"
-spotbugs-contrib = "com.mebigfatguy.sb-contrib:sb-contrib:7.4.7"
+spotbugs-contrib = "com.mebigfatguy.sb-contrib:sb-contrib:7.6.0"
 
 # Main
 checkstyle = { group = "com.puppycrawl.tools", name = "checkstyle", version.ref = "checkstyleBase" }
@@ -48,4 +48,4 @@ mockito = "org.mockito:mockito-core:4.4.0"
 jacocoLog = { id = "org.barfuin.gradle.jacocolog", version = "3.1.0" }
 taskinfo = { id = "org.barfuin.gradle.taskinfo", version = "2.1.0" }
 sonarqube = { id = "org.sonarqube", version = "3.3" }
-spotbugs = { id = "com.github.spotbugs", version = "5.0.6" }
+spotbugs = { id = "com.github.spotbugs", version = "5.0.14" }

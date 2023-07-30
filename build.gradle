@@ -81,7 +81,7 @@ dependencies {
     testImplementation checkstyleAddonsLibs.junit
     testImplementation checkstyleAddonsLibs.mockito
 
-    spotbugsPlugins checkstyleAddonsLibs.spotbugs.contrib
+    spotbugsPlugins(checkstyleAddonsLibs.spotbugs.contrib) { transitive = false }
 }
 
 
