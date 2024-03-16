@@ -43,7 +43,7 @@ public class SiteCopyDownloadGuideConfigAction
     {
         pCopyTask.setDescription("Copy download guide frontmatter stub to site directory");
         pCopyTask.setGroup(SiteTask.SITE_GROUP);
-        pCopyTask.setDestinationDir(new File(project.getBuildDir(), "site"));
+        pCopyTask.setDestinationDir(new File(project.getLayout().getBuildDirectory().getAsFile().get(), "site"));
 
         final SourceSet mainSourceSet = buildUtil.getSourceSet(SourceSet.MAIN_SOURCE_SET_NAME);
         final File originalFile = new File(mainSourceSet.getResources().getSrcDirs().iterator().next(),

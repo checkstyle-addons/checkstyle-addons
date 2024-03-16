@@ -45,7 +45,7 @@ public class SiteCopyJavadocConfigAction
         pCopyTask.dependsOn(javadocTask);
         pCopyTask.setDescription("Copy Javadoc to site directory");
         pCopyTask.setGroup(SiteTask.SITE_GROUP);
-        pCopyTask.setDestinationDir(new File(project.getBuildDir(), "site"));
+        pCopyTask.setDestinationDir(new File(project.getLayout().getBuildDirectory().getAsFile().get(), "site"));
         pCopyTask.setDuplicatesStrategy(DuplicatesStrategy.EXCLUDE);
 
         final String website = buildUtil.getBuildConfig().getWebsite().get();

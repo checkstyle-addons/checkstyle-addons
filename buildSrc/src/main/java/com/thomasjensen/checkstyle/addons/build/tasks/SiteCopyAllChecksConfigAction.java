@@ -49,7 +49,7 @@ public class SiteCopyAllChecksConfigAction
     {
         pCopyTask.setDescription("Copy list of all checks to site directory");
         pCopyTask.setGroup(SiteTask.SITE_GROUP);
-        pCopyTask.setDestinationDir(new File(project.getBuildDir(), "site"));
+        pCopyTask.setDestinationDir(new File(project.getLayout().getBuildDirectory().getAsFile().get(), "site"));
 
         final SourceSet mainSourceSet = buildUtil.getSourceSet(SourceSet.MAIN_SOURCE_SET_NAME);
         final String checksPackage = buildUtil.getBuildConfig().getChecksPackage().get();

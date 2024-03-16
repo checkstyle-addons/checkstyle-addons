@@ -14,8 +14,22 @@
  * program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+plugins {
+    id 'org.gradle.toolchains.foojay-resolver' version '0.8.0'
+}
+
 rootProject.name='checkstyle-addons'
 include ':sqtest'
+
+toolchainManagement {
+    jvm {
+        javaRepositories {
+            repository('foojay') {
+                resolverClass = org.gradle.toolchains.foojay.FoojayToolchainResolver
+            }
+        }
+    }
+}
 
 dependencyResolutionManagement {
     versionCatalogs {

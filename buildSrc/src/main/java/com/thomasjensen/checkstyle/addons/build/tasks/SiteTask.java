@@ -34,6 +34,7 @@ import java.util.TreeSet;
 import org.gradle.api.DefaultTask;
 import org.gradle.api.GradleException;
 import org.gradle.api.Project;
+import org.gradle.api.file.Directory;
 import org.gradle.api.file.FileTree;
 import org.gradle.api.provider.Provider;
 import org.gradle.api.tasks.InputFiles;
@@ -55,7 +56,7 @@ public class SiteTask
 
     private Provider<FileTree> markdownFiles;
 
-    private Provider<File> siteDir;
+    private Provider<Directory> siteDir;
 
 
 
@@ -79,7 +80,7 @@ public class SiteTask
                 mainSourceSet.getResources().getSrcDirs().iterator().next(), ft -> ft.include("**/*.md"));
         });
 
-        siteDir = project.provider(() -> new File(project.getBuildDir(), "site"));
+        siteDir = project.getLayout().getBuildDirectory().map(dir -> dir.dir("site"));
     }
 
 
@@ -104,7 +105,7 @@ public class SiteTask
         final Project project = getProject();
         final BuildUtil buildUtil = new BuildUtil(project);
         final FileTree mdFiles = getMarkdownFiles().get();
-        final File siteDir = getSiteDir().get();
+        final File siteDir = getSiteDir().get().getAsFile();
         File includesVersionDir = new File(siteDir, "_includes/v" + project.getVersion());
         includesVersionDir.mkdirs();
 
@@ -187,7 +188,7 @@ public class SiteTask
 
 
     @OutputDirectory
-    public Provider<File> getSiteDir()
+    public Provider<Directory> getSiteDir()
     {
         return siteDir;
     }
