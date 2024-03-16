@@ -17,20 +17,24 @@
 [versions]
 
 checkstyleBase = "10.0"
-spotbugs = "4.7.3"
+spotbugs = "4.8.3"
 
 
 [libraries]
 
 # Build
-diffutils = "io.github.java-diff-utils:java-diff-utils:4.11"
-jgit = "org.eclipse.jgit:org.eclipse.jgit:6.6.0.202305301015-r"
+diffutils = "io.github.java-diff-utils:java-diff-utils:4.12"
+jgit = "org.eclipse.jgit:org.eclipse.jgit:6.9.0.202403050737-r"
 shadow = "gradle.plugin.com.github.johnrengelman:shadow:8.0.0"
-spotbugs-contrib = "com.mebigfatguy.sb-contrib:sb-contrib:7.6.0"
+spotbugs-contrib = "com.mebigfatguy.sb-contrib:sb-contrib:7.6.4"
 
 # Main
 checkstyle = { group = "com.puppycrawl.tools", name = "checkstyle", version.ref = "checkstyleBase" }
-jackson-databind = "com.fasterxml.jackson.core:jackson-databind:2.15.2"
+jackson-databind = "com.fasterxml.jackson.core:jackson-databind:2.16.0"
+# CHECK: jackson-databind 2.16.1 and up requires the shadow plugin to support Java 21, because it is a multi-
+# version JAR, containing Java-21-versions of some classes, which throw off package relocation by the shadow
+# plugin. https://github.com/johnrengelman/shadow/issues/888 The shadow plugin has some maintenance problems atm,
+# so there is a fork which supports Java 21: https://github.com/Goooler/shadow/releases (just in case).
 jcip = "net.jcip:jcip-annotations:1.0"
 jsr305 = "com.google.code.findbugs:jsr305:3.0.2"
 slf4j-nop = "org.slf4j:slf4j-nop:1.7.32"
@@ -40,12 +44,12 @@ spotbugs-annotations = { group = "com.github.spotbugs", name = "spotbugs-annotat
 
 # Test
 junit = "junit:junit:4.13.2"
-mockito = "org.mockito:mockito-core:4.4.0"
+mockito = "org.mockito:mockito-core:4.11.0"
 
 
 [plugins]
 
 jacocoLog = { id = "org.barfuin.gradle.jacocolog", version = "3.1.0" }
-taskinfo = { id = "org.barfuin.gradle.taskinfo", version = "2.1.0" }
+taskinfo = { id = "org.barfuin.gradle.taskinfo", version = "2.2.0" }
 sonarqube = { id = "org.sonarqube", version = "3.3" }
-spotbugs = { id = "com.github.spotbugs", version = "5.0.14" }
+spotbugs = { id = "com.github.spotbugs", version = "6.0.8" }

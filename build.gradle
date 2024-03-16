@@ -32,6 +32,8 @@ repositories {
 }
 
 import org.gradle.plugins.ide.idea.model.IdeaLanguageLevel
+import com.github.spotbugs.snom.Confidence
+import com.github.spotbugs.snom.Effort
 
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
@@ -90,7 +92,9 @@ dependencies {
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
 java {
-    sourceCompatibility = JavaVersion.VERSION_11
+    toolchain {
+        languageVersion.set(JavaLanguageVersion.of(11))
+    }
 }
 
 tasks.withType(JavaCompile).configureEach {
@@ -108,8 +112,8 @@ tasks.withType(JavaCompile).configureEach {
 
 spotbugs {
     toolVersion = checkstyleAddonsLibs.versions.spotbugs.get()
-    effort = 'max'
-    reportLevel = 'low'
+    effort = Effort.MAX
+    reportLevel = Confidence.valueOf('LOW')
     ignoreFailures = false
     includeFilter = file('config/spotbugs.xml')
     excludeFilter = file('config/spotbugs-excludes.xml')
