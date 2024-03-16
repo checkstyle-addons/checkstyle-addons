@@ -1,7 +1,7 @@
 package com.thomasjensen.checkstyle.addons.build;
 /*
  * Checkstyle-Addons - Additional Checkstyle checks
- * Copyright (c) 2015-2023, the Checkstyle Addons contributors
+ * Copyright (c) 2015-2024, the Checkstyle Addons contributors
  *
  * This program is free software: you can redistribute it and/or modify it under the
  * terms of the GNU General Public License, version 3, as published by the Free
