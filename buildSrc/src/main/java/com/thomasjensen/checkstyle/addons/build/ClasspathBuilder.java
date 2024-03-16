@@ -17,6 +17,7 @@ package com.thomasjensen.checkstyle.addons.build;
 
 import java.io.File;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import javax.annotation.Nonnull;
@@ -223,6 +224,11 @@ public class ClasspathBuilder
             if (isCheckstyle(dependency) && pCsVersionOverride != null) {
                 final ModuleDependency newDep = (ModuleDependency) project.getDependencies().create(
                     dependency.getGroup() + ":" + dependency.getName() + ":" + pCsVersionOverride);
+                // Exclude google-collections, which is now part of guava, and would otherwise cause conflicts.
+                Map<String, String> googleCollections = new HashMap<>();
+                googleCollections.put("group", "com.google.collections");
+                googleCollections.put("module", "google-collections");
+                newDep.exclude(googleCollections);
                 newDeps.add(newDep);
             }
             else if (versionOverrides.containsKey(dependency.getGroup())) {
