@@ -65,12 +65,12 @@ jobs:
                   ls -l ${checkstyleaddons_jdk8_java}
                   ${checkstyleaddons_jdk8_java} -version
 
-            - uses: actions/checkout@v2
+            - uses: actions/checkout@v4
 
             - name: build
               run: |
                   gradle clean
-                  gradle build site
+                  gradle --warning-mode all build site
                   gradle jacocoTestReport
 
             - name: codecov
