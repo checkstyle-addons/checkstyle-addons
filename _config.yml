@@ -48,10 +48,10 @@ latest_version_checkstyle_java7: '6.4.1'
 latest_version_checkstyle_java8a: '8.0'
 latest_version_checkstyle_java8b: '8.21'
 # next line is the highest Checkstyle version tested by the unit tests
-latest_checkstyle_tested: '10.5.0'
+latest_checkstyle_tested: '10.14.1'
 
 # links to external websites that are used in multiple places throughout the site
-link_mavencentral: 'https://search.maven.org/#search%7Cgav%7C1%7Cg%3Acom.thomasjensen.checkstyle.addons'
+link_mavencentral: 'https://central.sonatype.com/search?q=g%3Acom.thomasjensen.checkstyle.addons'
 link_central_download: 'https://repo1.maven.org/maven2/com/thomasjensen/checkstyle/addons'
 
 link_cs_home: 'https://checkstyle.org/'
@@ -70,5 +70,5 @@ link_cs_type_string: 'https://checkstyle.org/property_types.html#String'
 link_cs_type_stringset: 'https://checkstyle.org/property_types.html#String.5B.5D'
 
 link_sq_home: 'https://www.sonarqube.org/'
-link_sq_relupgradenotes: 'https://docs.sonarqube.org/latest/setup/upgrade-notes/'
+link_sq_relupgradenotes: 'https://docs.sonarsource.com/sonarqube/latest/setup-and-upgrade/release-upgrade-notes/'
 link_sq_csplugin: 'https://github.com/checkstyle/sonar-checkstyle'
