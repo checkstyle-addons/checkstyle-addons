@@ -19,7 +19,6 @@ import java.util.ArrayList;
 import java.util.List;
 import javax.annotation.Nonnull;
 
-import com.github.jengelman.gradle.plugins.shadow.tasks.ConfigureShadowRelocation;
 import com.github.jengelman.gradle.plugins.shadow.tasks.ShadowJar;
 import org.gradle.api.JavaVersion;
 import org.gradle.api.Project;
@@ -217,22 +216,12 @@ public class TaskCreator
             final TaskProvider<Jar> jarEclipseTaskProvider = tasks.register(eclipseTaskName, Jar.class);
             jarEclipseTaskProvider.configure(new JarEclipseConfigAction(depConfig));
 
-            // 'jarSonarqube' task (with 'jarSonarqubeRelocate' task)
+            // 'jarSonarqube' task
             TaskProvider<ShadowJar> jarSqTaskProvider = null;
             if (depConfig.isSonarQubeSupported()) {
                 final String sqTaskName = TaskNames.jarSonarqube.getName(depConfig);
-
-                final String relocateTaskName = TaskNames.jarSonarqubeRelocate.getName(depConfig);
-                final TaskProvider<ConfigureShadowRelocation> relocationTaskProvider =
-                    tasks.register(relocateTaskName, ConfigureShadowRelocation.class);
-                relocationTaskProvider.configure(relocTask -> {
-                    relocTask.setTarget((ShadowJar) tasks.getByName(sqTaskName));
-                    relocTask.setPrefix("com.thomasjensen.checkstyle.addons.shadow");
-                });
-
                 jarSqTaskProvider = tasks.register(sqTaskName, ShadowJar.class);
                 jarSqTaskProvider.configure(new JarSonarqubeConfigAction(depConfig));
-                jarSqTaskProvider.configure(t -> t.dependsOn(relocationTaskProvider));
             }
             final TaskProvider<ShadowJar> jarSqTaskProviderFinal = jarSqTaskProvider;
 

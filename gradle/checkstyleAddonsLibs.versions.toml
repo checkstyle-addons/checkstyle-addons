@@ -25,7 +25,7 @@ spotbugs = "4.8.3"
 # Build
 diffutils = "io.github.java-diff-utils:java-diff-utils:4.12"
 jgit = "org.eclipse.jgit:org.eclipse.jgit:6.9.0.202403050737-r"
-shadow = "gradle.plugin.com.github.johnrengelman:shadow:8.0.0"
+shadow = "com.gradleup.shadow:shadow-gradle-plugin:8.3.6"
 spotbugs-contrib = "com.mebigfatguy.sb-contrib:sb-contrib:7.6.4"
 
 # Main
@@ -52,4 +52,4 @@ mockito = "org.mockito:mockito-core:4.11.0"
 jacocoLog = { id = "org.barfuin.gradle.jacocolog", version = "3.1.0" }
 taskinfo = { id = "org.barfuin.gradle.taskinfo", version = "2.2.0" }
 sonarqube = { id = "org.sonarqube", version = "3.3" }
-spotbugs = { id = "com.github.spotbugs", version = "6.0.8" }
+spotbugs = { id = "com.github.spotbugs", version = "6.1.10" }

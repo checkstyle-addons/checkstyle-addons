@@ -120,6 +120,10 @@ public class JarSonarqubeConfigAction
 
         // Manifest
         setManifestAttributes(pJarTask, pDepConfig);
+
+        // Relocation
+        pJarTask.setEnableRelocation(true);
+        pJarTask.setRelocationPrefix("com.thomasjensen.checkstyle.addons.shadow");
     }
 
 
