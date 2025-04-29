@@ -41,6 +41,15 @@ public class VersionFileTask
 
     private final Property<File> versionFile = getProject().getObjects().property(File.class);
 
+    private BuildUtil buildUtil = null;
+
+
+
+    public VersionFileTask()
+    {
+        buildUtil = new BuildUtil(getProject());
+    }
+
 
 
     public static void konfigure(@Nonnull final VersionFileTask pTask)
@@ -56,11 +65,11 @@ public class VersionFileTask
     @TaskAction
     public void writeVersionFile()
     {
-        final BuildConfigExtension buildConfig = new BuildUtil(getProject()).getBuildConfig();
+        final BuildConfigExtension buildConfig = buildUtil.getBuildConfig();
         List<String> lines = new ArrayList<>();
         lines.add("# " + buildConfig.getLongName().get() + " version information");
         lines.add("# " + buildConfig.getBuildTimestamp().get());
-        lines.add("version=" + getProject().getVersion());
+        lines.add("version=" + getInputs().getProperties().get("version"));
 
         try {
             Files.write(getVersionFile().get().toPath(), lines, StandardCharsets.US_ASCII);

@@ -58,12 +58,14 @@ public class SiteTask
 
     private Provider<Directory> siteDir;
 
+    private BuildUtil buildUtil = null;
+
 
 
     public void configureTask()
     {
         final Project project = getProject();
-        final BuildUtil buildUtil = new BuildUtil(project);
+        buildUtil = new BuildUtil(project);
         setDescription("Package documentation for publication on the website");
         setGroup(SITE_GROUP);
 
@@ -102,14 +104,12 @@ public class SiteTask
     private void collect()
         throws IOException
     {
-        final Project project = getProject();
-        final BuildUtil buildUtil = new BuildUtil(project);
         final FileTree mdFiles = getMarkdownFiles().get();
         final File siteDir = getSiteDir().get().getAsFile();
-        File includesVersionDir = new File(siteDir, "_includes/v" + project.getVersion());
+        File includesVersionDir = new File(siteDir, "_includes/v" + buildUtil.getVersion());
         includesVersionDir.mkdirs();
 
-        File versionChecksDir = new File(siteDir, "v" + project.getVersion() + "/checks");
+        File versionChecksDir = new File(siteDir, "v" + buildUtil.getVersion() + "/checks");
         versionChecksDir.mkdirs();
         File latestChecksDir = new File(siteDir, "latest/checks");
         latestChecksDir.mkdirs();
@@ -130,7 +130,7 @@ public class SiteTask
             for (final File f : cat.getValue()) {
                 Files.copy(f.toPath(), new File(mdDir, f.getName()).toPath(), StandardCopyOption.REPLACE_EXISTING,
                     StandardCopyOption.COPY_ATTRIBUTES);
-                frontMatterFileSet.add("v" + project.getVersion() + "/" + cat.getKey() + "/" + f.getName());
+                frontMatterFileSet.add("v" + buildUtil.getVersion() + "/" + cat.getKey() + "/" + f.getName());
             }
 
             StringBuilder sb = new StringBuilder();
@@ -139,7 +139,7 @@ public class SiteTask
 
             // current version
             sb.append("check_version: v");
-            sb.append(project.getVersion());
+            sb.append(buildUtil.getVersion());
             sb.append("\n");
 
             // current check category

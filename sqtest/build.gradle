@@ -73,7 +73,7 @@ ext {
 
 checkstyle {
     configDirectory = file('config')
-    configProperties 'workspace_loc': projectDir
+    configProperties += ['workspace_loc': projectDir]
     sourceSets = [project.sourceSets.main]
     toolVersion = '8.14'
     showViolations = true

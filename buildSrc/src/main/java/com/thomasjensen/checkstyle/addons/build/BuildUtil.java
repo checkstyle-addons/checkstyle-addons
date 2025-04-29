@@ -50,12 +50,15 @@ public final class BuildUtil
 
     private final Project project;
 
+    private final String version;
+
 
 
     public BuildUtil(@Nonnull final Project pProject)
     {
         super();
         project = pProject;
+        version = (String) project.getVersion();
     }
 
 
@@ -176,5 +179,13 @@ public final class BuildUtil
     public BuildConfigExtension getBuildConfig()
     {
         return project.getExtensions().getByType(BuildConfigExtension.class);
+    }
+
+
+
+    @Nonnull
+    public String getVersion()
+    {
+        return version;
     }
 }

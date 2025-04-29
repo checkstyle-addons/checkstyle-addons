@@ -14,11 +14,17 @@
  * program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-plugins {
-    id 'org.gradle.toolchains.foojay-resolver-convention' version '0.8.0'
+pluginManagement {
+    plugins {
+        id 'org.gradle.toolchains.foojay-resolver-convention' version '0.10.0'
+    }
 }
 
-rootProject.name='checkstyle-addons'
+plugins {
+    id 'org.gradle.toolchains.foojay-resolver-convention'
+}
+
+rootProject.name = 'checkstyle-addons'
 include ':sqtest'
 
 dependencyResolutionManagement {

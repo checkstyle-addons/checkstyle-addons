@@ -22,7 +22,7 @@ jobs:
     build:
         runs-on: ubuntu-latest
         container:
-            image: gradle:8.6-jdk11
+            image: gradle:8.14-jdk11
             env:
                 DEBIAN_FRONTEND: noninteractive
                 checkstyleaddons_jdk7_java: /usr/lib/jvm/zulu7/bin/java

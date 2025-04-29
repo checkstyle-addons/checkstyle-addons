@@ -36,6 +36,8 @@ public class PrintDepConfigsTask
 {
     private final DependencyConfigs depConfigs;
 
+    private final Logger log;
+
 
 
     @Inject
@@ -43,6 +45,7 @@ public class PrintDepConfigsTask
     {
         depConfigs = pDepConfigs;
         setDescription("Print the Checkstyle Addons dependency configurations");
+        log = getProject().getLogger();
     }
 
 
@@ -50,7 +53,6 @@ public class PrintDepConfigsTask
     @TaskAction
     public void printDepConfigs()
     {
-        final Logger log = getProject().getLogger();
         log.info("-----------------------------------------------------------------------------------------------");
         log.lifecycle("Dependency Configurations:");
         log.lifecycle("--------------------------");

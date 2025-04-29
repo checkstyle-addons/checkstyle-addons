@@ -159,7 +159,7 @@ idea.project {
 
 checkstyle {
     configDirectory = file('config')
-    configProperties 'workspace_loc': project.projectDir
+    configProperties += ['workspace_loc': project.projectDir]
     toolVersion = '7.1.2'    // depends on our checkstyle.xml; has nothing to do with the CS version used for building
     showViolations = true
     ignoreFailures = false
@@ -203,7 +203,7 @@ publishing {
     repositories {
         maven {
             name = 'localBuildDir'
-            url = "$buildDir/maven-repo-test"
+            url = layout.buildDirectory.dir('maven-repo-test').get()
         }
         maven {
             name = 'mavenCentralStaging'
@@ -251,7 +251,7 @@ publishing {
 signing {
     useGpgCmd()   // use local GPG installation and agent
     // CHECK Unfortunately, the signing plugin does not make use of configuration avoidance yet, so it causes 20+ tasks
-    //       to be unnecessarily realized (as of Gradle 7.4.1).
+    //       to be unnecessarily realized (as of Gradle 8.14).
     sign(publishing.publications)
 }
 tasks.withType(Sign).configureEach {
@@ -264,7 +264,7 @@ tasks.register('checkPublishProperties').configure {
     doLast {
         ['sonatype.user', 'sonatype.password', 'signing.gnupg.keyName.thomasjensen.com'].each {
             final String prp ->
-                if (!project.hasProperty(prp)) {
+                if (!rootProject.hasProperty(prp)) {
                     String gradlePropsPath = new File(gradle.getGradleUserHomeDir(), "gradle.properties").canonicalPath;
                     throw new GradleException("Could not find property \'${prp}\'. " +
                             "Did you forget to specify it in ${gradlePropsPath}?")
