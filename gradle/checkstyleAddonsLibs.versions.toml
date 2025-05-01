@@ -17,7 +17,7 @@
 [versions]
 
 checkstyleBase = "10.0"
-spotbugs = "4.8.3"
+spotbugs = "4.9.3"
 
 
 [libraries]
@@ -30,11 +30,7 @@ spotbugs-contrib = "com.mebigfatguy.sb-contrib:sb-contrib:7.6.4"
 
 # Main
 checkstyle = { group = "com.puppycrawl.tools", name = "checkstyle", version.ref = "checkstyleBase" }
-jackson-databind = "com.fasterxml.jackson.core:jackson-databind:2.16.0"
-# CHECK: jackson-databind 2.16.1 and up requires the shadow plugin to support Java 21, because it is a multi-
-# version JAR, containing Java-21-versions of some classes, which throw off package relocation by the shadow
-# plugin. https://github.com/johnrengelman/shadow/issues/888 The shadow plugin has some maintenance problems atm,
-# so there is a fork which supports Java 21: https://github.com/Goooler/shadow/releases (just in case).
+jackson-databind = "com.fasterxml.jackson.core:jackson-databind:2.19.0"
 jcip = "net.jcip:jcip-annotations:1.0"
 jsr305 = "com.google.code.findbugs:jsr305:3.0.2"
 slf4j-nop = "org.slf4j:slf4j-nop:1.7.32"
