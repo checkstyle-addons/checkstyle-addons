@@ -22,20 +22,14 @@ jobs:
     build:
         runs-on: ubuntu-latest
         container:
-            image: gradle:8.14-jdk11
+            image: gradle:8.14-jdk17
             env:
                 DEBIAN_FRONTEND: noninteractive
-                checkstyleaddons_jdk7_java: /usr/lib/jvm/zulu7/bin/java
-                checkstyleaddons_jdk7_javac: /usr/lib/jvm/zulu7/bin/javac
-                checkstyleaddons_jdk7_javadoc: /usr/lib/jvm/zulu7/bin/javadoc
-                checkstyleaddons_jdk8_java: /usr/lib/jvm/zulu8/bin/java
-                checkstyleaddons_jdk8_javac: /usr/lib/jvm/zulu8/bin/javac
-                checkstyleaddons_jdk8_javadoc: /usr/lib/jvm/zulu8/bin/javadoc
         steps:
             - name: upgrade-git
               run: |
                   apt-get update -y
-                  apt-get install -y software-properties-common
+                  apt-get install -y software-properties-common apt-transport-https
                   add-apt-repository -y ppa:git-core/ppa
                   apt-get update
                   apt-get install -y git
@@ -51,7 +45,16 @@ jobs:
 
             - name: add-jdk8
               run: |
-                  apt-get install -y zulu8-jdk
+                  curl -L -o - https://packages.adoptium.net/artifactory/api/gpg/key/public | gpg --dearmor | tee /etc/apt/trusted.gpg.d/adoptium.gpg > /dev/null
+                  echo "deb https://packages.adoptium.net/artifactory/deb $(awk -F= '/^VERSION_CODENAME/{print$2}' /etc/os-release) main" | tee /etc/apt/sources.list.d/adoptium.list
+                  apt-get update
+                  apt-get install -y temurin-8-jdk
+
+            - name: add-jdk11
+              run: |
+                  apt-get install -y temurin-11-jdk
+
+            - uses: actions/checkout@v4
 
             - name: versions
               run: |
@@ -60,18 +63,19 @@ jobs:
                   echo JAVA_HOME=${JAVA_HOME}
                   ls -l ${JAVA_HOME}/bin/java
                   java -version
-                  ls -l ${checkstyleaddons_jdk7_java}
-                  ${checkstyleaddons_jdk7_java} -version
-                  ls -l ${checkstyleaddons_jdk8_java}
-                  ${checkstyleaddons_jdk8_java} -version
-
-            - uses: actions/checkout@v4
+                  ls -l /usr/lib/jvm/zulu7/bin
+                  /usr/lib/jvm/zulu7/bin/java -version
+                  ls -l /usr/lib/jvm/temurin-8-jdk-amd64/bin
+                  /usr/lib/jvm/temurin-8-jdk-amd64/bin/java -version
+                  ls -l /usr/lib/jvm/temurin-11-jdk-amd64/bin
+                  /usr/lib/jvm/temurin-11-jdk-amd64/bin/java -version
+                  gradle javaToolchains
 
             - name: build
               run: |
-                  gradle clean
+                  gradle --warning-mode all clean
                   gradle --warning-mode all build site
-                  gradle jacocoTestReport
+                  gradle --warning-mode all jacocoTestReport
 
             - name: codecov
               env:

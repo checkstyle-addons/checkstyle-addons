@@ -29,11 +29,12 @@ import org.gradle.api.tasks.SourceSet;
 import org.gradle.api.tasks.TaskProvider;
 import org.gradle.api.tasks.compile.CompileOptions;
 import org.gradle.api.tasks.compile.JavaCompile;
+import org.gradle.jvm.toolchain.JavaToolchainService;
 
 import com.thomasjensen.checkstyle.addons.build.ClasspathBuilder;
 import com.thomasjensen.checkstyle.addons.build.DependencyConfig;
-import com.thomasjensen.checkstyle.addons.build.JavaLevelUtil;
 import com.thomasjensen.checkstyle.addons.build.TaskNames;
+import com.thomasjensen.checkstyle.addons.build.ToolchainSpecAction;
 
 
 /**
@@ -42,9 +43,10 @@ import com.thomasjensen.checkstyle.addons.build.TaskNames;
 public class CompileConfigAction
     extends AbstractTaskConfigAction<JavaCompile>
 {
-    public CompileConfigAction(@Nonnull DependencyConfig pDepConfig, @Nonnull final SourceSet pSourceSetToCompile)
+    public CompileConfigAction(@Nonnull DependencyConfig pDepConfig, @Nonnull final SourceSet pSourceSetToCompile,
+        @Nonnull final JavaToolchainService pJavaToolchainService)
     {
-        super(pDepConfig, pSourceSetToCompile);
+        super(pDepConfig, pJavaToolchainService, pSourceSetToCompile);
     }
 
 
@@ -62,7 +64,7 @@ public class CompileConfigAction
 
     @Nonnull
     @Override
-    protected String getExtraLogInfo(@Nonnull JavaCompile pTask)
+    protected String getExtraLogInfo(@Nonnull final JavaCompile pTask)
     {
         SourceSet sourceSetToCompile = getSourceSetToCompile();
         return " and sourceSet '" + sourceSetToCompile.getName() + "' (isTest = " + isTest(sourceSetToCompile) + ")";
@@ -70,7 +72,7 @@ public class CompileConfigAction
 
 
 
-    private boolean isTest(@Nonnull SourceSet pSourceSetToCompile)
+    private boolean isTest(@Nonnull final SourceSet pSourceSetToCompile)
     {
         return SourceSet.TEST_SOURCE_SET_NAME.equals(pSourceSetToCompile.getName());
     }
@@ -78,7 +80,8 @@ public class CompileConfigAction
 
 
     @Override
-    protected void configureTaskFor(@Nonnull JavaCompile pCompileTask, @Nullable DependencyConfig pDepConfig)
+    protected void configureTaskFor(@Nonnull final JavaCompile pCompileTask,
+        @Nullable final DependencyConfig pDepConfig)
     {
         Objects.requireNonNull(pDepConfig, "required dependency config not present");
         final SourceSet sourceSetToCompile = getSourceSetToCompile();
@@ -96,17 +99,13 @@ public class CompileConfigAction
         options.setEncoding(StandardCharsets.UTF_8.toString());
         options.setDeprecation(true);  // show deprecation warnings in compiler output
 
-        final JavaLevelUtil javaLevelUtil = new JavaLevelUtil(project);
-        if (javaLevelUtil.isOlderSupportedJava(javaLevel)) {
-            options.setFork(true);
-            options.getForkOptions().setExecutable(javaLevelUtil.getCompilerExecutable(javaLevel));
-        }
-
         final File destDir = calculateDestDirFromSourceSet(sourceSetToCompile, pDepConfig.getName());
         pCompileTask.setSource(sourceSetToCompile.getAllJava());
         pCompileTask.getDestinationDirectory().set(destDir);
-        pCompileTask.setSourceCompatibility(javaLevel.toString());
-        pCompileTask.setTargetCompatibility(javaLevel.toString());
+        if (javaLevel.isJava11Compatible()) {
+            pCompileTask.getOptions().getRelease().set(Integer.valueOf(javaLevel.getMajorVersion()));
+        }
+        pCompileTask.getJavaCompiler().set(javaToolchainService.compilerFor(new ToolchainSpecAction(javaLevel)));
 
         FileCollection cp = new ClasspathBuilder(project)
             .buildCompileClasspath(pDepConfig, sourceSetToCompile.getName());

@@ -21,6 +21,7 @@ import javax.annotation.Nullable;
 
 import org.gradle.api.tasks.bundling.Jar;
 import org.gradle.api.tasks.javadoc.Javadoc;
+import org.gradle.jvm.toolchain.JavaToolchainService;
 
 import com.thomasjensen.checkstyle.addons.build.DependencyConfig;
 import com.thomasjensen.checkstyle.addons.build.TaskCreator;
@@ -33,9 +34,10 @@ import com.thomasjensen.checkstyle.addons.build.TaskNames;
 public class JarJavadocConfigAction
     extends AbstractTaskConfigAction<Jar>
 {
-    public JarJavadocConfigAction(@Nonnull DependencyConfig pDepConfig)
+    public JarJavadocConfigAction(@Nonnull DependencyConfig pDepConfig,
+        @Nonnull final JavaToolchainService pJavaToolchainService)
     {
-        super(pDepConfig);
+        super(pDepConfig, pJavaToolchainService);
     }
 
 

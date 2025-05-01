@@ -35,6 +35,7 @@ import org.gradle.api.tasks.SourceSet;
 import org.gradle.api.tasks.TaskInputs;
 import org.gradle.api.tasks.bundling.Jar;
 import org.gradle.api.tasks.compile.JavaCompile;
+import org.gradle.jvm.toolchain.JavaToolchainService;
 
 import com.thomasjensen.checkstyle.addons.build.BuildConfigExtension;
 import com.thomasjensen.checkstyle.addons.build.BuildUtil;
@@ -50,9 +51,10 @@ import com.thomasjensen.checkstyle.addons.build.TaskNames;
 public class JarEclipseConfigAction
     extends AbstractTaskConfigAction<Jar>
 {
-    public JarEclipseConfigAction(@Nonnull DependencyConfig pDepConfig)
+    public JarEclipseConfigAction(@Nonnull DependencyConfig pDepConfig,
+        @Nonnull final JavaToolchainService pJavaToolchainService)
     {
-        super(pDepConfig);
+        super(pDepConfig, pJavaToolchainService);
     }
 
 
@@ -166,7 +168,7 @@ public class JarEclipseConfigAction
      *
      * @param pTask the calling task
      * @param pDepConfig the current dependency configuration
-     * @return list of files
+     * @return set of files
      */
     @Nonnull
     private Set<File> getPublishedDependencyLibs(@Nonnull final Task pTask, @Nonnull final DependencyConfig pDepConfig)

@@ -21,6 +21,7 @@ import javax.annotation.Nullable;
 
 import org.gradle.api.tasks.SourceSet;
 import org.gradle.api.tasks.bundling.Jar;
+import org.gradle.jvm.toolchain.JavaToolchainService;
 
 import com.thomasjensen.checkstyle.addons.build.BuildUtil;
 import com.thomasjensen.checkstyle.addons.build.DependencyConfig;
@@ -33,9 +34,10 @@ import com.thomasjensen.checkstyle.addons.build.TaskCreator;
 public class JarSourcesConfigAction
     extends AbstractTaskConfigAction<Jar>
 {
-    public JarSourcesConfigAction(@Nonnull DependencyConfig pDepConfig)
+    public JarSourcesConfigAction(@Nonnull DependencyConfig pDepConfig,
+        @Nonnull final JavaToolchainService pJavaToolchainService)
     {
-        super(pDepConfig);
+        super(pDepConfig, pJavaToolchainService);
     }
 
 

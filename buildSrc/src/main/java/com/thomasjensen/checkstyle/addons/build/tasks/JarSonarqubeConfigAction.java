@@ -35,6 +35,7 @@ import org.gradle.api.tasks.TaskInputs;
 import org.gradle.api.tasks.TaskProvider;
 import org.gradle.api.tasks.bundling.Jar;
 import org.gradle.api.tasks.compile.JavaCompile;
+import org.gradle.jvm.toolchain.JavaToolchainService;
 
 import com.thomasjensen.checkstyle.addons.build.BuildConfigExtension;
 import com.thomasjensen.checkstyle.addons.build.BuildUtil;
@@ -50,9 +51,10 @@ import com.thomasjensen.checkstyle.addons.build.TaskNames;
 public class JarSonarqubeConfigAction
     extends AbstractTaskConfigAction<ShadowJar>
 {
-    public JarSonarqubeConfigAction(@Nonnull DependencyConfig pDepConfig)
+    public JarSonarqubeConfigAction(@Nonnull DependencyConfig pDepConfig,
+        @Nonnull final JavaToolchainService pJavaToolchainService)
     {
-        super(pDepConfig);
+        super(pDepConfig, pJavaToolchainService);
     }
 
 

@@ -32,6 +32,7 @@ import org.gradle.api.tasks.SourceSet;
 import org.gradle.api.tasks.TaskContainer;
 import org.gradle.api.tasks.bundling.Jar;
 import org.gradle.internal.jvm.Jvm;
+import org.gradle.jvm.toolchain.JavaToolchainService;
 import org.gradle.util.GradleVersion;
 
 import com.thomasjensen.checkstyle.addons.build.BuildConfigExtension;
@@ -48,9 +49,10 @@ import com.thomasjensen.checkstyle.addons.build.TaskNames;
 public class JarConfigAction
     extends AbstractTaskConfigAction<Jar>
 {
-    public JarConfigAction(@Nonnull DependencyConfig pDepConfig)
+    public JarConfigAction(@Nonnull DependencyConfig pDepConfig,
+        @Nonnull final JavaToolchainService pJavaToolchainService)
     {
-        super(pDepConfig);
+        super(pDepConfig, pJavaToolchainService);
     }
 
 

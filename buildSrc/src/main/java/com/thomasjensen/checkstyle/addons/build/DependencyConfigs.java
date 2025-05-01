@@ -190,22 +190,10 @@ public class DependencyConfigs
     private SortedMap<String, DependencyConfig> readAllDependencyVersions(final FileCollection pAllDepConfigs)
     {
         final SortedMap<String, DependencyConfig> result = new TreeMap<>();
-        final JavaLevelUtil javaLevelUtil = new JavaLevelUtil(project);
 
         for (final File depCfgFile : pAllDepConfigs) {
             final DependencyConfig depConfig = loadDependencyConfig(depCfgFile);
-
-            final JavaVersion myJavaLevel = depConfig.getJavaLevel();
-            if ((myJavaLevel.isJava7() && !javaLevelUtil.java7Configured())
-                || (myJavaLevel.isJava8() && !javaLevelUtil.java8Configured())) //
-            {
-                project.getLogger().warn(
-                    "WARNING: Skipping dependency configuration file '" + depConfig.getConfigFile().getName()
-                        + "' because of missing JDK" + myJavaLevel.getMajorVersion() + " compiler configuration.");
-            }
-            else {
-                result.put(depConfig.getName(), depConfig);
-            }
+            result.put(depConfig.getName(), depConfig);
         }
         return Collections.unmodifiableSortedMap(result);
     }

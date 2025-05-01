@@ -23,6 +23,7 @@ import javax.annotation.Nullable;
 import org.gradle.api.Action;
 import org.gradle.api.Project;
 import org.gradle.api.Task;
+import org.gradle.jvm.toolchain.JavaToolchainService;
 
 import com.thomasjensen.checkstyle.addons.build.BuildUtil;
 import com.thomasjensen.checkstyle.addons.build.DependencyConfig;
@@ -42,6 +43,8 @@ public abstract class AbstractTaskConfigAction<T extends Task>
 
     protected Project project;
 
+    protected JavaToolchainService javaToolchainService;
+
     protected BuildUtil buildUtil;
 
 
@@ -49,15 +52,18 @@ public abstract class AbstractTaskConfigAction<T extends Task>
     protected AbstractTaskConfigAction()
     {
         depConfig = null;
+        javaToolchainService = null;
         extraParams = null;
     }
 
 
 
     protected AbstractTaskConfigAction(@Nonnull final DependencyConfig pDepConfig,
+        @Nonnull final JavaToolchainService pJavaToolchainService,
         @Nullable final Object... pExtraParams)
     {
         depConfig = Objects.requireNonNull(pDepConfig);
+        javaToolchainService = pJavaToolchainService;
         extraParams = pExtraParams;
     }
 

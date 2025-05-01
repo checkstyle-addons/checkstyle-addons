@@ -19,6 +19,7 @@ import java.io.File;
 import java.io.IOException;
 import java.util.Arrays;
 import javax.annotation.Nonnull;
+import javax.inject.Inject;
 
 import com.github.jengelman.gradle.plugins.shadow.tasks.ShadowJar;
 import org.eclipse.jgit.api.Git;
@@ -49,6 +50,7 @@ import org.gradle.api.tasks.TaskProvider;
 import org.gradle.api.tasks.bundling.Jar;
 import org.gradle.api.tasks.javadoc.Javadoc;
 import org.gradle.api.tasks.testing.Test;
+import org.gradle.jvm.toolchain.JavaToolchainService;
 import org.gradle.language.base.plugins.LifecycleBasePlugin;
 
 import com.thomasjensen.checkstyle.addons.build.tasks.GeneratePomConfigAction;
@@ -75,6 +77,15 @@ public class BuildPlugin
 
 
 
+    @Inject
+    protected JavaToolchainService getJavaToolchainService()
+    {
+        // Method body is ignored
+        throw new UnsupportedOperationException();
+    }
+
+
+
     @Override
     public void apply(final Project pRootProject)
     {
@@ -85,7 +96,7 @@ public class BuildPlugin
 
         provideGitInfos(project);
         final DependencyConfigs depConfigs = new DependencyConfigs(pRootProject);
-        new JavaLevelUtil(project).analyzeJavaLevels();
+
         project.getTasks().register(VersionFileTask.TASK_NAME, VersionFileTask.class)
             .configure(VersionFileTask::konfigure);
         establishSonarQubeSourceSet(project);
@@ -99,7 +110,10 @@ public class BuildPlugin
                 depConfigs.getDefault().getCheckstyleBaseVersion());
         });
 
-        final TaskCreator taskCreator = new TaskCreator(project);
+        if (getJavaToolchainService() == null) {
+            throw new GradleException("Bug: Failed to inject JavaToolchainService");
+        }
+        final TaskCreator taskCreator = new TaskCreator(project, getJavaToolchainService());
         for (DependencyConfig depConfig : depConfigs.getAll().values()) {
             if (!depConfig.isDefaultConfig()) {
                 taskCreator.setupBuildTasks(depConfig);
@@ -223,7 +237,7 @@ public class BuildPlugin
     private void configureDefaultJavadocTask(final Project pRootProject, final DependencyConfigs pDepConfigs)
     {
         pRootProject.getTasks().named("javadoc", Javadoc.class).configure(javadocTask ->
-            new JavadocConfigAction(pDepConfigs.getDefault())
+            new JavadocConfigAction(pDepConfigs.getDefault(), getJavaToolchainService())
                 .configureJavadocTask(javadocTask, pDepConfigs.getDefault()));
     }
 
@@ -271,7 +285,7 @@ public class BuildPlugin
             });
 
             buildUtil.getTaskProvider(TaskNames.generatePomFileForCheckstyleAddonsPublication, GenerateMavenPom.class,
-                depConfig).configure(new GeneratePomConfigAction(depConfig));
+                depConfig).configure(new GeneratePomConfigAction(depConfig, getJavaToolchainService()));
         }
 
         if (pProject.hasProperty("signing.gnupg.keyName.thomasjensen.com")) {

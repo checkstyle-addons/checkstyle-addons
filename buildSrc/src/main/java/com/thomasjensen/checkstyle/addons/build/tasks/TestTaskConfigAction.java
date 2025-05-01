@@ -31,6 +31,7 @@ import org.gradle.api.tasks.TaskProvider;
 import org.gradle.api.tasks.compile.AbstractCompile;
 import org.gradle.api.tasks.compile.JavaCompile;
 import org.gradle.api.tasks.testing.Test;
+import org.gradle.jvm.toolchain.JavaToolchainService;
 import org.gradle.language.base.plugins.LifecycleBasePlugin;
 import org.gradle.testing.jacoco.plugins.JacocoPluginExtension;
 import org.gradle.testing.jacoco.plugins.JacocoTaskExtension;
@@ -38,8 +39,8 @@ import org.gradle.testing.jacoco.plugins.JacocoTaskExtension;
 import com.thomasjensen.checkstyle.addons.build.BuildUtil;
 import com.thomasjensen.checkstyle.addons.build.ClasspathBuilder;
 import com.thomasjensen.checkstyle.addons.build.DependencyConfig;
-import com.thomasjensen.checkstyle.addons.build.JavaLevelUtil;
 import com.thomasjensen.checkstyle.addons.build.TaskNames;
+import com.thomasjensen.checkstyle.addons.build.ToolchainSpecAction;
 
 
 /**
@@ -52,9 +53,10 @@ public class TestTaskConfigAction
 
 
 
-    public TestTaskConfigAction(@Nonnull DependencyConfig pDepConfig, @Nonnull final String pCsVersion)
+    public TestTaskConfigAction(@Nonnull DependencyConfig pDepConfig,
+        @Nonnull final JavaToolchainService pJavaToolchainService, @Nonnull final String pCsVersion)
     {
-        super(pDepConfig, pCsVersion);
+        super(pDepConfig, pJavaToolchainService, pCsVersion);
     }
 
 
@@ -129,11 +131,7 @@ public class TestTaskConfigAction
         jacoco.setEnabled(false);
 
         pTestTask.setClasspath(new ClasspathBuilder(project).buildTestExecutionClasspath(pDepConfig, csVersion));
-
-        final JavaLevelUtil javaLevelUtil = new JavaLevelUtil(project);
-        if (javaLevelUtil.isOlderSupportedJava(javaLevel)) {
-            pTestTask.setExecutable(javaLevelUtil.getJvmExecutable(javaLevel));
-        }
+        pTestTask.getJavaLauncher().set(javaToolchainService.launcherFor(new ToolchainSpecAction(javaLevel)));
 
         // Make the Checkstyle version available to the test cases via a system property.
         pTestTask.systemProperty(CSVERSION_SYSPROP_NAME, csVersion);

@@ -29,12 +29,13 @@ import org.gradle.api.tasks.SourceSet;
 import org.gradle.api.tasks.compile.JavaCompile;
 import org.gradle.api.tasks.javadoc.Javadoc;
 import org.gradle.external.javadoc.StandardJavadocDocletOptions;
+import org.gradle.jvm.toolchain.JavaToolchainService;
 
 import com.thomasjensen.checkstyle.addons.build.BuildUtil;
 import com.thomasjensen.checkstyle.addons.build.ClasspathBuilder;
 import com.thomasjensen.checkstyle.addons.build.DependencyConfig;
-import com.thomasjensen.checkstyle.addons.build.JavaLevelUtil;
 import com.thomasjensen.checkstyle.addons.build.TaskNames;
+import com.thomasjensen.checkstyle.addons.build.ToolchainSpecAction;
 
 
 /**
@@ -43,9 +44,10 @@ import com.thomasjensen.checkstyle.addons.build.TaskNames;
 public class JavadocConfigAction
     extends AbstractTaskConfigAction<Javadoc>
 {
-    public JavadocConfigAction(@Nonnull DependencyConfig pDepConfig)
+    public JavadocConfigAction(@Nonnull DependencyConfig pDepConfig,
+        @Nonnull final JavaToolchainService pJavaToolchainService)
     {
-        super(pDepConfig);
+        super(pDepConfig, pJavaToolchainService);
     }
 
 
@@ -70,10 +72,7 @@ public class JavadocConfigAction
 
         configureJavadocTask(pJavadocTask, pDepConfig);
 
-        final JavaLevelUtil javaLevelUtil = new JavaLevelUtil(project);
-        if (javaLevelUtil.isOlderSupportedJava(javaLevel)) {
-            pJavadocTask.setExecutable(javaLevelUtil.getJavadocExecutable(javaLevel));
-        }
+        pJavadocTask.getJavadocTool().set(javaToolchainService.javadocToolFor(new ToolchainSpecAction(javaLevel)));
     }
 
 

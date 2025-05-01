@@ -26,6 +26,7 @@ import org.gradle.api.artifacts.Dependency;
 import org.gradle.api.artifacts.DependencyArtifact;
 import org.gradle.api.artifacts.ExternalDependency;
 import org.gradle.api.publish.maven.tasks.GenerateMavenPom;
+import org.gradle.jvm.toolchain.JavaToolchainService;
 
 import com.thomasjensen.checkstyle.addons.build.BuildUtil;
 import com.thomasjensen.checkstyle.addons.build.ClasspathBuilder;
@@ -38,9 +39,10 @@ import com.thomasjensen.checkstyle.addons.build.DependencyConfig;
 public class GeneratePomConfigAction
     extends AbstractTaskConfigAction<GenerateMavenPom>
 {
-    public GeneratePomConfigAction(@Nonnull final DependencyConfig pDepConfig)
+    public GeneratePomConfigAction(@Nonnull final DependencyConfig pDepConfig,
+        @Nonnull final JavaToolchainService pJavaToolchainService)
     {
-        super(pDepConfig);
+        super(pDepConfig, pJavaToolchainService);
     }
 
 

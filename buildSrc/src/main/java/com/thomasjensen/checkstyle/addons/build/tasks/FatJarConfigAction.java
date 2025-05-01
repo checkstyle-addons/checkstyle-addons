@@ -28,6 +28,7 @@ import org.gradle.api.artifacts.Configuration;
 import org.gradle.api.artifacts.ResolvedDependency;
 import org.gradle.api.tasks.SourceSet;
 import org.gradle.api.tasks.bundling.Jar;
+import org.gradle.jvm.toolchain.JavaToolchainService;
 
 import com.thomasjensen.checkstyle.addons.build.ClasspathBuilder;
 import com.thomasjensen.checkstyle.addons.build.DependencyConfig;
@@ -41,9 +42,10 @@ import com.thomasjensen.checkstyle.addons.build.TaskNames;
 public class FatJarConfigAction
     extends AbstractTaskConfigAction<ShadowJar>
 {
-    public FatJarConfigAction(@Nonnull DependencyConfig pDepConfig)
+    public FatJarConfigAction(@Nonnull DependencyConfig pDepConfig,
+        @Nonnull final JavaToolchainService pJavaToolchainService)
     {
-        super(pDepConfig);
+        super(pDepConfig, pJavaToolchainService);
     }
 
 

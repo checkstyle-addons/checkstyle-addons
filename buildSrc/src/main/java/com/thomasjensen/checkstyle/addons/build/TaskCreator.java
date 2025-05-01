@@ -35,6 +35,7 @@ import org.gradle.api.tasks.bundling.Jar;
 import org.gradle.api.tasks.compile.JavaCompile;
 import org.gradle.api.tasks.javadoc.Javadoc;
 import org.gradle.api.tasks.testing.Test;
+import org.gradle.jvm.toolchain.JavaToolchainService;
 import org.gradle.language.base.plugins.LifecycleBasePlugin;
 
 import com.thomasjensen.checkstyle.addons.build.tasks.CompileConfigAction;
@@ -65,6 +66,8 @@ public class TaskCreator
 
     private final Project project;
 
+    private final JavaToolchainService javaToolchainService;
+
     private final BuildUtil buildUtil;
 
 
@@ -74,10 +77,11 @@ public class TaskCreator
      *
      * @param pProject the Gradle root project
      */
-    public TaskCreator(@Nonnull final Project pProject)
+    public TaskCreator(@Nonnull final Project pProject, @Nonnull final JavaToolchainService pJavaToolchainService)
     {
         project = pProject;
         buildUtil = new BuildUtil(pProject);
+        javaToolchainService = pJavaToolchainService;
     }
 
 
@@ -96,14 +100,15 @@ public class TaskCreator
 
         // test
         final TaskProvider<Test> testTaskProvider = tasks.register(TaskNames.test.getName(pDepConfig), Test.class);
-        testTaskProvider.configure(new TestTaskConfigAction(pDepConfig, pDepConfig.getCheckstyleBaseVersion()));
+        testTaskProvider.configure(
+            new TestTaskConfigAction(pDepConfig, javaToolchainService, pDepConfig.getCheckstyleBaseVersion()));
         final TaskProvider<Task> checkTaskProvider = tasks.named(JavaBasePlugin.CHECK_TASK_NAME);
         checkTaskProvider.configure(checkTask -> checkTask.dependsOn(testTaskProvider));
 
         // javadoc
         final TaskProvider<Javadoc> javadocTaskProvider =
             tasks.register(TaskNames.javadoc.getName(pDepConfig), Javadoc.class);
-        javadocTaskProvider.configure(new JavadocConfigAction(pDepConfig));
+        javadocTaskProvider.configure(new JavadocConfigAction(pDepConfig, javaToolchainService));
     }
 
 
@@ -117,7 +122,7 @@ public class TaskCreator
         final SourceSet sourceSet = buildUtil.getSourceSet(pSourceSetName);
         final TaskProvider<JavaCompile> compileTaskProvider =
             tasks.register(pCompileTaskName.getName(pDepConfig), JavaCompile.class);
-        compileTaskProvider.configure(new CompileConfigAction(pDepConfig, sourceSet));
+        compileTaskProvider.configure(new CompileConfigAction(pDepConfig, sourceSet, javaToolchainService));
 
         final TaskProvider<Task> classesTaskProvider = tasks.register(pClassesTaskName.getName(pDepConfig));
         classesTaskProvider.configure(classesTask -> {
@@ -152,7 +157,7 @@ public class TaskCreator
 
                 final TaskProvider<Test> testTaskProvider =
                     tasks.register(TaskNames.xtest.getName(depConfig, csRuntimeVersion), Test.class);
-                testTaskProvider.configure(new TestTaskConfigAction(depConfig, csRuntimeVersion));
+                testTaskProvider.configure(new TestTaskConfigAction(depConfig, javaToolchainService, csRuntimeVersion));
                 testTaskProvider.configure(testTask -> {
                     testTask.setGroup(XTEST_GROUP_NAME);
                     testTask.setDescription("Run the unit tests compiled for Checkstyle " + csBaseVersion
@@ -194,34 +199,34 @@ public class TaskCreator
             // 'jar' task
             final String jarTaskName = TaskNames.jar.getName(depConfig);
             final TaskProvider<Jar> jarTaskProvider = tasks.register(jarTaskName, Jar.class);
-            jarTaskProvider.configure(new JarConfigAction(depConfig));
+            jarTaskProvider.configure(new JarConfigAction(depConfig, javaToolchainService));
 
             // 'fatjar' task
             final String fatjarTaskName = TaskNames.fatJar.getName(depConfig);
             final TaskProvider<ShadowJar> shadowJarTaskProvider = tasks.register(fatjarTaskName, ShadowJar.class);
-            shadowJarTaskProvider.configure(new FatJarConfigAction(depConfig));
+            shadowJarTaskProvider.configure(new FatJarConfigAction(depConfig, javaToolchainService));
 
             // 'jarSources' task
             final String jarSourcesTaskName = TaskNames.jarSources.getName(depConfig);
             final TaskProvider<Jar> jarSourcesTaskProvider = tasks.register(jarSourcesTaskName, Jar.class);
-            jarSourcesTaskProvider.configure(new JarSourcesConfigAction(depConfig));
+            jarSourcesTaskProvider.configure(new JarSourcesConfigAction(depConfig, javaToolchainService));
 
             // 'jarJavadoc' task
             final String jarJavadocTaskName = TaskNames.jarJavadoc.getName(depConfig);
             final TaskProvider<Jar> jarJavadocTaskProvider = tasks.register(jarJavadocTaskName, Jar.class);
-            jarJavadocTaskProvider.configure(new JarJavadocConfigAction(depConfig));
+            jarJavadocTaskProvider.configure(new JarJavadocConfigAction(depConfig, javaToolchainService));
 
             // 'jarEclipse' task
             final String eclipseTaskName = TaskNames.jarEclipse.getName(depConfig);
             final TaskProvider<Jar> jarEclipseTaskProvider = tasks.register(eclipseTaskName, Jar.class);
-            jarEclipseTaskProvider.configure(new JarEclipseConfigAction(depConfig));
+            jarEclipseTaskProvider.configure(new JarEclipseConfigAction(depConfig, javaToolchainService));
 
             // 'jarSonarqube' task
             TaskProvider<ShadowJar> jarSqTaskProvider = null;
             if (depConfig.isSonarQubeSupported()) {
                 final String sqTaskName = TaskNames.jarSonarqube.getName(depConfig);
                 jarSqTaskProvider = tasks.register(sqTaskName, ShadowJar.class);
-                jarSqTaskProvider.configure(new JarSonarqubeConfigAction(depConfig));
+                jarSqTaskProvider.configure(new JarSonarqubeConfigAction(depConfig, javaToolchainService));
             }
             final TaskProvider<ShadowJar> jarSqTaskProviderFinal = jarSqTaskProvider;
 
