@@ -100,6 +100,7 @@ public class BuildPlugin
         project.getTasks().register(VersionFileTask.TASK_NAME, VersionFileTask.class)
             .configure(VersionFileTask::konfigure);
         establishSonarQubeSourceSet(project);
+        establishTest17SourceSet(project);
         establishGeneralCompileOnlyCfg(project);
 
         project.getTasks().named(JavaPlugin.TEST_TASK_NAME, Test.class).configure(testTask -> {
@@ -215,6 +216,33 @@ public class BuildPlugin
             pRootProject.files(sqSourceSet.getOutput().getResourcesDir()));
         testSourceSet.setCompileClasspath(testSourceSet.getCompileClasspath().plus(sqOutputs));
         testSourceSet.setRuntimeClasspath(testSourceSet.getRuntimeClasspath().plus(sqOutputs));
+    }
+
+
+
+    private void establishTest17SourceSet(final Project pRootProject)
+    {
+        final JavaPluginExtension javaExt = pRootProject.getExtensions().getByType(JavaPluginExtension.class);
+        final SourceSetContainer sourceSets = javaExt.getSourceSets();
+        final ConfigurationContainer configs = pRootProject.getConfigurations();
+
+        final SourceSet testSourceSet = sourceSets.getByName(SourceSet.TEST_SOURCE_SET_NAME);
+        final SourceSet test17SourceSet = sourceSets.create(BuildUtil.TEST17_SOURCE_SET_NAME);
+
+        configs.named(testSourceSet.getImplementationConfigurationName()).configure(testImplementation ->
+            testImplementation.extendsFrom(configs.getByName(test17SourceSet.getImplementationConfigurationName())));
+        configs.named(testSourceSet.getRuntimeOnlyConfigurationName()).configure(testRuntimeOnly ->
+            testRuntimeOnly.extendsFrom(configs.getByName(test17SourceSet.getRuntimeOnlyConfigurationName())));
+
+        final TaskContainer tasks = pRootProject.getTasks();
+
+        tasks.named(test17SourceSet.getClassesTaskName()).configure(test17TestTask ->
+            test17TestTask.dependsOn(JavaPlugin.COMPILE_TEST_JAVA_TASK_NAME));
+
+        final FileCollection test17Outputs = test17SourceSet.getOutput().getClassesDirs().plus(
+            pRootProject.files(test17SourceSet.getOutput().getResourcesDir()));
+        test17SourceSet.setCompileClasspath(testSourceSet.getCompileClasspath().plus(test17Outputs));
+        test17SourceSet.setRuntimeClasspath(testSourceSet.getRuntimeClasspath().plus(test17Outputs));
     }
 
 

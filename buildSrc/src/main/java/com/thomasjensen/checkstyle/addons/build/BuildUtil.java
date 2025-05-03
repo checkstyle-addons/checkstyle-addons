@@ -48,6 +48,9 @@ public final class BuildUtil
     /** the name of our 'sonarqube' source set */
     public static final String SONARQUBE_SOURCE_SET_NAME = "sonarqube";
 
+    /** the name of our 'test17' source set */
+    public static final String TEST17_SOURCE_SET_NAME = "test17";
+
     private final Project project;
 
     private final String version;
