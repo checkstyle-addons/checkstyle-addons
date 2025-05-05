@@ -26,56 +26,59 @@ jobs:
             env:
                 DEBIAN_FRONTEND: noninteractive
         steps:
-            - name: upgrade-git
+            - name: 'upgrade-git'
               run: |
-                  apt-get update -y
-                  apt-get install -y software-properties-common apt-transport-https
+                  apt-get update
+                  apt-get install -y software-properties-common apt-transport-https gnupg
                   add-apt-repository -y ppa:git-core/ppa
                   apt-get update
                   apt-get install -y git
+                  echo "SAVE_JAVA_HOME=${JAVA_HOME}" >> "$GITHUB_ENV"
+                  echo "SAVE_PATH=${PATH}" >> "$GITHUB_ENV"
 
-            - name: add-jdk7
-              run: |
-                  apt-get -y install gnupg
-                  apt-key adv --keyserver hkp://keyserver.ubuntu.com:80 --recv-keys 0xB1998361219BD9C9
-                  curl -LO https://cdn.azul.com/zulu/bin/zulu-repo_1.0.0-3_all.deb
-                  apt-get install ./zulu-repo_1.0.0-3_all.deb
-                  apt-get update
-                  apt-get install -y zulu7-jdk
+            - name: 'add-jdk7'
+              uses: actions/setup-java@v4
+              with:
+                  distribution: zulu
+                  java-version: 7
 
-            - name: add-jdk8
-              run: |
-                  curl -L -o - https://packages.adoptium.net/artifactory/api/gpg/key/public | gpg --dearmor | tee /etc/apt/trusted.gpg.d/adoptium.gpg > /dev/null
-                  echo "deb https://packages.adoptium.net/artifactory/deb $(awk -F= '/^VERSION_CODENAME/{print$2}' /etc/os-release) main" | tee /etc/apt/sources.list.d/adoptium.list
-                  apt-get update
-                  apt-get install -y temurin-8-jdk
-
-            - name: add-jdk11
-              run: |
-                  apt-get install -y temurin-11-jdk
+            - name: 'add-jdk8, add-jdk11'
+              uses: actions/setup-java@v4
+              with:
+                  distribution: temurin
+                  java-version: |
+                      8
+                      11
 
             - uses: actions/checkout@v4
 
             - name: versions
               run: |
+                  export JAVA_HOME=$SAVE_JAVA_HOME
+                  export PATH=$SAVE_PATH
+                  echo JAVA_HOME=${JAVA_HOME}
                   echo PATH=${PATH}
                   git --version
-                  echo JAVA_HOME=${JAVA_HOME}
-                  ls -l ${JAVA_HOME}/bin/java
+                  echo '---'
                   java -version
-                  ls -l /usr/lib/jvm/zulu7/bin
-                  /usr/lib/jvm/zulu7/bin/java -version
-                  ls -l /usr/lib/jvm/temurin-8-jdk-amd64/bin
-                  /usr/lib/jvm/temurin-8-jdk-amd64/bin/java -version
-                  ls -l /usr/lib/jvm/temurin-11-jdk-amd64/bin
-                  /usr/lib/jvm/temurin-11-jdk-amd64/bin/java -version
-                  gradle javaToolchains
+                  echo '---'
+                  ${JAVA_HOME_7_X64}/bin/java -version
+                  echo '---'
+                  ${JAVA_HOME_8_X64}/bin/java -version
+                  echo '---'
+                  ${JAVA_HOME_11_X64}/bin/java -version
+                  echo '---'
+                  export EXTRA_JDKS="-Porg.gradle.java.installations.paths=${JAVA_HOME_7_X64},${JAVA_HOME_8_X64},${JAVA_HOME_11_X64}"
+                  echo "EXTRA_JDKS=${EXTRA_JDKS}" >> "$GITHUB_ENV"
+                  gradle ${EXTRA_JDKS} javaToolchains
 
             - name: build
               run: |
-                  gradle --warning-mode all clean
-                  gradle --warning-mode all build site
-                  gradle --warning-mode all jacocoTestReport
+                  export JAVA_HOME=$SAVE_JAVA_HOME
+                  export PATH=$SAVE_PATH
+                  gradle ${EXTRA_JDKS} --warning-mode all clean
+                  gradle ${EXTRA_JDKS} --warning-mode all build site
+                  gradle ${EXTRA_JDKS} --warning-mode all jacocoTestReport
 
             - name: codecov
               env:
