@@ -17,6 +17,7 @@ package com.thomasjensen.checkstyle.addons.build;
 
 import java.io.File;
 import java.io.IOException;
+import java.nio.charset.StandardCharsets;
 import java.util.Arrays;
 import javax.annotation.Nonnull;
 import javax.inject.Inject;
@@ -28,6 +29,7 @@ import org.eclipse.jgit.errors.InvalidPatternException;
 import org.eclipse.jgit.lib.Repository;
 import org.eclipse.jgit.storage.file.FileRepositoryBuilder;
 import org.gradle.api.GradleException;
+import org.gradle.api.JavaVersion;
 import org.gradle.api.NamedDomainObjectProvider;
 import org.gradle.api.Plugin;
 import org.gradle.api.Project;
@@ -48,6 +50,8 @@ import org.gradle.api.tasks.SourceSetContainer;
 import org.gradle.api.tasks.TaskContainer;
 import org.gradle.api.tasks.TaskProvider;
 import org.gradle.api.tasks.bundling.Jar;
+import org.gradle.api.tasks.compile.CompileOptions;
+import org.gradle.api.tasks.compile.JavaCompile;
 import org.gradle.api.tasks.javadoc.Javadoc;
 import org.gradle.api.tasks.testing.Test;
 import org.gradle.jvm.toolchain.JavaToolchainService;
@@ -110,6 +114,7 @@ public class BuildPlugin
             testTask.systemProperty(TestTaskConfigAction.CSVERSION_SYSPROP_NAME,
                 depConfigs.getDefault().getCheckstyleBaseVersion());
         });
+        registerTest17Task(project);
 
         if (getJavaToolchainService() == null) {
             throw new GradleException("Bug: Failed to inject JavaToolchainService");
@@ -130,6 +135,17 @@ public class BuildPlugin
 
         configurePrintDepConfigsTask(project, depConfigs);
         configureSiteTasks(project);
+    }
+
+
+
+    private void registerTest17Task(@Nonnull final Project pProject)
+    {
+        final TaskContainer tasks = pProject.getTasks();
+        final TaskProvider<Test> testTaskProvider = tasks.register("test17", Test.class);
+        testTaskProvider.configure(t -> {
+            // TODO
+        });
     }
 
 
@@ -226,23 +242,36 @@ public class BuildPlugin
         final SourceSetContainer sourceSets = javaExt.getSourceSets();
         final ConfigurationContainer configs = pRootProject.getConfigurations();
 
+        final SourceSet mainSourceSet = sourceSets.getByName(SourceSet.MAIN_SOURCE_SET_NAME);
         final SourceSet testSourceSet = sourceSets.getByName(SourceSet.TEST_SOURCE_SET_NAME);
         final SourceSet test17SourceSet = sourceSets.create(BuildUtil.TEST17_SOURCE_SET_NAME);
 
-        configs.named(testSourceSet.getImplementationConfigurationName()).configure(testImplementation ->
-            testImplementation.extendsFrom(configs.getByName(test17SourceSet.getImplementationConfigurationName())));
-        configs.named(testSourceSet.getRuntimeOnlyConfigurationName()).configure(testRuntimeOnly ->
-            testRuntimeOnly.extendsFrom(configs.getByName(test17SourceSet.getRuntimeOnlyConfigurationName())));
+        configs.named(test17SourceSet.getImplementationConfigurationName()).configure(testImplementation ->
+            testImplementation.extendsFrom(configs.getByName(testSourceSet.getImplementationConfigurationName())));
+        configs.named(test17SourceSet.getRuntimeOnlyConfigurationName()).configure(testRuntimeOnly ->
+            testRuntimeOnly.extendsFrom(configs.getByName(testSourceSet.getRuntimeOnlyConfigurationName())));
 
         final TaskContainer tasks = pRootProject.getTasks();
 
-        tasks.named(test17SourceSet.getClassesTaskName()).configure(test17TestTask ->
-            test17TestTask.dependsOn(JavaPlugin.COMPILE_TEST_JAVA_TASK_NAME));
+        tasks.named(test17SourceSet.getCompileTaskName("java")).configure(test17CompileTask ->
+            test17CompileTask.dependsOn(JavaPlugin.COMPILE_TEST_JAVA_TASK_NAME));
 
-        final FileCollection test17Outputs = test17SourceSet.getOutput().getClassesDirs().plus(
-            pRootProject.files(test17SourceSet.getOutput().getResourcesDir()));
-        test17SourceSet.setCompileClasspath(testSourceSet.getCompileClasspath().plus(test17Outputs));
-        test17SourceSet.setRuntimeClasspath(testSourceSet.getRuntimeClasspath().plus(test17Outputs));
+        final FileCollection testOutputs = testSourceSet.getOutput().getClassesDirs().plus(
+            pRootProject.files(testSourceSet.getOutput().getResourcesDir()));
+        final FileCollection mainOutputs = mainSourceSet.getOutput().getClassesDirs().plus(
+            pRootProject.files(mainSourceSet.getOutput().getResourcesDir()));
+        test17SourceSet.setCompileClasspath(test17SourceSet.getCompileClasspath().plus(testOutputs).plus(mainOutputs));
+        test17SourceSet.setRuntimeClasspath(test17SourceSet.getRuntimeClasspath().plus(testOutputs).plus(mainOutputs));
+
+        tasks.named(test17SourceSet.getCompileTaskName("java"), JavaCompile.class)
+            .configure((final JavaCompile compileTask) -> {
+                compileTask.getJavaCompiler()
+                    .set(getJavaToolchainService().compilerFor(new ToolchainSpecAction(JavaVersion.VERSION_17)));
+                final CompileOptions options = compileTask.getOptions();
+                options.getRelease().set(17);
+                options.setEncoding(StandardCharsets.UTF_8.toString());
+                options.setDeprecation(true);  // show deprecation warnings in compiler output
+            });
     }
 
 
@@ -253,11 +282,12 @@ public class BuildPlugin
         final Configuration generalCompileOnly = configs.create(GENERAL_COMPILE_ONLY_CONFIG_NAME);
 
         Arrays.asList(SourceSet.MAIN_SOURCE_SET_NAME, BuildUtil.SONARQUBE_SOURCE_SET_NAME,
-            SourceSet.TEST_SOURCE_SET_NAME).forEach((@Nonnull final String pSourceSetName) -> {
-            final SourceSet sourceSet = buildUtil.getSourceSet(pSourceSetName);
-            configs.named(sourceSet.getCompileOnlyConfigurationName()).configure(compileOnly ->
-                compileOnly.extendsFrom(generalCompileOnly));
-        });
+            SourceSet.TEST_SOURCE_SET_NAME, BuildUtil.TEST17_SOURCE_SET_NAME).forEach(
+            (@Nonnull final String pSourceSetName) -> {
+                final SourceSet sourceSet = buildUtil.getSourceSet(pSourceSetName);
+                configs.named(sourceSet.getCompileOnlyConfigurationName()).configure(compileOnly ->
+                    compileOnly.extendsFrom(generalCompileOnly));
+            });
     }
 
 

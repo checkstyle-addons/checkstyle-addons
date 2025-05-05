@@ -15,10 +15,30 @@ package com.thomasjensen.checkstyle.addons.checks.coding;
  * program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+import com.puppycrawl.tools.checkstyle.DefaultConfiguration;
+import org.junit.Test;
+
+import com.thomasjensen.checkstyle.addons.BaseCheckTestSupport;
+
+
 /**
  * Unit tests of {@link LostInstanceCheck} which require Java 17, or at least a Java level greater than 11.
  */
 public class LostInstanceCheckTest
     extends BaseCheckTestSupport
 {
+    public LostInstanceCheckTest()
+    {
+        setCheckShortname(LostInstanceCheck.class);
+    }
+
+
+
+    @Test
+    public void testIssue4() throws Exception
+    {
+        final DefaultConfiguration checkConfig = createCheckConfig(LostInstanceCheck.class);
+        final String[] expected = {};
+        verify(checkConfig, getPath("coding/InputLostInstance17.java"), expected);
+    }
 }
