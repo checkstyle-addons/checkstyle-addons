@@ -60,38 +60,30 @@ In order to build {{ site.name }} yourself, follow these steps:
 
  1. Make sure you have the prerequisites set up:
    - [Git](https://git-scm.com/){:target="_blank"}
-   - [Java 11 SDK](https://adoptium.net/?variant=openjdk11){:target="_blank"},
+   - [Java 17 SDK](https://adoptium.net/?variant=openjdk17){:target="_blank"},
      which must be used to run the build process
+   - [Java 11 SDK](https://adoptium.net/?variant=openjdk11){:target="_blank"}
    - [Java 8 SDK](https://adoptium.net/?variant=openjdk8){:target="_blank"}
    - [Java 7 SDK](https://www.azul.com/downloads/?version=java-7-lts&package=jdk#download-openjdk){:target="_blank"}
 
-    In order to do a full build of {{ site.name }}, we actually need all three JDKs at the same time. It's no problem
+    In order to do a full build of {{ site.name }}, we actually need all JDKs at the same time. It's no problem
     to have them all installed as long as each has its own distinct directory. The build process itself *must* run on
-    Java&nbsp;11. It is basically possible to skip installing the other JDKs, but then the build will not create
-    artifacts compatible with older versions of Java or older Versions of Checkstyle.
+    Java&nbsp;17. It is basically possible to skip installing the other JDKs, in which case Gradle will try to
+    procure them for you.
 
- 1. Make sure that your environment variable `JAVA_HOME` points to the Java&nbsp;11 SDK, for example
-    `C:\PROGRA~1\Java\jdk-11.0.11.9-hotspot` (Windows).
+ 1. Make sure that your environment variable `JAVA_HOME` points to the Java&nbsp;17 SDK, for example
+    `C:\PROGRA~1\Java\jdk-17.0.5+8` (Windows).
  1. If you don't have a Gradle User Home yet, set it up by creating an empty directory called `.gradle` somewhere,
     for example `D:\.gradle` (Windows) or `~/.gradle` (Unix). Create an environment variable `GRADLE_USER_HOME` which
     points to this directory. It may grow quite large over time, because Gradle uses it to cache all downloaded stuff.
     Mine is almost 10&nbsp;GB. All Gradle processes, including your IDE, should see this environment variable.
- 1. Create an empty text file in `$GRADLE_USER_HOME` called `gradle.properties`. Inside, add the following lines:
+ 1. (optional) Create an empty text file in `$GRADLE_USER_HOME` called `gradle.properties`. Inside, add the following
+    lines:
 
         org.gradle.daemon=true
         org.gradle.jvmargs=-Xmx3062m -XX:MaxPermSize=384m
-        checkstyleaddons_jdk7_java=C:/PROGRA~1/Java/zulu-7/bin/java.exe
-        checkstyleaddons_jdk7_javac=C:/PROGRA~1/Java/zulu-7/bin/javac.exe
-        checkstyleaddons_jdk7_javadoc=C:/PROGRA~1/Java/zulu-7/bin/javadoc.exe
-        checkstyleaddons_jdk8_java=C:/PROGRA~1/Java/jdk-8.0.302.8-hotspot/bin/java.exe
-        checkstyleaddons_jdk8_javac=C:/PROGRA~1/Java/jdk-8.0.302.8-hotspot/bin/javac.exe
-        checkstyleaddons_jdk8_javadoc=C:/PROGRA~1/Java/jdk-8.0.302.8-hotspot/bin/javadoc.exe
 
-    The first two lines are optional and may be left out if the build works for you. The other lines
-    basically configure where the executables from the lower version JDKs are at. This is used to build
-    artifacts compatible with previous versions of Java. If these properties are missing, those artifacts
-    will not be created. Adjust the paths depending on where you installed your Java&nbsp;7 and Java&nbsp;8 SDKs).
-    The paths should not contain spaces (may still work, but not tested).
+    These lines are optional and may be left out if the build works for you.
  1. Clone the {{ site.name }} repo:\\
     `git clone https://github.com/{{ site.github }}.git`
  1. `cd checkstyle-addons`
@@ -114,6 +106,35 @@ settings are configured correctly:
 - Before running the unit tests from IntelliJ, make sure that the option
   "Add runtime assertions for not-null annotated methods and parameters" is turned *off* in the compiler settings.
   The tests will not run successfully if you forget to do that.
+- Java versions are sometimes not properly imported for some versions of IntelliJ. Consider pressing <kbd>F4</kbd>
+  and double checking the Java versions for all modules:
+
+  <table class="table table-striped" style="width: auto;">
+      <tr>
+          <th>Module</th>
+          <th>Java</th>
+      </tr>
+      <tr>
+          <td>buildSrc</td>
+          <td>17</td>
+      </tr>
+      <tr>
+          <td>main</td>
+          <td>7</td>
+      </tr>
+      <tr>
+          <td>sonarqube</td>
+          <td>11</td>
+      </tr>
+      <tr>
+          <td>test</td>
+          <td>7</td>
+      </tr>
+      <tr>
+          <td>sqtest/main</td>
+          <td>11</td>
+      </tr>
+  </table>
 
 
 <a name="local-jekyll" class="csa-offset-anchor"/>
@@ -176,7 +197,7 @@ there are a small number of criteria that new code must meet:
   - No Checkstyle or SpotBugs violations
   - Full unit test coverage
   - Meaningful documentation
-  
+
 People rely on {{ site.name }} to work as documented, so it is most important to minimize bugs and have good
 documentation. The idea is to provide a stable and correct tool, so fixing known bugs if and when they arise has the
 highest priority (more than new features).
