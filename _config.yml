@@ -48,7 +48,7 @@ latest_version_checkstyle_java7: '6.4.1'
 latest_version_checkstyle_java8a: '8.0'
 latest_version_checkstyle_java8b: '8.21'
 # next line is the highest Checkstyle version tested by the unit tests
-latest_checkstyle_tested: '10.14.1'
+latest_checkstyle_tested: '10.23.1'
 
 # links to external websites that are used in multiple places throughout the site
 link_mavencentral: 'https://central.sonatype.com/search?q=g%3Acom.thomasjensen.checkstyle.addons'
