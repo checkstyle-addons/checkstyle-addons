@@ -18,7 +18,7 @@ url: https://checkstyle-addons.thomasjensen.com
 #     run it like so: jekyll serve --baseurl=''
 baseurl: ''
 
-# This can be '' to hide the Github nav button
+# This can be '' to hide the GitHub nav button
 github: 'checkstyle-addons/checkstyle-addons'
 
 # Set this to your UA-# value, or '' to disable the block completely
@@ -70,5 +70,5 @@ link_cs_type_string: 'https://checkstyle.org/property_types.html#String'
 link_cs_type_stringset: 'https://checkstyle.org/property_types.html#String.5B.5D'
 
 link_sq_home: 'https://www.sonarqube.org/'
-link_sq_relupgradenotes: 'https://docs.sonarsource.com/sonarqube/latest/setup-and-upgrade/release-upgrade-notes/'
+link_sq_relupgradenotes: 'https://docs.sonarsource.com/sonarqube-server/latest/server-upgrade-and-maintenance/release-notes/'
 link_sq_csplugin: 'https://github.com/checkstyle/sonar-checkstyle'

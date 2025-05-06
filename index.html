@@ -6,7 +6,7 @@ sedesc: Additional Checkstyle Checks
 <div class="csa-main-title">
 <div class="hidden-xs">
 <div class="logo"><img src="{{ site.baseurl }}/images/checkstyle-addons-logo-text.png" width="637" height="126" alt="{{ site.name }}" /></div>
-<p class="buttons"><a class="btn btn-primary" href="{{ site.link_central_download }}">Download</a>
+<p class="buttons"><a class="btn btn-primary" href="{{ site.baseurl }}/v{{ site.latest_version }}/download-guide.html">Download</a>
  <a class="btn btn-default btn-outline-inverse"
     href="https://github.com/{{ site.github }}" title="Browse/clone code at GitHub">Sources</a>
 </p>
@@ -16,7 +16,7 @@ sedesc: Additional Checkstyle Checks
 <div class="logo"><img src="{{ site.baseurl }}/images/checkstyle-addons-logo.png" width="118" height="126" alt="{{ site.name }}" /></div>
 <h1>{{ site.name }}</h1>
 <h2>{{ site.description }}</h2>
-<p class="buttons"><a class="btn btn-primary" href="{{ site.link_central_download }}">Download</a>
+<p class="buttons"><a class="btn btn-primary" href="{{ site.baseurl }}/v{{ site.latest_version }}/download-guide.html">Download</a>
  <a class="btn btn-default btn-outline-inverse"
     href="https://github.com/{{ site.github }}" title="Browse/clone code at GitHub">Sources</a>
 </p>
@@ -26,11 +26,11 @@ sedesc: Additional Checkstyle Checks
 <p>{{ site.name }} provides additional detectors for the <a href="{{ site.link_cs_home }}" target="_blank">Checkstyle</a>
 static code analysis tool for Java. It <a href="{{ site.baseurl }}/run.html">integrates</a> with a large number of standard software,
 and is distributed through Maven Central. It is well tested and stable.</p>
- 
+
 <p>{{ site.name }} is free software under the GNU General Public License, version 3
 (<a href="https://www.gnu.org/copyleft/gpl.html" target="_blank">GPLv3</a>).</p>
 
-{% if site.posts.size > 0 %}  
+{% if site.posts.size > 0 %}
 <h2>What's New</h2>
 <div class="whatsnewposts">
 <div class="container-fluid">
@@ -54,7 +54,7 @@ and is distributed through Maven Central. It is well tested and stable.</p>
 </div>
 {% endfor %}
 
-{% if site.posts.size > 2 %}  
+{% if site.posts.size > 2 %}
 <div class="col-sm-2">
 <div class="panel panel-default">
   <div class="panel-heading"><h3 class="panel-title"><a href="{{ site.baseurl }}/whatsnew.html">&raquo; All Blog posts</a></h3></div>
